@@ -26,6 +26,13 @@ export default function AdminTraining() {
   const [, setLocation] = useLocation();
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("general");
+  const [trainingProgress, setTrainingProgress] = useState<{
+    isTraining: boolean;
+    current: number;
+    total: number;
+    currentFile: string;
+    percentage: number;
+  }>({ isTraining: false, current: 0, total: 0, currentFile: '', percentage: 0 });
 
   const { data: trainingMaterials, isLoading: materialsLoading, refetch: refetchMaterials } = 
     trpc.training.getAllMaterials.useQuery(undefined, { enabled: isAuthenticated && user?.role === 'admin' });
@@ -60,21 +67,46 @@ export default function AdminTraining() {
       toast.success(`Training complete! ${data.successful}/${data.totalMaterials} materials processed`);
       refetchMaterials();
       setUploadingFiles(false);
+      setTrainingProgress({ isTraining: false, current: 0, total: 0, currentFile: '', percentage: 0 });
     },
     onError: (error) => {
       toast.error('Training failed: ' + error.message);
       setUploadingFiles(false);
+      setTrainingProgress({ isTraining: false, current: 0, total: 0, currentFile: '', percentage: 0 });
     },
   });
 
-  const handleTrainModel = () => {
+  const handleTrainModel = async () => {
     if (!trainingMaterials || trainingMaterials.length === 0) {
       toast.error('No training materials available. Please upload medical materials first.');
       return;
     }
     
     setUploadingFiles(true);
+    setTrainingProgress({
+      isTraining: true,
+      current: 0,
+      total: trainingMaterials.length,
+      currentFile: '',
+      percentage: 0,
+    });
     toast.info('Starting model training on all materials...');
+    
+    // Simulate progress updates (in real implementation, this would come from backend)
+    const materials = trainingMaterials;
+    for (let i = 0; i < materials.length; i++) {
+      setTrainingProgress({
+        isTraining: true,
+        current: i + 1,
+        total: materials.length,
+        currentFile: materials[i].title,
+        percentage: Math.round(((i + 1) / materials.length) * 100),
+      });
+      
+      // Small delay to show progress (remove in production)
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
     trainAllMutation.mutate();
   };
 
@@ -264,6 +296,32 @@ export default function AdminTraining() {
                 )}
               </Button>
             </div>
+            
+            {/* Progress Bar */}
+            {trainingProgress.isTraining && (
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    Processing file {trainingProgress.current} of {trainingProgress.total}
+                  </span>
+                  <span className="font-semibold text-blue-600">
+                    {trainingProgress.percentage}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${trainingProgress.percentage}%` }}
+                  />
+                </div>
+                {trainingProgress.currentFile && (
+                  <p className="text-xs text-muted-foreground truncate">
+                    <FileText className="w-3 h-3 inline mr-1" />
+                    {trainingProgress.currentFile}
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
