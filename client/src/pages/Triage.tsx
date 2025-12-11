@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Send, Mic, MicOff, ArrowLeft } from "lucide-react";
+import { Loader2, Send, Mic, MicOff, ArrowLeft, FileImage } from "lucide-react";
+import XRayUpload from "@/components/XRayUpload";
 import { useLocation } from "wouter";
 import { Streamdown } from "streamdown";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ export default function Triage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [showXRayUpload, setShowXRayUpload] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);

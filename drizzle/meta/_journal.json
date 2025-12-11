@@ -15,6 +15,13 @@
       "when": 1765452805429,
       "tag": "0001_opposite_sleepwalker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765482983288,
+      "tag": "0002_calm_odin",
+      "breakpoints": true
     }
   ]
 }

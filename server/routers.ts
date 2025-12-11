@@ -4,6 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
+import { invokeDeepSeek, trainOnMedicalMaterial, deepMedicalReasoning } from "./_core/deepseek";
+import { analyzeXRayBackend, analyzeDocumentBackend } from "./_core/gemini";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import { 
@@ -17,6 +19,13 @@ import {
   getVoiceRecordingsByUserId
 } from "./db";
 import { SYSTEM_PROMPT_TRIAGE, SYSTEM_PROMPT_FINAL_ADVICE } from "@shared/localization";
+import { 
+  createTrainingMaterial,
+  createTriageTrainingData,
+  getAllTrainingMaterials,
+  getAllTriageTrainingData,
+  getUntrainedTriageData
+} from "./training-db";
 import { nanoid } from "nanoid";
 
 export const appRouter = router({
@@ -33,7 +42,39 @@ export const appRouter = router({
   }),
 
   triage: router({
-    // Start a new triage conversation
+    // Start a new triage conversation with DeepSeek backend
+    chatDeepSeek: protectedProcedure
+      .input(z.object({
+        messages: z.array(z.object({
+          role: z.enum(['system', 'user', 'assistant']),
+          content: z.string(),
+        })),
+        language: z.enum(['en', 'ar']).default('en'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { messages, language } = input;
+        
+        const systemMessage = {
+          role: 'system' as const,
+          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\nRespond in Arabic.' : ''),
+        };
+        
+        const fullMessages = messages[0]?.role === 'system' 
+          ? messages 
+          : [systemMessage, ...messages];
+
+        const response = await invokeDeepSeek({
+          messages: fullMessages,
+          temperature: 0.7,
+        });
+
+        return {
+          content: response.choices[0]?.message?.content || '',
+          usage: response.usage,
+        };
+      }),
+
+    // Start a new triage conversation (original with built-in LLM)
     chat: protectedProcedure
       .input(z.object({
         messages: z.array(z.object({
@@ -134,9 +175,11 @@ export const appRouter = router({
         redFlags: z.array(z.string()).optional(),
         duration: z.number().optional(),
         messageCount: z.number(),
+        attachedFiles: z.array(z.string()).optional(),
+        xrayImages: z.array(z.string()).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        await createTriageRecord({
+        const result = await createTriageRecord({
           userId: ctx.user.id,
           language: input.language,
           conversationHistory: input.conversationHistory,
@@ -150,7 +193,22 @@ export const appRouter = router({
           messageCount: input.messageCount,
         });
 
-        return { success: true };
+        // Store training data for model improvement
+        const insertResult = result[0] as any;
+        const triageId = insertResult?.insertId || 0;
+        
+        if (triageId) {
+          await createTriageTrainingData({
+            triageRecordId: triageId,
+            conversationJson: input.conversationHistory,
+            symptoms: JSON.stringify(input.symptoms),
+            urgencyLevel: input.urgencyLevel,
+            attachedFiles: JSON.stringify(input.attachedFiles || []),
+            xrayImages: JSON.stringify(input.xrayImages || []),
+          });
+        }
+
+        return { success: true, triageId };
       }),
 
     // Get user's triage history
@@ -244,6 +302,116 @@ export const appRouter = router({
     history: protectedProcedure.query(async ({ ctx }) => {
       return await getVoiceRecordingsByUserId(ctx.user.id);
     }),
+  }),
+
+  training: router({
+    // Add medical training material
+    addMaterial: protectedProcedure
+      .input(z.object({
+        title: z.string(),
+        category: z.string(),
+        source: z.string(),
+        sourceUrl: z.string().optional(),
+        content: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Unauthorized');
+        }
+
+        // Store content to S3
+        const contentBuffer = Buffer.from(input.content, 'utf-8');
+        const storageKey = `training/${nanoid()}.txt`;
+        const { url } = await storagePut(storageKey, contentBuffer, 'text/plain');
+
+        // Process with DeepSeek
+        const analysis = await trainOnMedicalMaterial({
+          title: input.title,
+          content: input.content,
+          category: input.category,
+          source: input.source,
+        });
+
+        await createTrainingMaterial({
+          title: input.title,
+          category: input.category,
+          source: input.source,
+          sourceUrl: input.sourceUrl,
+          content: input.content.substring(0, 5000), // Store excerpt in DB
+          storageKey,
+          storageUrl: url,
+          summary: analysis.summary,
+          keyFindings: JSON.stringify(analysis.keyFindings),
+          clinicalRelevance: analysis.clinicalRelevance,
+          trainingStatus: 'processed',
+        });
+
+        return { success: true, analysis };
+      }),
+
+    // Get all training materials (admin only)
+    getAllMaterials: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      return await getAllTrainingMaterials();
+    }),
+
+    // Get all training data (admin only)
+    getAllTrainingData: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      return await getAllTriageTrainingData();
+    }),
+
+    // Get untrained data for export
+    getUntrainedData: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      return await getUntrainedTriageData();
+    }),
+  }),
+
+  imaging: router({
+    // Analyze X-ray using Gemini (secure backend)
+    analyzeXRay: protectedProcedure
+      .input(z.object({
+        imageBase64: z.string(),
+        mimeType: z.string(),
+        clinicalContext: z.string().optional(),
+        language: z.enum(['en', 'ar']).default('en'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const analysis = await analyzeXRayBackend({
+          imageBase64: input.imageBase64,
+          mimeType: input.mimeType,
+          clinicalContext: input.clinicalContext,
+          language: input.language,
+        });
+
+        return analysis;
+      }),
+
+    // Analyze medical document using Gemini (secure backend)
+    analyzeDocument: protectedProcedure
+      .input(z.object({
+        documentBase64: z.string(),
+        mimeType: z.string(),
+        documentType: z.enum(['lab_report', 'prescription', 'medical_record']),
+        language: z.enum(['en', 'ar']).default('en'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const analysis = await analyzeDocumentBackend({
+          documentBase64: input.documentBase64,
+          mimeType: input.mimeType,
+          documentType: input.documentType,
+          language: input.language,
+        });
+
+        return analysis;
+      }),
   }),
 
   documents: router({

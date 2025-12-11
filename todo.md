@@ -37,3 +37,22 @@
 - [x] Admin dashboard
 - [x] Document upload/viewer
 - [x] Voice recording interface
+
+
+## New Features - API Integration & Cloud Storage
+- [x] Add Gemini API key for backend operations
+- [x] Add DeepSeek API key for backend brain training
+- [x] Implement fluid compute for cost optimization
+- [x] Store all triage questions to cloud
+- [x] Store all symptoms data to cloud
+- [x] Store X-ray images to cloud with metadata
+- [x] Implement medical material training data storage
+- [x] Create DeepSeek training pipeline for medical knowledge
+- [x] Add X-ray analysis using Gemini vision API (secure backend)
+- [ ] Implement training data export for model fine-tuning
+
+## Security Enhancement
+- [x] Move all API keys to backend only (no frontend exposure)
+- [x] Create backend endpoint for Gemini X-ray analysis
+- [x] Remove frontend Gemini API key usage
+- [x] Ensure all AI calls go through backend tRPC procedures
