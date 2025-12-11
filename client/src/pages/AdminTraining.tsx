@@ -55,6 +55,29 @@ export default function AdminTraining() {
     },
   });
 
+  const trainAllMutation = trpc.training.trainAll.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Training complete! ${data.successful}/${data.totalMaterials} materials processed`);
+      refetchMaterials();
+      setUploadingFiles(false);
+    },
+    onError: (error) => {
+      toast.error('Training failed: ' + error.message);
+      setUploadingFiles(false);
+    },
+  });
+
+  const handleTrainModel = () => {
+    if (!trainingMaterials || trainingMaterials.length === 0) {
+      toast.error('No training materials available. Please upload medical materials first.');
+      return;
+    }
+    
+    setUploadingFiles(true);
+    toast.info('Starting model training on all materials...');
+    trainAllMutation.mutate();
+  };
+
   // Redirect if not admin
   if (!isAuthenticated || user?.role !== 'admin') {
     return (
@@ -208,6 +231,41 @@ export default function AdminTraining() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Train Model Button */}
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200 dark:border-blue-800">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-blue-600" />
+                  Train AI Model on Medical Directory
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Process all uploaded medical materials with DeepSeek AI to extract clinical knowledge and update the model
+                </p>
+              </div>
+              <Button
+                onClick={handleTrainModel}
+                disabled={uploadingFiles || !trainingMaterials || trainingMaterials.length === 0}
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {uploadingFiles ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Training...
+                  </>
+                ) : (
+                  <>
+                    <Brain className="w-4 h-4 mr-2" />
+                    Train Model
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Main Interface */}
         <Tabs defaultValue="upload" className="space-y-4">

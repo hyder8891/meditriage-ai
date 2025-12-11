@@ -24,7 +24,8 @@ import {
   createTriageTrainingData,
   getAllTrainingMaterials,
   getAllTriageTrainingData,
-  getUntrainedTriageData
+  getUntrainedTriageData,
+  updateTrainingMaterialStatus
 } from "./training-db";
 import { nanoid } from "nanoid";
 
@@ -397,6 +398,66 @@ export const appRouter = router({
 
         return {
           totalProcessed: results.length,
+          successful: results.filter(r => r.success).length,
+          failed: results.filter(r => !r.success).length,
+          results,
+        };
+      }),
+
+    // Train model on all existing materials
+    trainAll: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Unauthorized');
+        }
+
+        const allMaterials = await getAllTrainingMaterials();
+        const results = [];
+        let processed = 0;
+
+        for (const material of allMaterials) {
+          try {
+            // Retrain with DeepSeek
+            const analysis = await trainOnMedicalMaterial({
+              title: material.title,
+              content: material.content,
+              category: material.category,
+              source: material.source,
+            });
+
+            // Update with new analysis
+            await updateTrainingMaterialStatus(
+              material.id,
+              'trained',
+              {
+                summary: analysis.summary,
+                keyFindings: JSON.stringify(analysis.keyFindings),
+                clinicalRelevance: analysis.clinicalRelevance,
+              }
+            );
+
+            processed++;
+            results.push({
+              id: material.id,
+              title: material.title,
+              success: true,
+              progress: Math.round((processed / allMaterials.length) * 100),
+            });
+          } catch (error) {
+            console.error(`Failed to train on ${material.title}:`, error);
+            results.push({
+              id: material.id,
+              title: material.title,
+              success: false,
+              error: 'Training failed',
+              progress: Math.round((processed / allMaterials.length) * 100),
+            });
+          }
+        }
+
+        return {
+          totalMaterials: allMaterials.length,
+          processed,
           successful: results.filter(r => r.success).length,
           failed: results.filter(r => !r.success).length,
           results,
