@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import AdminTraining from "./pages/AdminTraining";
+import AdminLoginTraditional from "./pages/AdminLoginTraditional";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/admin/login"} component={AdminLogin} />
+      <Route path={"/admin/login/traditional"} component={AdminLoginTraditional} />
       <Route path={"/admin/training"} component={AdminTraining} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

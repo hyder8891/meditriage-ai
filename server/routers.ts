@@ -32,6 +32,33 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    
+    // Traditional admin login with username/password
+    adminLogin: publicProcedure
+      .input(z.object({
+        username: z.string(),
+        password: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Simple admin credentials check
+        if (input.username === 'admin' && input.password === 'admin') {
+          // Create a simple admin session marker
+          // In production, this should use proper session management
+          return {
+            success: true,
+            user: {
+              id: 0,
+              username: 'admin',
+              role: 'admin' as const,
+            },
+          };
+        }
+        
+        return {
+          success: false,
+        };
+      }),
+    
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

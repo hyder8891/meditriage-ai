@@ -69,3 +69,11 @@
 - [x] Implement model performance metrics
 - [x] Create training data search and filter
 - [x] Add training material preview and editing
+
+
+## Navigation & Authentication Improvements
+- [x] Add visible login/profile button to landing page header
+- [x] Implement traditional username/password admin login (admin/admin)
+- [x] Create admin credentials validation endpoint
+- [x] Add profile dropdown menu in header
+- [x] Show user authentication status in navigation

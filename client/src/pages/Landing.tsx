@@ -1,13 +1,16 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Activity, FileText, Languages } from "lucide-react";
+import { AlertCircle, Activity, FileText, Languages, User, LogIn } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 
 export default function Landing() {
   const { strings, language, toggleLanguage } = useLanguage();
   const [, setLocation] = useLocation();
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -18,21 +21,44 @@ export default function Landing() {
       </div>
 
       {/* Header */}
-      <header className="container py-6 flex justify-between items-center">
+      <header className="container py-6 flex justify-between items-center gap-4">
         <div className="flex items-center gap-3">
           <Activity className="w-8 h-8 text-primary" />
           <h1 className="text-2xl font-bold text-primary">{strings.title}</h1>
         </div>
         
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleLanguage}
-          className="gap-2"
-        >
-          <Languages className="w-4 h-4" />
-          {language === 'en' ? 'العربية' : 'English'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleLanguage}
+            className="gap-2"
+          >
+            <Languages className="w-4 h-4" />
+            {language === 'en' ? 'العربية' : 'English'}
+          </Button>
+          
+          {isAuthenticated ? (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setLocation('/profile')}
+              className="gap-2"
+            >
+              <User className="w-4 h-4" />
+              {user?.name || (language === 'ar' ? 'الملف الشخصي' : 'Profile')}
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={() => window.location.href = getLoginUrl()}
+              className="gap-2"
+            >
+              <LogIn className="w-4 h-4" />
+              {language === 'ar' ? 'تسجيل الدخول' : 'Login'}
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* Main Content */}

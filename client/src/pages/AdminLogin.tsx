@@ -100,6 +100,16 @@ export default function AdminLogin() {
                 <li>• Monitor system performance</li>
                 <li>• View all triage records</li>
               </ul>
+              <div className="mt-4 pt-4 border-t">
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => setLocation('/admin/login/traditional')}
+                  className="text-xs"
+                >
+                  Use traditional login (username/password)
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
