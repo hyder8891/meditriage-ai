@@ -142,3 +142,82 @@ export async function getKnowledgeByCategory(category: string) {
     .where(eq(medicalKnowledgeBase.category, category))
     .orderBy(desc(medicalKnowledgeBase.confidence));
 }
+
+// Additional helper functions
+export async function getTrainingMaterialById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db
+    .select()
+    .from(trainingMaterials)
+    .where(eq(trainingMaterials.id, id))
+    .limit(1);
+  
+  return results[0] || null;
+}
+
+export async function updateTrainingMaterial(id: number, data: Partial<InsertTrainingMaterial>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db
+    .update(trainingMaterials)
+    .set(data)
+    .where(eq(trainingMaterials.id, id));
+}
+
+export async function deleteTrainingMaterial(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db
+    .delete(trainingMaterials)
+    .where(eq(trainingMaterials.id, id));
+}
+
+export async function getTrainingStats() {
+  const db = await getDb();
+  if (!db) return { total: 0, byCategory: {}, totalKnowledgeExtracted: 0 };
+  
+  const allMaterials = await db.select().from(trainingMaterials);
+  
+  const byCategory = allMaterials.reduce((acc, material) => {
+    acc[material.category] = (acc[material.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  return {
+    total: allMaterials.length,
+    byCategory,
+    totalKnowledgeExtracted: allMaterials.filter(m => m.summary).length,
+  };
+}
+
+export async function saveTrainingMaterial(data: {
+  userId: number;
+  category: string;
+  title: string;
+  content: string;
+  fileUrl: string;
+  fileKey: string;
+  extractedKnowledge?: string;
+  processingStatus: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(trainingMaterials).values({
+    title: data.title,
+    category: data.category,
+    source: 'admin_upload',
+    content: data.content,
+    storageUrl: data.fileUrl,
+    storageKey: data.fileKey,
+    summary: data.extractedKnowledge || null,
+    trainingStatus: data.processingStatus,
+  });
+  
+  // For MySQL, insertId is available on the result
+  return Number((result as any).insertId || 0);
+}

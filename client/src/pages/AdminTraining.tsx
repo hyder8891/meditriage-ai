@@ -33,7 +33,27 @@ export default function AdminTraining() {
   const { data: trainingData, isLoading: dataLoading } = 
     trpc.training.getAllTrainingData.useQuery(undefined, { enabled: isAuthenticated && user?.role === 'admin' });
 
-  const addMaterialMutation = trpc.training.addMaterial.useMutation();
+  const batchMutation = trpc.training.batchProcess.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Batch complete: ${data.successful}/${data.totalProcessed} files processed`);
+      refetchMaterials();
+      setUploadingFiles(false);
+    },
+    onError: (error) => {
+      toast.error('Batch processing failed: ' + error.message);
+      setUploadingFiles(false);
+    },
+  });
+
+  const uploadMutation = trpc.training.addMaterial.useMutation({
+    onSuccess: () => {
+      toast.success('Training material added successfully');
+      refetchMaterials();
+    },
+    onError: (error) => {
+      toast.error('Failed to add material: ' + error.message);
+    },
+  });
 
   // Redirect if not admin
   if (!isAuthenticated || user?.role !== 'admin') {
@@ -59,7 +79,7 @@ export default function AdminTraining() {
       for (const file of Array.from(files)) {
         const content = await file.text();
         
-        await addMaterialMutation.mutateAsync({
+        await uploadMutation.mutateAsync({
           title: file.name,
           category: selectedCategory,
           source: "Manual Upload",

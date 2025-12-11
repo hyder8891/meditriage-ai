@@ -332,6 +332,77 @@ export const appRouter = router({
   }),
 
   training: router({
+    // Batch process multiple files (directory upload)
+    batchProcess: protectedProcedure
+      .input(z.object({
+        files: z.array(z.object({
+          filename: z.string(),
+          content: z.string(),
+          category: z.string(),
+        })),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Unauthorized');
+        }
+
+        const results = [];
+        const totalFiles = input.files.length;
+
+        for (let i = 0; i < input.files.length; i++) {
+          const file = input.files[i];
+          
+          try {
+            // Store to S3
+            const contentBuffer = Buffer.from(file.content, 'utf-8');
+            const storageKey = `training/${nanoid()}-${file.filename}`;
+            const { url } = await storagePut(storageKey, contentBuffer, 'text/plain');
+
+            // Process with DeepSeek AI (fluid compute)
+            const analysis = await trainOnMedicalMaterial({
+              title: file.filename,
+              content: file.content,
+              category: file.category,
+              source: 'batch_upload',
+            });
+
+            await createTrainingMaterial({
+              title: file.filename,
+              category: file.category,
+              source: 'batch_upload',
+              content: file.content.substring(0, 5000),
+              storageKey,
+              storageUrl: url,
+              summary: analysis.summary,
+              keyFindings: JSON.stringify(analysis.keyFindings),
+              clinicalRelevance: analysis.clinicalRelevance,
+              trainingStatus: 'processed',
+            });
+
+            results.push({
+              filename: file.filename,
+              success: true,
+              progress: Math.round(((i + 1) / totalFiles) * 100),
+            });
+          } catch (error) {
+            console.error(`Error processing ${file.filename}:`, error);
+            results.push({
+              filename: file.filename,
+              success: false,
+              error: 'Processing failed',
+              progress: Math.round(((i + 1) / totalFiles) * 100),
+            });
+          }
+        }
+
+        return {
+          totalProcessed: results.length,
+          successful: results.filter(r => r.success).length,
+          failed: results.filter(r => !r.success).length,
+          results,
+        };
+      }),
+
     // Add medical training material
     addMaterial: protectedProcedure
       .input(z.object({
@@ -477,7 +548,6 @@ export const appRouter = router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return await getMedicalDocumentsByUserId(ctx.user.id);
     }),
-  }),
+   }),
 });
-
 export type AppRouter = typeof appRouter;
