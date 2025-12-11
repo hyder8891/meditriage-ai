@@ -133,6 +133,89 @@
   }
 }
 
+@layer utilities {
+  /* RTL Support */
+  [dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+  }
+
+  [dir="ltr"] {
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* Medical Emergency Colors */
+  .urgency-emergency {
+    @apply bg-red-100 text-red-900 border-red-300;
+  }
+
+  .urgency-urgent {
+    @apply bg-orange-100 text-orange-900 border-orange-300;
+  }
+
+  .urgency-semi-urgent {
+    @apply bg-yellow-100 text-yellow-900 border-yellow-300;
+  }
+
+  .urgency-non-urgent {
+    @apply bg-blue-100 text-blue-900 border-blue-300;
+  }
+
+  .urgency-routine {
+    @apply bg-green-100 text-green-900 border-green-300;
+  }
+
+  /* Chat message styling */
+  .chat-message {
+    @apply rounded-lg p-4 mb-3 max-w-[85%];
+  }
+
+  .chat-message-user {
+    @apply bg-primary text-primary-foreground ml-auto;
+  }
+
+  .chat-message-assistant {
+    @apply bg-muted text-foreground mr-auto;
+  }
+
+  /* Voice recording animation */
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.8);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  .recording-pulse {
+    animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  /* Print styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    body {
+      background: white;
+    }
+    
+    .print-page-break {
+      page-break-after: always;
+    }
+  }
+}
+
 @layer components {
   /**
    * Custom container utility that centers content and adds responsive padding.

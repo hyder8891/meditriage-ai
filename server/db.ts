@@ -1,11 +1,19 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, 
+  users, 
+  triageRecords, 
+  InsertTriageRecord, 
+  medicalDocuments,
+  InsertMedicalDocument,
+  voiceRecordings,
+  InsertVoiceRecording
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -89,4 +97,96 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Triage record operations
+export async function createTriageRecord(record: InsertTriageRecord) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(triageRecords).values(record);
+  return result;
+}
+
+export async function getTriageRecordsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(triageRecords)
+    .where(eq(triageRecords.userId, userId))
+    .orderBy(desc(triageRecords.createdAt));
+}
+
+export async function getTriageRecordById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db
+    .select()
+    .from(triageRecords)
+    .where(eq(triageRecords.id, id))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getAllTriageRecords() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(triageRecords)
+    .orderBy(desc(triageRecords.createdAt));
+}
+
+// Medical document operations
+export async function createMedicalDocument(doc: InsertMedicalDocument) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(medicalDocuments).values(doc);
+  return result;
+}
+
+export async function getMedicalDocumentsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(medicalDocuments)
+    .where(eq(medicalDocuments.userId, userId))
+    .orderBy(desc(medicalDocuments.createdAt));
+}
+
+export async function getMedicalDocumentsByTriageId(triageRecordId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(medicalDocuments)
+    .where(eq(medicalDocuments.triageRecordId, triageRecordId))
+    .orderBy(desc(medicalDocuments.createdAt));
+}
+
+// Voice recording operations
+export async function createVoiceRecording(recording: InsertVoiceRecording) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(voiceRecordings).values(recording);
+  return result;
+}
+
+export async function getVoiceRecordingsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(voiceRecordings)
+    .where(eq(voiceRecordings.userId, userId))
+    .orderBy(desc(voiceRecordings.createdAt));
+}

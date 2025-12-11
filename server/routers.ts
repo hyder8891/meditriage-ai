@@ -1,10 +1,25 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import { invokeLLM } from "./_core/llm";
+import { transcribeAudio } from "./_core/voiceTranscription";
+import { storagePut } from "./storage";
+import { 
+  createTriageRecord, 
+  getTriageRecordsByUserId, 
+  getTriageRecordById,
+  getAllTriageRecords,
+  createMedicalDocument,
+  getMedicalDocumentsByUserId,
+  createVoiceRecording,
+  getVoiceRecordingsByUserId
+} from "./db";
+import { SYSTEM_PROMPT_TRIAGE, SYSTEM_PROMPT_FINAL_ADVICE } from "@shared/localization";
+import { nanoid } from "nanoid";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -17,12 +32,257 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  triage: router({
+    // Start a new triage conversation
+    chat: protectedProcedure
+      .input(z.object({
+        messages: z.array(z.object({
+          role: z.enum(['system', 'user', 'assistant']),
+          content: z.string(),
+        })),
+        language: z.enum(['en', 'ar']).default('en'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { messages, language } = input;
+        
+        // Add system prompt if not present
+        const systemMessage = {
+          role: 'system' as const,
+          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\nRespond in Arabic.' : ''),
+        };
+        
+        const fullMessages = messages[0]?.role === 'system' 
+          ? messages 
+          : [systemMessage, ...messages];
+
+        const response = await invokeLLM({
+          messages: fullMessages,
+        });
+
+        return {
+          content: response.choices[0]?.message?.content || '',
+        };
+      }),
+
+    // Generate final medical advice
+    generateAdvice: protectedProcedure
+      .input(z.object({
+        conversationHistory: z.string(), // JSON stringified
+        language: z.enum(['en', 'ar']).default('en'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { conversationHistory, language } = input;
+
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: SYSTEM_PROMPT_FINAL_ADVICE + (language === 'ar' ? '\n\nRespond in Arabic.' : ''),
+            },
+            {
+              role: 'user',
+              content: `Based on this conversation, generate a comprehensive medical report:\n\n${conversationHistory}`,
+            },
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "medical_advice",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  urgencyLevel: {
+                    type: "string",
+                    enum: ["EMERGENCY", "URGENT", "SEMI-URGENT", "NON-URGENT", "ROUTINE"],
+                  },
+                  chiefComplaint: { type: "string" },
+                  symptoms: {
+                    type: "array",
+                    items: { type: "string" },
+                  },
+                  assessment: { type: "string" },
+                  recommendations: { type: "string" },
+                  redFlags: {
+                    type: "array",
+                    items: { type: "string" },
+                  },
+                  disclaimer: { type: "string" },
+                },
+                required: ["urgencyLevel", "chiefComplaint", "symptoms", "assessment", "recommendations", "redFlags", "disclaimer"],
+                additionalProperties: false,
+              },
+            },
+          },
+        });
+
+        const content = response.choices[0]?.message?.content;
+        const advice = typeof content === 'string' ? JSON.parse(content) : content;
+        return advice;
+      }),
+
+    // Save triage record
+    save: protectedProcedure
+      .input(z.object({
+        language: z.string(),
+        conversationHistory: z.string(),
+        urgencyLevel: z.string(),
+        chiefComplaint: z.string(),
+        symptoms: z.array(z.string()),
+        assessment: z.string(),
+        recommendations: z.string(),
+        redFlags: z.array(z.string()).optional(),
+        duration: z.number().optional(),
+        messageCount: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await createTriageRecord({
+          userId: ctx.user.id,
+          language: input.language,
+          conversationHistory: input.conversationHistory,
+          urgencyLevel: input.urgencyLevel,
+          chiefComplaint: input.chiefComplaint,
+          symptoms: JSON.stringify(input.symptoms),
+          assessment: input.assessment,
+          recommendations: input.recommendations,
+          redFlags: JSON.stringify(input.redFlags || []),
+          duration: input.duration,
+          messageCount: input.messageCount,
+        });
+
+        return { success: true };
+      }),
+
+    // Get user's triage history
+    history: protectedProcedure.query(async ({ ctx }) => {
+      const records = await getTriageRecordsByUserId(ctx.user.id);
+      return records.map(record => ({
+        ...record,
+        symptoms: JSON.parse(record.symptoms),
+        redFlags: record.redFlags ? JSON.parse(record.redFlags) : [],
+      }));
+    }),
+
+    // Get specific triage record
+    getRecord: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const record = await getTriageRecordById(input.id);
+        if (!record || record.userId !== ctx.user.id) {
+          throw new Error('Record not found');
+        }
+        return {
+          ...record,
+          symptoms: JSON.parse(record.symptoms),
+          redFlags: record.redFlags ? JSON.parse(record.redFlags) : [],
+          conversationHistory: JSON.parse(record.conversationHistory),
+        };
+      }),
+
+    // Admin: Get all triage records
+    adminGetAll: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      const records = await getAllTriageRecords();
+      return records.map(record => ({
+        ...record,
+        symptoms: JSON.parse(record.symptoms),
+        redFlags: record.redFlags ? JSON.parse(record.redFlags) : [],
+      }));
+    }),
+  }),
+
+  voice: router({
+    // Transcribe audio to text
+    transcribe: protectedProcedure
+      .input(z.object({
+        audioUrl: z.string(),
+        language: z.enum(['en', 'ar']).default('en'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await transcribeAudio({
+          audioUrl: input.audioUrl,
+          language: input.language,
+        });
+
+        if ('error' in result) {
+          throw new Error(result.error);
+        }
+
+        // Save voice recording metadata
+        await createVoiceRecording({
+          userId: ctx.user.id,
+          audioKey: input.audioUrl.split('/').pop() || '',
+          audioUrl: input.audioUrl,
+          transcription: result.text,
+          language: input.language,
+        });
+
+        return {
+          text: result.text,
+          language: result.language,
+        };
+      }),
+
+    // Upload audio file
+    upload: protectedProcedure
+      .input(z.object({
+        audioData: z.string(), // base64 encoded
+        mimeType: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const buffer = Buffer.from(input.audioData, 'base64');
+        const fileKey = `voice/${ctx.user.id}/${nanoid()}.webm`;
+        
+        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+        
+        return { url };
+      }),
+
+    // Get user's voice recordings
+    history: protectedProcedure.query(async ({ ctx }) => {
+      return await getVoiceRecordingsByUserId(ctx.user.id);
+    }),
+  }),
+
+  documents: router({
+    // Upload medical document
+    upload: protectedProcedure
+      .input(z.object({
+        fileName: z.string(),
+        fileData: z.string(), // base64 encoded
+        mimeType: z.string(),
+        documentType: z.string(),
+        description: z.string().optional(),
+        triageRecordId: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const buffer = Buffer.from(input.fileData, 'base64');
+        const fileKey = `documents/${ctx.user.id}/${nanoid()}-${input.fileName}`;
+        
+        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+        
+        await createMedicalDocument({
+          userId: ctx.user.id,
+          triageRecordId: input.triageRecordId,
+          fileName: input.fileName,
+          fileKey,
+          fileUrl: url,
+          fileSize: buffer.length,
+          mimeType: input.mimeType,
+          documentType: input.documentType,
+          description: input.description,
+        });
+
+        return { url, fileKey };
+      }),
+
+    // Get user's documents
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await getMedicalDocumentsByUserId(ctx.user.id);
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
