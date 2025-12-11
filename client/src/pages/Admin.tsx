@@ -12,7 +12,9 @@ import {
   TrendingUp, 
   Calendar,
   AlertCircle,
-  Shield
+  Shield,
+  Brain,
+  ArrowRight
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
@@ -78,6 +80,28 @@ export default function Admin() {
 
       {/* Content */}
       <main className="container py-8 max-w-7xl space-y-6">
+        {/* Training Dashboard Link */}
+        <Card className="bg-gradient-to-br from-primary/10 to-purple-500/10 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="w-5 h-5" />
+              AI Model Training
+            </CardTitle>
+            <CardDescription>
+              Upload medical data, methodologies, and techniques to train the AI
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => setLocation('/admin/training')}
+              className="w-full"
+            >
+              Open Training Dashboard
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Statistics */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

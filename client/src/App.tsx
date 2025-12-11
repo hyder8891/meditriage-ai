@@ -10,6 +10,8 @@ import Triage from "./pages/Triage";
 import Advice from "./pages/Advice";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
+import AdminTraining from "./pages/AdminTraining";
 
 function Router() {
   return (
@@ -19,6 +21,8 @@ function Router() {
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={Admin} />
+      <Route path={"/admin/login"} component={AdminLogin} />
+      <Route path={"/admin/training"} component={AdminTraining} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
