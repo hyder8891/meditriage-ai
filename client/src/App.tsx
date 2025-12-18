@@ -13,11 +13,15 @@ import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import AdminTraining from "./pages/AdminTraining";
 import AdminLoginTraditional from "./pages/AdminLoginTraditional";
+import PortalSelection from "./pages/PortalSelection";
+import ClinicianLogin from "./pages/ClinicianLogin";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Landing} />
+      <Route path={"/"} component={PortalSelection} />
+      <Route path={"/home"} component={Landing} />
+      <Route path={"/clinician/login"} component={ClinicianLogin} />
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />

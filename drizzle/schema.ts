@@ -204,3 +204,108 @@ export const trainingSessions = mysqlTable("training_sessions", {
 
 export type TrainingSession = typeof trainingSessions.$inferSelect;
 export type InsertTrainingSession = typeof trainingSessions.$inferInsert;
+
+/**
+ * Clinical cases table for case management
+ */
+export const cases = mysqlTable("cases", {
+  id: int("id").autoincrement().primaryKey(),
+  patientName: varchar("patient_name", { length: 255 }).notNull(),
+  patientAge: int("patient_age"),
+  patientGender: mysqlEnum("patient_gender", ["male", "female", "other"]),
+  chiefComplaint: text("chief_complaint").notNull(),
+  status: mysqlEnum("status", ["active", "completed", "archived"]).default("active").notNull(),
+  urgency: mysqlEnum("urgency", ["emergency", "urgent", "semi-urgent", "non-urgent", "routine"]),
+  clinicianId: int("clinician_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Case = typeof cases.$inferSelect;
+export type InsertCase = typeof cases.$inferInsert;
+
+/**
+ * Patient vitals table
+ */
+export const vitals = mysqlTable("vitals", {
+  id: int("id").autoincrement().primaryKey(),
+  caseId: int("case_id").notNull(),
+  bloodPressureSystolic: int("bp_systolic"),
+  bloodPressureDiastolic: int("bp_diastolic"),
+  heartRate: int("heart_rate"),
+  temperature: varchar("temperature", { length: 10 }),
+  oxygenSaturation: int("oxygen_saturation"),
+  respiratoryRate: int("respiratory_rate"),
+  weight: varchar("weight", { length: 20 }),
+  height: varchar("height", { length: 20 }),
+  recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+});
+
+export type Vitals = typeof vitals.$inferSelect;
+export type InsertVitals = typeof vitals.$inferInsert;
+
+/**
+ * Differential diagnoses table
+ */
+export const diagnoses = mysqlTable("diagnoses", {
+  id: int("id").autoincrement().primaryKey(),
+  caseId: int("case_id").notNull(),
+  diagnosis: varchar("diagnosis", { length: 500 }).notNull(),
+  probability: int("probability"),
+  reasoning: text("reasoning"),
+  redFlags: text("red_flags"),
+  recommendedActions: text("recommended_actions"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type Diagnosis = typeof diagnoses.$inferSelect;
+export type InsertDiagnosis = typeof diagnoses.$inferInsert;
+
+/**
+ * Clinical notes table
+ */
+export const clinicalNotes = mysqlTable("clinical_notes", {
+  id: int("id").autoincrement().primaryKey(),
+  caseId: int("case_id").notNull(),
+  noteType: mysqlEnum("note_type", ["history", "examination", "assessment", "plan", "scribe"]).notNull(),
+  content: text("content").notNull(),
+  createdBy: int("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ClinicalNote = typeof clinicalNotes.$inferSelect;
+export type InsertClinicalNote = typeof clinicalNotes.$inferInsert;
+
+/**
+ * Medications table for drug interaction checking
+ */
+export const medications = mysqlTable("medications", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  genericName: varchar("generic_name", { length: 255 }),
+  category: varchar("category", { length: 100 }),
+  interactions: text("interactions"),
+  contraindications: text("contraindications"),
+  sideEffects: text("side_effects"),
+});
+
+export type Medication = typeof medications.$inferSelect;
+export type InsertMedication = typeof medications.$inferInsert;
+
+/**
+ * Medical facilities table for care locator
+ */
+export const facilities = mysqlTable("facilities", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  type: mysqlEnum("type", ["hospital", "clinic", "emergency", "specialist"]).notNull(),
+  address: text("address").notNull(),
+  latitude: varchar("latitude", { length: 50 }),
+  longitude: varchar("longitude", { length: 50 }),
+  phone: varchar("phone", { length: 50 }),
+  specialties: text("specialties"),
+  emergencyServices: int("emergency_services").default(0),
+});
+
+export type Facility = typeof facilities.$inferSelect;
+export type InsertFacility = typeof facilities.$inferInsert;
