@@ -14,7 +14,11 @@ import {
   ArrowLeft,
   Loader2,
   TrendingUp,
-  CheckCircle2
+  CheckCircle2,
+  Shield,
+  BookOpen,
+  Calendar,
+  Info
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -228,16 +232,63 @@ export default function ClinicalReasoning() {
                     </CardTitle>
                     <CardDescription>Ranked by likelihood</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    {reasoning.differentialDiagnosis.map((diagnosis: string, index: number) => {
-                      const probability = Math.max(0, 100 - (index * 15));
+                  <CardContent className="space-y-4">
+                    {reasoning.differentialDiagnosis.map((diagnosisItem: any, index: number) => {
+                      const severityColors = {
+                        mild: 'bg-green-50 border-green-200',
+                        moderate: 'bg-yellow-50 border-yellow-200',
+                        severe: 'bg-orange-50 border-orange-200',
+                        critical: 'bg-red-50 border-red-200',
+                      };
+                      const severityBadgeColors = {
+                        mild: 'bg-green-600',
+                        moderate: 'bg-yellow-600',
+                        severe: 'bg-orange-600',
+                        critical: 'bg-red-600',
+                      };
                       return (
-                        <div key={index} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-900">{diagnosis}</h4>
-                            <Badge className="bg-purple-600">{probability}%</Badge>
+                        <div key={index} className={`p-4 rounded-lg border ${severityColors[diagnosisItem.severity as keyof typeof severityColors] || 'bg-gray-50 border-gray-200'}`}>
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold text-gray-900 text-lg">{diagnosisItem.diagnosis}</h4>
+                                <Badge className="bg-purple-600">{diagnosisItem.confidence}%</Badge>
+                                <Badge className={severityBadgeColors[diagnosisItem.severity as keyof typeof severityBadgeColors] || 'bg-gray-600'}>
+                                  {diagnosisItem.severity?.toUpperCase()}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-3">{diagnosisItem.clinicalPresentation}</p>
+                            </div>
                           </div>
-                          <Progress value={probability} className="h-2" />
+                          <Progress value={diagnosisItem.confidence} className="h-2 mb-3" />
+                          
+                          {diagnosisItem.supportingEvidence && diagnosisItem.supportingEvidence.length > 0 && (
+                            <div className="mb-3">
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Supporting Evidence:</p>
+                              <ul className="text-xs text-gray-600 space-y-1">
+                                {diagnosisItem.supportingEvidence.map((evidence: string, i: number) => (
+                                  <li key={i} className="flex items-start gap-1">
+                                    <span className="text-purple-600 mt-0.5">•</span>
+                                    <span>{evidence}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {diagnosisItem.nextSteps && diagnosisItem.nextSteps.length > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Next Steps:</p>
+                              <ul className="text-xs text-gray-600 space-y-1">
+                                {diagnosisItem.nextSteps.map((step: string, i: number) => (
+                                  <li key={i} className="flex items-start gap-1">
+                                    <CheckCircle2 className="w-3 h-3 text-blue-600 mt-0.5 flex-shrink-0" />
+                                    <span>{step}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -281,6 +332,28 @@ export default function ClinicalReasoning() {
                   </Card>
                 )}
 
+                {/* Red Flags */}
+                {reasoning.redFlags && reasoning.redFlags.length > 0 && (
+                  <Card className="card-modern border-red-200 bg-red-50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-red-700">
+                        <Shield className="w-5 h-5" />
+                        Red Flags - Immediate Attention Required
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {reasoning.redFlags.map((flag: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-900 font-medium">{flag}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Urgency Assessment */}
                 <Card className="card-modern border-orange-200 bg-orange-50">
                   <CardHeader>
@@ -290,11 +363,45 @@ export default function ClinicalReasoning() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-900 font-semibold text-lg">
+                    <p className="text-gray-900 font-semibold text-lg whitespace-pre-wrap">
                       {reasoning.urgencyAssessment}
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Patient Education */}
+                {reasoning.patientEducation && (
+                  <Card className="card-modern border-blue-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-blue-700">
+                        <BookOpen className="w-5 h-5" />
+                        Patient Education
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {reasoning.patientEducation}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Follow-up Recommendations */}
+                {reasoning.followUpRecommendations && (
+                  <Card className="card-modern border-green-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-green-700">
+                        <Calendar className="w-5 h-5" />
+                        Follow-up Recommendations
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {reasoning.followUpRecommendations}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </>
             ) : (
               <Card className="card-modern">

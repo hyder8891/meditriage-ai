@@ -140,29 +140,59 @@ Provide:
  * Advanced medical reasoning using DeepSeek
  * For complex cases requiring deep analysis
  */
+export interface DiagnosisWithConfidence {
+  diagnosis: string;
+  confidence: number; // 0-100
+  supportingEvidence: string[];
+  severity: 'mild' | 'moderate' | 'severe' | 'critical';
+  clinicalPresentation: string;
+  nextSteps: string[];
+}
+
+export interface MedicalReasoningResult {
+  differentialDiagnosis: DiagnosisWithConfidence[];
+  reasoning: string;
+  recommendedTests: string[];
+  urgencyAssessment: string;
+  redFlags: string[];
+  patientEducation: string;
+  followUpRecommendations: string;
+}
+
 export async function deepMedicalReasoning(params: {
   symptoms: string[];
   history: string;
   vitalSigns?: Record<string, string>;
   labResults?: string;
-}): Promise<{
-  differentialDiagnosis: string[];
-  reasoning: string;
-  recommendedTests: string[];
-  urgencyAssessment: string;
-}> {
-  const prompt = `Perform advanced medical reasoning for this case:
+}): Promise<MedicalReasoningResult> {
+  const prompt = `Perform comprehensive medical reasoning for this case:
 
 Symptoms: ${params.symptoms.join(', ')}
 Medical History: ${params.history}
 ${params.vitalSigns ? `Vital Signs: ${JSON.stringify(params.vitalSigns)}` : ''}
 ${params.labResults ? `Lab Results: ${params.labResults}` : ''}
 
-Provide:
-1. Differential diagnosis (ranked by likelihood)
-2. Clinical reasoning process
-3. Recommended diagnostic tests
-4. Urgency assessment`;
+Provide a detailed JSON response with this exact structure:
+{
+  "differentialDiagnosis": [
+    {
+      "diagnosis": "condition name",
+      "confidence": 85,
+      "supportingEvidence": ["symptom matches", "vital sign abnormality"],
+      "severity": "moderate",
+      "clinicalPresentation": "typical presentation description",
+      "nextSteps": ["specific test", "treatment consideration"]
+    }
+  ],
+  "reasoning": "detailed clinical reasoning process",
+  "recommendedTests": ["specific diagnostic tests with rationale"],
+  "urgencyAssessment": "EMERGENCY|URGENT|SEMI-URGENT|ROUTINE with explanation",
+  "redFlags": ["warning signs requiring immediate attention"],
+  "patientEducation": "key points for patient understanding",
+  "followUpRecommendations": "when and why to follow up"
+}
+
+Rank diagnoses by confidence (0-100). Include 3-5 differential diagnoses.`;
 
   const response = await invokeDeepSeek({
     messages: [
@@ -190,6 +220,9 @@ Provide:
       reasoning: parsed.reasoning || content,
       recommendedTests: parsed.recommendedTests || [],
       urgencyAssessment: parsed.urgencyAssessment || 'UNKNOWN',
+      redFlags: parsed.redFlags || [],
+      patientEducation: parsed.patientEducation || '',
+      followUpRecommendations: parsed.followUpRecommendations || '',
     };
   } catch {
     return {
@@ -197,6 +230,9 @@ Provide:
       reasoning: content,
       recommendedTests: [],
       urgencyAssessment: 'UNKNOWN',
+      redFlags: [],
+      patientEducation: '',
+      followUpRecommendations: '',
     };
   }
 }

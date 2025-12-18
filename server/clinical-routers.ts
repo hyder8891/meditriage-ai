@@ -164,15 +164,14 @@ export const clinicalRouter = router({
       });
 
       // Save top diagnoses to database
-      for (let i = 0; i < reasoning.differentialDiagnosis.length; i++) {
-        const diagnosis = reasoning.differentialDiagnosis[i];
+      for (const diagnosisItem of reasoning.differentialDiagnosis) {
         await saveDiagnosis({
           caseId: input.caseId,
-          diagnosis: diagnosis,
-          probability: Math.max(0, 100 - (i * 15)), // Decreasing probability
-          reasoning: reasoning.reasoning,
-          redFlags: JSON.stringify([]),
-          recommendedActions: JSON.stringify(reasoning.recommendedTests),
+          diagnosis: diagnosisItem.diagnosis,
+          probability: diagnosisItem.confidence,
+          reasoning: `${diagnosisItem.clinicalPresentation}\n\nSupporting Evidence: ${diagnosisItem.supportingEvidence.join(', ')}`,
+          redFlags: JSON.stringify(reasoning.redFlags),
+          recommendedActions: JSON.stringify(diagnosisItem.nextSteps),
         });
       }
 
