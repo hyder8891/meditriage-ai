@@ -22,6 +22,7 @@ import PharmaGuard from "./pages/PharmaGuard";
 import CareLocator from "./pages/CareLocator";
 import BioScanner from "./pages/BioScanner";
 import LiveScribe from "./pages/LiveScribe";
+import CaseTimeline from "./pages/CaseTimeline";
 
 function Router() {
   return (
@@ -36,6 +37,7 @@ function Router() {
       <Route path={"/clinician/care-locator"} component={CareLocator} />
       <Route path={"/clinician/bio-scanner"} component={BioScanner} />
       <Route path={"/clinician/live-scribe"} component={LiveScribe} />
+      <Route path={"/clinician/case/:id/timeline"} component={CaseTimeline} />
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />

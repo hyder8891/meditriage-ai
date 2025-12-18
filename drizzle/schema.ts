@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -341,3 +341,40 @@ export const transcriptions = mysqlTable("transcriptions", {
 
 export type Transcription = typeof transcriptions.$inferSelect;
 export type InsertTranscription = typeof transcriptions.$inferInsert;
+
+/**
+ * Timeline events table for case history visualization
+ */
+export const timelineEvents = mysqlTable("timeline_events", {
+  id: int("id").autoincrement().primaryKey(),
+  caseId: int("case_id").notNull(),
+  
+  // Event details
+  eventType: mysqlEnum("event_type", [
+    "symptom",
+    "vital_signs",
+    "diagnosis",
+    "treatment",
+    "medication",
+    "procedure",
+    "lab_result",
+    "imaging",
+    "note",
+  ]).notNull(),
+  
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  
+  // Event data (JSON for flexibility)
+  eventData: json("event_data"),
+  
+  // Metadata
+  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]),
+  recordedBy: int("recorded_by"),
+  
+  eventTime: timestamp("event_time").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type TimelineEvent = typeof timelineEvents.$inferSelect;
+export type InsertTimelineEvent = typeof timelineEvents.$inferInsert;

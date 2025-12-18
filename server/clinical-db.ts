@@ -8,6 +8,7 @@ import {
   medications,
   facilities,
   transcriptions,
+  timelineEvents,
   InsertCase,
   InsertVitals,
   InsertDiagnosis,
@@ -15,6 +16,7 @@ import {
   InsertMedication,
   InsertFacility,
   InsertTranscription,
+  InsertTimelineEvent,
 } from "../drizzle/schema";
 
 /**
@@ -237,4 +239,43 @@ export async function deleteTranscription(transcriptionId: number) {
   
   await db.delete(transcriptions)
     .where(eq(transcriptions.id, transcriptionId));
+}
+
+/**
+ * Timeline Events Management
+ */
+export async function createTimelineEvent(eventData: InsertTimelineEvent) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(timelineEvents).values(eventData);
+  return result[0].insertId;
+}
+
+export async function getTimelineEventsByCaseId(caseId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(timelineEvents)
+    .where(eq(timelineEvents.caseId, caseId))
+    .orderBy(timelineEvents.eventTime);
+}
+
+export async function getTimelineEventsByType(caseId: number, eventType: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const allEvents = await db.select().from(timelineEvents)
+    .where(eq(timelineEvents.caseId, caseId))
+    .orderBy(timelineEvents.eventTime);
+  
+  return allEvents.filter(event => event.eventType === eventType);
+}
+
+export async function deleteTimelineEvent(eventId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(timelineEvents)
+    .where(eq(timelineEvents.id, eventId));
 }

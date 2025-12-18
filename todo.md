@@ -126,3 +126,16 @@
   - [x] Add export as text file functionality
   - [x] Add save to clinical notes functionality
   - [x] Link SOAP notes to patient cases
+
+
+## Case Timeline Visualization
+- [x] Interactive patient timeline with symptom progression
+  - [x] Create timeline events database table
+  - [x] Add backend endpoints for timeline data
+  - [x] Build timeline UI component with vertical layout
+  - [x] Implement vital signs trend display (BP, HR, Temp, SpO2)
+  - [x] Add event type filtering (symptoms, vitals, diagnoses, treatments, medications)
+  - [x] Create event cards with icons and color coding
+  - [x] Add severity badges for events
+  - [x] Display event data and descriptions
+  - [x] Add timeline route and navigation

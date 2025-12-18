@@ -43,6 +43,13 @@
       "when": 1766062834210,
       "tag": "0005_lying_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1766063638821,
+      "tag": "0006_tan_arachne",
+      "breakpoints": true
     }
   ]
 }

@@ -24,6 +24,10 @@ import {
   getTranscriptionsByCaseId,
   updateTranscription,
   deleteTranscription,
+  createTimelineEvent,
+  getTimelineEventsByCaseId,
+  getTimelineEventsByType,
+  deleteTimelineEvent,
 } from "./clinical-db";
 
 export const clinicalRouter = router({
@@ -414,6 +418,12 @@ Be empathetic, clear, and avoid medical jargon. Always encourage seeking profess
       return await getTranscriptionsByCaseId(input.caseId);
     }),
 
+  getVitalsByCaseId: protectedProcedure
+    .input(z.object({ caseId: z.number() }))
+    .query(async ({ input }) => {
+      return await getVitalsByCaseId(input.caseId);
+    }),
+
   updateTranscription: protectedProcedure
     .input(z.object({
       id: z.number(),
@@ -515,5 +525,56 @@ Provide a well-structured, professional clinical note. Use clear medical termino
         soapNote,
         generatedAt: new Date().toISOString(),
       };
+    }),
+
+  // Case Timeline: Get timeline events for a case
+  getCaseTimeline: protectedProcedure
+    .input(z.object({ caseId: z.number() }))
+    .query(async ({ input }) => {
+      return await getTimelineEventsByCaseId(input.caseId);
+    }),
+
+  getTimelineByType: protectedProcedure
+    .input(z.object({
+      caseId: z.number(),
+      eventType: z.string(),
+    }))
+    .query(async ({ input }) => {
+      return await getTimelineEventsByType(input.caseId, input.eventType);
+    }),
+
+  createTimelineEvent: protectedProcedure
+    .input(z.object({
+      caseId: z.number(),
+      eventType: z.enum([
+        "symptom",
+        "vital_signs",
+        "diagnosis",
+        "treatment",
+        "medication",
+        "procedure",
+        "lab_result",
+        "imaging",
+        "note",
+      ]),
+      title: z.string(),
+      description: z.string().optional(),
+      eventData: z.any().optional(),
+      severity: z.enum(["low", "medium", "high", "critical"]).optional(),
+      eventTime: z.date(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const eventId = await createTimelineEvent({
+        ...input,
+        recordedBy: ctx.user.id,
+      });
+      return { eventId };
+    }),
+
+  deleteTimelineEvent: protectedProcedure
+    .input(z.object({ eventId: z.number() }))
+    .mutation(async ({ input }) => {
+      await deleteTimelineEvent(input.eventId);
+      return { success: true };
     }),
 });
