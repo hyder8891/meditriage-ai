@@ -15,8 +15,7 @@ import {
   LogOut,
   Menu,
   Mic,
-  FileImage,
-  Calendar
+  FileImage
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -134,14 +133,6 @@ export default function ClinicianDashboard() {
             >
               <FileImage className="w-5 h-5 mr-3" />
               {sidebarOpen && "X-Ray Analysis"}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/calendar")}
-            >
-              <Calendar className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Calendar"}
             </Button>
           </nav>
 
