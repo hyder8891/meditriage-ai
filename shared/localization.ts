@@ -1,6 +1,52 @@
 export type Language = 'en' | 'ar';
 
 export interface LocalizationStrings {
+  // Homepage
+  homepage: {
+    nav: {
+      clinicianLogin: string;
+      patientPortal: string;
+    };
+    hero: {
+      title: string;
+      subtitle: string;
+      getStarted: string;
+      learnMore: string;
+    };
+    stats: {
+      accuracy: string;
+      timeSaved: string;
+      cases: string;
+      satisfaction: string;
+    };
+    features: {
+      title: string;
+      subtitle: string;
+      clinicalReasoning: { title: string; desc: string };
+      bioScanner: { title: string; desc: string };
+      liveScribe: { title: string; desc: string };
+      pharmaGuard: { title: string; desc: string };
+      xrayAnalysis: { title: string; desc: string };
+      careLocator: { title: string; desc: string };
+    };
+    benefits: {
+      title: string;
+      items: string[];
+    };
+    cta: {
+      title: string;
+      subtitle: string;
+      startTrial: string;
+      scheduleDemo: string;
+    };
+    footer: {
+      tagline: string;
+      description: string;
+      product: string;
+      company: string;
+      rights: string;
+    };
+  };
   title: string;
   subtitle: string;
   startTriage: string;
@@ -98,6 +144,58 @@ export interface LocalizationStrings {
 
 export const LOCALIZATION: Record<Language, LocalizationStrings> = {
   en: {
+    homepage: {
+      nav: {
+        clinicianLogin: 'Clinician Login',
+        patientPortal: 'Patient Portal',
+      },
+      hero: {
+        title: 'AI-Powered Medical Operating System',
+        subtitle: 'Transform clinical workflows with intelligent diagnostics, real-time transcription, and evidence-based decision support',
+        getStarted: 'Get Started',
+        learnMore: 'Learn More',
+      },
+      stats: {
+        accuracy: 'Diagnostic Accuracy',
+        timeSaved: 'Time Saved',
+        cases: 'Cases Analyzed',
+        satisfaction: 'User Satisfaction',
+      },
+      features: {
+        title: 'Comprehensive Clinical Intelligence Platform',
+        subtitle: 'Everything you need for modern healthcare delivery',
+        clinicalReasoning: { title: 'Clinical Reasoning Engine', desc: 'AI-powered differential diagnosis with probability scoring' },
+        bioScanner: { title: '3D Bio-Scanner', desc: 'Interactive anatomical visualization with symptom mapping' },
+        liveScribe: { title: 'Live Scribe', desc: 'Real-time voice-to-text clinical documentation' },
+        pharmaGuard: { title: 'PharmaGuard', desc: 'Drug interaction checking and safety analysis' },
+        xrayAnalysis: { title: 'X-Ray Analysis', desc: 'AI-powered medical imaging interpretation' },
+        careLocator: { title: 'Care Locator', desc: 'Find nearby medical facilities and specialists' },
+      },
+      benefits: {
+        title: 'Why Choose MediTriage AI Pro',
+        items: [
+          'Reduce diagnostic errors with AI-powered clinical decision support',
+          'Save time with automated documentation and SOAP note generation',
+          'Improve patient outcomes through comprehensive symptom analysis',
+          'Access evidence-based recommendations from medical literature',
+          'Streamline workflow with integrated tools in one platform',
+          'Enhance clinical confidence with probability-scored diagnoses',
+        ],
+      },
+      cta: {
+        title: 'Ready to Transform Your Clinical Practice?',
+        subtitle: 'Join thousands of healthcare professionals using MediTriage AI Pro',
+        startTrial: 'Start Free Trial',
+        scheduleDemo: 'Schedule Demo',
+      },
+      footer: {
+        tagline: 'Medical Operating System',
+        description: 'Empowering healthcare professionals with AI-driven clinical intelligence',
+        product: 'Product',
+        company: 'Company',
+        rights: 'All rights reserved',
+      },
+    },
     title: "MediTriage AI Pro",
     subtitle: "Advanced Medical Triage, Imaging Analysis & Detailed Advisory",
     startTriage: "Start Comprehensive Assessment",
@@ -199,6 +297,58 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
     },
   },
   ar: {
+    homepage: {
+      nav: {
+        clinicianLogin: 'تسجيل دخول الطبيب',
+        patientPortal: 'بوابة المريض',
+      },
+      hero: {
+        title: 'نظام تشغيل طبي مدعوم بالذكاء الاصطناعي',
+        subtitle: 'حوّل سير العمل السريري بالتشخيص الذكي والنسخ الفوري ودعم القرار المبني على الأدلة',
+        getStarted: 'ابدأ الآن',
+        learnMore: 'اعرف المزيد',
+      },
+      stats: {
+        accuracy: 'دقة التشخيص',
+        timeSaved: 'الوقت الموفر',
+        cases: 'الحالات المحللة',
+        satisfaction: 'رضا المستخدمين',
+      },
+      features: {
+        title: 'منصة ذكاء سريري شاملة',
+        subtitle: 'كل ما تحتاجه لتقديم رعاية صحية حديثة',
+        clinicalReasoning: { title: 'Clinical Reasoning Engine', desc: 'تشخيص تفاضلي مدعوم بالذكاء الاصطناعي مع تسجيل الاحتمالات' },
+        bioScanner: { title: '3D Bio-Scanner', desc: 'تصور تشريحي تفاعلي مع رسم خرائط الأعراض' },
+        liveScribe: { title: 'Live Scribe', desc: 'توثيق سريري من الصوت إلى النص في الوقت الفعلي' },
+        pharmaGuard: { title: 'PharmaGuard', desc: 'فحص التفاعلات الدوائية وتحليل السلامة' },
+        xrayAnalysis: { title: 'X-Ray Analysis', desc: 'تفسير التصوير الطبي المدعوم بالذكاء الاصطناعي' },
+        careLocator: { title: 'Care Locator', desc: 'ابحث عن المرافق الطبية والمتخصصين القريبين' },
+      },
+      benefits: {
+        title: 'لماذا تختار MediTriage AI Pro',
+        items: [
+          'قلل أخطاء التشخيص بدعم القرار السريري المدعوم بالذكاء الاصطناعي',
+          'وفر الوقت بالتوثيق الآلي وإنشاء ملاحظات SOAP',
+          'حسّن نتائج المرضى من خلال تحليل شامل للأعراض',
+          'احصل على توصيات مبنية على الأدلة من الأدبيات الطبية',
+          'بسّط سير العمل بأدوات متكاملة في منصة واحدة',
+          'عزز الثقة السريرية بتشخيصات مسجلة الاحتمالات',
+        ],
+      },
+      cta: {
+        title: 'هل أنت مستعد لتحويل ممارستك السريرية؟',
+        subtitle: 'انضم إلى آلاف المهنيين الصحيين الذين يستخدمون MediTriage AI Pro',
+        startTrial: 'ابدأ تجربة مجانية',
+        scheduleDemo: 'احجز عرضًا توضيحيًا',
+      },
+      footer: {
+        tagline: 'نظام التشغيل الطبي',
+        description: 'تمكين المهنيين الصحيين بالذكاء السريري المدعوم بالذكاء الاصطناعي',
+        product: 'المنتج',
+        company: 'الشركة',
+        rights: 'جميع الحقوق محفوظة',
+      },
+    },
     title: "المساعد الطبي المتقدم",
     subtitle: "نظام الفرز الطبي الشامل وتحليل الأشعة والتقارير",
     startTriage: "ابدأ التقييم الطبي",

@@ -24,10 +24,13 @@ import { useLocation } from "wouter";
 import { useTour } from "@/contexts/TourContext";
 import { useEffect } from "react";
 import { ProductDemoSlideshow } from "@/components/ProductDemoSlideshow";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { setSteps, startTour } = useTour();
+  const { strings, language, setLanguage } = useLanguage();
 
   // Define tour steps
   useEffect(() => {
@@ -176,26 +179,20 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                onClick={startTour}
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Take a Tour
-              </Button>
+              <LanguageSwitcher />
               <Button
                 variant="ghost"
                 onClick={() => setLocation("/clinician/login")}
+                className="text-gray-700 hover:text-gray-900"
               >
-                Clinician Login
+                {strings.homepage.nav.clinicianLogin}
               </Button>
               <Button
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 onClick={() => setLocation("/patient/symptom-checker")}
               >
                 <Heart className="w-4 h-4 mr-2" />
-                Patient Portal
+                {strings.homepage.nav.patientPortal}
               </Button>
             </div>
           </div>
