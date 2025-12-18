@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Play, Pause, ChevronLeft, ChevronRight, Brain, Scan, Mic, Shield, FileText, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Brain, Scan, Mic, Shield, FileText, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Slide {
   id: number;
@@ -13,61 +14,64 @@ interface Slide {
   features: string[];
 }
 
-const slides: Slide[] = [
-  {
-    id: 1,
-    title: 'Clinical Reasoning Engine',
-    description: 'AI-powered differential diagnosis with evidence-based recommendations',
-    icon: Brain,
-    color: 'from-blue-500 to-cyan-500',
-    features: ['Symptom Analysis', 'Probability Scoring', 'Evidence-Based Results'],
-  },
-  {
-    id: 2,
-    title: '3D Bio-Scanner',
-    description: 'Interactive anatomical visualization with symptom mapping',
-    icon: Scan,
-    color: 'from-purple-500 to-pink-500',
-    features: ['3D Body Model', 'Organ Insights', 'Visual Symptom Mapping'],
-  },
-  {
-    id: 3,
-    title: 'Live Scribe',
-    description: 'Real-time voice-to-text transcription for clinical documentation',
-    icon: Mic,
-    color: 'from-green-500 to-emerald-500',
-    features: ['Voice Recognition', 'Auto-Transcription', 'Speaker ID'],
-  },
-  {
-    id: 4,
-    title: 'PharmaGuard',
-    description: 'Drug interaction checking and medication safety analysis',
-    icon: Shield,
-    color: 'from-orange-500 to-red-500',
-    features: ['Interaction Alerts', 'Dosage Guidance', 'Safety Warnings'],
-  },
-  {
-    id: 5,
-    title: 'SOAP Note Generator',
-    description: 'Automated clinical documentation in standardized format',
-    icon: FileText,
-    color: 'from-indigo-500 to-blue-500',
-    features: ['Auto-Generation', 'SOAP Format', 'Export Options'],
-  },
-  {
-    id: 6,
-    title: 'Case Timeline',
-    description: 'Comprehensive patient history with visual progression tracking',
-    icon: Clock,
-    color: 'from-teal-500 to-cyan-500',
-    features: ['Event Tracking', 'Vital Trends', 'Treatment History'],
-  },
-];
+
 
 export function ProductDemoSlideshow() {
+  const { strings: t } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying] = useState(true);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
+
+  const slides: Slide[] = [
+    {
+      id: 1,
+      title: t.homepage.slideshow.slides.clinicalReasoning.title,
+      description: t.homepage.slideshow.slides.clinicalReasoning.desc,
+      icon: Brain,
+      color: 'from-blue-500 to-cyan-500',
+      features: t.homepage.slideshow.slides.clinicalReasoning.features,
+    },
+    {
+      id: 2,
+      title: t.homepage.slideshow.slides.bioScanner.title,
+      description: t.homepage.slideshow.slides.bioScanner.desc,
+      icon: Scan,
+      color: 'from-purple-500 to-pink-500',
+      features: t.homepage.slideshow.slides.bioScanner.features,
+    },
+    {
+      id: 3,
+      title: t.homepage.slideshow.slides.liveScribe.title,
+      description: t.homepage.slideshow.slides.liveScribe.desc,
+      icon: Mic,
+      color: 'from-green-500 to-emerald-500',
+      features: t.homepage.slideshow.slides.liveScribe.features,
+    },
+    {
+      id: 4,
+      title: t.homepage.slideshow.slides.pharmaGuard.title,
+      description: t.homepage.slideshow.slides.pharmaGuard.desc,
+      icon: Shield,
+      color: 'from-orange-500 to-red-500',
+      features: t.homepage.slideshow.slides.pharmaGuard.features,
+    },
+    {
+      id: 5,
+      title: t.homepage.slideshow.slides.soapGenerator.title,
+      description: t.homepage.slideshow.slides.soapGenerator.desc,
+      icon: FileText,
+      color: 'from-indigo-500 to-blue-500',
+      features: t.homepage.slideshow.slides.soapGenerator.features,
+    },
+    {
+      id: 6,
+      title: t.homepage.slideshow.slides.caseTimeline.title,
+      description: t.homepage.slideshow.slides.caseTimeline.desc,
+      icon: Clock,
+      color: 'from-teal-500 to-cyan-500',
+      features: t.homepage.slideshow.slides.caseTimeline.features,
+    },
+  ];
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -199,25 +203,7 @@ export function ProductDemoSlideshow() {
                 ))}
               </div>
 
-              {/* Play/Pause Button */}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                {isPlaying ? (
-                  <>
-                    <Pause className="w-4 h-4 mr-2" />
-                    Pause
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4 mr-2" />
-                    Play
-                  </>
-                )}
-              </Button>
+
             </div>
 
             {/* Auto-advance Progress Bar */}
@@ -236,7 +222,7 @@ export function ProductDemoSlideshow() {
       {/* Caption Below */}
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600">
-          Interactive product demonstration • 6 key features • Auto-advancing slideshow
+          {t.homepage.slideshow.caption}
         </p>
       </div>
     </div>

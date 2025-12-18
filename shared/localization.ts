@@ -46,6 +46,17 @@ export interface LocalizationStrings {
       company: string;
       rights: string;
     };
+    slideshow: {
+      caption: string;
+      slides: {
+        clinicalReasoning: { title: string; desc: string; features: string[] };
+        bioScanner: { title: string; desc: string; features: string[] };
+        liveScribe: { title: string; desc: string; features: string[] };
+        pharmaGuard: { title: string; desc: string; features: string[] };
+        soapGenerator: { title: string; desc: string; features: string[] };
+        caseTimeline: { title: string; desc: string; features: string[] };
+      };
+    };
   };
   title: string;
   subtitle: string;
@@ -194,6 +205,41 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
         product: 'Product',
         company: 'Company',
         rights: 'All rights reserved',
+      },
+      slideshow: {
+        caption: 'Interactive product demonstration • 6 key features • Auto-advancing slideshow',
+        slides: {
+          clinicalReasoning: {
+            title: 'Clinical Reasoning Engine',
+            desc: 'AI-powered differential diagnosis with evidence-based recommendations',
+            features: ['Symptom Analysis', 'Probability Scoring', 'Evidence-Based Results'],
+          },
+          bioScanner: {
+            title: '3D Bio-Scanner',
+            desc: 'Interactive anatomical visualization with symptom mapping',
+            features: ['3D Body Model', 'Organ Insights', 'Visual Symptom Mapping'],
+          },
+          liveScribe: {
+            title: 'Live Scribe',
+            desc: 'Real-time voice-to-text transcription for clinical documentation',
+            features: ['Voice Recognition', 'Auto-Transcription', 'Speaker ID'],
+          },
+          pharmaGuard: {
+            title: 'PharmaGuard',
+            desc: 'Drug interaction checking and medication safety analysis',
+            features: ['Interaction Alerts', 'Dosage Guidance', 'Safety Warnings'],
+          },
+          soapGenerator: {
+            title: 'SOAP Note Generator',
+            desc: 'Automated clinical documentation in standardized format',
+            features: ['Auto-Generation', 'SOAP Format', 'Export Options'],
+          },
+          caseTimeline: {
+            title: 'Case Timeline',
+            desc: 'Comprehensive patient history with visual progression tracking',
+            features: ['Event Tracking', 'Vital Trends', 'Treatment History'],
+          },
+        },
       },
     },
     title: "MediTriage AI Pro",
@@ -347,6 +393,41 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
         product: 'المنتج',
         company: 'الشركة',
         rights: 'جميع الحقوق محفوظة',
+      },
+      slideshow: {
+        caption: 'عرض توضيحي تفاعلي للمنتج • 6 ميزات رئيسية • عرض شرائح تلقائي',
+        slides: {
+          clinicalReasoning: {
+            title: 'Clinical Reasoning Engine',
+            desc: 'تشخيص تفاضلي مدعوم بالذكاء الاصطناعي مع توصيات مبنية على الأدلة',
+            features: ['تحليل الأعراض', 'تسجيل الاحتمالات', 'نتائج مبنية على الأدلة'],
+          },
+          bioScanner: {
+            title: '3D Bio-Scanner',
+            desc: 'تصور تشريحي تفاعلي مع رسم خرائط الأعراض',
+            features: ['نموذج جسم ثلاثي الأبعاد', 'رؤى الأعضاء', 'رسم خرائط الأعراض المرئية'],
+          },
+          liveScribe: {
+            title: 'Live Scribe',
+            desc: 'نسخ من الصوت إلى النص في الوقت الفعلي للتوثيق السريري',
+            features: ['التعرف على الصوت', 'النسخ التلقائي', 'تحديد المتحدث'],
+          },
+          pharmaGuard: {
+            title: 'PharmaGuard',
+            desc: 'فحص التفاعلات الدوائية وتحليل سلامة الأدوية',
+            features: ['تنبيهات التفاعل', 'إرشادات الجرعة', 'تحذيرات السلامة'],
+          },
+          soapGenerator: {
+            title: 'SOAP Note Generator',
+            desc: 'توثيق سريري آلي بتنسيق موحد',
+            features: ['التوليد التلقائي', 'تنسيق SOAP', 'خيارات التصدير'],
+          },
+          caseTimeline: {
+            title: 'Case Timeline',
+            desc: 'تاريخ شامل للمريض مع تتبع التقدم المرئي',
+            features: ['تتبع الأحداث', 'اتجاهات العلامات الحيوية', 'تاريخ العلاج'],
+          },
+        },
       },
     },
     title: "المساعد الطبي المتقدم",

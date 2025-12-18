@@ -225,3 +225,8 @@
 
 ## Bug Fixes
 - [x] Fix Care Locator validation error - type parameter now accepts empty string for "all types" filter
+
+
+## Product Demo Slideshow Updates
+- [x] Add Arabic translations to slideshow content
+- [x] Remove pause button from slideshow controls
