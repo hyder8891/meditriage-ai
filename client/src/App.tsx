@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import Triage from "./pages/Triage";
 import Advice from "./pages/Advice";
@@ -27,7 +28,8 @@ import CaseTimeline from "./pages/CaseTimeline";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={PortalSelection} />
+      <Route path={"/"} component={Home} />
+      <Route path={"/portal-selection"} component={PortalSelection} />
       <Route path={"/home"} component={Landing} />
       <Route path={"/clinician/login"} component={ClinicianLogin} />
       <Route path={"/clinician/dashboard"} component={ClinicianDashboard} />
