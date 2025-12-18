@@ -18,7 +18,8 @@ import {
   FileImage,
   Calendar,
   Pill,
-  MessageSquare
+  MessageSquare,
+  Bell
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -39,6 +40,10 @@ export default function ClinicianDashboard() {
   });
 
   const { data: cases, isLoading: casesLoading } = trpc.clinical.getAllCases.useQuery();
+  const { data: unreadCount } = trpc.clinical.getUnreadMessageCount.useQuery(
+    { recipientId: user?.id || 0 },
+    { enabled: !!user?.id, refetchInterval: 10000 } // Refetch every 10 seconds
+  );
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -186,10 +191,25 @@ export default function ClinicianDashboard() {
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
               <p className="text-sm text-gray-500 mt-1">Welcome back, Dr. {user?.name || "Clinician"}</p>
             </div>
-            <Button onClick={handleNewCase} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              New Case
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => setLocation("/clinician/messages")}
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount && unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+              <Button onClick={handleNewCase} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                New Case
+              </Button>
+            </div>
           </div>
         </header>
 
