@@ -31,6 +31,7 @@ import ClinicianCalendar from "./pages/ClinicianCalendar";
 import MedicationManagement from "./pages/MedicationManagement";
 import PatientMedications from "./pages/PatientMedications";
 import PatientPortal from "./pages/PatientPortal";
+import SecureMessaging from "./pages/SecureMessaging";
 
 function Router() {
   return (
@@ -48,8 +49,8 @@ function Router() {
       <Route path={"/clinician/live-scribe"} component={LiveScribe} />
       <Route path={"/clinician/case/:id/timeline"} component={CaseTimeline} />
       <Route path={"/clinician/xray-analysis"} component={XRayAnalysis} />
-      <Route path={"/clinician/calendar"} component={ClinicianCalendar} />
-      <Route path={"/clinician/medications"} component={MedicationManagement} />
+      <Route path={"/clinician/calendar"} component={ClinicianCalendar} />      <Route path={"/clinician/medications"} component={MedicationManagement} />
+      <Route path={"/clinician/messages"} component={SecureMessaging} />
       <Route path={"/patient/medications"} component={PatientMedications} />
       <Route path={"/patient/portal"} component={PatientPortal} />
       <Route path={"/triage"} component={Triage} />

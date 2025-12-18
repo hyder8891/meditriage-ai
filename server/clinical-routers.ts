@@ -1025,4 +1025,53 @@ Provide a well-structured, professional clinical note. Use clear medical termino
       });
       return { success: true };
     }),
+
+  // Messaging procedures
+  sendMessage: protectedProcedure
+    .input(z.object({
+      senderId: z.number(),
+      recipientId: z.number(),
+      subject: z.string().optional(),
+      content: z.string(),
+    }))
+    .mutation(async ({ input }) => {
+      const { sendMessage } = await import("./messaging-db");
+      return sendMessage(input);
+    }),
+
+  getMessagesBySender: protectedProcedure
+    .input(z.object({ senderId: z.number() }))
+    .query(async ({ input }) => {
+      const { getMessagesBySender } = await import("./messaging-db");
+      return getMessagesBySender(input.senderId);
+    }),
+
+  getMessagesByRecipient: protectedProcedure
+    .input(z.object({ recipientId: z.number() }))
+    .query(async ({ input }) => {
+      const { getMessagesByRecipient } = await import("./messaging-db");
+      return getMessagesByRecipient(input.recipientId);
+    }),
+
+  getMessagesBetweenUsers: protectedProcedure
+    .input(z.object({ userId1: z.number(), userId2: z.number() }))
+    .query(async ({ input }) => {
+      const { getMessagesBetweenUsers } = await import("./messaging-db");
+      return getMessagesBetweenUsers(input.userId1, input.userId2);
+    }),
+
+  markMessageAsRead: protectedProcedure
+    .input(z.object({ messageId: z.number() }))
+    .mutation(async ({ input }) => {
+      const { markMessageAsRead } = await import("./messaging-db");
+      await markMessageAsRead(input.messageId);
+      return { success: true };
+    }),
+
+  getUnreadMessageCount: protectedProcedure
+    .input(z.object({ recipientId: z.number() }))
+    .query(async ({ input }) => {
+      const { getUnreadMessageCount } = await import("./messaging-db");
+      return getUnreadMessageCount(input.recipientId);
+    }),
 });

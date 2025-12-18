@@ -17,7 +17,8 @@ import {
   Mic,
   FileImage,
   Calendar,
-  Pill
+  Pill,
+  MessageSquare
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -152,6 +153,14 @@ export default function ClinicianDashboard() {
             >
               <Pill className="w-5 h-5 mr-3" />
               {sidebarOpen && "Medications"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/messages")}
+            >
+              <MessageSquare className="w-5 h-5 mr-3" />
+              {sidebarOpen && "Messages"}
             </Button>
           </nav>
 
