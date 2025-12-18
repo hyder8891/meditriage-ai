@@ -2,6 +2,7 @@ import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { makeRequest } from "./_core/map";
 import { invokeDeepSeek, deepMedicalReasoning } from "./_core/deepseek";
+import { IRAQI_MEDICAL_CONTEXT_PROMPT } from "@shared/iraqiMedicalContext";
 import {
   createCase,
   getCaseById,
@@ -287,6 +288,8 @@ Be empathetic, clear, and avoid medical jargon. Always encourage seeking profess
           {
             role: 'system',
             content: `You are a clinical pharmacist expert. Analyze drug interactions with Iraqi medication context.
+
+${IRAQI_MEDICAL_CONTEXT_PROMPT}
             
 Provide structured JSON output with this exact format:
             {

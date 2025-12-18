@@ -20,6 +20,7 @@ import {
   getVoiceRecordingsByUserId
 } from "./db";
 import { SYSTEM_PROMPT_TRIAGE, SYSTEM_PROMPT_FINAL_ADVICE } from "@shared/localization";
+import { IRAQI_MEDICAL_CONTEXT_PROMPT } from "@shared/iraqiMedicalContext";
 import { 
   createTrainingMaterial,
   createTriageTrainingData,
@@ -89,7 +90,7 @@ export const appRouter = router({
         
         const systemMessage = {
           role: 'system' as const,
-          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
+          content: SYSTEM_PROMPT_TRIAGE + '\n\n' + IRAQI_MEDICAL_CONTEXT_PROMPT + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
         };
         
         const fullMessages = messages[0]?.role === 'system' 
@@ -122,7 +123,7 @@ export const appRouter = router({
         // Add system prompt if not present
         const systemMessage = {
           role: 'system' as const,
-          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
+          content: SYSTEM_PROMPT_TRIAGE + '\n\n' + IRAQI_MEDICAL_CONTEXT_PROMPT + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
         };
         
         const fullMessages = messages[0]?.role === 'system' 
