@@ -221,28 +221,57 @@ export default function PharmaGuard() {
                         <CardHeader>
                           <div className="flex items-start justify-between">
                             <CardTitle className="text-lg">
-                              {interaction.drug1} + {interaction.drug2}
+                              {interaction.drugs?.join(' + ') || `${interaction.drug1} + ${interaction.drug2}`}
                             </CardTitle>
                             <Badge className={`${getSeverityColor(interaction.severity)} text-white`}>
-                              {interaction.severity}
+                              {interaction.severity?.toUpperCase()}
                             </Badge>
                           </div>
                         </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div>
-                            <p className="text-sm font-semibold text-gray-700 mb-1">Description:</p>
-                            <p className="text-sm text-gray-600">{interaction.description}</p>
-                          </div>
-                          {interaction.clinicalEffects && (
+                        <CardContent className="space-y-4">
+                          {/* Mechanism */}
+                          {interaction.mechanism && (
                             <div>
-                              <p className="text-sm font-semibold text-gray-700 mb-1">Clinical Effects:</p>
-                              <p className="text-sm text-gray-600">{interaction.clinicalEffects}</p>
+                              <p className="text-sm font-semibold text-gray-700 mb-1">Interaction Mechanism:</p>
+                              <p className="text-sm text-gray-600">{interaction.mechanism}</p>
                             </div>
                           )}
+                          
+                          {/* Clinical Significance */}
+                          {interaction.clinicalSignificance && (
+                            <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                              <p className="text-sm font-semibold text-orange-900 mb-1">Clinical Significance:</p>
+                              <p className="text-sm text-orange-800">{interaction.clinicalSignificance}</p>
+                            </div>
+                          )}
+                          
+                          {/* Management */}
                           {interaction.management && (
                             <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                               <p className="text-sm font-semibold text-blue-900 mb-1">Management:</p>
                               <p className="text-sm text-blue-800">{interaction.management}</p>
+                            </div>
+                          )}
+                          
+                          {/* Alternatives */}
+                          {interaction.alternatives && interaction.alternatives.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold text-gray-700 mb-2">Alternative Medications:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {interaction.alternatives.map((alt: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="bg-green-50 text-green-700 border-green-300">
+                                    {alt}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Timing */}
+                          {interaction.timing && (
+                            <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                              <p className="text-sm font-semibold text-purple-900 mb-1">Timing Recommendations:</p>
+                              <p className="text-sm text-purple-800">{interaction.timing}</p>
                             </div>
                           )}
                         </CardContent>
@@ -251,13 +280,33 @@ export default function PharmaGuard() {
                   </div>
                 )}
 
+                {/* Overall Risk */}
+                {interactions.overallRisk && (
+                  <Card className={`card-modern ${
+                    interactions.overallRisk === 'high' ? 'border-red-200 bg-red-50' :
+                    interactions.overallRisk === 'moderate' ? 'border-orange-200 bg-orange-50' :
+                    'border-green-200 bg-green-50'
+                  }`}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <AlertTriangle className={`w-5 h-5 ${
+                          interactions.overallRisk === 'high' ? 'text-red-600' :
+                          interactions.overallRisk === 'moderate' ? 'text-orange-600' :
+                          'text-green-600'
+                        }`} />
+                        Overall Risk: {interactions.overallRisk.toUpperCase()}
+                      </CardTitle>
+                    </CardHeader>
+                  </Card>
+                )}
+
                 {/* Recommendations */}
                 {interactions.recommendations && interactions.recommendations.length > 0 && (
                   <Card className="card-modern border-blue-200 bg-blue-50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-blue-700">
                         <CheckCircle2 className="w-5 h-5" />
-                        Recommendations
+                        Clinical Recommendations
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -266,6 +315,50 @@ export default function PharmaGuard() {
                           <li key={index} className="flex items-start gap-2">
                             <CheckCircle2 className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                             <span className="text-sm text-blue-900">{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Monitoring */}
+                {interactions.monitoring && interactions.monitoring.length > 0 && (
+                  <Card className="card-modern border-purple-200 bg-purple-50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-purple-700">
+                        <AlertCircle className="w-5 h-5" />
+                        Monitoring Required
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {interactions.monitoring.map((mon: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <AlertCircle className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-purple-900">{mon}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Food Interactions */}
+                {interactions.foodInteractions && interactions.foodInteractions.length > 0 && (
+                  <Card className="card-modern border-amber-200 bg-amber-50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-amber-700">
+                        <Pill className="w-5 h-5" />
+                        Food & Beverage Interactions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {interactions.foodInteractions.map((food: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-amber-900">{food}</span>
                           </li>
                         ))}
                       </ul>

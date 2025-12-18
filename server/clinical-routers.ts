@@ -285,22 +285,52 @@ Be empathetic, clear, and avoid medical jargon. Always encourage seeking profess
         messages: [
           {
             role: 'system',
-            content: 'You are a clinical pharmacist expert. Analyze drug interactions and provide clear warnings.',
+            content: `You are a clinical pharmacist expert. Analyze drug interactions with Iraqi medication context.
+            
+Provide structured JSON output with this exact format:
+            {
+              "interactions": [
+                {
+                  "drugs": ["Drug A", "Drug B"],
+                  "severity": "major|moderate|minor|contraindicated",
+                  "mechanism": "detailed explanation of interaction mechanism",
+                  "clinicalSignificance": "what this means for the patient",
+                  "management": "how to manage this interaction",
+                  "alternatives": ["alternative medication options"],
+                  "timing": "timing recommendations if applicable"
+                }
+              ],
+              "overallRisk": "high|moderate|low",
+              "recommendations": ["specific clinical recommendations"],
+              "monitoring": ["what to monitor"],
+              "foodInteractions": ["relevant food/beverage interactions"]
+            }`,
           },
           {
             role: 'user',
-            content: `Analyze potential drug-drug interactions for these medications: ${medNames.join(', ')}. Provide: 1) Severity level (major/moderate/minor), 2) Interaction mechanism, 3) Clinical recommendations.`,
+            content: `Analyze drug-drug interactions for: ${medNames.join(', ')}. Consider Iraqi medication availability and common formulations.`,
           },
         ],
+        temperature: 0.3,
+        max_tokens: 2000,
       });
 
       const content = response.choices[0]?.message?.content || '';
       
-      return {
-        interactions: [],
-        recommendations: [],
-        analysis: content,
-      };
+      try {
+        const parsed = JSON.parse(content);
+        return parsed;
+      } catch (e) {
+        // Fallback if JSON parsing fails
+        return {
+          interactions: [],
+          overallRisk: 'low',
+          recommendations: ['Unable to parse interaction data. Please verify medications manually.'],
+          monitoring: [],
+          foodInteractions: [],
+          analysis: content,
+        };
+      }
     }),
 
   // Care Locator (Iraq-specific)
