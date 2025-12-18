@@ -88,7 +88,7 @@ export const appRouter = router({
         
         const systemMessage = {
           role: 'system' as const,
-          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\nRespond in Arabic.' : ''),
+          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
         };
         
         const fullMessages = messages[0]?.role === 'system' 
@@ -121,7 +121,7 @@ export const appRouter = router({
         // Add system prompt if not present
         const systemMessage = {
           role: 'system' as const,
-          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\nRespond in Arabic.' : ''),
+          content: SYSTEM_PROMPT_TRIAGE + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
         };
         
         const fullMessages = messages[0]?.role === 'system' 
