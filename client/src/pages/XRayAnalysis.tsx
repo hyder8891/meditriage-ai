@@ -573,40 +573,155 @@ export default function XRayAnalysis() {
 
       {/* Analysis Results */}
       {analysis && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              {language === 'ar' ? 'نتائج التحليل' : 'Analysis Results'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <h3 className="font-semibold text-sm text-muted-foreground">
-                  {language === 'ar' ? 'النتائج' : 'Findings'}
-                </h3>
-                <p className="text-sm whitespace-pre-line">{analysis.findings}</p>
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                {language === 'ar' ? 'نتائج التحليل' : 'Analysis Results'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-sm text-muted-foreground">
+                    {language === 'ar' ? 'النتائج' : 'Findings'}
+                  </h3>
+                  <p className="text-sm whitespace-pre-line">{analysis.findings}</p>
+                </div>
+                {analysis.interpretation && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-sm text-muted-foreground">
+                      {language === 'ar' ? 'التفسير' : 'Interpretation'}
+                    </h3>
+                    <p className="text-sm whitespace-pre-line">{analysis.interpretation}</p>
+                  </div>
+                )}
+                {analysis.recommendations && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-sm text-muted-foreground">
+                      {language === 'ar' ? 'التوصيات' : 'Recommendations'}
+                    </h3>
+                    <p className="text-sm whitespace-pre-line">{analysis.recommendations}</p>
+                  </div>
+                )}
               </div>
-              {analysis.interpretation && (
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-sm text-muted-foreground">
-                    {language === 'ar' ? 'التفسير' : 'Interpretation'}
+
+              {/* Overall Assessment */}
+              {analysis.overallAssessment && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h3 className="font-semibold text-sm text-blue-900 mb-2">
+                    {language === 'ar' ? 'التقييم العام' : 'Overall Assessment'}
                   </h3>
-                  <p className="text-sm whitespace-pre-line">{analysis.interpretation}</p>
+                  <p className="text-sm text-blue-800">{analysis.overallAssessment}</p>
                 </div>
               )}
-              {analysis.recommendations && (
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-sm text-muted-foreground">
-                    {language === 'ar' ? 'التوصيات' : 'Recommendations'}
-                  </h3>
-                  <p className="text-sm whitespace-pre-line">{analysis.recommendations}</p>
+
+              {/* Urgency Level */}
+              {analysis.urgency && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">
+                    {language === 'ar' ? 'مستوى الإلحاح:' : 'Urgency Level:'}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    analysis.urgency === 'emergency' ? 'bg-red-100 text-red-800' :
+                    analysis.urgency === 'urgent' ? 'bg-orange-100 text-orange-800' :
+                    analysis.urgency === 'semi-urgent' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-green-100 text-green-800'
+                  }`}>
+                    {analysis.urgency.toUpperCase()}
+                  </span>
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Detected Abnormalities */}
+          {analysis.abnormalities && analysis.abnormalities.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-orange-600" />
+                  {language === 'ar' ? 'الشذوذات المكتشفة' : 'Detected Abnormalities'}
+                </CardTitle>
+                <CardDescription>
+                  {language === 'ar' 
+                    ? 'تم اكتشاف الشذوذات التالية بواسطة الذكاء الاصطناعي مع درجات الثقة'
+                    : 'AI-detected abnormalities with confidence scores'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {analysis.abnormalities.map((abn: any, index: number) => (
+                    <div 
+                      key={index} 
+                      className="p-4 rounded-lg border-2 transition-all hover:shadow-md"
+                      style={{
+                        borderColor: abn.severity === 'critical' ? '#ef4444' :
+                                   abn.severity === 'high' ? '#f97316' :
+                                   abn.severity === 'medium' ? '#eab308' : '#22c55e',
+                        backgroundColor: abn.severity === 'critical' ? '#fef2f2' :
+                                       abn.severity === 'high' ? '#fff7ed' :
+                                       abn.severity === 'medium' ? '#fefce8' : '#f0fdf4'
+                      }}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm mb-1">{abn.type}</h4>
+                          <p className="text-xs text-muted-foreground mb-2">
+                            {language === 'ar' ? 'الموقع:' : 'Location:'} <span className="font-medium">{abn.location}</span>
+                          </p>
+                          <p className="text-sm">{abn.description}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-2 ml-4">
+                          <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                            abn.severity === 'critical' ? 'bg-red-600 text-white' :
+                            abn.severity === 'high' ? 'bg-orange-600 text-white' :
+                            abn.severity === 'medium' ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'
+                          }`}>
+                            {abn.severity.toUpperCase()}
+                          </span>
+                          <div className="text-right">
+                            <div className="text-xs text-muted-foreground">
+                              {language === 'ar' ? 'الثقة' : 'Confidence'}
+                            </div>
+                            <div className="text-lg font-bold">
+                              {abn.confidence}%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Confidence Bar */}
+                      <div className="mt-3">
+                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full transition-all"
+                            style={{
+                              width: `${abn.confidence}%`,
+                              backgroundColor: abn.severity === 'critical' ? '#ef4444' :
+                                             abn.severity === 'high' ? '#f97316' :
+                                             abn.severity === 'medium' ? '#eab308' : '#22c55e'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Alert className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    {language === 'ar'
+                      ? 'هذه النتائج تم إنشاؤها بواسطة الذكاء الاصطناعي ويجب مراجعتها من قبل أخصائي أشعة مؤهل'
+                      : 'These findings are AI-generated and should be reviewed by a qualified radiologist'}
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
 
       {/* Comparison View */}

@@ -1,5 +1,6 @@
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import { makeRequest } from "./_core/map";
 import { invokeDeepSeek, deepMedicalReasoning } from "./_core/deepseek";
 import {
   createCase,
@@ -344,6 +345,192 @@ Provide structured JSON output with this exact format:
         ? undefined 
         : (input.type as "hospital" | "clinic" | "emergency" | "specialist");
       return await searchFacilities(facilityType, input.city);
+    }),
+
+  // Search real hospitals using Google Places API
+  searchRealFacilities: protectedProcedure
+    .input(z.object({
+      query: z.string().optional(),
+      location: z.object({
+        lat: z.number(),
+        lng: z.number(),
+      }).optional(),
+      radius: z.number().optional().default(10000), // 10km default
+      type: z.enum(["hospital", "clinic", "emergency", "specialist"]).optional(),
+    }))
+    .query(async ({ input }) => {
+      const { query, location, radius, type } = input;
+      
+      // Map facility type to Google Places types
+      const placeTypeMap: Record<string, string> = {
+        hospital: "hospital",
+        clinic: "doctor|health",
+        emergency: "hospital",
+        specialist: "doctor",
+      };
+      
+      let searchQuery = query;
+      if (!searchQuery && location) {
+        // If no query provided, search by type and location
+        const typeKeywords: Record<string, string> = {
+          hospital: "hospital",
+          clinic: "clinic",
+          emergency: "emergency hospital",
+          specialist: "specialist doctor",
+        };
+        searchQuery = `${type ? typeKeywords[type] : "hospital"} in Iraq`;
+      }
+      
+      try {
+        interface PlacesSearchResult {
+          results: Array<{
+            place_id: string;
+            name: string;
+            formatted_address: string;
+            geometry: {
+              location: { lat: number; lng: number };
+            };
+            rating?: number;
+            user_ratings_total?: number;
+            opening_hours?: {
+              open_now?: boolean;
+              weekday_text?: string[];
+            };
+            photos?: Array<{
+              photo_reference: string;
+              height: number;
+              width: number;
+            }>;
+            types: string[];
+          }>;
+          status: string;
+        }
+        
+        const params: Record<string, unknown> = {
+          query: searchQuery,
+        };
+        
+        if (location) {
+          params.location = `${location.lat},${location.lng}`;
+          params.radius = radius;
+        }
+        
+        const result = await makeRequest<PlacesSearchResult>(
+          "/maps/api/place/textsearch/json",
+          params
+        );
+        
+        if (result.status !== "OK" && result.status !== "ZERO_RESULTS") {
+          throw new Error(`Places API error: ${result.status}`);
+        }
+        
+        return result.results.map((place) => ({
+          id: place.place_id,
+          name: place.name,
+          address: place.formatted_address,
+          latitude: place.geometry.location.lat.toString(),
+          longitude: place.geometry.location.lng.toString(),
+          rating: place.rating?.toString(),
+          phone: null, // Will be fetched in details
+          hours: place.opening_hours?.open_now !== undefined 
+            ? (place.opening_hours.open_now ? "Open now" : "Closed")
+            : null,
+          services: null,
+          specialties: null,
+          website: null,
+          type: type || "hospital",
+          city: null,
+          emergencyServices: type === "emergency" ? 1 : 0,
+          photoReference: place.photos?.[0]?.photo_reference,
+          types: place.types,
+        }));
+      } catch (error) {
+        console.error("Error searching facilities:", error);
+        throw new Error(`Failed to search facilities: ${error}`);
+      }
+    }),
+
+  // Get detailed facility information from Google Places
+  getFacilityDetails: protectedProcedure
+    .input(z.object({
+      placeId: z.string(),
+    }))
+    .query(async ({ input }) => {
+      try {
+        interface PlaceDetailsResult {
+          result: {
+            place_id: string;
+            name: string;
+            formatted_address: string;
+            formatted_phone_number?: string;
+            international_phone_number?: string;
+            website?: string;
+            rating?: number;
+            user_ratings_total?: number;
+            opening_hours?: {
+              open_now?: boolean;
+              weekday_text?: string[];
+              periods?: Array<{
+                open: { day: number; time: string };
+                close?: { day: number; time: string };
+              }>;
+            };
+            geometry: {
+              location: { lat: number; lng: number };
+            };
+            photos?: Array<{
+              photo_reference: string;
+              height: number;
+              width: number;
+            }>;
+            reviews?: Array<{
+              author_name: string;
+              rating: number;
+              text: string;
+              time: number;
+            }>;
+            types: string[];
+          };
+          status: string;
+        }
+        
+        const result = await makeRequest<PlaceDetailsResult>(
+          "/maps/api/place/details/json",
+          {
+            place_id: input.placeId,
+            fields: "name,formatted_address,formatted_phone_number,international_phone_number,website,rating,user_ratings_total,opening_hours,geometry,photos,reviews,types",
+          }
+        );
+        
+        if (result.status !== "OK") {
+          throw new Error(`Place Details API error: ${result.status}`);
+        }
+        
+        const place = result.result;
+        return {
+          id: place.place_id,
+          name: place.name,
+          address: place.formatted_address,
+          latitude: place.geometry.location.lat.toString(),
+          longitude: place.geometry.location.lng.toString(),
+          phone: place.formatted_phone_number || place.international_phone_number,
+          website: place.website,
+          rating: place.rating?.toString(),
+          hours: place.opening_hours?.weekday_text?.join(", "),
+          openNow: place.opening_hours?.open_now,
+          photos: place.photos?.map(p => p.photo_reference),
+          reviews: place.reviews?.slice(0, 5).map(r => ({
+            author: r.author_name,
+            rating: r.rating,
+            text: r.text,
+            date: new Date(r.time * 1000).toLocaleDateString(),
+          })),
+          types: place.types,
+        };
+      } catch (error) {
+        console.error("Error fetching facility details:", error);
+        throw new Error(`Failed to fetch facility details: ${error}`);
+      }
     }),
 
   getEmergencyFacilities: protectedProcedure.query(async () => {

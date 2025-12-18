@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,8 @@ import { useLocation, useRoute } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import {
   LineChart,
   Line,
@@ -56,6 +58,9 @@ export default function CaseTimeline() {
   ]);
   
   const [selectedVitalMetric, setSelectedVitalMetric] = useState<'all' | 'bp' | 'hr' | 'temp' | 'spo2'>('all');
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const chartsRef = useRef<HTMLDivElement>(null);
   
   const { data: caseData } = trpc.clinical.getCase.useQuery(
     { id: caseId! },
@@ -198,6 +203,163 @@ export default function CaseTimeline() {
     );
   };
 
+  const handleExportPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      let yPosition = 20;
+
+      // Header
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Medical Case Timeline Report', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 10;
+
+      // Patient Information
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`Patient: ${caseData?.patientName || 'N/A'}`, 20, yPosition);
+      yPosition += 7;
+      pdf.text(`Age: ${caseData?.patientAge || 'N/A'} | Gender: ${caseData?.patientGender || 'N/A'}`, 20, yPosition);
+      yPosition += 7;
+      pdf.text(`Chief Complaint: ${caseData?.chiefComplaint || 'N/A'}`, 20, yPosition);
+      yPosition += 7;
+      pdf.text(`Urgency: ${caseData?.urgency || 'N/A'}`, 20, yPosition);
+      yPosition += 7;
+      pdf.text(`Report Generated: ${new Date().toLocaleString()}`, 20, yPosition);
+      yPosition += 15;
+
+      // Vital Signs Summary
+      if (vitalsData && vitalsData.length > 0) {
+        const latestVital = vitalsData[vitalsData.length - 1];
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Latest Vital Signs', 20, yPosition);
+        yPosition += 7;
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        if (latestVital.bloodPressureSystolic && latestVital.bloodPressureDiastolic) {
+          pdf.text(`Blood Pressure: ${latestVital.bloodPressureSystolic}/${latestVital.bloodPressureDiastolic} mmHg`, 20, yPosition);
+          yPosition += 6;
+        }
+        if (latestVital.heartRate) {
+          pdf.text(`Heart Rate: ${latestVital.heartRate} bpm`, 20, yPosition);
+          yPosition += 6;
+        }
+        if (latestVital.temperature) {
+          pdf.text(`Temperature: ${latestVital.temperature}°C`, 20, yPosition);
+          yPosition += 6;
+        }
+        if (latestVital.oxygenSaturation) {
+          pdf.text(`Oxygen Saturation: ${latestVital.oxygenSaturation}%`, 20, yPosition);
+          yPosition += 6;
+        }
+        yPosition += 10;
+      }
+
+      // Capture charts as images
+      if (chartsRef.current) {
+        try {
+          const canvas = await html2canvas(chartsRef.current, {
+            scale: 2,
+            logging: false,
+            useCORS: true,
+          });
+          const imgData = canvas.toDataURL('image/png');
+          const imgWidth = pageWidth - 40;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          // Check if we need a new page
+          if (yPosition + imgHeight > pageHeight - 20) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          
+          pdf.setFontSize(14);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('Vital Signs Trends', 20, yPosition);
+          yPosition += 10;
+          
+          pdf.addImage(imgData, 'PNG', 20, yPosition, imgWidth, Math.min(imgHeight, 100));
+          yPosition += Math.min(imgHeight, 100) + 15;
+        } catch (error) {
+          console.error('Error capturing charts:', error);
+        }
+      }
+
+      // Timeline Events
+      if (filteredEvents && filteredEvents.length > 0) {
+        // Check if we need a new page
+        if (yPosition > pageHeight - 40) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Timeline Events', 20, yPosition);
+        yPosition += 10;
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        filteredEvents.slice(0, 20).forEach((event: any, index: number) => {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 30) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          
+          const eventDate = new Date(event.eventDate).toLocaleDateString();
+          const eventText = `${eventDate} - ${event.eventType.toUpperCase()}`;
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(eventText, 20, yPosition);
+          yPosition += 5;
+          
+          pdf.setFont('helvetica', 'normal');
+          if (event.description) {
+            const lines = pdf.splitTextToSize(event.description, pageWidth - 50);
+            lines.forEach((line: string) => {
+              if (yPosition > pageHeight - 20) {
+                pdf.addPage();
+                yPosition = 20;
+              }
+              pdf.text(line, 25, yPosition);
+              yPosition += 5;
+            });
+          }
+          yPosition += 3;
+        });
+      }
+
+      // Footer on last page
+      const totalPages = pdf.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'italic');
+        pdf.text(
+          `MediTriage AI Pro - Page ${i} of ${totalPages}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: 'center' }
+        );
+      }
+
+      // Save PDF
+      pdf.save(`case-timeline-${caseData?.patientName?.replace(/\s+/g, '-')}-${Date.now()}.pdf`);
+      toast.success('PDF report generated successfully!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF report');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   if (authLoading || isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -225,15 +387,28 @@ export default function CaseTimeline() {
               </p>
             </div>
           </div>
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Export Timeline
+          <Button 
+            variant="outline"
+            onClick={handleExportPDF}
+            disabled={isGeneratingPDF}
+          >
+            {isGeneratingPDF ? (
+              <>
+                <Clock className="w-4 h-4 mr-2 animate-spin" />
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-2" />
+                Export Timeline PDF
+              </>
+            )}
           </Button>
         </div>
 
         {/* Vital Signs Charts */}
         {vitalsData && vitalsData.length > 0 && selectedEventTypes.includes("vital_signs") && (
-          <div className="space-y-6 mb-6">
+          <div ref={chartsRef} className="space-y-6 mb-6">
             {/* Vital Signs Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Blood Pressure Card */}

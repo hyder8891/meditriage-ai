@@ -434,3 +434,31 @@
   - [x] Add organ detail modal with medical information
   - [x] Implement better lighting and shadows
   - [x] Add anatomical layers (skeletal, muscular, organs)
+
+
+## Advanced Features Phase
+
+- [x] Google Places API Integration for Care Locator
+  - [x] Set up Google Places API backend integration
+  - [x] Create search endpoint for Iraqi hospitals and clinics
+  - [x] Fetch real-time facility data (name, address, phone, hours, rating)
+  - [x] Display place photos and reviews
+  - [x] Add "Search Nearby" feature using user location
+  - [x] Cache results for performance
+
+- [x] AI-Powered X-Ray Analysis
+  - [x] Integrate medical imaging AI model for abnormality detection
+  - [x] Create X-Ray upload and analysis workflow
+  - [x] Implement confidence scoring for detected abnormalities
+  - [x] Add visual highlighting of areas of concern
+  - [x] Generate AI analysis report with findings
+  - [x] Add disclaimer for AI-assisted diagnosis
+
+- [x] PDF Report Generation from Case Timeline
+  - [x] Install PDF generation library
+  - [x] Create report template with header/footer
+  - [x] Include patient demographics and case information
+  - [x] Embed vital signs charts as images
+  - [x] Add timeline events with formatting
+  - [x] Include diagnoses and treatment history
+  - [x] Add export button to Case Timeline page

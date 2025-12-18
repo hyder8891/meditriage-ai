@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   MapPin, 
   Hospital,
@@ -17,7 +24,10 @@ import {
   Globe,
   MapPinned,
   CheckCircle,
-  XCircle
+  XCircle,
+  Loader2,
+  Image as ImageIcon,
+  MessageSquare,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -25,7 +35,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityWithDistance {
-  id: number;
+  id: string | number;
   name: string;
   type: string;
   address: string;
@@ -39,27 +49,20 @@ interface FacilityWithDistance {
   latitude?: string | null;
   longitude?: string | null;
   distance?: number;
+  photoReference?: string;
+  openNow?: boolean;
 }
 
 export default function CareLocator() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
-  const [city, setCity] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [facilityType, setFacilityType] = useState<string>("");
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [sortBy, setSortBy] = useState<'distance' | 'rating'>('distance');
-
-  const { data: facilities, isLoading, refetch } = trpc.clinical.searchFacilities.useQuery(
-    {
-      type: facilityType as any,
-      city: city || undefined,
-    },
-    {
-      enabled: false,
-    }
-  );
-
-  const { data: emergencyFacilities } = trpc.clinical.getEmergencyFacilities.useQuery();
+  const [useRealData, setUseRealData] = useState(true);
+  const [selectedFacility, setSelectedFacility] = useState<any>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
   // Get user location
   useEffect(() => {
@@ -73,10 +76,56 @@ export default function CareLocator() {
         },
         (error) => {
           console.log('Location access denied:', error);
+          // Default to Baghdad coordinates
+          setUserLocation({ lat: 33.3152, lng: 44.3661 });
         }
       );
+    } else {
+      // Default to Baghdad coordinates
+      setUserLocation({ lat: 33.3152, lng: 44.3661 });
     }
   }, []);
+
+  // Query for real facilities using Google Places API
+  const { data: realFacilities, isLoading: realLoading, refetch: refetchReal } = trpc.clinical.searchRealFacilities.useQuery(
+    {
+      query: searchQuery || undefined,
+      location: userLocation || undefined,
+      radius: 50000, // 50km
+      type: facilityType as any,
+    },
+    {
+      enabled: useRealData && !!userLocation,
+    }
+  );
+
+  // Query for database facilities (fallback)
+  const { data: dbFacilities, isLoading: dbLoading, refetch: refetchDb } = trpc.clinical.searchFacilities.useQuery(
+    {
+      type: facilityType as any,
+      city: undefined,
+    },
+    {
+      enabled: !useRealData,
+    }
+  );
+
+  const { data: emergencyFacilities } = trpc.clinical.getEmergencyFacilities.useQuery();
+
+  // Fetch detailed facility information
+  const fetchFacilityDetails = async (placeId: string) => {
+    setDetailsLoading(true);
+    try {
+      const utils = trpc.useUtils();
+      const details = await utils.client.clinical.getFacilityDetails.query({ placeId });
+      setSelectedFacility(details);
+    } catch (error) {
+      toast.error("Failed to load facility details");
+      console.error(error);
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
 
   // Calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -90,6 +139,9 @@ export default function CareLocator() {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
   };
+
+  const facilities = useRealData ? realFacilities : dbFacilities;
+  const isLoading = useRealData ? realLoading : dbLoading;
 
   // Add distance to facilities and sort
   const facilitiesWithDistance: FacilityWithDistance[] = (facilities || []).map((facility: any) => {
@@ -116,7 +168,11 @@ export default function CareLocator() {
   });
 
   const handleSearch = () => {
-    refetch();
+    if (useRealData) {
+      refetchReal();
+    } else {
+      refetchDb();
+    }
   };
 
   const getTypeColor = (type: string) => {
@@ -129,27 +185,12 @@ export default function CareLocator() {
     }
   };
 
-  const isOpenNow = (hours?: string | null): boolean | null => {
-    if (!hours) return null;
-    
-    // Simple check for "24/7" or "Open 24 hours"
-    if (hours.toLowerCase().includes('24') || hours.toLowerCase().includes('24/7')) {
-      return true;
-    }
-    
-    // For more complex hours, would need proper parsing
-    // For now, return null (unknown)
-    return null;
-  };
-
   const getDirections = (facility: FacilityWithDistance) => {
     if (facility.latitude && facility.longitude) {
-      // Use coordinates for more accurate directions
       const url = `https://www.google.com/maps/dir/?api=1&destination=${facility.latitude},${facility.longitude}`;
       window.open(url, '_blank');
     } else {
-      // Fallback to address search
-      const address = encodeURIComponent(`${facility.name}, ${facility.address}, ${facility.city || ''}, Iraq`);
+      const address = encodeURIComponent(`${facility.name}, ${facility.address}`);
       window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
     }
   };
@@ -159,16 +200,10 @@ export default function CareLocator() {
       const url = `https://www.google.com/maps/search/?api=1&query=${facility.latitude},${facility.longitude}`;
       window.open(url, '_blank');
     } else {
-      const address = encodeURIComponent(`${facility.name}, ${facility.address}, ${facility.city || ''}, Iraq`);
+      const address = encodeURIComponent(`${facility.name}, ${facility.address}`);
       window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
     }
   };
-
-  const iraqiCities = [
-    "Baghdad", "Basra", "Mosul", "Erbil", "Kirkuk", 
-    "Najaf", "Karbala", "Nasiriyah", "Amarah", "Diwaniyah",
-    "Kut", "Hillah", "Ramadi", "Fallujah", "Samarra"
-  ];
 
   const t = {
     title: language === 'ar' ? 'محدد موقع الرعاية' : 'Care Locator',
@@ -177,8 +212,7 @@ export default function CareLocator() {
     emergencyServices: language === 'ar' ? 'خدمات الطوارئ' : 'Emergency Services',
     searchFilters: language === 'ar' ? 'مرشحات البحث' : 'Search Filters',
     findNearYou: language === 'ar' ? 'ابحث عن المرافق القريبة منك' : 'Find facilities near you',
-    city: language === 'ar' ? 'المدينة' : 'City',
-    selectCity: language === 'ar' ? 'اختر المدينة' : 'Select city',
+    searchPlaceholder: language === 'ar' ? 'ابحث عن المستشفيات والعيادات...' : 'Search for hospitals, clinics...',
     facilityType: language === 'ar' ? 'نوع المرفق' : 'Facility Type',
     allTypes: language === 'ar' ? 'جميع الأنواع' : 'All Types',
     hospital: language === 'ar' ? 'مستشفى' : 'Hospital',
@@ -189,19 +223,24 @@ export default function CareLocator() {
     distance: language === 'ar' ? 'المسافة' : 'Distance',
     rating: language === 'ar' ? 'التقييم' : 'Rating',
     searchFacilities: language === 'ar' ? 'البحث عن المرافق' : 'Search Facilities',
+    useRealData: language === 'ar' ? 'استخدام بيانات حقيقية' : 'Use Real Data',
     quickStats: language === 'ar' ? 'إحصائيات سريعة' : 'Quick Stats',
     totalFacilities: language === 'ar' ? 'إجمالي المرافق' : 'Total Facilities',
     emergencyCenters: language === 'ar' ? 'مراكز الطوارئ' : 'Emergency Centers',
     loading: language === 'ar' ? 'جاري التحميل...' : 'Loading facilities...',
     noFacilities: language === 'ar' ? 'لم يتم العثور على مرافق' : 'No facilities found',
-    adjustFilters: language === 'ar' ? 'حاول تعديل مرشحات البحث أو اختر مدينة مختلفة' : 'Try adjusting your search filters or select a different city',
+    adjustFilters: language === 'ar' ? 'حاول تعديل مرشحات البحث' : 'Try adjusting your search filters',
     getDirections: language === 'ar' ? 'احصل على الاتجاهات' : 'Get Directions',
     viewOnMap: language === 'ar' ? 'عرض على الخريطة' : 'View on Map',
+    viewDetails: language === 'ar' ? 'عرض التفاصيل' : 'View Details',
     openNow: language === 'ar' ? 'مفتوح الآن' : 'Open Now',
     closed: language === 'ar' ? 'مغلق' : 'Closed',
     services: language === 'ar' ? 'الخدمات' : 'Services',
     website: language === 'ar' ? 'الموقع الإلكتروني' : 'Website',
     kmAway: language === 'ar' ? 'كم' : 'km away',
+    photos: language === 'ar' ? 'الصور' : 'Photos',
+    reviews: language === 'ar' ? 'التقييمات' : 'Reviews',
+    openingHours: language === 'ar' ? 'ساعات العمل' : 'Opening Hours',
   };
 
   return (
@@ -268,19 +307,13 @@ export default function CareLocator() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">{t.city}</label>
-                  <Select value={city} onValueChange={setCity}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t.selectCity} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {iraqiCities.map((cityName) => (
-                        <SelectItem key={cityName} value={cityName}>
-                          {cityName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <label className="text-sm font-semibold text-gray-700">{t.searchPlaceholder}</label>
+                  <Input
+                    placeholder={t.searchPlaceholder}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -312,11 +345,29 @@ export default function CareLocator() {
                   </Select>
                 </div>
 
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="useRealData"
+                    checked={useRealData}
+                    onChange={(e) => setUseRealData(e.target.checked)}
+                    className="rounded"
+                  />
+                  <label htmlFor="useRealData" className="text-sm text-gray-700 cursor-pointer">
+                    {t.useRealData} (Google Places)
+                  </label>
+                </div>
+
                 <Button
                   onClick={handleSearch}
                   className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+                  disabled={isLoading}
                 >
-                  <Search className="w-4 h-4 mr-2" />
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Search className="w-4 h-4 mr-2" />
+                  )}
                   {t.searchFacilities}
                 </Button>
 
@@ -326,7 +377,7 @@ export default function CareLocator() {
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">{t.totalFacilities}</span>
-                      <span className="font-semibold">{facilities?.length || 0}</span>
+                      <span className="font-semibold">{facilitiesWithDistance?.length || 0}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">{t.emergencyCenters}</span>
@@ -343,12 +394,12 @@ export default function CareLocator() {
             {isLoading ? (
               <Card className="card-modern">
                 <CardContent className="py-12 text-center">
+                  <Loader2 className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
                   <p className="text-gray-500">{t.loading}</p>
                 </CardContent>
               </Card>
             ) : facilitiesWithDistance && facilitiesWithDistance.length > 0 ? (
               facilitiesWithDistance.map((facility) => {
-                const openStatus = isOpenNow(facility.hours);
                 const services = facility.services ? JSON.parse(facility.services) : [];
                 const specialties = facility.specialties ? JSON.parse(facility.specialties) : [];
                 
@@ -371,7 +422,7 @@ export default function CareLocator() {
                           </div>
                           <CardDescription className="flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
-                            {facility.address}, {facility.city}
+                            {facility.address}
                             {facility.distance && (
                               <span className="text-blue-600 font-medium ml-2">
                                 ({facility.distance.toFixed(1)} {t.kmAway})
@@ -398,8 +449,8 @@ export default function CareLocator() {
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="w-4 h-4 text-gray-600" />
                             <span className="text-gray-600">{facility.hours}</span>
-                            {openStatus !== null && (
-                              openStatus ? (
+                            {facility.openNow !== undefined && (
+                              facility.openNow ? (
                                 <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
                                   <CheckCircle className="w-3 h-3 mr-1" />
                                   {t.openNow}
@@ -454,7 +505,7 @@ export default function CareLocator() {
                       )}
 
                       {/* Action Buttons */}
-                      <div className="grid grid-cols-2 gap-2 mt-3">
+                      <div className="grid grid-cols-3 gap-2 mt-3">
                         <Button
                           variant="default"
                           className="w-full"
@@ -471,6 +522,16 @@ export default function CareLocator() {
                           <MapPinned className="w-4 h-4 mr-2" />
                           {t.viewOnMap}
                         </Button>
+                        {useRealData && typeof facility.id === 'string' && (
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => fetchFacilityDetails(facility.id as string)}
+                          >
+                            <ImageIcon className="w-4 h-4 mr-2" />
+                            {t.viewDetails}
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -490,6 +551,102 @@ export default function CareLocator() {
           </div>
         </div>
       </div>
+
+      {/* Facility Details Modal */}
+      <Dialog open={!!selectedFacility} onOpenChange={() => setSelectedFacility(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Hospital className="w-6 h-6 text-green-600" />
+              {selectedFacility?.name}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedFacility?.address}
+            </DialogDescription>
+          </DialogHeader>
+          {detailsLoading ? (
+            <div className="py-12 text-center">
+              <Loader2 className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
+              <p className="text-gray-500">Loading details...</p>
+            </div>
+          ) : selectedFacility && (
+            <div className="space-y-4 mt-4">
+              {/* Contact Information */}
+              <div className="grid md:grid-cols-2 gap-4">
+                {selectedFacility.phone && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Phone className="w-4 h-4 text-gray-600" />
+                    <a href={`tel:${selectedFacility.phone}`} className="hover:text-green-600">
+                      {selectedFacility.phone}
+                    </a>
+                  </div>
+                )}
+                {selectedFacility.website && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Globe className="w-4 h-4 text-gray-600" />
+                    <a 
+                      href={selectedFacility.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="hover:text-green-600 truncate"
+                    >
+                      Visit Website
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Rating */}
+              {selectedFacility.rating && (
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold text-lg">{selectedFacility.rating}</span>
+                </div>
+              )}
+
+              {/* Opening Hours */}
+              {selectedFacility.hours && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-blue-600" />
+                    {t.openingHours}
+                  </h4>
+                  <p className="text-sm text-gray-600 whitespace-pre-line">
+                    {selectedFacility.hours}
+                  </p>
+                </div>
+              )}
+
+              {/* Reviews */}
+              {selectedFacility.reviews && selectedFacility.reviews.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-purple-600" />
+                    {t.reviews}
+                  </h4>
+                  <div className="space-y-3">
+                    {selectedFacility.reviews.map((review: any, index: number) => (
+                      <Card key={index} className="bg-gray-50">
+                        <CardContent className="pt-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-sm">{review.author}</span>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                              <span className="text-xs">{review.rating}</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">{review.text}</p>
+                          <p className="text-xs text-gray-400">{review.date}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
