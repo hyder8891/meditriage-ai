@@ -7,12 +7,14 @@ import {
   clinicalNotes,
   medications,
   facilities,
+  transcriptions,
   InsertCase,
   InsertVitals,
   InsertDiagnosis,
   InsertClinicalNote,
   InsertMedication,
   InsertFacility,
+  InsertTranscription,
 } from "../drizzle/schema";
 
 /**
@@ -179,4 +181,60 @@ export async function getEmergencyFacilities() {
   return await db.select().from(facilities)
     .where(eq(facilities.emergencyServices, 1))
     .limit(20);
+}
+
+/**
+ * Transcription Management for Live Scribe
+ */
+export async function createTranscription(transcriptionData: InsertTranscription) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(transcriptions).values(transcriptionData);
+  return result[0].insertId;
+}
+
+export async function getTranscriptionById(transcriptionId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(transcriptions)
+    .where(eq(transcriptions.id, transcriptionId))
+    .limit(1);
+  return result[0] || null;
+}
+
+export async function getTranscriptionsByClinicianId(clinicianId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(transcriptions)
+    .where(eq(transcriptions.clinicianId, clinicianId))
+    .orderBy(desc(transcriptions.createdAt));
+}
+
+export async function getTranscriptionsByCaseId(caseId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(transcriptions)
+    .where(eq(transcriptions.caseId, caseId))
+    .orderBy(desc(transcriptions.createdAt));
+}
+
+export async function updateTranscription(transcriptionId: number, updates: Partial<InsertTranscription>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(transcriptions)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(transcriptions.id, transcriptionId));
+}
+
+export async function deleteTranscription(transcriptionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(transcriptions)
+    .where(eq(transcriptions.id, transcriptionId));
 }

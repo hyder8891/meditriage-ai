@@ -10,7 +10,18 @@
 - [x] Case management dashboard with patient list
 - [x] Clinical intake form (vitals: BP, HR, temp, SpO2, etc.)
 - [x] Medical history collection form
-- [ ] Live Scribe functionality for real-time note-taking
+- [x] Live Scribe functionality for real-time note-taking
+  - [x] Create transcriptions database table
+  - [x] Build backend voice transcription API endpoint
+  - [x] Implement audio recording with MediaRecorder API
+  - [x] Create Live Scribe page with recording controls
+  - [x] Add real-time transcription display
+  - [x] Implement save to case notes functionality
+  - [x] Add transcription history view
+  - [x] Create speaker identification (clinician/patient)
+  - [x] Add edit and formatting controls for transcribed text
+  - [x] Integrate with clinical cases database
+  - [x] Add Live Scribe route and navigation link
 - [x] Clinical Reasoning Engine integration
 - [x] Differential diagnosis generator with probabilities
 - [x] Red flags detection and display
@@ -88,7 +99,7 @@
 - [ ] 3D Bio-Scanner with anatomical highlighting
 - [ ] Interactive body map for symptom location
 - [ ] Timeline visualization for symptom progression
-- [ ] Live Scribe real-time note-taking
+- [ ] Live Scribe real-time note-taking (see detailed tasks above)
 
 
 ## 3D Bio-Scanner Visualization

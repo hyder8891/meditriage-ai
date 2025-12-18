@@ -309,3 +309,35 @@ export const facilities = mysqlTable("facilities", {
 
 export type Facility = typeof facilities.$inferSelect;
 export type InsertFacility = typeof facilities.$inferInsert;
+
+/**
+ * Transcriptions table for Live Scribe feature
+ */
+export const transcriptions = mysqlTable("transcriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  caseId: int("case_id"),
+  clinicianId: int("clinician_id").notNull(),
+  
+  // Audio file info
+  audioKey: varchar("audio_key", { length: 512 }),
+  audioUrl: varchar("audio_url", { length: 1024 }),
+  duration: int("duration"), // in seconds
+  
+  // Transcription content
+  transcriptionText: text("transcription_text").notNull(),
+  language: varchar("language", { length: 10 }).notNull().default("en"),
+  
+  // Metadata
+  speaker: mysqlEnum("speaker", ["clinician", "patient", "mixed"]).default("clinician"),
+  status: mysqlEnum("status", ["draft", "final", "archived"]).default("draft").notNull(),
+  
+  // Integration
+  savedToClinicalNotes: boolean("saved_to_clinical_notes").default(false),
+  clinicalNoteId: int("clinical_note_id"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Transcription = typeof transcriptions.$inferSelect;
+export type InsertTranscription = typeof transcriptions.$inferInsert;

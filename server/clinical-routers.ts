@@ -18,6 +18,12 @@ import {
   searchFacilities,
   getEmergencyFacilities,
   addFacility,
+  createTranscription,
+  getTranscriptionById,
+  getTranscriptionsByClinicianId,
+  getTranscriptionsByCaseId,
+  updateTranscription,
+  deleteTranscription,
 } from "./clinical-db";
 
 export const clinicalRouter = router({
@@ -371,4 +377,87 @@ Be empathetic, clear, and avoid medical jargon. Always encourage seeking profess
 
     return { success: true, count: iraqiFacilities.length };
   }),
+
+  // Live Scribe: Voice transcription
+  createTranscription: protectedProcedure
+    .input(z.object({
+      caseId: z.number().optional(),
+      audioKey: z.string().optional(),
+      audioUrl: z.string().optional(),
+      duration: z.number().optional(),
+      transcriptionText: z.string(),
+      language: z.string().default("en"),
+      speaker: z.enum(["clinician", "patient", "mixed"]).default("clinician"),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const transcriptionId = await createTranscription({
+        ...input,
+        clinicianId: ctx.user.id,
+      });
+      return { transcriptionId };
+    }),
+
+  getTranscription: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      return await getTranscriptionById(input.id);
+    }),
+
+  getMyTranscriptions: protectedProcedure
+    .query(async ({ ctx }) => {
+      return await getTranscriptionsByClinicianId(ctx.user.id);
+    }),
+
+  getCaseTranscriptions: protectedProcedure
+    .input(z.object({ caseId: z.number() }))
+    .query(async ({ input }) => {
+      return await getTranscriptionsByCaseId(input.caseId);
+    }),
+
+  updateTranscription: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      transcriptionText: z.string().optional(),
+      status: z.enum(["draft", "final", "archived"]).optional(),
+      savedToClinicalNotes: z.boolean().optional(),
+      clinicalNoteId: z.number().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...updates } = input;
+      await updateTranscription(id, updates);
+      return { success: true };
+    }),
+
+  deleteTranscription: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await deleteTranscription(input.id);
+      return { success: true };
+    }),
+
+  transcribeAudio: protectedProcedure
+    .input(z.object({
+      audioUrl: z.string(),
+      language: z.string().default("en"),
+    }))
+    .mutation(async ({ input }) => {
+      // Import transcribeAudio from voice transcription helper
+      const { transcribeAudio } = await import("./_core/voiceTranscription");
+      
+      const result = await transcribeAudio({
+        audioUrl: input.audioUrl,
+        language: input.language,
+      });
+
+      // Check if it's an error
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      return {
+        text: result.text,
+        language: result.language,
+        duration: result.duration,
+      };
+    }),
 });

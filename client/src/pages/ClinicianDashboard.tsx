@@ -13,7 +13,8 @@ import {
   FileText,
   TrendingUp,
   LogOut,
-  Menu
+  Menu,
+  Mic
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -115,6 +116,14 @@ export default function ClinicianDashboard() {
             >
               <Activity className="w-5 h-5 mr-3" />
               {sidebarOpen && "3D Bio-Scanner"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/live-scribe")}
+            >
+              <Mic className="w-5 h-5 mr-3" />
+              {sidebarOpen && "Live Scribe"}
             </Button>
           </nav>
 

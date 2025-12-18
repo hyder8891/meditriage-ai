@@ -36,6 +36,13 @@
       "when": 1766060376953,
       "tag": "0004_windy_snowbird",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1766062834210,
+      "tag": "0005_lying_meteorite",
+      "breakpoints": true
     }
   ]
 }
