@@ -20,6 +20,8 @@ import {
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
+import { PatientVitalsInput } from "@/components/PatientVitalsInput";
+import { PatientReminders } from "@/components/PatientReminders";
 
 export default function PatientPortal() {
   const { language } = useLanguage();
@@ -292,42 +294,44 @@ export default function PatientPortal() {
           </TabsContent>
 
           {/* Other tabs would be implemented similarly */}
-          <TabsContent value="appointments">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t.appointments}</CardTitle>
-                <CardDescription>View and manage your appointments</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500">Appointments list will be displayed here</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="medications">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t.medications}</CardTitle>
-                <CardDescription>Track your prescribed medications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => setLocation("/patient/medications")}>
-                  {t.viewMedications}
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              <PatientReminders patientId={patientId} />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t.medications}</CardTitle>
+                  <CardDescription>
+                    {language === 'ar' ? 'عرض أدويتك الحالية' : 'View your current medications'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => setLocation("/patient/medications")}>
+                    {t.viewMedications}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="vitals">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t.vitalSigns}</CardTitle>
-                <CardDescription>Monitor your health metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500">Vital signs history will be displayed here</p>
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              <PatientVitalsInput patientId={patientId} />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t.vitalSigns} {language === 'ar' ? 'السابقة' : 'History'}</CardTitle>
+                  <CardDescription>
+                    {language === 'ar' ? 'عرض سجل العلامات الحيوية' : 'View your vital signs history'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-500">
+                    {language === 'ar' ? 'سيتم عرض سجل العلامات الحيوية هنا' : 'Vital signs history will be displayed here'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="messages">

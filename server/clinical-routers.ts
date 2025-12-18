@@ -1077,4 +1077,34 @@ Provide a well-structured, professional clinical note. Use clear medical termino
       const { getUnreadMessageCount } = await import("./messaging-db");
       return getUnreadMessageCount(input.recipientId);
     }),
+
+  // Medication Reminders
+  createMedicationReminders: protectedProcedure
+    .input(z.object({ prescriptionId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      const { createMedicationReminders } = await import("./medication-reminders");
+      return createMedicationReminders(input.prescriptionId);
+    }),
+
+  getUpcomingReminders: protectedProcedure
+    .input(z.object({ 
+      patientId: z.number(),
+      hoursAhead: z.number().optional().default(24),
+    }))
+    .query(async ({ input }) => {
+      const { getUpcomingReminders } = await import("./medication-reminders");
+      return getUpcomingReminders(input.patientId, input.hoursAhead);
+    }),
+
+  processPendingReminders: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      const { processPendingReminders } = await import("./medication-reminders");
+      return processPendingReminders();
+    }),
 });

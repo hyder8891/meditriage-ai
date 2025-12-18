@@ -28,10 +28,21 @@ export default function MedicationManagement() {
 
   const { data: prescriptions, refetch } = trpc.clinical.getAllPrescriptions.useQuery();
 
+  const createRemindersMutation = trpc.clinical.createMedicationReminders.useMutation();
+  
   const createPrescriptionMutation = trpc.clinical.createPrescription.useMutation({
-    onSuccess: () => {
+    onSuccess: async (data) => {
       toast.success("Prescription created successfully");
       refetch();
+      
+      // Automatically create medication reminders
+      try {
+        await createRemindersMutation.mutateAsync({ prescriptionId: data.prescriptionId });
+        toast.success(language === 'ar' ? 'تم إنشاء تذكيرات الدواء' : 'Medication reminders created');
+      } catch (error) {
+        console.error('Failed to create reminders:', error);
+      }
+      
       setShowNewPrescriptionDialog(false);
       resetForm();
     },
