@@ -1,0 +1,315 @@
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { 
+  Brain, 
+  AlertTriangle, 
+  Activity,
+  FileText,
+  ArrowLeft,
+  Loader2,
+  TrendingUp,
+  CheckCircle2
+} from "lucide-react";
+import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+
+export default function ClinicalReasoning() {
+  const [, setLocation] = useLocation();
+  const [chiefComplaint, setChiefComplaint] = useState("");
+  const [symptoms, setSymptoms] = useState("");
+  const [patientAge, setPatientAge] = useState("");
+  const [patientGender, setPatientGender] = useState("");
+  const [bloodPressure, setBloodPressure] = useState("");
+  const [heartRate, setHeartRate] = useState("");
+  const [temperature, setTemperature] = useState("");
+  const [oxygenSaturation, setOxygenSaturation] = useState("");
+  const [reasoning, setReasoning] = useState<any>(null);
+
+  const generateDiagnosisMutation = trpc.clinical.generateDifferentialDiagnosis.useMutation({
+    onSuccess: (data) => {
+      setReasoning(data);
+      toast.success("Differential diagnosis generated");
+    },
+    onError: (error) => {
+      toast.error("Failed to generate diagnosis: " + error.message);
+    },
+  });
+
+  const handleGenerate = () => {
+    if (!chiefComplaint || !symptoms) {
+      toast.error("Please enter chief complaint and symptoms");
+      return;
+    }
+
+    const symptomList = symptoms.split(",").map(s => s.trim()).filter(s => s);
+
+    generateDiagnosisMutation.mutate({
+      caseId: 1, // Temporary - in production, this would be from route params
+      chiefComplaint,
+      symptoms: symptomList,
+      vitals: {
+        bloodPressure,
+        heartRate: heartRate ? parseInt(heartRate) : undefined,
+        temperature,
+        oxygenSaturation: oxygenSaturation ? parseInt(oxygenSaturation) : undefined,
+      },
+      patientAge: patientAge ? parseInt(patientAge) : undefined,
+      patientGender,
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => setLocation("/clinician/dashboard")}
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Dashboard
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Brain className="w-8 h-8 text-purple-600" />
+                Clinical Reasoning Engine
+              </h1>
+              <p className="text-gray-600 mt-1">AI-powered differential diagnosis with DeepSeek</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Input Section */}
+          <Card className="card-modern">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Patient Information
+              </CardTitle>
+              <CardDescription>Enter clinical data for AI analysis</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="complaint">Chief Complaint *</Label>
+                <Input
+                  id="complaint"
+                  value={chiefComplaint}
+                  onChange={(e) => setChiefComplaint(e.target.value)}
+                  placeholder="e.g., Chest pain, Headache, Abdominal pain"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="symptoms">Symptoms (comma-separated) *</Label>
+                <Textarea
+                  id="symptoms"
+                  value={symptoms}
+                  onChange={(e) => setSymptoms(e.target.value)}
+                  placeholder="e.g., fever, cough, shortness of breath, fatigue"
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="age">Age</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    value={patientAge}
+                    onChange={(e) => setPatientAge(e.target.value)}
+                    placeholder="Years"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="gender">Gender</Label>
+                  <select
+                    id="gender"
+                    value={patientGender}
+                    onChange={(e) => setPatientGender(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  >
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Activity className="w-4 h-4" />
+                  Vital Signs
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="bp">Blood Pressure</Label>
+                    <Input
+                      id="bp"
+                      value={bloodPressure}
+                      onChange={(e) => setBloodPressure(e.target.value)}
+                      placeholder="120/80"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="hr">Heart Rate</Label>
+                    <Input
+                      id="hr"
+                      type="number"
+                      value={heartRate}
+                      onChange={(e) => setHeartRate(e.target.value)}
+                      placeholder="bpm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="temp">Temperature</Label>
+                    <Input
+                      id="temp"
+                      value={temperature}
+                      onChange={(e) => setTemperature(e.target.value)}
+                      placeholder="37.0°C"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="spo2">SpO2</Label>
+                    <Input
+                      id="spo2"
+                      type="number"
+                      value={oxygenSaturation}
+                      onChange={(e) => setOxygenSaturation(e.target.value)}
+                      placeholder="%"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleGenerate}
+                disabled={generateDiagnosisMutation.isPending}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+                size="lg"
+              >
+                {generateDiagnosisMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Analyzing with AI...
+                  </>
+                ) : (
+                  <>
+                    <Brain className="w-5 h-5 mr-2" />
+                    Generate Differential Diagnosis
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Results Section */}
+          <div className="space-y-6">
+            {reasoning ? (
+              <>
+                {/* Differential Diagnosis */}
+                <Card className="card-modern border-purple-200">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-purple-700">
+                      <TrendingUp className="w-5 h-5" />
+                      Differential Diagnosis
+                    </CardTitle>
+                    <CardDescription>Ranked by likelihood</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {reasoning.differentialDiagnosis.map((diagnosis: string, index: number) => {
+                      const probability = Math.max(0, 100 - (index * 15));
+                      return (
+                        <div key={index} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900">{diagnosis}</h4>
+                            <Badge className="bg-purple-600">{probability}%</Badge>
+                          </div>
+                          <Progress value={probability} className="h-2" />
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+
+                {/* Clinical Reasoning */}
+                <Card className="card-modern">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Brain className="w-5 h-5" />
+                      Clinical Reasoning
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {reasoning.reasoning}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Recommended Tests */}
+                {reasoning.recommendedTests && reasoning.recommendedTests.length > 0 && (
+                  <Card className="card-modern border-blue-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-blue-700">
+                        <CheckCircle2 className="w-5 h-5" />
+                        Recommended Diagnostic Tests
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {reasoning.recommendedTests.map((test: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-700">{test}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Urgency Assessment */}
+                <Card className="card-modern border-orange-200 bg-orange-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-orange-700">
+                      <AlertTriangle className="w-5 h-5" />
+                      Urgency Assessment
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-900 font-semibold text-lg">
+                      {reasoning.urgencyAssessment}
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <Card className="card-modern">
+                <CardContent className="py-12 text-center">
+                  <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-2">No analysis yet</p>
+                  <p className="text-sm text-gray-400">
+                    Enter patient information and click "Generate Differential Diagnosis"
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

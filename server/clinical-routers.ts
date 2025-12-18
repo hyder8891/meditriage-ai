@@ -1,4 +1,4 @@
-import { protectedProcedure, router } from "./_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeDeepSeek, deepMedicalReasoning } from "./_core/deepseek";
 import {
@@ -214,7 +214,51 @@ export const clinicalRouter = router({
       return await getClinicalNotesByCaseId(input.caseId);
     }),
 
-  // PharmaGuard - Drug Interaction Checker
+  // Patient symptom analysis
+  patientSymptomAnalysis: publicProcedure
+    .input(z.object({
+      symptoms: z.string(),
+    }))
+    .mutation(async ({ input }: { input: { symptoms: string } }) => {
+      // Use DeepSeek for patient-friendly symptom analysis
+      const response = await invokeDeepSeek({
+        messages: [
+          {
+            role: 'system',
+            content: `You are a compassionate medical AI assistant helping patients understand their symptoms. Provide:
+1. Urgency level (EMERGENCY, URGENT, SEMI-URGENT, NON-URGENT, ROUTINE)
+2. Personalized care guide with clear next steps
+3. Doctor communication script (how to describe symptoms to doctor)
+4. Possible conditions (3-5 most likely)
+5. Home care advice
+
+Be empathetic, clear, and avoid medical jargon. Always encourage seeking professional care when appropriate.`,
+          },
+          {
+            role: 'user',
+            content: `Patient symptoms: ${input.symptoms}`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+      });
+
+      const content = response.choices[0]?.message?.content || '';
+
+      // Parse structured response
+      const urgencyMatch = content.match(/urgency[:\s]*(emergency|urgent|semi-urgent|non-urgent|routine)/i);
+      const urgencyLevel = urgencyMatch ? urgencyMatch[1].toUpperCase() : 'NON-URGENT';
+
+      return {
+        urgencyLevel,
+        careGuide: content,
+        doctorScript: `When speaking with your doctor, you can say: "${input.symptoms}"`,
+        possibleConditions: [],
+        homeCareAdvice: 'Rest, stay hydrated, and monitor your symptoms.',
+      };
+    }),
+
+  // PharmaGuard: Drug interaction checkerr
   searchMedications: protectedProcedure
     .input(z.object({ query: z.string() }))
     .query(async ({ input }) => {
@@ -223,15 +267,10 @@ export const clinicalRouter = router({
 
   checkDrugInteractions: protectedProcedure
     .input(z.object({
-      medications: z.array(z.number()), // medication IDs
+      medications: z.array(z.string()), // medication names
     }))
     .mutation(async ({ input }) => {
-      const meds = await Promise.all(
-        input.medications.map(id => getMedicationById(id))
-      );
-
-      // Use DeepSeek to analyze interactions
-      const medNames = meds.filter(m => m !== null).map(m => m!.name);
+      const medNames = input.medications;
       
       const response = await invokeDeepSeek({
         messages: [
@@ -246,9 +285,12 @@ export const clinicalRouter = router({
         ],
       });
 
+      const content = response.choices[0]?.message?.content || '';
+      
       return {
-        medications: meds,
-        analysis: response.choices[0]?.message?.content || '',
+        interactions: [],
+        recommendations: [],
+        analysis: content,
       };
     }),
 

@@ -16,6 +16,10 @@ import AdminLoginTraditional from "./pages/AdminLoginTraditional";
 import PortalSelection from "./pages/PortalSelection";
 import ClinicianLogin from "./pages/ClinicianLogin";
 import ClinicianDashboard from "./pages/ClinicianDashboard";
+import ClinicalReasoning from "./pages/ClinicalReasoning";
+import PatientSymptomChecker from "./pages/PatientSymptomChecker";
+import PharmaGuard from "./pages/PharmaGuard";
+import CareLocator from "./pages/CareLocator";
 
 function Router() {
   return (
@@ -24,6 +28,10 @@ function Router() {
       <Route path={"/home"} component={Landing} />
       <Route path={"/clinician/login"} component={ClinicianLogin} />
       <Route path={"/clinician/dashboard"} component={ClinicianDashboard} />
+      <Route path={"/clinician/reasoning"} component={ClinicalReasoning} />
+      <Route path={"/patient/symptom-checker"} component={PatientSymptomChecker} />
+      <Route path={"/clinician/pharmaguard"} component={PharmaGuard} />
+      <Route path={"/clinician/care-locator"} component={CareLocator} />
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
