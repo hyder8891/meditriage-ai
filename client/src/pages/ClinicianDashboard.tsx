@@ -42,7 +42,8 @@ export default function ClinicianDashboard() {
   };
 
   const handleNewCase = () => {
-    setLocation("/clinician/case/new");
+    // Navigate to Clinical Reasoning to create a new case
+    setLocation("/clinician/reasoning");
   };
 
   // Redirect if not authenticated or not admin
@@ -261,7 +262,7 @@ export default function ClinicianDashboard() {
                       <div
                         key={caseItem.id}
                         className="p-4 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer"
-                        onClick={() => setLocation(`/clinician/case/${caseItem.id}`)}
+                        onClick={() => setLocation(`/clinician/case/${caseItem.id}/timeline`)}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
