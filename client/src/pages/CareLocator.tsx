@@ -28,11 +28,13 @@ import {
   Loader2,
   Image as ImageIcon,
   MessageSquare,
+  Calendar,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { AppointmentBooking } from "@/components/AppointmentBooking";
 
 interface FacilityWithDistance {
   id: string | number;
@@ -63,6 +65,7 @@ export default function CareLocator() {
   const [useRealData, setUseRealData] = useState(true);
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [bookingFacility, setBookingFacility] = useState<any>(null);
 
   // Get user location
   useEffect(() => {
@@ -233,6 +236,7 @@ export default function CareLocator() {
     getDirections: language === 'ar' ? 'احصل على الاتجاهات' : 'Get Directions',
     viewOnMap: language === 'ar' ? 'عرض على الخريطة' : 'View on Map',
     viewDetails: language === 'ar' ? 'عرض التفاصيل' : 'View Details',
+    bookAppointment: language === 'ar' ? 'حجز موعد' : 'Book Appointment',
     openNow: language === 'ar' ? 'مفتوح الآن' : 'Open Now',
     closed: language === 'ar' ? 'مغلق' : 'Closed',
     services: language === 'ar' ? 'الخدمات' : 'Services',
@@ -505,7 +509,7 @@ export default function CareLocator() {
                       )}
 
                       {/* Action Buttons */}
-                      <div className="grid grid-cols-3 gap-2 mt-3">
+                      <div className="grid grid-cols-2 gap-2 mt-3">
                         <Button
                           variant="default"
                           className="w-full"
@@ -521,6 +525,16 @@ export default function CareLocator() {
                         >
                           <MapPinned className="w-4 h-4 mr-2" />
                           {t.viewOnMap}
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <Button
+                          variant="default"
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          onClick={() => setBookingFacility(facility)}
+                        >
+                          <Calendar className="w-4 h-4 mr-2" />
+                          {t.bookAppointment}
                         </Button>
                         {useRealData && typeof facility.id === 'string' && (
                           <Button
@@ -647,6 +661,19 @@ export default function CareLocator() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Appointment Booking Modal */}
+      {bookingFacility && (
+        <AppointmentBooking
+          facility={{
+            id: typeof bookingFacility.id === 'number' ? bookingFacility.id : undefined,
+            name: bookingFacility.name,
+            address: bookingFacility.address,
+          }}
+          open={!!bookingFacility}
+          onClose={() => setBookingFacility(null)}
+        />
+      )}
     </div>
   );
 }

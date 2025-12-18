@@ -468,9 +468,17 @@
 
 - [ ] Appointment Booking System
   - [x] Create appointments database schema
-  - [ ] Build appointment scheduling UI in Care Locator
-  - [ ] Implement calendar view for clinicians
-  - [ ] Add appointment status management (pending, confirmed, completed, cancelled)
+  - [x] Install calendar dependencies (react-big-calendar, date-fns)
+  - [x] Build appointment scheduling UI in Care Locator
+  - [x] Create AppointmentBooking component with date/time picker
+  - [x] Add Book Appointment button to facility cards
+  - [x] Implement appointment creation with conflict detection
+  - [x] Implement calendar view for clinicians
+  - [x] Create ClinicianCalendar page with react-big-calendar
+  - [x] Add appointment statistics dashboard
+  - [x] Implement color-coded calendar events by status
+  - [x] Add appointment status management (pending, confirmed, completed, cancelled)
+  - [x] Add Calendar link to clinician sidebar
   - [ ] Create automated email/SMS reminder system
   - [ ] Add appointment conflict detection
   - [ ] Implement appointment rescheduling functionality
