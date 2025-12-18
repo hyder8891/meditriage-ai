@@ -159,6 +159,8 @@ export interface MedicalReasoningResult {
   followUpRecommendations: string;
 }
 
+import { IRAQI_MEDICAL_CONTEXT_PROMPT } from '../../shared/iraqiMedicalContext';
+
 export async function deepMedicalReasoning(params: {
   symptoms: string[];
   history: string;
@@ -198,7 +200,9 @@ Rank diagnoses by confidence (0-100). Include 3-5 differential diagnoses.`;
     messages: [
       {
         role: 'system',
-        content: 'You are an expert medical diagnostician. Provide thorough differential diagnosis and clinical reasoning.',
+        content: `You are an expert medical diagnostician. Provide thorough differential diagnosis and clinical reasoning.
+
+${IRAQI_MEDICAL_CONTEXT_PROMPT}`,
       },
       {
         role: 'user',
