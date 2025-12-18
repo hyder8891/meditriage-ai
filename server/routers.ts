@@ -6,7 +6,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
 import { invokeDeepSeek, trainOnMedicalMaterial, deepMedicalReasoning } from "./_core/deepseek";
-import { analyzeXRayBackend, analyzeDocumentBackend } from "./_core/gemini";
+import { analyzeXRayBackend } from "./_core/gemini";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import { 
@@ -613,7 +613,7 @@ export const appRouter = router({
         return analysis;
       }),
 
-    // Analyze medical document using Gemini (secure backend)
+    // Analyze medical document using Gemini (secure backend) - DISABLED
     analyzeDocument: protectedProcedure
       .input(z.object({
         documentBase64: z.string(),
@@ -622,14 +622,8 @@ export const appRouter = router({
         language: z.enum(['en', 'ar']).default('en'),
       }))
       .mutation(async ({ input, ctx }) => {
-        const analysis = await analyzeDocumentBackend({
-          documentBase64: input.documentBase64,
-          mimeType: input.mimeType,
-          documentType: input.documentType,
-          language: input.language,
-        });
-
-        return analysis;
+        // Feature temporarily disabled - switched to built-in LLM
+        throw new Error('Document analysis temporarily disabled');
       }),
   }),
 

@@ -92,7 +92,7 @@ export default function CareLocator() {
       query: searchQuery || undefined,
       location: userLocation || undefined,
       radius: 50000, // 50km
-      type: facilityType as any,
+      type: (facilityType === "all" || !facilityType) ? undefined : facilityType as any,
     },
     {
       enabled: useRealData && !!userLocation,
@@ -102,7 +102,7 @@ export default function CareLocator() {
   // Query for database facilities (fallback)
   const { data: dbFacilities, isLoading: dbLoading, refetch: refetchDb } = trpc.clinical.searchFacilities.useQuery(
     {
-      type: facilityType as any,
+      type: (facilityType === "all" || !facilityType) ? "" : facilityType as any,
       city: undefined,
     },
     {
@@ -116,9 +116,14 @@ export default function CareLocator() {
   const fetchFacilityDetails = async (placeId: string) => {
     setDetailsLoading(true);
     try {
-      const utils = trpc.useUtils();
-      const details = await utils.client.clinical.getFacilityDetails.query({ placeId });
-      setSelectedFacility(details);
+      // Use trpc client directly without hooks
+      const response = await fetch('/api/trpc/clinical.getFacilityDetails?input=' + encodeURIComponent(JSON.stringify({ placeId })));
+      const data = await response.json();
+      if (data.result?.data) {
+        setSelectedFacility(data.result.data);
+      } else {
+        throw new Error('Failed to fetch facility details');
+      }
     } catch (error) {
       toast.error("Failed to load facility details");
       console.error(error);
