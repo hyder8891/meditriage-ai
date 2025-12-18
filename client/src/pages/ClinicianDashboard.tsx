@@ -14,7 +14,8 @@ import {
   TrendingUp,
   LogOut,
   Menu,
-  Mic
+  Mic,
+  FileImage
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -124,6 +125,14 @@ export default function ClinicianDashboard() {
             >
               <Mic className="w-5 h-5 mr-3" />
               {sidebarOpen && "Live Scribe"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/xray-analysis")}
+            >
+              <FileImage className="w-5 h-5 mr-3" />
+              {sidebarOpen && "X-Ray Analysis"}
             </Button>
           </nav>
 

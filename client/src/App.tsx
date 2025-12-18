@@ -26,6 +26,7 @@ import CareLocator from "./pages/CareLocator";
 import BioScanner from "./pages/BioScanner";
 import LiveScribe from "./pages/LiveScribe";
 import CaseTimeline from "./pages/CaseTimeline";
+import XRayAnalysis from "./pages/XRayAnalysis";
 
 function Router() {
   return (
@@ -42,6 +43,7 @@ function Router() {
       <Route path={"/clinician/bio-scanner"} component={BioScanner} />
       <Route path={"/clinician/live-scribe"} component={LiveScribe} />
       <Route path={"/clinician/case/:id/timeline"} component={CaseTimeline} />
+      <Route path={"/clinician/xray-analysis"} component={XRayAnalysis} />
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />

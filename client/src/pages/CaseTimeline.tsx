@@ -11,16 +11,34 @@ import {
   FileText,
   AlertCircle,
   TrendingUp,
+  TrendingDown,
+  Minus,
   Calendar,
   Filter,
   ArrowLeft,
   Download,
   Clock,
+  Thermometer,
+  Wind,
 } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+} from 'recharts';
 
 export default function CaseTimeline() {
   const [, setLocation] = useLocation();
@@ -36,6 +54,8 @@ export default function CaseTimeline() {
     "treatment",
     "medication",
   ]);
+  
+  const [selectedVitalMetric, setSelectedVitalMetric] = useState<'all' | 'bp' | 'hr' | 'temp' | 'spo2'>('all');
   
   const { data: caseData } = trpc.clinical.getCase.useQuery(
     { id: caseId! },
@@ -62,6 +82,46 @@ export default function CaseTimeline() {
   if (!caseId) {
     return <div className="min-h-screen flex items-center justify-center">Invalid case ID</div>;
   }
+
+  // Prepare chart data from vitals
+  const vitalsChartData = vitalsData?.map((vital: any) => {
+    // Parse blood pressure
+    const bpMatch = vital.bloodPressure?.match(/(\d+)\/(\d+)/);
+    const systolic = bpMatch ? parseInt(bpMatch[1]) : null;
+    const diastolic = bpMatch ? parseInt(bpMatch[2]) : null;
+    
+    return {
+      date: new Date(vital.recordedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      timestamp: new Date(vital.recordedAt).getTime(),
+      systolic,
+      diastolic,
+      heartRate: vital.heartRate || null,
+      temperature: vital.temperature || null,
+      spo2: vital.oxygenSaturation || null,
+    };
+  }).sort((a: any, b: any) => a.timestamp - b.timestamp) || [];
+
+  // Calculate trends
+  const calculateTrend = (data: any[], key: string) => {
+    if (data.length < 2) return 'stable';
+    const recent = data.slice(-3).filter(d => d[key] !== null);
+    if (recent.length < 2) return 'stable';
+    
+    const first = recent[0][key];
+    const last = recent[recent.length - 1][key];
+    const change = ((last - first) / first) * 100;
+    
+    if (Math.abs(change) < 5) return 'stable';
+    return change > 0 ? 'up' : 'down';
+  };
+
+  const getTrendIcon = (trend: string) => {
+    switch (trend) {
+      case 'up': return <TrendingUp className="w-4 h-4 text-red-600" />;
+      case 'down': return <TrendingDown className="w-4 h-4 text-green-600" />;
+      default: return <Minus className="w-4 h-4 text-gray-600" />;
+    }
+  };
 
   const getEventIcon = (eventType: string) => {
     switch (eventType) {
@@ -171,6 +231,212 @@ export default function CaseTimeline() {
           </Button>
         </div>
 
+        {/* Vital Signs Charts */}
+        {vitalsData && vitalsData.length > 0 && selectedEventTypes.includes("vital_signs") && (
+          <div className="space-y-6 mb-6">
+            {/* Vital Signs Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Blood Pressure Card */}
+              <Card className="card-modern">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-red-600" />
+                      <span className="text-sm font-semibold">Blood Pressure</span>
+                    </div>
+                    {getTrendIcon(calculateTrend(vitalsChartData, 'systolic'))}
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {vitalsChartData[vitalsChartData.length - 1]?.systolic || 'N/A'}/
+                    {vitalsChartData[vitalsChartData.length - 1]?.diastolic || 'N/A'}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">mmHg</p>
+                </CardContent>
+              </Card>
+
+              {/* Heart Rate Card */}
+              <Card className="card-modern">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm font-semibold">Heart Rate</span>
+                    </div>
+                    {getTrendIcon(calculateTrend(vitalsChartData, 'heartRate'))}
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {vitalsChartData[vitalsChartData.length - 1]?.heartRate || 'N/A'}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">bpm</p>
+                </CardContent>
+              </Card>
+
+              {/* Temperature Card */}
+              <Card className="card-modern">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Thermometer className="w-5 h-5 text-orange-600" />
+                      <span className="text-sm font-semibold">Temperature</span>
+                    </div>
+                    {getTrendIcon(calculateTrend(vitalsChartData, 'temperature'))}
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {vitalsChartData[vitalsChartData.length - 1]?.temperature || 'N/A'}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">°C</p>
+                </CardContent>
+              </Card>
+
+              {/* SpO2 Card */}
+              <Card className="card-modern">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Wind className="w-5 h-5 text-green-600" />
+                      <span className="text-sm font-semibold">SpO2</span>
+                    </div>
+                    {getTrendIcon(calculateTrend(vitalsChartData, 'spo2'))}
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {vitalsChartData[vitalsChartData.length - 1]?.spo2 || 'N/A'}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">%</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Interactive Charts */}
+            <Card className="card-modern">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-blue-600" />
+                      Vital Signs Trend Analysis
+                    </CardTitle>
+                    <CardDescription>Interactive charts showing vital signs over time</CardDescription>
+                  </div>
+                  <Select value={selectedVitalMetric} onValueChange={(v: any) => setSelectedVitalMetric(v)}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Metrics</SelectItem>
+                      <SelectItem value="bp">Blood Pressure</SelectItem>
+                      <SelectItem value="hr">Heart Rate</SelectItem>
+                      <SelectItem value="temp">Temperature</SelectItem>
+                      <SelectItem value="spo2">SpO2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {selectedVitalMetric === 'all' ? (
+                  <div className="space-y-8">
+                    {/* Blood Pressure Chart */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <Heart className="w-4 h-4 text-red-600" />
+                        Blood Pressure (mmHg)
+                      </h4>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <LineChart data={vitalsChartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis domain={[60, 180]} />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="systolic" stroke="#dc2626" strokeWidth={2} name="Systolic" />
+                          <Line type="monotone" dataKey="diastolic" stroke="#f97316" strokeWidth={2} name="Diastolic" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Heart Rate Chart */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-blue-600" />
+                        Heart Rate (bpm)
+                      </h4>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <AreaChart data={vitalsChartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis domain={[40, 140]} />
+                          <Tooltip />
+                          <Area type="monotone" dataKey="heartRate" stroke="#2563eb" fill="#93c5fd" name="Heart Rate" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Temperature & SpO2 Combined */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <Thermometer className="w-4 h-4 text-orange-600" />
+                        Temperature & SpO2
+                      </h4>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <ComposedChart data={vitalsChartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis yAxisId="left" domain={[35, 42]} />
+                          <YAxis yAxisId="right" orientation="right" domain={[90, 100]} />
+                          <Tooltip />
+                          <Legend />
+                          <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#f97316" strokeWidth={2} name="Temp (°C)" />
+                          <Bar yAxisId="right" dataKey="spo2" fill="#22c55e" name="SpO2 (%)" />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={400}>
+                    {selectedVitalMetric === 'bp' ? (
+                      <LineChart data={vitalsChartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[60, 180]} />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="systolic" stroke="#dc2626" strokeWidth={3} name="Systolic" />
+                        <Line type="monotone" dataKey="diastolic" stroke="#f97316" strokeWidth={3} name="Diastolic" />
+                      </LineChart>
+                    ) : selectedVitalMetric === 'hr' ? (
+                      <AreaChart data={vitalsChartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[40, 140]} />
+                        <Tooltip />
+                        <Legend />
+                        <Area type="monotone" dataKey="heartRate" stroke="#2563eb" fill="#93c5fd" strokeWidth={3} name="Heart Rate (bpm)" />
+                      </AreaChart>
+                    ) : selectedVitalMetric === 'temp' ? (
+                      <LineChart data={vitalsChartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[35, 42]} />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="temperature" stroke="#f97316" strokeWidth={3} name="Temperature (°C)" />
+                      </LineChart>
+                    ) : (
+                      <AreaChart data={vitalsChartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[90, 100]} />
+                        <Tooltip />
+                        <Legend />
+                        <Area type="monotone" dataKey="spo2" stroke="#22c55e" fill="#86efac" strokeWidth={3} name="SpO2 (%)" />
+                      </AreaChart>
+                    )}
+                  </ResponsiveContainer>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Event Type Filters */}
         <Card className="card-modern mb-6">
           <CardHeader>
@@ -208,141 +474,68 @@ export default function CaseTimeline() {
           </CardContent>
         </Card>
 
-        {/* Vitals Trend Graph */}
-        {vitalsData && vitalsData.length > 0 && selectedEventTypes.includes("vital_signs") && (
-          <Card className="card-modern mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-                Vital Signs Trends
-              </CardTitle>
-              <CardDescription>Track changes in vital signs over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Blood Pressure */}
-                <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-4 h-4 text-red-600" />
-                    <span className="text-sm font-semibold text-red-900">Blood Pressure</span>
-                  </div>
-                  <div className="space-y-1">
-                    {vitalsData.slice(0, 3).map((vital: any, idx: number) => (
-                      <div key={idx} className="text-xs text-red-800">
-                        {vital.bloodPressure || "N/A"} - {new Date(vital.recordedAt).toLocaleDateString()}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Heart Rate */}
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Activity className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-semibold text-blue-900">Heart Rate</span>
-                  </div>
-                  <div className="space-y-1">
-                    {vitalsData.slice(0, 3).map((vital: any, idx: number) => (
-                      <div key={idx} className="text-xs text-blue-800">
-                        {vital.heartRate || "N/A"} bpm - {new Date(vital.recordedAt).toLocaleDateString()}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Temperature */}
-                <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Activity className="w-4 h-4 text-orange-600" />
-                    <span className="text-sm font-semibold text-orange-900">Temperature</span>
-                  </div>
-                  <div className="space-y-1">
-                    {vitalsData.slice(0, 3).map((vital: any, idx: number) => (
-                      <div key={idx} className="text-xs text-orange-800">
-                        {vital.temperature || "N/A"}°C - {new Date(vital.recordedAt).toLocaleDateString()}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* SpO2 */}
-                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Activity className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-semibold text-green-900">Oxygen Saturation</span>
-                  </div>
-                  <div className="space-y-1">
-                    {vitalsData.slice(0, 3).map((vital: any, idx: number) => (
-                      <div key={idx} className="text-xs text-green-800">
-                        {vital.oxygenSaturation || "N/A"}% - {new Date(vital.recordedAt).toLocaleDateString()}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Timeline Events */}
         <Card className="card-modern">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-purple-600" />
-              Timeline Events
+              <Calendar className="w-5 h-5 text-blue-600" />
+              Event Timeline
             </CardTitle>
-            <CardDescription>
-              Chronological view of patient case events
-            </CardDescription>
+            <CardDescription>Chronological view of patient events</CardDescription>
           </CardHeader>
           <CardContent>
             {filteredEvents.length === 0 ? (
-              <div className="text-center py-12">
-                <Clock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">No timeline events found</p>
-                <p className="text-sm text-gray-400">
-                  Events will appear here as the case progresses
-                </p>
+              <div className="text-center py-12 text-gray-500">
+                No events found. Try adjusting your filters.
               </div>
             ) : (
               <div className="relative">
                 {/* Timeline Line */}
-                <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300"></div>
 
-                {/* Timeline Events */}
+                {/* Events */}
                 <div className="space-y-6">
-                  {filteredEvents.map((event: any, idx: number) => (
-                    <div key={event.id} className="relative pl-20">
+                  {filteredEvents.map((event: any, index: number) => (
+                    <div key={event.id} className="relative pl-16">
                       {/* Timeline Dot */}
-                      <div className="absolute left-5 top-2 w-6 h-6 rounded-full bg-white border-4 border-blue-500 z-10"></div>
+                      <div className="absolute left-6 top-2 w-5 h-5 rounded-full bg-white border-4 border-blue-600 shadow-md"></div>
 
                       {/* Event Card */}
-                      <div className={`p-4 rounded-lg border-2 ${getEventColor(event.eventType)}`}>
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-3">
-                            {getEventIcon(event.eventType)}
-                            <div>
-                              <h3 className="font-semibold">{event.title}</h3>
-                              <p className="text-xs opacity-75">
-                                {new Date(event.eventTime).toLocaleString()}
-                              </p>
+                      <Card className={`border-2 ${getEventColor(event.eventType)}`}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-3">
+                              {getEventIcon(event.eventType)}
+                              <div>
+                                <CardTitle className="text-base">{event.title}</CardTitle>
+                                <CardDescription className="text-xs mt-1">
+                                  {new Date(event.timestamp).toLocaleString()}
+                                </CardDescription>
+                              </div>
                             </div>
+                            {event.severity && (
+                              <Badge className={getSeverityColor(event.severity)}>
+                                {event.severity}
+                              </Badge>
+                            )}
                           </div>
-                          {event.severity && (
-                            <Badge className={getSeverityColor(event.severity)}>
-                              {event.severity}
-                            </Badge>
-                          )}
-                        </div>
+                        </CardHeader>
                         {event.description && (
-                          <p className="text-sm mt-2">{event.description}</p>
+                          <CardContent className="pt-0">
+                            <p className="text-sm text-gray-700">{event.description}</p>
+                            {event.data && typeof event.data === 'object' && (
+                              <div className="mt-3 p-3 bg-white/50 rounded text-xs space-y-1">
+                                {Object.entries(event.data).map(([key, value]) => (
+                                  <div key={key} className="flex justify-between">
+                                    <span className="font-medium">{key}:</span>
+                                    <span>{String(value)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
                         )}
-                        {event.eventData && (
-                          <div className="mt-3 p-3 bg-white/50 rounded text-xs font-mono">
-                            {JSON.stringify(event.eventData, null, 2)}
-                          </div>
-                        )}
-                      </div>
+                      </Card>
                     </div>
                   ))}
                 </div>

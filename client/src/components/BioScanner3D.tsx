@@ -1,7 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   RotateCw,
   ZoomIn,
@@ -9,7 +16,20 @@ import {
   Maximize2,
   AlertCircle,
   Info,
+  Heart,
+  Brain,
+  Activity,
+  Stethoscope,
+  Eye,
 } from "lucide-react";
+
+interface OrganDetail {
+  name: string;
+  function: string;
+  commonConditions: string[];
+  diagnosticTests: string[];
+  icon: any;
+}
 
 interface BodyRegion {
   id: string;
@@ -17,7 +37,9 @@ interface BodyRegion {
   path: string;
   color: string;
   organs: string[];
+  organDetails: OrganDetail[];
   commonSymptoms: string[];
+  diagnosticApproach: string;
 }
 
 const bodyRegions: BodyRegion[] = [
@@ -27,7 +49,24 @@ const bodyRegions: BodyRegion[] = [
     path: "M250,50 Q280,50 280,80 L280,120 Q280,140 260,140 L240,140 Q220,140 220,120 L220,80 Q220,50 250,50",
     color: "#3b82f6",
     organs: ["Brain", "Eyes", "Ears", "Nose", "Throat"],
+    organDetails: [
+      {
+        name: "Brain",
+        function: "Central nervous system control, cognition, memory, and motor coordination",
+        commonConditions: ["Migraine", "Stroke", "Meningitis", "Concussion", "Brain tumor"],
+        diagnosticTests: ["CT scan", "MRI", "EEG", "Neurological examination"],
+        icon: Brain,
+      },
+      {
+        name: "Eyes",
+        function: "Vision and visual processing",
+        commonConditions: ["Conjunctivitis", "Glaucoma", "Cataracts", "Retinal detachment"],
+        diagnosticTests: ["Visual acuity test", "Fundoscopy", "Tonometry", "OCT scan"],
+        icon: Eye,
+      },
+    ],
     commonSymptoms: ["Headache", "Dizziness", "Vision problems", "Sore throat", "Ear pain"],
+    diagnosticApproach: "Neurological examination, cranial nerve assessment, visual inspection of throat and ears. Consider imaging for severe or persistent symptoms.",
   },
   {
     id: "chest",
@@ -35,7 +74,24 @@ const bodyRegions: BodyRegion[] = [
     path: "M220,140 L220,180 Q220,200 230,210 L270,210 Q280,200 280,180 L280,140",
     color: "#ef4444",
     organs: ["Heart", "Lungs", "Esophagus"],
+    organDetails: [
+      {
+        name: "Heart",
+        function: "Pumps blood throughout the body, delivering oxygen and nutrients",
+        commonConditions: ["Coronary artery disease", "Heart failure", "Arrhythmia", "Myocardial infarction", "Pericarditis"],
+        diagnosticTests: ["ECG", "Echocardiogram", "Cardiac enzymes", "Stress test", "Coronary angiography"],
+        icon: Heart,
+      },
+      {
+        name: "Lungs",
+        function: "Gas exchange - oxygen intake and carbon dioxide removal",
+        commonConditions: ["Pneumonia", "Asthma", "COPD", "Pulmonary embolism", "Tuberculosis"],
+        diagnosticTests: ["Chest X-ray", "CT scan", "Pulmonary function tests", "Arterial blood gas", "Bronchoscopy"],
+        icon: Activity,
+      },
+    ],
     commonSymptoms: ["Chest pain", "Shortness of breath", "Cough", "Palpitations"],
+    diagnosticApproach: "Cardiac and respiratory examination, auscultation, ECG, chest X-ray. Urgent evaluation for acute chest pain or severe dyspnea.",
   },
   {
     id: "abdomen",
@@ -43,7 +99,24 @@ const bodyRegions: BodyRegion[] = [
     path: "M230,210 L230,280 Q230,300 250,300 Q270,300 270,280 L270,210",
     color: "#f59e0b",
     organs: ["Stomach", "Liver", "Intestines", "Kidneys", "Pancreas"],
+    organDetails: [
+      {
+        name: "Liver",
+        function: "Detoxification, protein synthesis, bile production, metabolism regulation",
+        commonConditions: ["Hepatitis", "Cirrhosis", "Fatty liver disease", "Liver cancer"],
+        diagnosticTests: ["Liver function tests", "Ultrasound", "CT scan", "Liver biopsy", "FibroScan"],
+        icon: Activity,
+      },
+      {
+        name: "Kidneys",
+        function: "Blood filtration, waste removal, fluid and electrolyte balance",
+        commonConditions: ["Kidney stones", "Chronic kidney disease", "Pyelonephritis", "Acute kidney injury"],
+        diagnosticTests: ["Urinalysis", "Kidney function tests", "Ultrasound", "CT scan", "Kidney biopsy"],
+        icon: Activity,
+      },
+    ],
     commonSymptoms: ["Abdominal pain", "Nausea", "Vomiting", "Diarrhea", "Constipation"],
+    diagnosticApproach: "Abdominal examination, palpation for tenderness and masses, bowel sounds assessment. Laboratory tests and imaging as indicated.",
   },
   {
     id: "pelvis",
@@ -51,7 +124,17 @@ const bodyRegions: BodyRegion[] = [
     path: "M230,300 L230,340 Q230,360 250,360 Q270,360 270,340 L270,300",
     color: "#8b5cf6",
     organs: ["Bladder", "Reproductive organs"],
+    organDetails: [
+      {
+        name: "Bladder",
+        function: "Urine storage and controlled release",
+        commonConditions: ["Urinary tract infection", "Bladder stones", "Overactive bladder", "Bladder cancer"],
+        diagnosticTests: ["Urinalysis", "Urine culture", "Cystoscopy", "Ultrasound", "Urodynamic studies"],
+        icon: Activity,
+      },
+    ],
     commonSymptoms: ["Pelvic pain", "Urinary issues", "Reproductive concerns"],
+    diagnosticApproach: "Pelvic examination, urinalysis, reproductive health assessment. Gender-specific evaluation as appropriate.",
   },
   {
     id: "left-arm",
@@ -59,7 +142,17 @@ const bodyRegions: BodyRegion[] = [
     path: "M220,140 L180,180 L170,240 L180,250 L220,210",
     color: "#10b981",
     organs: ["Muscles", "Bones", "Joints"],
+    organDetails: [
+      {
+        name: "Musculoskeletal System",
+        function: "Movement, support, protection of organs, blood cell production",
+        commonConditions: ["Fractures", "Tendonitis", "Arthritis", "Muscle strain", "Carpal tunnel syndrome"],
+        diagnosticTests: ["X-ray", "MRI", "Ultrasound", "Nerve conduction studies", "Joint aspiration"],
+        icon: Activity,
+      },
+    ],
     commonSymptoms: ["Arm pain", "Weakness", "Numbness", "Joint pain"],
+    diagnosticApproach: "Musculoskeletal examination, range of motion assessment, neurovascular status. Consider cardiac evaluation for left arm pain with chest symptoms.",
   },
   {
     id: "right-arm",
@@ -67,7 +160,17 @@ const bodyRegions: BodyRegion[] = [
     path: "M280,140 L320,180 L330,240 L320,250 L280,210",
     color: "#10b981",
     organs: ["Muscles", "Bones", "Joints"],
+    organDetails: [
+      {
+        name: "Musculoskeletal System",
+        function: "Movement, support, protection of organs, blood cell production",
+        commonConditions: ["Fractures", "Tendonitis", "Arthritis", "Muscle strain", "Rotator cuff injury"],
+        diagnosticTests: ["X-ray", "MRI", "Ultrasound", "Nerve conduction studies", "Joint aspiration"],
+        icon: Activity,
+      },
+    ],
     commonSymptoms: ["Arm pain", "Weakness", "Numbness", "Joint pain"],
+    diagnosticApproach: "Musculoskeletal examination, range of motion assessment, neurovascular status. Evaluate for overuse injuries and trauma.",
   },
   {
     id: "left-leg",
@@ -75,7 +178,17 @@ const bodyRegions: BodyRegion[] = [
     path: "M230,340 L220,400 L210,480 L220,490 L240,490 L240,360",
     color: "#06b6d4",
     organs: ["Muscles", "Bones", "Joints", "Blood vessels"],
+    organDetails: [
+      {
+        name: "Lower Extremity Vascular System",
+        function: "Blood circulation to and from lower limbs",
+        commonConditions: ["Deep vein thrombosis", "Peripheral artery disease", "Varicose veins", "Chronic venous insufficiency"],
+        diagnosticTests: ["Doppler ultrasound", "Venography", "Ankle-brachial index", "CT angiography"],
+        icon: Activity,
+      },
+    ],
     commonSymptoms: ["Leg pain", "Swelling", "Weakness", "Numbness"],
+    diagnosticApproach: "Vascular examination, pedal pulses, edema assessment. Consider DVT evaluation for unilateral swelling with pain.",
   },
   {
     id: "right-leg",
@@ -83,7 +196,17 @@ const bodyRegions: BodyRegion[] = [
     path: "M270,340 L280,400 L290,480 L280,490 L260,490 L260,360",
     color: "#06b6d4",
     organs: ["Muscles", "Bones", "Joints", "Blood vessels"],
+    organDetails: [
+      {
+        name: "Lower Extremity Vascular System",
+        function: "Blood circulation to and from lower limbs",
+        commonConditions: ["Deep vein thrombosis", "Peripheral artery disease", "Varicose veins", "Chronic venous insufficiency"],
+        diagnosticTests: ["Doppler ultrasound", "Venography", "Ankle-brachial index", "CT angiography"],
+        icon: Activity,
+      },
+    ],
     commonSymptoms: ["Leg pain", "Swelling", "Weakness", "Numbness"],
+    diagnosticApproach: "Vascular examination, pedal pulses, edema assessment. Consider DVT evaluation for unilateral swelling with pain.",
   },
 ];
 
@@ -94,19 +217,29 @@ interface BioScanner3DProps {
 
 export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: BioScanner3DProps) {
   const [selectedRegion, setSelectedRegion] = useState<BodyRegion | null>(null);
+  const [selectedOrgan, setSelectedOrgan] = useState<OrganDetail | null>(null);
   const [rotation, setRotation] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const handleRegionClick = (region: BodyRegion) => {
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
     setSelectedRegion(region);
     if (onRegionClick) {
       onRegionClick(region);
     }
   };
 
+  const handleOrganClick = (organ: OrganDetail) => {
+    setSelectedOrgan(organ);
+  };
+
   const handleRotate = () => {
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
     setRotation((prev) => (prev + 90) % 360);
   };
 
@@ -119,6 +252,8 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
   };
 
   const handleReset = () => {
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
     setRotation(0);
     setZoom(1);
     setSelectedRegion(null);
@@ -181,7 +316,7 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
               <svg
                 ref={svgRef}
                 viewBox="0 0 500 550"
-                className="w-full h-full transition-transform duration-300"
+                className={`w-full h-full ${isAnimating ? 'transition-transform duration-300 ease-in-out' : ''}`}
                 style={{
                   transform: `rotate(${rotation}deg) scale(${zoom})`,
                   maxWidth: "400px",
@@ -211,7 +346,7 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
                         opacity={isSelected ? 0.9 : isHighlighted ? 0.7 : isHovered ? 0.5 : 0.3}
                         stroke={isSelected ? region.color : isHighlighted ? "#fbbf24" : region.color}
                         strokeWidth={isSelected ? 3 : isHighlighted ? 2 : 1}
-                        className="cursor-pointer transition-all duration-200"
+                        className={`cursor-pointer ${isAnimating ? 'transition-all duration-300 ease-in-out' : 'transition-all duration-200'}`}
                         onClick={() => handleRegionClick(region)}
                         onMouseEnter={() => setHoveredRegion(region.id)}
                         onMouseLeave={() => setHoveredRegion(null)}
@@ -278,21 +413,33 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
             <CardTitle className="text-lg">
               {selectedRegion ? selectedRegion.name : "Region Details"}
             </CardTitle>
+            {selectedRegion && (
+              <CardDescription>{selectedRegion.diagnosticApproach}</CardDescription>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             {selectedRegion ? (
               <>
                 <div>
                   <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-blue-600" />
+                    <Stethoscope className="w-4 h-4 text-blue-600" />
                     Organs in this region
                   </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedRegion.organs.map((organ, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {organ}
-                      </Badge>
-                    ))}
+                  <div className="space-y-2">
+                    {selectedRegion.organDetails.map((organ, index) => {
+                      const Icon = organ.icon;
+                      return (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          className="w-full justify-start text-left h-auto py-2"
+                          onClick={() => handleOrganClick(organ)}
+                        >
+                          <Icon className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="text-sm">{organ.name}</span>
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -314,7 +461,7 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
                 </div>
 
                 {isRegionHighlighted(selectedRegion) && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 animate-pulse">
                     <div className="flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
                       <div>
@@ -340,6 +487,56 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
           </CardContent>
         </Card>
       </div>
+
+      {/* Organ Detail Modal */}
+      <Dialog open={!!selectedOrgan} onOpenChange={() => setSelectedOrgan(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              {selectedOrgan && <selectedOrgan.icon className="w-6 h-6 text-blue-600" />}
+              {selectedOrgan?.name}
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              {selectedOrgan?.function}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrgan && (
+            <div className="space-y-4 mt-4">
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600" />
+                  Common Conditions
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedOrgan.commonConditions.map((condition, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {condition}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <Stethoscope className="w-4 h-4 text-blue-600" />
+                  Diagnostic Tests
+                </h4>
+                <ul className="space-y-1">
+                  {selectedOrgan.diagnosticTests.map((test, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-gray-600 flex items-center gap-2"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                      {test}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

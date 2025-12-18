@@ -300,11 +300,16 @@ export const facilities = mysqlTable("facilities", {
   name: varchar("name", { length: 255 }).notNull(),
   type: mysqlEnum("type", ["hospital", "clinic", "emergency", "specialist"]).notNull(),
   address: text("address").notNull(),
+  city: varchar("city", { length: 100 }),
   latitude: varchar("latitude", { length: 50 }),
   longitude: varchar("longitude", { length: 50 }),
   phone: varchar("phone", { length: 50 }),
+  hours: varchar("hours", { length: 255 }),
+  rating: varchar("rating", { length: 10 }),
+  services: text("services"), // JSON array
   specialties: text("specialties"),
   emergencyServices: int("emergency_services").default(0),
+  website: varchar("website", { length: 512 }),
 });
 
 export type Facility = typeof facilities.$inferSelect;
