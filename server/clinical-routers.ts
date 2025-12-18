@@ -796,4 +796,142 @@ Provide a well-structured, professional clinical note. Use clear medical termino
       await deleteTimelineEvent(input.eventId);
       return { success: true };
     }),
+
+  // Appointment Management
+  createAppointment: publicProcedure
+    .input(z.object({
+      patientId: z.number(),
+      facilityId: z.number().optional(),
+      facilityName: z.string().optional(),
+      facilityAddress: z.string().optional(),
+      clinicianId: z.number().optional(),
+      appointmentDate: z.date(),
+      duration: z.number().default(30),
+      appointmentType: z.enum(["consultation", "follow_up", "emergency", "screening", "vaccination", "other"]).default("consultation"),
+      chiefComplaint: z.string().optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { createAppointment, checkAppointmentConflicts } = await import("./appointment-db");
+      
+      // Check for conflicts if clinician is assigned
+      if (input.clinicianId) {
+        const conflicts = await checkAppointmentConflicts(
+          input.clinicianId,
+          input.appointmentDate,
+          input.duration
+        );
+        
+        if (conflicts.length > 0) {
+          throw new Error("Appointment time conflicts with existing appointment");
+        }
+      }
+      
+      const appointmentId = await createAppointment(input);
+      return { appointmentId };
+    }),
+
+  getAppointmentsByPatient: publicProcedure
+    .input(z.object({ patientId: z.number() }))
+    .query(async ({ input }) => {
+      const { getAppointmentsByPatientId } = await import("./appointment-db");
+      return getAppointmentsByPatientId(input.patientId);
+    }),
+
+  getAppointmentsByClinician: protectedProcedure
+    .input(z.object({ clinicianId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      const { getAppointmentsByClinicianId } = await import("./appointment-db");
+      return getAppointmentsByClinicianId(input.clinicianId);
+    }),
+
+  getAppointmentsByDateRange: protectedProcedure
+    .input(z.object({
+      startDate: z.date(),
+      endDate: z.date(),
+      clinicianId: z.number().optional(),
+    }))
+    .query(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      
+      const { getAppointmentsByDateRange, getAppointmentsByClinicianAndDateRange } = await import("./appointment-db");
+      
+      if (input.clinicianId) {
+        return getAppointmentsByClinicianAndDateRange(
+          input.clinicianId,
+          input.startDate,
+          input.endDate
+        );
+      }
+      
+      return getAppointmentsByDateRange(input.startDate, input.endDate);
+    }),
+
+  updateAppointmentStatus: protectedProcedure
+    .input(z.object({
+      appointmentId: z.number(),
+      status: z.enum(["pending", "confirmed", "completed", "cancelled", "no_show"]),
+    }))
+    .mutation(async ({ input }) => {
+      const { updateAppointmentStatus } = await import("./appointment-db");
+      await updateAppointmentStatus(input.appointmentId, input.status);
+      return { success: true };
+    }),
+
+  cancelAppointment: publicProcedure
+    .input(z.object({
+      appointmentId: z.number(),
+      cancelledBy: z.number(),
+      cancellationReason: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { cancelAppointment } = await import("./appointment-db");
+      await cancelAppointment(
+        input.appointmentId,
+        input.cancelledBy,
+        input.cancellationReason
+      );
+      return { success: true };
+    }),
+
+  rescheduleAppointment: publicProcedure
+    .input(z.object({
+      appointmentId: z.number(),
+      newDate: z.date(),
+      duration: z.number().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { getAppointmentById, updateAppointment, checkAppointmentConflicts } = await import("./appointment-db");
+      
+      const appointment = await getAppointmentById(input.appointmentId);
+      if (!appointment) {
+        throw new Error("Appointment not found");
+      }
+      
+      // Check for conflicts if clinician is assigned
+      if (appointment.clinicianId) {
+        const conflicts = await checkAppointmentConflicts(
+          appointment.clinicianId,
+          input.newDate,
+          input.duration || appointment.duration || 30,
+          input.appointmentId
+        );
+        
+        if (conflicts.length > 0) {
+          throw new Error("New appointment time conflicts with existing appointment");
+        }
+      }
+      
+      await updateAppointment(input.appointmentId, {
+        appointmentDate: input.newDate,
+        ...(input.duration && { duration: input.duration }),
+      });
+      
+      return { success: true };
+    }),
 });

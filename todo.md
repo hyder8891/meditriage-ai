@@ -462,3 +462,37 @@
   - [x] Add timeline events with formatting
   - [x] Include diagnoses and treatment history
   - [x] Add export button to Case Timeline page
+
+
+## Comprehensive Features Phase
+
+- [ ] Appointment Booking System
+  - [x] Create appointments database schema
+  - [ ] Build appointment scheduling UI in Care Locator
+  - [ ] Implement calendar view for clinicians
+  - [ ] Add appointment status management (pending, confirmed, completed, cancelled)
+  - [ ] Create automated email/SMS reminder system
+  - [ ] Add appointment conflict detection
+  - [ ] Implement appointment rescheduling functionality
+
+- [ ] Medication Tracking Module
+  - [x] Create medications and prescriptions database schema
+  - [ ] Build prescription creation interface for clinicians
+  - [ ] Implement medication schedule management
+  - [ ] Create patient medication list view
+  - [ ] Add medication adherence tracking
+  - [ ] Build visual pill tracker with adherence rates
+  - [ ] Implement automated medication reminders
+  - [ ] Add medication history and refill tracking
+
+- [ ] Patient Portal
+  - [x] Create patient authentication and authorization
+  - [ ] Build patient dashboard with medical overview
+  - [ ] Implement medical records viewer
+  - [ ] Add X-ray results access for patients
+  - [ ] Create vital signs trends visualization
+  - [ ] Build secure messaging system (patient-clinician)
+  - [ ] Implement message encryption
+  - [ ] Add notification system for new messages
+  - [ ] Create appointment management for patients
+  - [ ] Add medication adherence view for patients

@@ -383,3 +383,176 @@ export const timelineEvents = mysqlTable("timeline_events", {
 
 export type TimelineEvent = typeof timelineEvents.$inferSelect;
 export type InsertTimelineEvent = typeof timelineEvents.$inferInsert;
+
+/**
+ * Appointments table for booking system
+ */
+export const appointments = mysqlTable("appointments", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Patient and facility info
+  patientId: int("patient_id").notNull(), // user ID
+  facilityId: int("facility_id"), // Optional: from facilities table
+  facilityName: varchar("facility_name", { length: 255 }), // For Google Places facilities
+  facilityAddress: text("facility_address"),
+  
+  // Clinician info
+  clinicianId: int("clinician_id"), // Optional: assigned clinician
+  
+  // Appointment details
+  appointmentDate: timestamp("appointment_date").notNull(),
+  duration: int("duration").default(30), // in minutes
+  appointmentType: mysqlEnum("appointment_type", [
+    "consultation",
+    "follow_up",
+    "emergency",
+    "screening",
+    "vaccination",
+    "other"
+  ]).default("consultation").notNull(),
+  
+  status: mysqlEnum("status", [
+    "pending",
+    "confirmed",
+    "completed",
+    "cancelled",
+    "no_show"
+  ]).default("pending").notNull(),
+  
+  // Additional info
+  chiefComplaint: text("chief_complaint"),
+  notes: text("notes"),
+  
+  // Reminders
+  reminderSent: boolean("reminder_sent").default(false),
+  reminderSentAt: timestamp("reminder_sent_at"),
+  
+  // Cancellation
+  cancelledBy: int("cancelled_by"),
+  cancellationReason: text("cancellation_reason"),
+  cancelledAt: timestamp("cancelled_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = typeof appointments.$inferInsert;
+
+/**
+ * Prescriptions table for medication tracking
+ */
+export const prescriptions = mysqlTable("prescriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Patient and case info
+  patientId: int("patient_id").notNull(),
+  caseId: int("case_id"),
+  clinicianId: int("clinician_id").notNull(),
+  
+  // Medication details
+  medicationName: varchar("medication_name", { length: 255 }).notNull(),
+  genericName: varchar("generic_name", { length: 255 }),
+  dosage: varchar("dosage", { length: 100 }).notNull(), // e.g., "500mg"
+  frequency: varchar("frequency", { length: 100 }).notNull(), // e.g., "twice daily"
+  route: varchar("route", { length: 50 }), // oral, injection, topical, etc.
+  
+  // Schedule
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  duration: int("duration"), // in days
+  
+  // Instructions
+  instructions: text("instructions"),
+  warnings: text("warnings"),
+  
+  // Status
+  status: mysqlEnum("status", [
+    "active",
+    "completed",
+    "discontinued",
+    "on_hold"
+  ]).default("active").notNull(),
+  
+  // Refills
+  refillsAllowed: int("refills_allowed").default(0),
+  refillsRemaining: int("refills_remaining").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Prescription = typeof prescriptions.$inferSelect;
+export type InsertPrescription = typeof prescriptions.$inferInsert;
+
+/**
+ * Medication adherence tracking
+ */
+export const medicationAdherence = mysqlTable("medication_adherence", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  prescriptionId: int("prescription_id").notNull(),
+  patientId: int("patient_id").notNull(),
+  
+  // Scheduled dose
+  scheduledTime: timestamp("scheduled_time").notNull(),
+  
+  // Actual intake
+  taken: boolean("taken").default(false),
+  takenAt: timestamp("taken_at"),
+  
+  // Missed dose tracking
+  missed: boolean("missed").default(false),
+  missedReason: text("missed_reason"),
+  
+  // Reminder
+  reminderSent: boolean("reminder_sent").default(false),
+  reminderSentAt: timestamp("reminder_sent_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type MedicationAdherence = typeof medicationAdherence.$inferSelect;
+export type InsertMedicationAdherence = typeof medicationAdherence.$inferInsert;
+
+/**
+ * Secure messaging between patients and clinicians
+ */
+export const messages = mysqlTable("messages", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Participants
+  senderId: int("sender_id").notNull(),
+  recipientId: int("recipient_id").notNull(),
+  
+  // Message content
+  subject: varchar("subject", { length: 255 }),
+  content: text("content").notNull(),
+  
+  // Encryption (content is encrypted before storage)
+  encrypted: boolean("encrypted").default(true),
+  
+  // Status
+  read: boolean("read").default(false),
+  readAt: timestamp("read_at"),
+  
+  // Thread management
+  threadId: int("thread_id"), // For grouping related messages
+  replyToId: int("reply_to_id"), // For direct replies
+  
+  // Related case
+  caseId: int("case_id"),
+  
+  // Attachments
+  attachments: text("attachments"), // JSON array of file URLs
+  
+  // Soft delete
+  deletedBySender: boolean("deleted_by_sender").default(false),
+  deletedByRecipient: boolean("deleted_by_recipient").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;

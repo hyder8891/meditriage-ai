@@ -57,6 +57,13 @@
       "when": 1766088955421,
       "tag": "0007_dizzy_vapor",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1766091331728,
+      "tag": "0008_groovy_nighthawk",
+      "breakpoints": true
     }
   ]
 }
