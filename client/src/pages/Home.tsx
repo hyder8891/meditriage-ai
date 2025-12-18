@@ -23,6 +23,7 @@ import {
 import { useLocation } from "wouter";
 import { useTour } from "@/contexts/TourContext";
 import { useEffect } from "react";
+import { ProductDemoSlideshow } from "@/components/ProductDemoSlideshow";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -258,93 +259,8 @@ export default function Home() {
             </div>
 
             {/* Right Column - Visual */}
-            <div className="relative animate-slide-up animation-delay-200">
-              <div className="relative">
-                {/* Main Card */}
-                <Card className="card-modern glass-strong shadow-2xl border-2 border-blue-200/50 overflow-hidden" data-tour="demo-card">
-                  <CardContent className="p-8">
-                    <div className="space-y-6">
-                      {/* Header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                            <Brain className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <div className="font-semibold text-gray-900">Clinical Analysis</div>
-                            <div className="text-xs text-gray-500">AI-Powered Diagnosis</div>
-                          </div>
-                        </div>
-                        <Badge className="bg-green-100 text-green-800 border-green-300">
-                          <Activity className="w-3 h-3 mr-1 animate-pulse" />
-                          Active
-                        </Badge>
-                      </div>
-
-                      {/* Symptoms */}
-                      <div className="space-y-3">
-                        <div className="text-sm font-semibold text-gray-700">Patient Symptoms</div>
-                        <div className="flex flex-wrap gap-2">
-                          {["Chest Pain", "Shortness of Breath", "Fatigue"].map((symptom) => (
-                            <Badge key={symptom} variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
-                              {symptom}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Diagnosis Results */}
-                      <div className="space-y-3">
-                        <div className="text-sm font-semibold text-gray-700">Differential Diagnosis</div>
-                        <div className="space-y-2">
-                          {[
-                            { condition: "Acute Coronary Syndrome", probability: 78, color: "red" },
-                            { condition: "Pulmonary Embolism", probability: 65, color: "orange" },
-                            { condition: "Anxiety Disorder", probability: 42, color: "yellow" },
-                          ].map((diagnosis) => (
-                            <div key={diagnosis.condition} className="space-y-1">
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-700">{diagnosis.condition}</span>
-                                <span className="font-semibold text-gray-900">{diagnosis.probability}%</span>
-                              </div>
-                              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full bg-gradient-to-r ${
-                                    diagnosis.color === 'red' ? 'from-red-500 to-red-600' :
-                                    diagnosis.color === 'orange' ? 'from-orange-500 to-orange-600' :
-                                    'from-yellow-500 to-yellow-600'
-                                  } rounded-full transition-all duration-1000 animate-progress`}
-                                  style={{ width: `${diagnosis.probability}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex gap-2 pt-2">
-                        <Button size="sm" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600">
-                          <FileText className="w-4 h-4 mr-2" />
-                          Generate Report
-                        </Button>
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <TrendingUp className="w-4 h-4 mr-2" />
-                          View Timeline
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Floating Elements */}
-                <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl shadow-xl animate-float opacity-80 flex items-center justify-center">
-                  <Zap className="w-12 h-12 text-white" />
-                </div>
-                <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl shadow-xl animate-float animation-delay-1000 opacity-80 flex items-center justify-center">
-                  <Shield className="w-10 h-10 text-white" />
-                </div>
-              </div>
+            <div className="relative animate-slide-up animation-delay-200" data-tour="demo-card">
+              <ProductDemoSlideshow />
             </div>
           </div>
         </div>
