@@ -42,10 +42,15 @@ export default function LiveScribe() {
   const [soapNote, setSoapNote] = useState("");
   const [showSOAPModal, setShowSOAPModal] = useState(false);
   const [isGeneratingSOAP, setIsGeneratingSOAP] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [recordingQuality, setRecordingQuality] = useState<'good' | 'fair' | 'poor'>('good');
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const audioChunksRef = useRef<Blob[]>([]);  
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
   
   const { data: cases } = trpc.clinical.getAllCases.useQuery();
   const { data: transcriptions, refetch: refetchTranscriptions } = trpc.clinical.getMyTranscriptions.useQuery();
@@ -113,7 +118,44 @@ export default function LiveScribe() {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        } 
+      });
+      
+      // Setup audio analysis for visualization
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+      
+      // Start audio level monitoring
+      const monitorAudioLevel = () => {
+        if (!analyserRef.current) return;
+        
+        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(dataArray);
+        
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        const normalizedLevel = Math.min(100, (average / 128) * 100);
+        setAudioLevel(normalizedLevel);
+        
+        // Determine quality based on audio level
+        if (normalizedLevel > 60) setRecordingQuality('good');
+        else if (normalizedLevel > 30) setRecordingQuality('fair');
+        else setRecordingQuality('poor');
+        
+        animationFrameRef.current = requestAnimationFrame(monitorAudioLevel);
+      };
+      monitorAudioLevel();
+      
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm',
       });
@@ -134,6 +176,15 @@ export default function LiveScribe() {
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
         
+        // Stop audio monitoring
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+        }
+        setAudioLevel(0);
+        
         // Auto-transcribe
         await handleTranscribe(audioBlob);
       };
@@ -142,8 +193,16 @@ export default function LiveScribe() {
       setIsRecording(true);
       setRecordingTime(0);
       toast.success("Recording started");
-    } catch (error) {
-      toast.error("Failed to access microphone");
+    } catch (error: any) {
+      let errorMessage = "Failed to access microphone";
+      if (error.name === 'NotAllowedError') {
+        errorMessage = "Microphone access denied. Please allow microphone permissions.";
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = "No microphone found. Please connect a microphone.";
+      } else if (error.name === 'NotReadableError') {
+        errorMessage = "Microphone is already in use by another application.";
+      }
+      toast.error(errorMessage);
       console.error("Microphone access error:", error);
     }
   };
@@ -324,7 +383,7 @@ export default function LiveScribe() {
                 <div className="space-y-6">
                   {/* Recording Status */}
                   <div className="flex items-center justify-center gap-6 p-8 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
-                    <div className="text-center">
+                    <div className="text-center w-full">
                       <div className="flex items-center justify-center gap-4 mb-4">
                         {isRecording ? (
                           <div className="relative">
@@ -343,6 +402,36 @@ export default function LiveScribe() {
                           </div>
                         )}
                       </div>
+                      
+                      {/* Audio Level Visualization */}
+                      {isRecording && !isPaused && (
+                        <div className="mb-4 px-8">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs font-semibold text-gray-700">Audio Level:</span>
+                            <Badge className={`${
+                              recordingQuality === 'good' ? 'bg-green-600' :
+                              recordingQuality === 'fair' ? 'bg-yellow-600' :
+                              'bg-red-600'
+                            }`}>
+                              {recordingQuality.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full transition-all duration-100 ${
+                                recordingQuality === 'good' ? 'bg-green-500' :
+                                recordingQuality === 'fair' ? 'bg-yellow-500' :
+                                'bg-red-500'
+                              }`}
+                              style={{ width: `${audioLevel}%` }}
+                            />
+                          </div>
+                          {recordingQuality === 'poor' && (
+                            <p className="text-xs text-red-600 mt-1">⚠️ Low audio level - speak louder or move closer to microphone</p>
+                          )}
+                        </div>
+                      )}
+                      
                       <div className="flex items-center justify-center gap-2 text-2xl font-mono font-bold text-gray-900">
                         <Clock className="w-6 h-6 text-blue-600" />
                         {formatTime(recordingTime)}

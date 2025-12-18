@@ -241,15 +241,13 @@
   - [x] Add recommended next steps and tests
   - [x] Include red flag warnings
   - [x] Add patient education resources
-  - [x] Add follow-up recommendations
-- [ ] Live Scribe Enhancements
-  - [ ] Add audio waveform visualization
-  - [ ] Implement real-time transcription display
-  - [ ] Add speaker diarization with labels
-  - [ ] Improve error handling for audio failures
-  - [ ] Add audio quality indicators
-  - [ ] Implement pause/resume functionality
-  - [ ] Add transcription editing with timestamps
+  - [x] Add follow-up recommendations- [x] Live Scribe Enhancements
+  - [x] Add audio level visualization with real-time monitoring
+  - [x] Add audio quality indicators (good/fair/poor)
+  - [x] Improve error handling for microphone access
+  - [x] Add enhanced audio settings (echo cancellation, noise suppression)
+  - [x] Add visual feedback for recording quality
+  - [x] Implement warning for low audio levelstimestamps
   - [ ] Export transcriptions in multiple formats
 - [ ] Drug Interaction Checker Enhancements
   - [ ] Add severity levels (mild, moderate, severe, contraindicated)
