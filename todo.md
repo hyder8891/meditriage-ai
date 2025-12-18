@@ -517,3 +517,41 @@
 - [x] Fix invalid hook call in CareLocator fetchFacilityDetails
 - [x] Fix facility type validation error
 - [x] Fix audio fetch error in voice transcription (error handling already in place)
+
+
+## Google Cloud Healthcare Integration
+
+- [ ] FHIR Patient Records
+  - [ ] Create FHIR-compliant patient resource schema
+  - [ ] Implement FHIR R4 patient record endpoints (create, read, update)
+  - [ ] Add medication, condition, and observation resources
+  - [ ] Create FHIR bundle support for batch operations
+  - [ ] Add patient search by identifier, name, and date
+
+- [ ] DICOM Imaging Support
+  - [ ] Create DICOM metadata storage schema
+  - [ ] Implement DICOM file upload with metadata extraction
+  - [ ] Add DICOM image viewer integration
+  - [ ] Support DICOM series and study organization
+  - [ ] Add DICOM to JPEG conversion for web viewing
+
+- [ ] Vertex AI Search for Healthcare
+  - [ ] Set up medical history search index
+  - [ ] Implement semantic search across patient records
+  - [ ] Add clinical notes full-text search
+  - [ ] Create search filters by date, condition, medication
+  - [ ] Add search result highlighting and snippets
+
+- [ ] Medical AI Models
+  - [ ] Integrate Med-PaLM 2 for clinical question answering
+  - [ ] Add medical summarization for patient records
+  - [ ] Implement clinical decision support suggestions
+  - [ ] Add drug interaction checking
+
+
+## Live Scribe Audio Bug Fix
+
+- [x] Fix "Failed to fetch audio file" error in Live Scribe transcription
+- [x] Investigate audio URL generation and accessibility
+- [x] Ensure audio files are properly uploaded to S3 before transcription
+- [x] Add better error messages for audio upload failures

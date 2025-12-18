@@ -230,25 +230,45 @@ export default function LiveScribe() {
     }
   };
 
+  const uploadAudioMutation = trpc.clinical.uploadAudioFile.useMutation({
+    onSuccess: (data) => {
+      // After upload, transcribe the audio
+      transcribeAudioMutation.mutate({
+        audioUrl: data.url,
+        language: "en",
+      });
+    },
+    onError: (error) => {
+      toast.error("Failed to upload audio: " + error.message);
+      setIsTranscribing(false);
+    },
+  });
+
   const handleTranscribe = async (blob: Blob) => {
     setIsTranscribing(true);
     
     try {
-      // Upload audio to S3 first
-      const formData = new FormData();
-      formData.append('file', blob, 'recording.webm');
-      
-      // For now, we'll use a placeholder URL
-      // In production, you would upload to S3 and get the URL
-      const audioUrl = URL.createObjectURL(blob);
-      
-      // Call transcription API
-      transcribeAudioMutation.mutate({
-        audioUrl: audioUrl,
-        language: "en",
-      });
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
+        // Remove data:audio/webm;base64, prefix
+        const base64Audio = base64data.split(',')[1];
+        
+        // Upload to S3 first
+        uploadAudioMutation.mutate({
+          audioBase64: base64Audio,
+          mimeType: 'audio/webm',
+          filename: `recording-${Date.now()}.webm`,
+        });
+      };
+      reader.onerror = () => {
+        toast.error("Failed to read audio file");
+        setIsTranscribing(false);
+      };
     } catch (error) {
-      toast.error("Failed to transcribe audio");
+      toast.error("Failed to process audio");
       setIsTranscribing(false);
     }
   };

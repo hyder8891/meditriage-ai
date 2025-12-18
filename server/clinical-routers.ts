@@ -664,6 +664,29 @@ Provide structured JSON output with this exact format:
       return { success: true };
     }),
 
+  // Upload audio file to S3 and return URL
+  uploadAudioFile: protectedProcedure
+    .input(z.object({
+      audioBase64: z.string(),
+      mimeType: z.string(),
+      filename: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { storagePut } = await import("./storage");
+      
+      // Convert base64 to buffer
+      const audioBuffer = Buffer.from(input.audioBase64, 'base64');
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const fileKey = `audio/${ctx.user.id}/${timestamp}-${input.filename}`;
+      
+      // Upload to S3
+      const { url } = await storagePut(fileKey, audioBuffer, input.mimeType);
+      
+      return { url, fileKey };
+    }),
+
   transcribeAudio: protectedProcedure
     .input(z.object({
       audioUrl: z.string(),

@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, date, decimal, time } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -556,3 +556,267 @@ export const messages = mysqlTable("messages", {
 
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = typeof messages.$inferInsert;
+
+
+/**
+ * FHIR R4 Patient Resource
+ * Stores patient demographics and identifiers following FHIR standard
+ */
+export const fhirPatients = mysqlTable("fhir_patients", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // FHIR Resource metadata
+  fhirId: varchar("fhir_id", { length: 64 }).notNull().unique(), // FHIR resource ID
+  resourceType: varchar("resource_type", { length: 50 }).default("Patient").notNull(),
+  
+  // Link to system user (if patient has app account)
+  userId: int("user_id"),
+  
+  // Patient identifiers (FHIR Identifier)
+  identifiers: text("identifiers").notNull(), // JSON array of {system, value, type}
+  
+  // Patient name (FHIR HumanName)
+  familyName: varchar("family_name", { length: 255 }),
+  givenNames: text("given_names"), // JSON array
+  prefix: varchar("prefix", { length: 50 }),
+  suffix: varchar("suffix", { length: 50 }),
+  
+  // Demographics
+  gender: mysqlEnum("gender", ["male", "female", "other", "unknown"]),
+  birthDate: date("birth_date"),
+  
+  // Contact information (FHIR ContactPoint)
+  telecom: text("telecom"), // JSON array of {system: phone|email|fax, value, use: home|work|mobile}
+  
+  // Address (FHIR Address)
+  addresses: text("addresses"), // JSON array of {use, type, line[], city, state, postalCode, country}
+  
+  // Marital status
+  maritalStatus: varchar("marital_status", { length: 50 }),
+  
+  // Communication preferences (FHIR Communication)
+  languages: text("languages"), // JSON array of {language, preferred}
+  
+  // General practitioner references
+  generalPractitioner: text("general_practitioner"), // JSON array of practitioner FHIR IDs
+  
+  // Managing organization
+  managingOrganization: varchar("managing_organization", { length: 255 }),
+  
+  // Active status
+  active: boolean("active").default(true),
+  
+  // Metadata
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FhirPatient = typeof fhirPatients.$inferSelect;
+export type InsertFhirPatient = typeof fhirPatients.$inferInsert;
+
+/**
+ * FHIR R4 Condition Resource
+ * Medical conditions, problems, diagnoses
+ */
+export const fhirConditions = mysqlTable("fhir_conditions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // FHIR Resource metadata
+  fhirId: varchar("fhir_id", { length: 64 }).notNull().unique(),
+  resourceType: varchar("resource_type", { length: 50 }).default("Condition").notNull(),
+  
+  // Subject (patient reference)
+  patientFhirId: varchar("patient_fhir_id", { length: 64 }).notNull(),
+  
+  // Clinical status (active, recurrence, relapse, inactive, remission, resolved)
+  clinicalStatus: varchar("clinical_status", { length: 50 }).notNull(),
+  
+  // Verification status (unconfirmed, provisional, differential, confirmed, refuted, entered-in-error)
+  verificationStatus: varchar("verification_status", { length: 50 }),
+  
+  // Category (problem-list-item, encounter-diagnosis)
+  category: text("category"), // JSON array
+  
+  // Severity (severe, moderate, mild)
+  severity: varchar("severity", { length: 50 }),
+  
+  // Condition code (SNOMED CT, ICD-10, etc.)
+  code: text("code").notNull(), // JSON {coding: [{system, code, display}], text}
+  
+  // Body site
+  bodySite: text("body_site"), // JSON array
+  
+  // Onset (when condition started)
+  onsetDateTime: timestamp("onset_date_time"),
+  onsetAge: int("onset_age"),
+  onsetString: varchar("onset_string", { length: 255 }),
+  
+  // Abatement (when condition resolved)
+  abatementDateTime: timestamp("abatement_date_time"),
+  abatementAge: int("abatement_age"),
+  abatementString: varchar("abatement_string", { length: 255 }),
+  
+  // Recorded date
+  recordedDate: timestamp("recorded_date"),
+  
+  // Recorder (practitioner who recorded)
+  recorder: varchar("recorder", { length: 255 }),
+  
+  // Asserter (who asserted the condition)
+  asserter: varchar("asserter", { length: 255 }),
+  
+  // Stage
+  stage: text("stage"), // JSON
+  
+  // Evidence
+  evidence: text("evidence"), // JSON array
+  
+  // Notes
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FhirCondition = typeof fhirConditions.$inferSelect;
+export type InsertFhirCondition = typeof fhirConditions.$inferInsert;
+
+/**
+ * FHIR R4 MedicationStatement Resource
+ * Record of medication being taken by a patient
+ */
+export const fhirMedicationStatements = mysqlTable("fhir_medication_statements", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // FHIR Resource metadata
+  fhirId: varchar("fhir_id", { length: 64 }).notNull().unique(),
+  resourceType: varchar("resource_type", { length: 50 }).default("MedicationStatement").notNull(),
+  
+  // Subject (patient reference)
+  patientFhirId: varchar("patient_fhir_id", { length: 64 }).notNull(),
+  
+  // Status (active, completed, entered-in-error, intended, stopped, on-hold, unknown, not-taken)
+  status: varchar("status", { length: 50 }).notNull(),
+  
+  // Medication (CodeableConcept or Reference)
+  medicationCodeableConcept: text("medication_codeable_concept"), // JSON {coding, text}
+  medicationReference: varchar("medication_reference", { length: 255 }),
+  
+  // Effective period
+  effectiveDateTime: timestamp("effective_date_time"),
+  effectivePeriodStart: timestamp("effective_period_start"),
+  effectivePeriodEnd: timestamp("effective_period_end"),
+  
+  // Date asserted
+  dateAsserted: timestamp("date_asserted"),
+  
+  // Information source
+  informationSource: varchar("information_source", { length: 255 }),
+  
+  // Derived from (supporting information)
+  derivedFrom: text("derived_from"), // JSON array
+  
+  // Reason code
+  reasonCode: text("reason_code"), // JSON array
+  
+  // Reason reference
+  reasonReference: text("reason_reference"), // JSON array
+  
+  // Notes
+  notes: text("notes"),
+  
+  // Dosage
+  dosage: text("dosage"), // JSON array of dosage instructions
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FhirMedicationStatement = typeof fhirMedicationStatements.$inferSelect;
+export type InsertFhirMedicationStatement = typeof fhirMedicationStatements.$inferInsert;
+
+/**
+ * FHIR R4 Observation Resource
+ * Vital signs, lab results, clinical observations
+ */
+export const fhirObservations = mysqlTable("fhir_observations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // FHIR Resource metadata
+  fhirId: varchar("fhir_id", { length: 64 }).notNull().unique(),
+  resourceType: varchar("resource_type", { length: 50 }).default("Observation").notNull(),
+  
+  // Subject (patient reference)
+  patientFhirId: varchar("patient_fhir_id", { length: 64 }).notNull(),
+  
+  // Status (registered, preliminary, final, amended, corrected, cancelled, entered-in-error, unknown)
+  status: varchar("status", { length: 50 }).notNull(),
+  
+  // Category (vital-signs, laboratory, imaging, survey, exam, therapy, social-history, etc.)
+  category: text("category"), // JSON array
+  
+  // Observation code (LOINC, SNOMED CT)
+  code: text("code").notNull(), // JSON {coding: [{system, code, display}], text}
+  
+  // Effective time
+  effectiveDateTime: timestamp("effective_date_time"),
+  effectivePeriodStart: timestamp("effective_period_start"),
+  effectivePeriodEnd: timestamp("effective_period_end"),
+  
+  // Issued (when result was released)
+  issued: timestamp("issued"),
+  
+  // Performer (who performed the observation)
+  performer: text("performer"), // JSON array
+  
+  // Value (result)
+  valueQuantityValue: decimal("value_quantity_value", { precision: 10, scale: 2 }),
+  valueQuantityUnit: varchar("value_quantity_unit", { length: 50 }),
+  valueQuantitySystem: varchar("value_quantity_system", { length: 255 }),
+  valueQuantityCode: varchar("value_quantity_code", { length: 50 }),
+  
+  valueCodeableConcept: text("value_codeable_concept"), // JSON
+  valueString: text("value_string"),
+  valueBoolean: boolean("value_boolean"),
+  valueInteger: int("value_integer"),
+  valueRange: text("value_range"), // JSON
+  valueRatio: text("value_ratio"), // JSON
+  valueSampledData: text("value_sampled_data"), // JSON
+  valueTime: time("value_time"),
+  valueDateTime: timestamp("value_date_time"),
+  valuePeriod: text("value_period"), // JSON
+  
+  // Data absent reason
+  dataAbsentReason: text("data_absent_reason"), // JSON
+  
+  // Interpretation (normal, abnormal, critical, etc.)
+  interpretation: text("interpretation"), // JSON array
+  
+  // Notes
+  notes: text("notes"),
+  
+  // Body site
+  bodySite: text("body_site"), // JSON
+  
+  // Method
+  method: text("method"), // JSON
+  
+  // Reference range
+  referenceRange: text("reference_range"), // JSON array
+  
+  // Has member (for grouped observations)
+  hasMember: text("has_member"), // JSON array of observation references
+  
+  // Derived from
+  derivedFrom: text("derived_from"), // JSON array
+  
+  // Component (for multi-component observations like blood pressure)
+  component: text("component"), // JSON array
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FhirObservation = typeof fhirObservations.$inferSelect;
+export type InsertFhirObservation = typeof fhirObservations.$inferInsert;
