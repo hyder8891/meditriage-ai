@@ -1,6 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { clinicalRouter } from "./clinical-routers";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -631,6 +632,9 @@ export const appRouter = router({
         return analysis;
       }),
   }),
+
+  // Clinical features (Medical OS)
+  clinical: clinicalRouter,
 
   documents: router({
     // Upload medical document

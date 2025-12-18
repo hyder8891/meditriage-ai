@@ -15,6 +15,7 @@ import AdminTraining from "./pages/AdminTraining";
 import AdminLoginTraditional from "./pages/AdminLoginTraditional";
 import PortalSelection from "./pages/PortalSelection";
 import ClinicianLogin from "./pages/ClinicianLogin";
+import ClinicianDashboard from "./pages/ClinicianDashboard";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <Route path={"/"} component={PortalSelection} />
       <Route path={"/home"} component={Landing} />
       <Route path={"/clinician/login"} component={ClinicianLogin} />
+      <Route path={"/clinician/dashboard"} component={ClinicianDashboard} />
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
