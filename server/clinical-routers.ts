@@ -307,11 +307,14 @@ Be empathetic, clear, and avoid medical jargon. Always encourage seeking profess
   // Care Locator (Iraq-specific)
   searchFacilities: protectedProcedure
     .input(z.object({
-      type: z.enum(["hospital", "clinic", "emergency", "specialist"]).optional(),
+      type: z.enum(["hospital", "clinic", "emergency", "specialist"]).or(z.literal("")).optional(),
       city: z.string().optional(),
     }))
     .query(async ({ input }) => {
-      return await searchFacilities(input.type, input.city);
+      const facilityType = (input.type === "" || !input.type) 
+        ? undefined 
+        : (input.type as "hospital" | "clinic" | "emergency" | "specialist");
+      return await searchFacilities(facilityType, input.city);
     }),
 
   getEmergencyFacilities: protectedProcedure.query(async () => {

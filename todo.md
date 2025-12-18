@@ -221,3 +221,7 @@
   - [x] CTA section
   - [x] Footer section
 - [x] Ensure medical terms remain in English in both languages
+
+
+## Bug Fixes
+- [x] Fix Care Locator validation error - type parameter now accepts empty string for "all types" filter
