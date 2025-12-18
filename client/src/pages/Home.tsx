@@ -97,63 +97,56 @@ export default function Home() {
   const features = [
     {
       icon: Brain,
-      title: "Clinical Reasoning Engine",
-      description: "AI-powered differential diagnosis with evidence-based recommendations and probability scoring",
+      title: strings.homepage.features.clinicalReasoning.title,
+      description: strings.homepage.features.clinicalReasoning.desc,
       color: "from-purple-500 to-indigo-600",
       iconColor: "text-purple-600",
     },
     {
       icon: Stethoscope,
-      title: "3D Bio-Scanner",
-      description: "Interactive anatomical visualization with symptom mapping and organ-specific diagnostic insights",
+      title: strings.homepage.features.bioScanner.title,
+      description: strings.homepage.features.bioScanner.desc,
       color: "from-blue-500 to-cyan-600",
       iconColor: "text-blue-600",
     },
     {
       icon: Mic,
-      title: "Live Scribe",
-      description: "Real-time voice-to-text transcription with automatic SOAP note generation for clinical documentation",
+      title: strings.homepage.features.liveScribe.title,
+      description: strings.homepage.features.liveScribe.desc,
       color: "from-green-500 to-emerald-600",
       iconColor: "text-green-600",
     },
     {
       icon: Pill,
-      title: "PharmaGuard",
-      description: "Advanced drug interaction checker with contraindication alerts and dosage recommendations",
+      title: strings.homepage.features.pharmaGuard.title,
+      description: strings.homepage.features.pharmaGuard.desc,
       color: "from-orange-500 to-red-600",
       iconColor: "text-orange-600",
     },
     {
       icon: Microscope,
-      title: "X-Ray Analysis",
-      description: "AI-powered medical imaging interpretation with abnormality detection and diagnostic suggestions",
+      title: strings.homepage.features.xrayAnalysis.title,
+      description: strings.homepage.features.xrayAnalysis.desc,
       color: "from-pink-500 to-rose-600",
       iconColor: "text-pink-600",
     },
     {
       icon: BarChart3,
-      title: "Case Timeline",
-      description: "Comprehensive patient history visualization with symptom progression and treatment tracking",
+      title: strings.homepage.features.careLocator.title,
+      description: strings.homepage.features.careLocator.desc,
       color: "from-teal-500 to-cyan-600",
       iconColor: "text-teal-600",
     },
   ];
 
   const stats = [
-    { value: "99.2%", label: "Diagnostic Accuracy", icon: CheckCircle },
-    { value: "<30s", label: "Analysis Time", icon: Zap },
-    { value: "24/7", label: "Availability", icon: Clock },
-    { value: "50+", label: "Conditions Covered", icon: Heart },
+    { value: "99.2%", label: strings.homepage.stats.accuracy, icon: CheckCircle },
+    { value: "<30s", label: strings.homepage.stats.timeSaved, icon: Zap },
+    { value: "24/7", label: strings.homepage.stats.cases, icon: Clock },
+    { value: "98%", label: strings.homepage.stats.satisfaction, icon: Heart },
   ];
 
-  const benefits = [
-    "Reduce diagnostic errors with AI-powered clinical decision support",
-    "Save time with automated documentation and SOAP note generation",
-    "Improve patient outcomes through comprehensive symptom analysis",
-    "Access evidence-based recommendations from medical literature",
-    "Streamline workflow with integrated tools in one platform",
-    "Enhance clinical confidence with probability-scored diagnoses",
-  ];
+  const benefits = strings.homepage.benefits.items;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
@@ -205,18 +198,15 @@ export default function Home() {
             <div className="space-y-8 animate-slide-up" data-tour="hero">
               <Badge className="badge-modern glass bg-blue-100 text-blue-800 border-blue-300">
                 <Sparkles className="w-3 h-3 mr-1" />
-                AI-Powered Clinical Intelligence
+                {strings.homepage.hero.title}
               </Badge>
               
               <div className="space-y-4">
                 <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  The Future of
-                  <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Clinical Decision Making
-                  </span>
+                  {strings.homepage.hero.title}
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  MediTriage AI Pro is a comprehensive medical operating system that combines artificial intelligence with clinical expertise to deliver accurate diagnoses, streamline documentation, and improve patient outcomes.
+                  {strings.homepage.hero.subtitle}
                 </p>
               </div>
 
@@ -226,7 +216,7 @@ export default function Home() {
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 shadow-xl hover:shadow-2xl transition-all"
                   onClick={() => setLocation("/clinician/login")}
                 >
-                  Get Started
+                  {strings.homepage.hero.getStarted}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button
@@ -237,7 +227,7 @@ export default function Home() {
                     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  Learn More
+                  {strings.homepage.hero.learnMore}
                 </Button>
               </div>
 
@@ -269,13 +259,13 @@ export default function Home() {
           <div className="text-center mb-16 animate-slide-up">
             <Badge className="badge-modern glass bg-purple-100 text-purple-800 border-purple-300 mb-4">
               <Sparkles className="w-3 h-3 mr-1" />
-              Comprehensive Features
+              {strings.homepage.features.title}
             </Badge>
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need in One Platform
+              {strings.homepage.features.subtitle}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              MediTriage AI Pro integrates cutting-edge AI technology with clinical workflows to provide a complete medical operating system
+              {strings.homepage.hero.subtitle}
             </p>
           </div>
 
@@ -308,13 +298,13 @@ export default function Home() {
             <div className="space-y-6 animate-slide-up">
               <Badge className="badge-modern glass bg-green-100 text-green-800 border-green-300">
                 <CheckCircle className="w-3 h-3 mr-1" />
-                Clinical Benefits
+                {strings.homepage.benefits.title}
               </Badge>
               <h2 className="text-4xl font-bold text-gray-900">
-                Transform Your Clinical Practice
+                {strings.homepage.cta.title}
               </h2>
               <p className="text-lg text-gray-600">
-                MediTriage AI Pro empowers healthcare professionals with intelligent tools that enhance decision-making, reduce errors, and improve patient care.
+                {strings.homepage.footer.description}
               </p>
               <div className="space-y-4">
                 {benefits.map((benefit, idx) => (
@@ -389,13 +379,13 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center space-y-8 animate-slide-up">
             <Badge className="badge-modern glass bg-white/20 text-white border-white/30">
               <Sparkles className="w-3 h-3 mr-1" />
-              Get Started Today
+              {strings.homepage.cta.startTrial}
             </Badge>
             <h2 className="text-4xl lg:text-5xl font-bold">
-              Ready to Transform Your Clinical Practice?
+              {strings.homepage.cta.title}
             </h2>
             <p className="text-xl text-blue-100">
-              Join healthcare professionals who are already using MediTriage AI Pro to deliver better patient outcomes
+              {strings.homepage.cta.subtitle}
             </p>
             <div className="flex flex-wrap gap-4 justify-center pt-4">
               <Button
@@ -404,7 +394,7 @@ export default function Home() {
                 onClick={() => setLocation("/clinician/login")}
               >
                 <Users className="w-5 h-5 mr-2" />
-                Start for Clinicians
+                {strings.homepage.nav.clinicianLogin}
               </Button>
               <Button
                 size="lg"
@@ -413,7 +403,7 @@ export default function Home() {
                 onClick={() => setLocation("/patient/symptom-checker")}
               >
                 <Heart className="w-5 h-5 mr-2" />
-                Patient Portal
+                {strings.homepage.nav.patientPortal}
               </Button>
             </div>
           </div>
@@ -431,11 +421,11 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="font-bold text-white">MediTriage AI</div>
-                  <div className="text-xs">Medical OS</div>
+                  <div className="text-xs">{strings.homepage.footer.tagline}</div>
                 </div>
               </div>
               <p className="text-sm">
-                AI-powered clinical intelligence platform for healthcare professionals
+                {strings.homepage.footer.description}
               </p>
             </div>
 
