@@ -477,7 +477,9 @@
 
 - [ ] Medication Tracking Module
   - [x] Create medications and prescriptions database schema
-  - [ ] Build prescription creation interface for clinicians
+  - [x] Build prescription creation interface for clinicians
+  - [x] Add Medications route to App.tsx
+  - [x] Add Medications link to clinician dashboard sidebar
   - [ ] Implement medication schedule management
   - [ ] Create patient medication list view
   - [ ] Add medication adherence tracking

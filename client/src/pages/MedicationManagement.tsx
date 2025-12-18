@@ -35,7 +35,7 @@ export default function MedicationManagement() {
       setShowNewPrescriptionDialog(false);
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "Failed to create prescription");
     },
   });
