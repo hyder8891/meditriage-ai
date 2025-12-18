@@ -139,3 +139,7 @@
   - [x] Add severity badges for events
   - [x] Display event data and descriptions
   - [x] Add timeline route and navigation
+
+
+## Bug Fixes
+- [x] Fix React render error in ClinicianLogin - setLocation called during render phase

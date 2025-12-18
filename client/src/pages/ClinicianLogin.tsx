@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,10 +60,11 @@ export default function ClinicianLogin() {
   };
 
   // If already authenticated with Manus OAuth and is admin, redirect to dashboard
-  if (user && user.role === 'admin' && !authLoading) {
-    setLocation("/clinician/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (user && user.role === 'admin' && !authLoading) {
+      setLocation("/clinician/dashboard");
+    }
+  }, [user, authLoading, setLocation]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white flex items-center justify-center p-4">
