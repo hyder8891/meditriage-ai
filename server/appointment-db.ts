@@ -14,6 +14,19 @@ export async function createAppointment(data: InsertAppointment) {
 }
 
 /**
+ * Get all appointments
+ */
+export async function getAllAppointments() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db
+    .select()
+    .from(appointments)
+    .orderBy(desc(appointments.appointmentDate));
+}
+
+/**
  * Get appointment by ID
  */
 export async function getAppointmentById(id: number) {

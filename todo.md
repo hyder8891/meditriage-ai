@@ -466,14 +466,14 @@
 
 ## Comprehensive Features Phase
 
-- [ ] Appointment Booking System
+- [x] Appointment Booking System
   - [x] Create appointments database schema
-  - [ ] Build appointment scheduling UI in Care Locator
-  - [ ] Implement calendar view for clinicians
-  - [ ] Add appointment status management (pending, confirmed, completed, cancelled)
+  - [x] Build appointment scheduling UI in Care Locator
+  - [x] Implement calendar view for clinicians
+  - [x] Add appointment status management (pending, confirmed, completed, cancelled)
   - [ ] Create automated email/SMS reminder system
-  - [ ] Add appointment conflict detection
-  - [ ] Implement appointment rescheduling functionality
+  - [x] Add appointment conflict detection
+  - [x] Implement appointment rescheduling functionality
 
 - [ ] Medication Tracking Module
   - [x] Create medications and prescriptions database schema

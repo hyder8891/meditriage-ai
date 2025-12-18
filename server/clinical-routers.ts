@@ -895,14 +895,23 @@ Provide a well-structured, professional clinical note. Use clear medical termino
       return getAppointmentsByDateRange(input.startDate, input.endDate);
     }),
 
+  getAllAppointments: protectedProcedure
+    .query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      const { getAllAppointments } = await import("./appointment-db");
+      return getAllAppointments();
+    }),
+
   updateAppointmentStatus: protectedProcedure
     .input(z.object({
-      appointmentId: z.number(),
+      id: z.number(),
       status: z.enum(["pending", "confirmed", "completed", "cancelled", "no_show"]),
     }))
     .mutation(async ({ input }) => {
       const { updateAppointmentStatus } = await import("./appointment-db");
-      await updateAppointmentStatus(input.appointmentId, input.status);
+      await updateAppointmentStatus(input.id, input.status);
       return { success: true };
     }),
 
@@ -955,6 +964,65 @@ Provide a well-structured, professional clinical note. Use clear medical termino
         ...(input.duration && { duration: input.duration }),
       });
       
+      return { success: true };
+    }),
+
+  // Prescription Management
+  createPrescription: protectedProcedure
+    .input(z.object({
+      patientId: z.number(),
+      medicationName: z.string(),
+      dosage: z.string(),
+      frequency: z.string(),
+      duration: z.number(),
+      instructions: z.string().optional(),
+      startDate: z.date(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      const { createPrescription } = await import("./prescription-db");
+      const prescriptionId = await createPrescription({
+        ...input,
+        clinicianId: ctx.user.id,
+      });
+      return { prescriptionId };
+    }),
+
+  getAllPrescriptions: protectedProcedure
+    .query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized');
+      }
+      const { getAllPrescriptions } = await import("./prescription-db");
+      return getAllPrescriptions();
+    }),
+
+  getPrescriptionsByPatient: publicProcedure
+    .input(z.object({ patientId: z.number() }))
+    .query(async ({ input }) => {
+      const { getPrescriptionsByPatientId } = await import("./prescription-db");
+      return getPrescriptionsByPatientId(input.patientId);
+    }),
+
+  updateMedicationAdherence: publicProcedure
+    .input(z.object({
+      prescriptionId: z.number(),
+      patientId: z.number(),
+      taken: z.boolean(),
+      takenAt: z.date().optional(),
+      scheduledTime: z.date(),
+    }))
+    .mutation(async ({ input }) => {
+      const { recordMedicationAdherence } = await import("./prescription-db");
+      await recordMedicationAdherence({
+        prescriptionId: input.prescriptionId,
+        patientId: input.patientId,
+        taken: input.taken,
+        takenAt: input.takenAt || new Date(),
+        scheduledTime: input.scheduledTime,
+      });
       return { success: true };
     }),
 });
