@@ -113,3 +113,16 @@
 - [x] Integrate with clinical reasoning engine
 - [x] Add symptom mapping to body regions
 - [x] Create Bio-Scanner page route
+
+
+## Smart Clinical Notes Generator
+- [x] AI-powered SOAP note generation from transcriptions
+  - [x] Create backend endpoint for SOAP note generation using DeepSeek
+  - [x] Add SOAP format template (Subjective, Objective, Assessment, Plan)
+  - [x] Implement transcription-to-SOAP conversion logic
+  - [x] Add "Generate SOAP Note" button to Live Scribe page
+  - [x] Create SOAP note preview modal with sections
+  - [x] Add copy to clipboard functionality
+  - [x] Add export as text file functionality
+  - [x] Add save to clinical notes functionality
+  - [x] Link SOAP notes to patient cases

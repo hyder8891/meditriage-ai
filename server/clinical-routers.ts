@@ -460,4 +460,60 @@ Be empathetic, clear, and avoid medical jargon. Always encourage seeking profess
         duration: result.duration,
       };
     }),
+
+  // Smart Clinical Notes Generator: Convert transcription to SOAP format
+  generateSOAPNote: protectedProcedure
+    .input(z.object({
+      transcriptionText: z.string(),
+      patientName: z.string().optional(),
+      patientAge: z.number().optional(),
+      patientGender: z.string().optional(),
+      chiefComplaint: z.string().optional(),
+      vitals: z.object({
+        bloodPressure: z.string().optional(),
+        heartRate: z.number().optional(),
+        temperature: z.number().optional(),
+        respiratoryRate: z.number().optional(),
+        oxygenSaturation: z.number().optional(),
+      }).optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const patientInfo = input.patientName 
+        ? `Patient: ${input.patientName}${input.patientAge ? `, Age: ${input.patientAge}` : ''}${input.patientGender ? `, Gender: ${input.patientGender}` : ''}`
+        : '';
+      
+      const chiefComplaintInfo = input.chiefComplaint 
+        ? `Chief Complaint: ${input.chiefComplaint}`
+        : '';
+      
+      const vitalsInfo = input.vitals 
+        ? `Vitals: BP ${input.vitals.bloodPressure || 'N/A'}, HR ${input.vitals.heartRate || 'N/A'}, Temp ${input.vitals.temperature || 'N/A'}°C, RR ${input.vitals.respiratoryRate || 'N/A'}, SpO2 ${input.vitals.oxygenSaturation || 'N/A'}%`
+        : '';
+
+      const systemPrompt = `You are a medical documentation expert. Convert the following clinical transcription into a structured SOAP note format.
+
+SOAP Format:
+- **Subjective:** Patient's complaints, symptoms, and history in their own words
+- **Objective:** Physical examination findings, vital signs, and observable data
+- **Assessment:** Clinical impression, differential diagnoses, and analysis
+- **Plan:** Treatment plan, medications, follow-up, and patient education
+
+Provide a well-structured, professional clinical note. Use clear medical terminology. Be concise but comprehensive.`;
+
+      const userPrompt = `${patientInfo ? patientInfo + '\n' : ''}${chiefComplaintInfo ? chiefComplaintInfo + '\n' : ''}${vitalsInfo ? vitalsInfo + '\n' : ''}\n\nTranscription:\n${input.transcriptionText}\n\nGenerate a complete SOAP note from this transcription.`;
+
+      const response = await invokeDeepSeek({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      });
+
+      const soapNote = response.choices[0]?.message?.content || '';
+
+      return {
+        soapNote,
+        generatedAt: new Date().toISOString(),
+      };
+    }),
 });

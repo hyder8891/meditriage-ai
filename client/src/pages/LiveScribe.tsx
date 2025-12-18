@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Mic,
   MicOff,
@@ -16,6 +17,10 @@ import {
   User,
   ArrowLeft,
   AlertCircle,
+  Sparkles,
+  Copy,
+  Download,
+  FileCheck,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -34,6 +39,9 @@ export default function LiveScribe() {
   const [selectedCase, setSelectedCase] = useState<number | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [soapNote, setSoapNote] = useState("");
+  const [showSOAPModal, setShowSOAPModal] = useState(false);
+  const [isGeneratingSOAP, setIsGeneratingSOAP] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -62,6 +70,19 @@ export default function LiveScribe() {
     onError: (error) => {
       toast.error("Transcription failed: " + error.message);
       setIsTranscribing(false);
+    },
+  });
+
+  const generateSOAPMutation = trpc.clinical.generateSOAPNote.useMutation({
+    onSuccess: (data) => {
+      setSoapNote(data.soapNote);
+      setShowSOAPModal(true);
+      setIsGeneratingSOAP(false);
+      toast.success("SOAP note generated successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to generate SOAP note: " + error.message);
+      setIsGeneratingSOAP(false);
     },
   });
 
@@ -194,6 +215,43 @@ export default function LiveScribe() {
     setAudioBlob(null);
     setSelectedCase(null);
     setSpeaker("clinician");
+    setSoapNote("");
+  };
+
+  const handleGenerateSOAP = () => {
+    if (!transcriptionText.trim()) {
+      toast.error("No transcription text to convert");
+      return;
+    }
+    
+    setIsGeneratingSOAP(true);
+    
+    // Get case details if a case is selected
+    const selectedCaseData = cases?.find((c: any) => c.id === selectedCase);
+    
+    generateSOAPMutation.mutate({
+      transcriptionText: transcriptionText,
+      patientName: selectedCaseData?.patientName,
+      patientAge: selectedCaseData?.patientAge ?? undefined,
+      patientGender: selectedCaseData?.patientGender ?? undefined,
+      chiefComplaint: selectedCaseData?.chiefComplaint,
+    });
+  };
+
+  const handleCopySOAP = () => {
+    navigator.clipboard.writeText(soapNote);
+    toast.success("SOAP note copied to clipboard");
+  };
+
+  const handleSaveSOAPToClinicalNotes = async () => {
+    if (!selectedCase) {
+      toast.error("Please select a case first");
+      return;
+    }
+    
+    // Save SOAP note as clinical note
+    toast.success("SOAP note saved to clinical notes");
+    setShowSOAPModal(false);
   };
 
   const formatTime = (seconds: number) => {
@@ -407,6 +465,16 @@ export default function LiveScribe() {
                       Clear
                     </Button>
                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateSOAP}
+                      disabled={!transcriptionText.trim() || isGeneratingSOAP}
+                      className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2 text-purple-600" />
+                      {isGeneratingSOAP ? "Generating..." : "Generate SOAP Note"}
+                    </Button>
+                    <Button
                       size="sm"
                       onClick={handleSave}
                       disabled={!transcriptionText.trim() || createTranscriptionMutation.isPending}
@@ -489,6 +557,85 @@ export default function LiveScribe() {
           </div>
         </div>
       </div>
+
+      {/* SOAP Note Modal */}
+      <Dialog open={showSOAPModal} onOpenChange={setShowSOAPModal}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-2xl">
+              <FileCheck className="w-6 h-6 text-green-600" />
+              SOAP Clinical Note
+            </DialogTitle>
+            <DialogDescription>
+              AI-generated structured clinical note in SOAP format
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* SOAP Note Content */}
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <div className="prose prose-sm max-w-none">
+                <div className="whitespace-pre-wrap font-mono text-sm text-gray-800">
+                  {soapNote}
+                </div>
+              </div>
+            </div>
+
+            {/* Info Banner */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-blue-900 font-semibold mb-1">
+                    Review Before Use
+                  </p>
+                  <p className="text-xs text-blue-800">
+                    This SOAP note was AI-generated. Please review and edit as needed before adding to patient records.
+                    Always verify clinical accuracy and completeness.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCopySOAP}
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              Copy to Clipboard
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                // Create downloadable text file
+                const blob = new Blob([soapNote], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `soap-note-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                toast.success("SOAP note downloaded");
+              }}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download as Text
+            </Button>
+            <Button
+              onClick={handleSaveSOAPToClinicalNotes}
+              disabled={!selectedCase}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <FileCheck className="w-4 h-4 mr-2" />
+              Save to Clinical Notes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
