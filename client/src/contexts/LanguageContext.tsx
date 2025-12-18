@@ -11,12 +11,17 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en');
+  // Default to Arabic for Iraqi users, with localStorage persistence
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('language');
+    return (saved as Language) || 'ar'; // Arabic as default
+  });
 
   // Set direction and lang attribute when language changes
   useEffect(() => {
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
+    localStorage.setItem('language', language);
   }, [language]);
 
   const toggleLanguage = () => {

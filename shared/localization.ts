@@ -53,9 +53,46 @@ export interface LocalizationStrings {
         bioScanner: { title: string; desc: string; features: string[] };
         liveScribe: { title: string; desc: string; features: string[] };
         pharmaGuard: { title: string; desc: string; features: string[] };
+        xrayAnalysis: { title: string; desc: string; features: string[] };
+        careLocator: { title: string; desc: string; features: string[] };
         soapGenerator: { title: string; desc: string; features: string[] };
         caseTimeline: { title: string; desc: string; features: string[] };
       };
+    };
+  };
+  // Patient Portal
+  patientPortal: {
+    symptomChecker: {
+      title: string;
+      subtitle: string;
+      backToHome: string;
+      disclaimer: {
+        title: string;
+        text: string;
+      };
+      input: {
+        title: string;
+        placeholder: string;
+        analyzeButton: string;
+        analyzing: string;
+      };
+      results: {
+        title: string;
+        urgency: string;
+        possibleConditions: string;
+        recommendations: string;
+        whenToSeek: string;
+        selfCare: string;
+        noResults: string;
+      };
+    };
+    dashboard: {
+      title: string;
+      welcome: string;
+      myAppointments: string;
+      testResults: string;
+      medicalHistory: string;
+      medications: string;
     };
   };
   title: string;
@@ -229,6 +266,16 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
             desc: 'Drug interaction checking and medication safety analysis',
             features: ['Interaction Alerts', 'Dosage Guidance', 'Safety Warnings'],
           },
+          xrayAnalysis: {
+            title: 'X-Ray Analysis',
+            desc: 'AI-powered medical imaging analysis and interpretation',
+            features: ['Image Analysis', 'Finding Detection', 'Diagnostic Support'],
+          },
+          careLocator: {
+            title: 'Care Locator',
+            desc: 'Find nearby healthcare facilities and specialists',
+            features: ['Facility Search', 'Map Integration', 'Contact Info'],
+          },
           soapGenerator: {
             title: 'SOAP Note Generator',
             desc: 'Automated clinical documentation in standardized format',
@@ -240,6 +287,40 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
             features: ['Event Tracking', 'Vital Trends', 'Treatment History'],
           },
         },
+      },
+    },
+    patientPortal: {
+      symptomChecker: {
+        title: 'Symptom Checker',
+        subtitle: 'AI-powered health assessment & care guide',
+        backToHome: 'Back to Home',
+        disclaimer: {
+          title: 'Medical Disclaimer',
+          text: 'This tool provides general health information and is not a substitute for professional medical advice. If you\'re experiencing a medical emergency, call emergency services immediately.',
+        },
+        input: {
+          title: 'Describe Your Symptoms',
+          placeholder: 'Describe your symptoms in detail... (e.g., "I have a headache and fever for 2 days")',
+          analyzeButton: 'Analyze Symptoms',
+          analyzing: 'Analyzing...',
+        },
+        results: {
+          title: 'Analysis Results',
+          urgency: 'Urgency Level',
+          possibleConditions: 'Possible Conditions',
+          recommendations: 'Recommendations',
+          whenToSeek: 'When to Seek Care',
+          selfCare: 'Self-Care Tips',
+          noResults: 'No analysis results yet. Describe your symptoms and click Analyze.',
+        },
+      },
+      dashboard: {
+        title: 'Patient Dashboard',
+        welcome: 'Welcome',
+        myAppointments: 'My Appointments',
+        testResults: 'Test Results',
+        medicalHistory: 'Medical History',
+        medications: 'Medications',
       },
     },
     title: "MediTriage AI Pro",
@@ -417,6 +498,16 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
             desc: 'فحص التفاعلات الدوائية وتحليل سلامة الأدوية',
             features: ['تنبيهات التفاعل', 'إرشادات الجرعة', 'تحذيرات السلامة'],
           },
+          xrayAnalysis: {
+            title: 'X-Ray Analysis',
+            desc: 'تحليل وتفسير التصوير الطبي المدعوم بالذكاء الاصطناعي',
+            features: ['تحليل الصور', 'اكتشاف النتائج', 'دعم التشخيص'],
+          },
+          careLocator: {
+            title: 'Care Locator',
+            desc: 'ابحث عن المرافق الصحية والمتخصصين القريبين',
+            features: ['بحث المرافق', 'تكامل الخرائط', 'معلومات الاتصال'],
+          },
           soapGenerator: {
             title: 'SOAP Note Generator',
             desc: 'توثيق سريري آلي بتنسيق موحد',
@@ -428,6 +519,40 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
             features: ['تتبع الأحداث', 'اتجاهات العلامات الحيوية', 'تاريخ العلاج'],
           },
         },
+      },
+    },
+    patientPortal: {
+      symptomChecker: {
+        title: 'فاحص الأعراض',
+        subtitle: 'تقييم صحي مدعوم بالذكاء الاصطناعي ودليل الرعاية',
+        backToHome: 'العودة للرئيسية',
+        disclaimer: {
+          title: 'إخلاء طبي',
+          text: 'توفر هذه الأداة معلومات صحية عامة ولا تغني عن المشورة الطبية المتخصصة. إذا كنت تعاني من حالة طبية طارئة، اتصل بخدمات الطوارئ فوراً.',
+        },
+        input: {
+          title: 'صف أعراضك',
+          placeholder: 'صف أعراضك بالتفصيل... (مثلاً، "أعاني من صداع وحمى لمدة يومين")',
+          analyzeButton: 'تحليل الأعراض',
+          analyzing: 'جاري التحليل...',
+        },
+        results: {
+          title: 'نتائج التحليل',
+          urgency: 'مستوى العجلة',
+          possibleConditions: 'الحالات المحتملة',
+          recommendations: 'التوصيات',
+          whenToSeek: 'متى تطلب الرعاية',
+          selfCare: 'نصائح الرعاية الذاتية',
+          noResults: 'لا توجد نتائج تحليل بعد. صف أعراضك وانقر تحليل.',
+        },
+      },
+      dashboard: {
+        title: 'لوحة المريض',
+        welcome: 'مرحباً',
+        myAppointments: 'مواعيدي',
+        testResults: 'نتائج الفحوصات',
+        medicalHistory: 'التاريخ الطبي',
+        medications: 'الأدوية',
       },
     },
     title: "المساعد الطبي المتقدم",

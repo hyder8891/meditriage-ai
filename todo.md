@@ -297,3 +297,22 @@
   - [ ] Add success notifications for all actions
   - [ ] Implement form validation with clear error messages
   - [ ] Add confirmation dialogs for destructive actions
+
+
+## Arabic Localization for Iraqi Users
+- [x] Set Arabic as default language platform-wide
+- [x] Add comprehensive Arabic translations to patient portal
+  - [x] Symptom Checker (input and output in Arabic)
+  - [x] Patient Dashboard translations
+  - [x] Medical history forms translations
+- [x] Ensure AI features support Arabic input/output
+  - [x] Clinical Reasoning Engine accepts Arabic symptoms
+  - [x] SOAP notes generation supports Arabic
+  - [x] Drug names with Arabic support
+- [x] Optimize RTL layout for all pages
+- [x] Add Arabic font optimization (Cairo font)
+- [ ] Add Iraqi medical context
+  - [ ] Common diseases in Iraq
+  - [ ] Local medication names
+  - [ ] Iraqi healthcare system information
+  - [ ] Cultural considerations for medical consultations
