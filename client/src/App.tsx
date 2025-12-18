@@ -20,6 +20,7 @@ import ClinicalReasoning from "./pages/ClinicalReasoning";
 import PatientSymptomChecker from "./pages/PatientSymptomChecker";
 import PharmaGuard from "./pages/PharmaGuard";
 import CareLocator from "./pages/CareLocator";
+import BioScanner from "./pages/BioScanner";
 
 function Router() {
   return (
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/patient/symptom-checker"} component={PatientSymptomChecker} />
       <Route path={"/clinician/pharmaguard"} component={PharmaGuard} />
       <Route path={"/clinician/care-locator"} component={CareLocator} />
+      <Route path={"/clinician/bio-scanner"} component={BioScanner} />
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
