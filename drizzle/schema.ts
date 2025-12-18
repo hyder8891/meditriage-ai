@@ -176,3 +176,31 @@ export const medicalKnowledgeBase = mysqlTable("medical_knowledge_base", {
 
 export type MedicalKnowledgeBase = typeof medicalKnowledgeBase.$inferSelect;
 export type InsertMedicalKnowledgeBase = typeof medicalKnowledgeBase.$inferInsert;
+
+/**
+ * Training sessions - tracks all model training runs
+ */
+export const trainingSessions = mysqlTable("training_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+  
+  totalMaterials: int("total_materials").notNull(),
+  processedMaterials: int("processed_materials").notNull(),
+  successfulMaterials: int("successful_materials").notNull(),
+  failedMaterials: int("failed_materials").notNull(),
+  
+  duration: int("duration"), // in seconds
+  status: varchar("status", { length: 50 }).notNull().default("running"), // running, completed, failed
+  
+  results: text("results"), // JSON stringified array of results
+  errorMessage: text("error_message"),
+  
+  triggeredBy: int("triggered_by").notNull(), // user ID
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type TrainingSession = typeof trainingSessions.$inferSelect;
+export type InsertTrainingSession = typeof trainingSessions.$inferInsert;

@@ -5,7 +5,8 @@ import {
   triageTrainingData,
   InsertTriageTrainingData,
   medicalKnowledgeBase,
-  InsertMedicalKnowledgeBase
+  InsertMedicalKnowledgeBase,
+  trainingSessions
 } from "../drizzle/schema";
 import { getDb } from "./db";
 
@@ -192,6 +193,68 @@ export async function getTrainingStats() {
     byCategory,
     totalKnowledgeExtracted: allMaterials.filter(m => m.summary).length,
   };
+}
+
+// Training Session Operations
+export async function createTrainingSession(data: {
+  totalMaterials: number;
+  triggeredBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(trainingSessions).values({
+    totalMaterials: data.totalMaterials,
+    processedMaterials: 0,
+    successfulMaterials: 0,
+    failedMaterials: 0,
+    status: 'running',
+    triggeredBy: data.triggeredBy,
+  });
+  
+  return Number((result as any).insertId || 0);
+}
+
+export async function updateTrainingSession(id: number, data: {
+  processedMaterials?: number;
+  successfulMaterials?: number;
+  failedMaterials?: number;
+  status?: string;
+  completedAt?: Date;
+  duration?: number;
+  results?: string;
+  errorMessage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db
+    .update(trainingSessions)
+    .set(data)
+    .where(eq(trainingSessions.id, id));
+}
+
+export async function getAllTrainingSessions() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(trainingSessions)
+    .orderBy(desc(trainingSessions.startedAt));
+}
+
+export async function getTrainingSessionById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db
+    .select()
+    .from(trainingSessions)
+    .where(eq(trainingSessions.id, id))
+    .limit(1);
+  
+  return results[0] || null;
 }
 
 export async function saveTrainingMaterial(data: {

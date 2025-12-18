@@ -25,7 +25,11 @@ import {
   getAllTrainingMaterials,
   getAllTriageTrainingData,
   getUntrainedTriageData,
-  updateTrainingMaterialStatus
+  updateTrainingMaterialStatus,
+  createTrainingSession,
+  updateTrainingSession,
+  getAllTrainingSessions,
+  getTrainingSessionById
 } from "./training-db";
 import { nanoid } from "nanoid";
 
@@ -412,56 +416,91 @@ export const appRouter = router({
         }
 
         const allMaterials = await getAllTrainingMaterials();
+        const startTime = Date.now();
+        
+        // Create training session
+        const sessionId = await createTrainingSession({
+          totalMaterials: allMaterials.length,
+          triggeredBy: ctx.user.id,
+        });
+        
         const results = [];
         let processed = 0;
 
-        for (const material of allMaterials) {
-          try {
-            // Retrain with DeepSeek
-            const analysis = await trainOnMedicalMaterial({
-              title: material.title,
-              content: material.content,
-              category: material.category,
-              source: material.source,
-            });
+        try {
+          for (const material of allMaterials) {
+            try {
+              // Retrain with DeepSeek
+              const analysis = await trainOnMedicalMaterial({
+                title: material.title,
+                content: material.content,
+                category: material.category,
+                source: material.source,
+              });
 
-            // Update with new analysis
-            await updateTrainingMaterialStatus(
-              material.id,
-              'trained',
-              {
-                summary: analysis.summary,
-                keyFindings: JSON.stringify(analysis.keyFindings),
-                clinicalRelevance: analysis.clinicalRelevance,
-              }
-            );
+              // Update with new analysis
+              await updateTrainingMaterialStatus(
+                material.id,
+                'trained',
+                {
+                  summary: analysis.summary,
+                  keyFindings: JSON.stringify(analysis.keyFindings),
+                  clinicalRelevance: analysis.clinicalRelevance,
+                }
+              );
 
-            processed++;
-            results.push({
-              id: material.id,
-              title: material.title,
-              success: true,
-              progress: Math.round((processed / allMaterials.length) * 100),
-            });
-          } catch (error) {
-            console.error(`Failed to train on ${material.title}:`, error);
-            results.push({
-              id: material.id,
-              title: material.title,
-              success: false,
-              error: 'Training failed',
-              progress: Math.round((processed / allMaterials.length) * 100),
-            });
+              processed++;
+              results.push({
+                id: material.id,
+                title: material.title,
+                success: true,
+                progress: Math.round((processed / allMaterials.length) * 100),
+              });
+            } catch (error) {
+              console.error(`Failed to train on ${material.title}:`, error);
+              results.push({
+                id: material.id,
+                title: material.title,
+                success: false,
+                error: 'Training failed',
+                progress: Math.round((processed / allMaterials.length) * 100),
+              });
+            }
           }
-        }
 
-        return {
-          totalMaterials: allMaterials.length,
-          processed,
-          successful: results.filter(r => r.success).length,
-          failed: results.filter(r => !r.success).length,
-          results,
-        };
+          const duration = Math.floor((Date.now() - startTime) / 1000);
+          const successful = results.filter(r => r.success).length;
+          const failed = results.filter(r => !r.success).length;
+
+          // Update session as completed
+          await updateTrainingSession(sessionId, {
+            processedMaterials: processed,
+            successfulMaterials: successful,
+            failedMaterials: failed,
+            status: 'completed',
+            completedAt: new Date(),
+            duration,
+            results: JSON.stringify(results),
+          });
+
+          return {
+            sessionId,
+            totalMaterials: allMaterials.length,
+            processed,
+            successful,
+            failed,
+            duration,
+            results,
+          };
+        } catch (error) {
+          // Update session as failed
+          await updateTrainingSession(sessionId, {
+            status: 'failed',
+            errorMessage: error instanceof Error ? error.message : 'Unknown error',
+            completedAt: new Date(),
+          });
+          throw error;
+        }
       }),
 
     // Add medical training material
@@ -516,13 +555,33 @@ export const appRouter = router({
       return await getAllTrainingMaterials();
     }),
 
-    // Get all training data (admin only)
-    getAllTrainingData: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== 'admin') {
-        throw new Error('Unauthorized');
-      }
-      return await getAllTriageTrainingData();
-    }),
+    // Get all triage training data
+    getAllTriageData: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Unauthorized');
+        }
+        return await getAllTriageTrainingData();
+      }),
+
+    // Get all training sessions
+    getTrainingSessions: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Unauthorized');
+        }
+        return await getAllTrainingSessions();
+      }),
+
+    // Get training session by ID
+    getTrainingSessionById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Unauthorized');
+        }
+        return await getTrainingSessionById(input.id);
+      }),
 
     // Get untrained data for export
     getUntrainedData: protectedProcedure.query(async ({ ctx }) => {

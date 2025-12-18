@@ -128,7 +128,7 @@ describe("Training Data Storage", () => {
     const { ctx } = createAuthContext('admin');
     const caller = appRouter.createCaller(ctx);
 
-    const result = await caller.training.getAllTrainingData();
+    const result = await caller.training.getAllTriageData();
 
     expect(Array.isArray(result)).toBe(true);
   });

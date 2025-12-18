@@ -107,3 +107,14 @@
 - [x] Add visual progress bar showing percentage completion
 - [x] Display current file name and position (e.g., "5 of 20")
 - [x] Show estimated time remaining
+
+
+## Training History Log
+- [x] Create database schema for training sessions
+- [x] Add training session tracking to trainAll endpoint
+- [x] Create backend endpoint to retrieve training history
+- [x] Build Training History tab in AdminTraining page
+- [x] Display session list with timestamps and statistics
+- [x] Add detailed view for individual training sessions
+- [x] Show processed files with success/failure status
+- [x] Add filtering and search capabilities

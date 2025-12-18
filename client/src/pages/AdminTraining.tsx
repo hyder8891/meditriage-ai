@@ -16,7 +16,8 @@ import {
   ArrowLeft,
   Loader2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Clock
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -37,8 +38,14 @@ export default function AdminTraining() {
   const { data: trainingMaterials, isLoading: materialsLoading, refetch: refetchMaterials } = 
     trpc.training.getAllMaterials.useQuery(undefined, { enabled: isAuthenticated && user?.role === 'admin' });
 
-  const { data: trainingData, isLoading: dataLoading } = 
-    trpc.training.getAllTrainingData.useQuery(undefined, { enabled: isAuthenticated && user?.role === 'admin' });
+  const { data: triageData, isLoading: triageLoading } = 
+    trpc.training.getAllTriageData.useQuery(undefined, { enabled: isAuthenticated && user?.role === 'admin' });
+  
+  const trainingData = triageData; // Alias for backward compatibility
+  const dataLoading = triageLoading;
+
+  const { data: trainingSessions, isLoading: sessionsLoading } = 
+    trpc.training.getTrainingSessions.useQuery(undefined, { enabled: isAuthenticated && user?.role === 'admin' });;
 
   const batchMutation = trpc.training.batchProcess.useMutation({
     onSuccess: (data) => {
@@ -331,6 +338,7 @@ export default function AdminTraining() {
             <TabsTrigger value="upload">Upload Data</TabsTrigger>
             <TabsTrigger value="materials">Training Materials</TabsTrigger>
             <TabsTrigger value="triage">Triage Data</TabsTrigger>
+            <TabsTrigger value="history">Training History</TabsTrigger>
           </TabsList>
 
           {/* Upload Tab */}
@@ -502,6 +510,101 @@ export default function AdminTraining() {
                               </div>
                               <div className="text-xs text-muted-foreground">
                                 {new Date(data.createdAt).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Training History Tab */}
+          <TabsContent value="history" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Training History</CardTitle>
+                <CardDescription>
+                  View all past training sessions with detailed statistics and results
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {sessionsLoading ? (
+                  <div className="text-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+                  </div>
+                ) : !trainingSessions || trainingSessions.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Clock className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                    <p>No training sessions yet</p>
+                    <p className="text-sm mt-2">Start training to see history here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {trainingSessions.map((session) => {
+                      const startDate = new Date(session.startedAt);
+                      const completedDate = session.completedAt ? new Date(session.completedAt) : null;
+                      const duration = session.duration ? `${Math.floor(session.duration / 60)}m ${session.duration % 60}s` : 'N/A';
+                      const successRate = session.totalMaterials > 0 
+                        ? Math.round((session.successfulMaterials / session.totalMaterials) * 100)
+                        : 0;
+
+                      return (
+                        <Card key={session.id} className="hover:bg-accent/50 transition-colors">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge 
+                                    variant={session.status === 'completed' ? 'default' : session.status === 'failed' ? 'destructive' : 'secondary'}
+                                  >
+                                    {session.status === 'completed' && <CheckCircle className="w-3 h-3 mr-1" />}
+                                    {session.status}
+                                  </Badge>
+                                  <span className="text-sm text-muted-foreground">
+                                    {startDate.toLocaleString()}
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+                                  <div>
+                                    <p className="text-xs text-muted-foreground">Total Materials</p>
+                                    <p className="text-lg font-semibold">{session.totalMaterials}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-muted-foreground">Successful</p>
+                                    <p className="text-lg font-semibold text-green-600">{session.successfulMaterials}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-muted-foreground">Failed</p>
+                                    <p className="text-lg font-semibold text-red-600">{session.failedMaterials}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-muted-foreground">Duration</p>
+                                    <p className="text-lg font-semibold">{duration}</p>
+                                  </div>
+                                </div>
+                                {session.status === 'completed' && (
+                                  <div className="mt-3">
+                                    <div className="flex items-center justify-between text-sm mb-1">
+                                      <span className="text-muted-foreground">Success Rate</span>
+                                      <span className="font-semibold">{successRate}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                      <div
+                                        className="bg-green-600 h-2 rounded-full transition-all"
+                                        style={{ width: `${successRate}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                                {session.errorMessage && (
+                                  <div className="mt-3 p-2 bg-red-50 dark:bg-red-950 rounded text-sm text-red-600">
+                                    <strong>Error:</strong> {session.errorMessage}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </CardContent>
