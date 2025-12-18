@@ -21,9 +21,74 @@ import {
   Microscope,
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTour } from "@/contexts/TourContext";
+import { useEffect } from "react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { setSteps, startTour } = useTour();
+
+  // Define tour steps
+  useEffect(() => {
+    setSteps([
+      {
+        id: 'hero',
+        target: '[data-tour="hero"]',
+        title: 'Welcome to MediTriage AI Pro',
+        content: 'Your comprehensive medical operating system that combines AI with clinical expertise to deliver accurate diagnoses and streamline documentation.',
+        placement: 'bottom',
+      },
+      {
+        id: 'demo-card',
+        target: '[data-tour="demo-card"]',
+        title: 'Live Clinical Analysis',
+        content: 'See how our AI analyzes patient symptoms and generates differential diagnoses with probability scores in real-time.',
+        placement: 'left',
+      },
+      {
+        id: 'stats',
+        target: '[data-tour="stats"]',
+        title: 'Proven Performance',
+        content: 'MediTriage AI Pro delivers 99.2% diagnostic accuracy with analysis completed in under 30 seconds, available 24/7.',
+        placement: 'top',
+      },
+      {
+        id: 'features',
+        target: '[data-tour="features"]',
+        title: 'Comprehensive Feature Set',
+        content: 'Explore our six core features: Clinical Reasoning Engine, 3D Bio-Scanner, Live Scribe, PharmaGuard, X-Ray Analysis, and Case Timeline.',
+        placement: 'top',
+      },
+      {
+        id: 'feature-clinical',
+        target: '[data-tour="feature-clinical"]',
+        title: 'Clinical Reasoning Engine',
+        content: 'AI-powered differential diagnosis with evidence-based recommendations and probability scoring for confident clinical decisions.',
+        placement: 'right',
+      },
+      {
+        id: 'feature-bioscanner',
+        target: '[data-tour="feature-bioscanner"]',
+        title: '3D Bio-Scanner',
+        content: 'Interactive anatomical visualization with symptom mapping and organ-specific diagnostic insights for comprehensive patient assessment.',
+        placement: 'right',
+      },
+      {
+        id: 'benefits',
+        target: '[data-tour="benefits"]',
+        title: 'Transform Your Practice',
+        content: 'Reduce diagnostic errors, save time with automated documentation, and improve patient outcomes through comprehensive AI-powered analysis.',
+        placement: 'right',
+      },
+      {
+        id: 'cta',
+        target: '[data-tour="cta"]',
+        title: 'Ready to Get Started?',
+        content: 'Join healthcare professionals using MediTriage AI Pro. Access the clinician portal or try the patient symptom checker now!',
+        placement: 'top',
+      },
+    ]);
+  }, [setSteps]);
 
   const features = [
     {
@@ -111,6 +176,14 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-3">
               <Button
+                variant="outline"
+                onClick={startTour}
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Take a Tour
+              </Button>
+              <Button
                 variant="ghost"
                 onClick={() => setLocation("/clinician/login")}
               >
@@ -131,7 +204,7 @@ export default function Home() {
         <div className="relative z-10 container mx-auto px-6 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Column */}
-            <div className="space-y-8 animate-slide-up">
+            <div className="space-y-8 animate-slide-up" data-tour="hero">
               <Badge className="badge-modern glass bg-blue-100 text-blue-800 border-blue-300">
                 <Sparkles className="w-3 h-3 mr-1" />
                 AI-Powered Clinical Intelligence
@@ -171,7 +244,7 @@ export default function Home() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8" data-tour="stats">
                 {stats.map((stat, idx) => (
                   <div key={idx} className="text-center">
                     <div className="flex items-center justify-center mb-2">
@@ -188,7 +261,7 @@ export default function Home() {
             <div className="relative animate-slide-up animation-delay-200">
               <div className="relative">
                 {/* Main Card */}
-                <Card className="card-modern glass-strong shadow-2xl border-2 border-blue-200/50 overflow-hidden">
+                <Card className="card-modern glass-strong shadow-2xl border-2 border-blue-200/50 overflow-hidden" data-tour="demo-card">
                   <CardContent className="p-8">
                     <div className="space-y-6">
                       {/* Header */}
@@ -278,7 +351,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white/50">
+      <section id="features" className="py-20 bg-white/50" data-tour="features">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16 animate-slide-up">
             <Badge className="badge-modern glass bg-purple-100 text-purple-800 border-purple-300 mb-4">
@@ -297,6 +370,7 @@ export default function Home() {
             {features.map((feature, idx) => (
               <Card
                 key={idx}
+                data-tour={idx === 0 ? 'feature-clinical' : idx === 1 ? 'feature-bioscanner' : undefined}
                 className="card-modern glass-strong hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group animate-slide-up border-2 border-transparent hover:border-blue-200"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
@@ -314,7 +388,7 @@ export default function Home() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20">
+      <section className="py-20" data-tour="benefits">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left - Benefits List */}
@@ -389,7 +463,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden" data-tour="cta">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{

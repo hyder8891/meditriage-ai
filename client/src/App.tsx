@@ -5,6 +5,8 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { TourProvider } from "./contexts/TourContext";
+import { GuidedTour } from "./components/GuidedTour";
 import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import Triage from "./pages/Triage";
@@ -54,14 +56,16 @@ function Router() {
 }
 
 function App() {
-  return (
+    return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <LanguageProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <TourProvider>
+            <TooltipProvider>
+              <Router />
+              <GuidedTour />
+            </TooltipProvider>
+          </TourProvider>
         </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>
