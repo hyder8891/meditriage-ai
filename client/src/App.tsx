@@ -8,6 +8,9 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { TourProvider } from "./contexts/TourContext";
 import { GuidedTour } from "./components/GuidedTour";
 import Home from "./pages/Home";
+import NewHome from "./pages/NewHome";
+import PatientLogin from "./pages/PatientLogin";
+import ClinicianLoginNew from "./pages/ClinicianLoginNew";
 import Landing from "./pages/Landing";
 import Triage from "./pages/Triage";
 import Advice from "./pages/Advice";
@@ -36,7 +39,10 @@ import SecureMessaging from "./pages/SecureMessaging";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={NewHome} />
+      <Route path={"/old-home"} component={Home} />
+      <Route path={"/patient-login"} component={PatientLogin} />
+      <Route path={"/clinician-login"} component={ClinicianLoginNew} />
       <Route path={"/portal-selection"} component={PortalSelection} />
       <Route path={"/home"} component={Landing} />
       <Route path={"/clinician/login"} component={ClinicianLogin} />

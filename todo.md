@@ -575,3 +575,33 @@
 - [x] Check case creation routing and navigation
 - [x] Verify case detail page route exists
 - [x] Ensure proper redirect after case creation
+
+
+## Landing Page Redesign & Authentication
+- [x] Research similar medical triage and telemedicine platforms
+  - [x] Research Babylon Health, K Health, Ada Health
+  - [x] Analyze layout patterns and design elements
+  - [x] Document best practices for medical landing pages
+- [x] Redesign landing page based on research
+  - [x] Implement hero section with clear value proposition
+  - [x] Add trust indicators (statistics, testimonials)
+  - [x] Create separate CTAs for patients and clinicians
+  - [x] Add features showcase section
+  - [x] Implement responsive design
+  - [x] Add "How It Works" section for both user types
+  - [x] Add final CTA section
+- [x] Implement patient authentication
+  - [x] Create patient login page
+  - [x] Add patient registration flow
+  - [x] Add password visibility toggle
+  - [x] Add OAuth placeholders (Google, Facebook)
+- [x] Implement clinician authentication
+  - [x] Create clinician login page
+  - [x] Add clinician registration/verification flow
+  - [x] Add medical license number field
+  - [x] Add specialty field
+  - [x] Add verification notice
+- [x] Update routing and navigation
+  - [x] Add /patient-login route
+  - [x] Add /clinician-login route
+  - [x] Update homepage to NewHome component
