@@ -15,6 +15,7 @@ import { Calendar as CalendarIcon, Clock, User, MapPin, Phone, Mail, CheckCircle
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ClinicianLayout from "@/components/ClinicianLayout";
 
 const locales = {
   "en-US": enUS,
@@ -29,7 +30,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-export default function ClinicianCalendar() {
+function ClinicianCalendarContent() {
   const { language } = useLanguage();
   const [view, setView] = useState<View>("month");
   const [date, setDate] = useState(new Date());
@@ -184,7 +185,7 @@ export default function ClinicianCalendar() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -474,5 +475,13 @@ export default function ClinicianCalendar() {
         </Dialog>
       </div>
     </div>
+  );
+}
+
+export default function ClinicianCalendar() {
+  return (
+    <ClinicianLayout>
+      <ClinicianCalendarContent />
+    </ClinicianLayout>
   );
 }

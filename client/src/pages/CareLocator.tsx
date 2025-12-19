@@ -30,6 +30,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { useLocation } from "wouter";
+import ClinicianLayout from "@/components/ClinicianLayout";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -53,7 +54,7 @@ interface FacilityWithDistance {
   openNow?: boolean;
 }
 
-export default function CareLocator() {
+function CareLocatorContent() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -249,7 +250,7 @@ export default function CareLocator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -653,5 +654,13 @@ export default function CareLocator() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function CareLocator() {
+  return (
+    <ClinicianLayout>
+      <CareLocatorContent />
+    </ClinicianLayout>
   );
 }

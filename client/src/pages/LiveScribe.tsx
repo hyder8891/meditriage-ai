@@ -23,11 +23,12 @@ import {
   FileCheck,
 } from "lucide-react";
 import { useLocation } from "wouter";
+import ClinicianLayout from "@/components/ClinicianLayout";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
-export default function LiveScribe() {
+function LiveScribeContent() {
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
   
@@ -344,7 +345,7 @@ export default function LiveScribe() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -746,5 +747,13 @@ export default function LiveScribe() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function LiveScribe() {
+  return (
+    <ClinicianLayout>
+      <LiveScribeContent />
+    </ClinicianLayout>
   );
 }

@@ -1283,3 +1283,12 @@
 - [x] Ensure sidebar persists across all clinician pages
 - [x] Test sidebar collapse/expand functionality
 - [x] Test navigation between different clinician features
+
+
+## Clinician Dashboard Navigation Audit & Fixes
+- [x] Audit all navigation routes in ClinicianLayout
+- [x] Fix 404 errors for missing pages
+- [x] Create missing pages (Patients, Reports)
+- [x] Wrap all existing pages with ClinicianLayout
+- [x] Ensure sidebar persists on all pages
+- [x] Test all navigation links end-to-end

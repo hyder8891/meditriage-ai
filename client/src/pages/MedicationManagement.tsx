@@ -11,8 +11,9 @@ import { Pill, Plus, Clock, AlertCircle, CheckCircle2, Search } from "lucide-rea
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ClinicianLayout from "@/components/ClinicianLayout";
 
-export default function MedicationManagement() {
+function MedicationManagementContent() {
   const { language } = useLanguage();
   const [showNewPrescriptionDialog, setShowNewPrescriptionDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -130,7 +131,7 @@ export default function MedicationManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -407,5 +408,13 @@ export default function MedicationManagement() {
         </Dialog>
       </div>
     </div>
+  );
+}
+
+export default function MedicationManagement() {
+  return (
+    <ClinicianLayout>
+      <MedicationManagementContent />
+    </ClinicianLayout>
   );
 }

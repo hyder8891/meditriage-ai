@@ -13,6 +13,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import ClinicianLayout from "@/components/ClinicianLayout";
 
 interface Annotation {
   id: string;
@@ -32,7 +33,7 @@ interface ComparisonImage {
   analysis?: any;
 }
 
-export default function XRayAnalysis() {
+function XRayAnalysisContent() {
   const { language } = useLanguage();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -856,5 +857,13 @@ export default function XRayAnalysis() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function XRayAnalysis() {
+  return (
+    <ClinicianLayout>
+      <XRayAnalysisContent />
+    </ClinicianLayout>
   );
 }

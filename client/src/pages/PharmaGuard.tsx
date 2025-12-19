@@ -14,10 +14,11 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useLocation } from "wouter";
+import ClinicianLayout from "@/components/ClinicianLayout";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
-export default function PharmaGuard() {
+function PharmaGuardContent() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMeds, setSelectedMeds] = useState<string[]>([]);
@@ -71,7 +72,7 @@ export default function PharmaGuard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -381,5 +382,13 @@ export default function PharmaGuard() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PharmaGuard() {
+  return (
+    <ClinicianLayout>
+      <PharmaGuardContent />
+    </ClinicianLayout>
   );
 }

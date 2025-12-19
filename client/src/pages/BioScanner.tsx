@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Activity, Brain, AlertTriangle } from "lucide-react";
 import { useLocation } from "wouter";
+import ClinicianLayout from "@/components/ClinicianLayout";
 import BioScanner3D from "@/components/BioScanner3D";
 
-export default function BioScanner() {
+function BioScannerContent() {
   const [, setLocation] = useLocation();
   const [selectedSymptoms] = useState([
     "Chest pain",
@@ -15,7 +16,7 @@ export default function BioScanner() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -137,5 +138,13 @@ export default function BioScanner() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function BioScanner() {
+  return (
+    <ClinicianLayout>
+      <BioScannerContent />
+    </ClinicianLayout>
   );
 }

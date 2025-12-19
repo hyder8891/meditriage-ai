@@ -16,8 +16,9 @@ import {
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
+import ClinicianLayout from "@/components/ClinicianLayout";
 
-export default function SecureMessaging() {
+function SecureMessagingContent() {
   const { language } = useLanguage();
   const { user } = useAuth();
   const [selectedConversation, setSelectedConversation] = useState<number | null>(null);
@@ -126,7 +127,7 @@ export default function SecureMessaging() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -280,5 +281,13 @@ export default function SecureMessaging() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SecureMessaging() {
+  return (
+    <ClinicianLayout>
+      <SecureMessagingContent />
+    </ClinicianLayout>
   );
 }
