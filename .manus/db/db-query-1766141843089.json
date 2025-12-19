@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, email, name, role, loginMethod, LENGTH(password_hash) as hash_length FROM users WHERE email = 'admin@meditriage.ai';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, name, role, loginMethod, LENGTH(password_hash) as hash_length FROM users WHERE email = 'admin@meditriage.ai';",
+  "rows": [
+    {
+      "id": "1440001",
+      "email": "admin@meditriage.ai",
+      "name": "Admin User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hash_length": "60"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tloginMethod\thash_length\n1440001\tadmin@meditriage.ai\tAdmin User\tadmin\temail\t60\n",
+  "stderr": "",
+  "execution_time_ms": 1710
+}

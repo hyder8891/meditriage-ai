@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, email, name, role, loginMethod, password_hash IS NOT NULL as hasPassword FROM users WHERE role IN ('admin', 'super_admin') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, name, role, loginMethod, password_hash IS NOT NULL as hasPassword FROM users WHERE role IN ('admin', 'super_admin') LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "haljanabi88@gmail.com",
+      "name": "Hyder Janabi",
+      "role": "admin",
+      "loginMethod": "google",
+      "hasPassword": "0"
+    },
+    {
+      "id": "900086",
+      "email": "admin@admin.com",
+      "name": "Admin User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tloginMethod\thasPassword\n1\thaljanabi88@gmail.com\tHyder Janabi\tadmin\tgoogle\t0\n900086\tadmin@admin.com\tAdmin User\tadmin\temail\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1720
+}

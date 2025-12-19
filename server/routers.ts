@@ -55,23 +55,76 @@ export const appRouter = router({
         password: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // Simple admin credentials check
-        if (input.username === 'admin' && input.password === 'admin') {
-          // Create a simple admin session marker
-          // In production, this should use proper session management
+        const { username, password } = input;
+        
+        // Import necessary functions
+        const { verifyPassword } = await import('./_core/auth-utils');
+        const { generateToken } = await import('./_core/auth-utils');
+        const { getDb } = await import('./db');
+        const { users } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        
+        try {
+          const db = await getDb();
+          if (!db) {
+            return { success: false, message: 'Database unavailable' };
+          }
+          
+          // Find user by email
+          const userResults = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, username))
+            .limit(1);
+          
+          if (userResults.length === 0) {
+            return { success: false, message: 'Invalid credentials' };
+          }
+          
+          const user = userResults[0];
+          
+          // Check if user has password hash (email/password login)
+          if (!user.passwordHash) {
+            return { success: false, message: 'Invalid login method' };
+          }
+          
+          // Verify password
+          const isValidPassword = await verifyPassword(password, user.passwordHash);
+          if (!isValidPassword) {
+            return { success: false, message: 'Invalid credentials' };
+          }
+          
+          // Check if user has admin or clinician role
+          const allowedRoles = ['admin', 'super_admin', 'clinician', 'doctor'];
+          if (!allowedRoles.includes(user.role)) {
+            return { success: false, message: 'Unauthorized access' };
+          }
+          
+          // Generate JWT token
+          const token = generateToken({
+            userId: user.id,
+            email: user.email!,
+            role: user.role,
+          });
+          
+          // Set session cookie
+          const { getSessionCookieOptions } = await import('./_core/cookies');
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+          
           return {
             success: true,
             user: {
-              id: 0,
-              username: 'admin',
-              role: 'admin' as const,
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role,
             },
           };
+        } catch (error) {
+          console.error('[adminLogin] Error:', error);
+          return { success: false, message: 'Login failed' };
         }
-        
-        return {
-          success: false,
-        };
       }),
     
     logout: publicProcedure.mutation(({ ctx }) => {
