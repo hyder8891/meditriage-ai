@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,19 @@ import { useAuth } from "@/hooks/useAuth";
 export default function ClinicianLoginNew() {
   const [, setLocation] = useLocation();
   const { language } = useLanguage();
-  const { setAuth } = useAuth();
+  const { setAuth, isAuthenticated, user } = useAuth();
+
+  // Redirect if already authenticated (but allow admin to stay)
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'clinician') {
+        setLocation('/clinician/dashboard');
+      } else if (user.role === 'patient') {
+        setLocation('/patient/portal');
+      }
+      // Admin can stay on login page to login with different credentials
+    }
+  }, [isAuthenticated, user, setLocation]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -59,7 +71,12 @@ export default function ClinicianLoginNew() {
     onSuccess: (data) => {
       setAuth(data.token, data.user as any);
       toast.success(language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
-      setLocation("/clinician/dashboard");
+      // Redirect based on role
+      if (data.user.role === 'admin') {
+        setLocation("/clinician/dashboard"); // Admin can access clinician dashboard
+      } else {
+        setLocation("/clinician/dashboard");
+      }
     },
     onError: (error) => {
       toast.error(error.message);

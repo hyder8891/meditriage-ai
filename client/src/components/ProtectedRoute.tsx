@@ -20,8 +20,14 @@ export function ProtectedRoute({ children, requiredRole, redirectTo }: Protected
       return;
     }
 
-    // If role is required and user doesn't have it, redirect
+    // If role is required and user doesn't have it, check if admin
     if (requiredRole && user?.role !== requiredRole) {
+      // Admin can access all portals
+      if (user?.role === "admin") {
+        // Allow admin to access any portal
+        return;
+      }
+      
       // Redirect based on user role
       if (user?.role === "patient") {
         setLocation("/patient/portal");
@@ -42,8 +48,8 @@ export function ProtectedRoute({ children, requiredRole, redirectTo }: Protected
     );
   }
 
-  // Show loading if role doesn't match
-  if (requiredRole && user?.role !== requiredRole) {
+  // Show loading if role doesn't match (unless admin)
+  if (requiredRole && user?.role !== requiredRole && user?.role !== "admin") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
