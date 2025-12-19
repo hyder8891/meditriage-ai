@@ -296,18 +296,39 @@ Provide structured JSON output with this exact format:
               "interactions": [
                 {
                   "drugs": ["Drug A", "Drug B"],
-                  "severity": "major|moderate|minor|contraindicated",
+                  "severity": "contraindicated|major|moderate|minor",
+                  "severityScore": 8,
                   "mechanism": "detailed explanation of interaction mechanism",
                   "clinicalSignificance": "what this means for the patient",
+                  "timeToOnset": "immediate|hours|days|weeks",
                   "management": "how to manage this interaction",
-                  "alternatives": ["alternative medication options"],
-                  "timing": "timing recommendations if applicable"
+                  "alternatives": ["alternative medication options with rationale"],
+                  "timing": "timing recommendations if applicable",
+                  "dosageAdjustment": "specific dosage modifications if needed",
+                  "monitoringParameters": [
+                    {
+                      "parameter": "vital sign or lab test",
+                      "frequency": "how often to monitor",
+                      "targetRange": "normal range or goal"
+                    }
+                  ],
+                  "patientCounseling": "key points to tell the patient",
+                  "references": ["medical literature citations"]
                 }
               ],
               "overallRisk": "high|moderate|low",
+              "overallRiskScore": 7,
               "recommendations": ["specific clinical recommendations"],
               "monitoring": ["what to monitor"],
-              "foodInteractions": ["relevant food/beverage interactions"]
+              "foodInteractions": [
+                {
+                  "food": "food or beverage name",
+                  "interaction": "description of interaction",
+                  "recommendation": "how to avoid or manage"
+                }
+              ],
+              "costEffectiveness": "analysis of cost vs alternatives in Iraqi market",
+              "availabilityNotes": "notes on medication availability in Iraq"
             }`,
           },
           {
