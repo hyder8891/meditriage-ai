@@ -16,12 +16,25 @@ import {
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
+import { TriageRecommendation } from "@/components/TriageRecommendation";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+}
+
+interface Recommendations {
+  urgencyLevel: "emergency" | "urgent" | "routine" | "self-care";
+  urgencyDescription: string;
+  possibleConditions: string[];
+  recommendedActions: string[];
+  specialistReferral?: string;
+  redFlagSymptoms?: string[];
+  selfCareInstructions?: string[];
+  timelineForCare: string;
+  emergencyWarning?: string;
 }
 
 export default function SymptomChecker() {
@@ -39,10 +52,12 @@ export default function SymptomChecker() {
   ]);
   const [input, setInput] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<Recommendations | null>(null);
+  const [messageCount, setMessageCount] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const sendMessage = trpc.triage.chatDeepSeek.useMutation({
-    onSuccess: (data: { content: string }) => {
+  const sendMessage = trpc.triageEnhanced.chatWithRecommendations.useMutation({
+    onSuccess: (data: { content: string; recommendations?: Recommendations; isFinalAssessment?: boolean }) => {
       setMessages((prev) => [
         ...prev,
         {
@@ -52,6 +67,11 @@ export default function SymptomChecker() {
           timestamp: new Date(),
         },
       ]);
+      
+      // If we received recommendations, display them
+      if (data.recommendations && data.isFinalAssessment) {
+        setRecommendations(data.recommendations);
+      }
     },
     onError: (error: any) => {
       toast.error(
@@ -74,6 +94,10 @@ export default function SymptomChecker() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    setMessageCount(prev => prev + 1);
+    
+    // Request final assessment after 5+ messages
+    const shouldRequestAssessment = messageCount >= 4;
 
     sendMessage.mutate({
       messages: [
@@ -84,6 +108,7 @@ export default function SymptomChecker() {
         { role: "user" as const, content: input },
       ],
       language: language === "ar" ? "ar" : "en",
+      requestFinalAssessment: shouldRequestAssessment,
     });
   };
 
@@ -253,6 +278,26 @@ export default function SymptomChecker() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Final Recommendations */}
+        {recommendations && (
+          <div className="mt-6">
+            <TriageRecommendation
+              recommendations={recommendations}
+              onPrint={() => window.print()}
+              onExport={() => {
+                const dataStr = JSON.stringify(recommendations, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `triage-assessment-${new Date().toISOString()}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+              }}
+            />
+          </div>
+        )}
 
         {/* Quick Tips */}
         <div className="mt-6 grid md:grid-cols-3 gap-4">

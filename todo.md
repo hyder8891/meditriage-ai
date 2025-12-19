@@ -713,3 +713,19 @@
   - [x] Create dedicated symptom checker page at /symptom-checker
   - [x] Add prominent banner in patient dashboard
   - [x] Add quick tips cards (be specific, mention duration, emergencies)
+
+
+## Symptom Checker Improvements
+- [x] Enhance final recommendations
+  - [x] Add urgency level assessment (emergency, urgent, routine, self-care)
+  - [x] Include color-coded urgency indicators
+  - [x] Add specialist referral suggestions
+  - [x] Include actionable next steps
+  - [x] Add timeline for seeking care
+  - [x] Include self-care instructions when appropriate
+  - [x] Add red flag symptoms warnings
+  - [x] Include nearby facility recommendations (link to Care Locator)
+- [x] Improve conversation flow
+  - [x] Add structured final assessment after 5+ messages
+  - [x] Include ability to save/export assessment (JSON)
+  - [x] Add print-friendly format (print button)
