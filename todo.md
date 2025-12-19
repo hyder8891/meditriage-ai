@@ -876,3 +876,253 @@
 - [x] Write and run vitest tests for adminLogin procedure
 - [x] Test login in browser with admin credentials
 - [x] Verify admin can access clinician dashboard
+
+## Authentication Enhancements
+### OAuth/SSO Integration
+- [ ] Add OAuth provider configuration (Google, Microsoft)
+- [ ] Update database schema for OAuth tokens and provider info
+- [ ] Create OAuth callback handlers
+- [ ] Implement Google OAuth flow
+- [ ] Implement Microsoft OAuth flow
+- [ ] Add OAuth buttons to login page
+- [ ] Handle OAuth account linking with existing email accounts
+- [ ] Add OAuth error handling and fallback
+- [ ] Test OAuth login flow end-to-end
+
+### Remember Me Functionality
+- [ ] Create refresh tokens table in database
+- [ ] Implement secure token generation and storage
+- [ ] Add "Remember Me" checkbox to login form
+- [ ] Create token refresh middleware
+- [ ] Implement automatic token renewal
+- [ ] Add token revocation on logout
+- [ ] Handle expired token scenarios
+- [ ] Test persistent login across browser sessions
+
+### Password Strength Indicator
+- [ ] Create password strength calculation utility
+- [ ] Build PasswordStrengthIndicator component
+- [ ] Add real-time strength visualization (weak/fair/good/strong)
+- [ ] Display password requirements checklist
+- [ ] Add color-coded progress bar
+- [ ] Integrate into registration form
+- [ ] Integrate into password reset form
+- [ ] Add password visibility toggle
+- [ ] Test password strength validation
+
+## BRAIN: Biomedical Reasoning and Intelligence Network
+
+### Phase 1: Foundation & Database Schema (Week 1-2)
+- [ ] Design BRAIN system architecture
+- [ ] Create brain_knowledge_concepts table
+- [ ] Create brain_knowledge_relationships table
+- [ ] Create brain_medical_literature table
+- [ ] Create brain_case_history table
+- [ ] Create brain_learning_feedback table
+- [ ] Create brain_performance_metrics table
+- [ ] Create brain_training_sessions table
+- [ ] Set up BRAIN module structure (server/brain/)
+- [ ] Create BRAIN core orchestrator class
+- [ ] Write database migration scripts
+- [ ] Test database schema
+
+### Phase 2: UMLS Integration (Week 2-3)
+- [ ] Apply for UMLS license from NLM
+- [ ] Download UMLS Metathesaurus, Semantic Network, SPECIALIST Lexicon
+- [ ] Load UMLS into MySQL/PostgreSQL
+- [ ] Create UMLS indexes for performance
+- [ ] Implement UMLSKnowledge class
+- [ ] Create findConcept() method
+- [ ] Create getRelationships() method
+- [ ] Create mapToICD10() method
+- [ ] Create findMedication() method (RxNorm)
+- [ ] Add term normalization
+- [ ] Test UMLS integration
+- [ ] Create tRPC procedures for UMLS queries
+
+### Phase 3: RAG Knowledge Base (Week 3-4)
+- [ ] Install Qdrant vector database
+- [ ] Create VectorKnowledgeBase class
+- [ ] Implement vector DB initialization
+- [ ] Set up embedding generation (OpenAI or alternative)
+- [ ] Download PubMed Central articles (3M+)
+- [ ] Download WHO clinical guidelines
+- [ ] Download CDC guidelines
+- [ ] Collect Iraqi Ministry of Health guidelines
+- [ ] Download StatPearls medical encyclopedia
+- [ ] Process documents into chunks (500-1000 tokens)
+- [ ] Generate embeddings for all documents
+- [ ] Store embeddings in vector DB with metadata
+- [ ] Implement semantic search function
+- [ ] Test RAG retrieval accuracy
+- [ ] Optimize vector DB performance
+
+### Phase 4: BRAIN Core Orchestrator (Week 4-5)
+- [ ] Implement BRAIN main reasoning function
+- [ ] Create normalizeSymptoms() method
+- [ ] Create retrieveEvidence() method
+- [ ] Create findSimilarCases() method
+- [ ] Implement generateDifferentialDiagnosis() with LLM
+- [ ] Create generateClinicalAssessment() method
+- [ ] Implement storeCaseHistory() method
+- [ ] Add Iraqi medical context to prompts
+- [ ] Implement confidence scoring
+- [ ] Add evidence quality assessment
+- [ ] Test end-to-end reasoning pipeline
+- [ ] Optimize response time (<3s target)
+
+### Phase 5: Continuous Learning System (Week 5-6)
+- [ ] Implement learn() method for feedback processing
+- [ ] Create calculateAccuracy() method
+- [ ] Implement feedback storage
+- [ ] Create updatePerformanceMetrics() method
+- [ ] Implement triggerLearningIfNeeded() logic
+- [ ] Build pattern recognition system
+- [ ] Create model fine-tuning pipeline
+- [ ] Implement knowledge update scheduler
+- [ ] Add feedback collection UI
+- [ ] Test learning loop
+
+### Phase 6: MedGemma Integration (Week 6)
+- [ ] Download MedSigLIP model (400M)
+- [ ] Download MedGemma 4B Multimodal
+- [ ] Set up model inference server
+- [ ] Create MedGemma wrapper class
+- [ ] Integrate MedSigLIP for X-ray analysis
+- [ ] Add zero-shot classification
+- [ ] Implement medical image similarity search
+- [ ] Add automatic report generation
+- [ ] Test medical imaging pipeline
+- [ ] Optimize inference speed
+
+### Phase 7: API & Frontend Integration (Week 7)
+- [ ] Create brainRouter with tRPC
+- [ ] Implement brain.analyze endpoint
+- [ ] Implement brain.submitFeedback endpoint
+- [ ] Implement brain.getMetrics endpoint
+- [ ] Implement brain.searchKnowledge endpoint
+- [ ] Implement brain.getCaseHistory endpoint
+- [ ] Create BRAINAnalysis.tsx page
+- [ ] Build symptom input UI
+- [ ] Create differential diagnosis display
+- [ ] Add evidence sources visualization
+- [ ] Build feedback collection form
+- [ ] Create BRAIN performance dashboard
+- [ ] Add BRAIN metrics charts
+- [ ] Integrate with existing Clinical Reasoning Engine
+- [ ] Update navigation to include BRAIN
+- [ ] Add BRAIN icon and branding
+
+### Phase 8: Testing & Validation (Week 8)
+- [ ] Test diagnostic accuracy on benchmark cases
+- [ ] Measure response time under load
+- [ ] Validate evidence retrieval quality
+- [ ] Test Arabic language support
+- [ ] Validate Iraqi medical context
+- [ ] Test continuous learning loop
+- [ ] Perform security audit
+- [ ] Load testing (100+ concurrent users)
+- [ ] Get feedback from Iraqi clinicians
+- [ ] Measure clinician satisfaction
+- [ ] Document BRAIN API
+- [ ] Create BRAIN user guide
+- [ ] Write BRAIN technical documentation
+
+### MIMIC-III Integration (Optional - Advanced)
+- [ ] Complete CITI training
+- [ ] Request MIMIC-III access
+- [ ] Download MIMIC-III data (~50GB)
+- [ ] Load into PostgreSQL
+- [ ] Create MIMIC query functions
+- [ ] Integrate with BRAIN reasoning
+- [ ] Build ICU analytics dashboard
+
+## Medical AI Model Training & Integration
+### Research Phase
+- [x] Research available medical datasets (MIMIC-III, PubMed, medical literature)
+- [x] Identify pre-trained medical AI models (MedGemma, MedSigLIP)
+- [x] Evaluate fine-tuning vs RAG (Retrieval-Augmented Generation) approaches
+- [x] Research medical knowledge bases (UMLS, SNOMED CT, ICD-10)
+- [x] Assess data privacy and HIPAA compliance requirements
+- [x] Create comprehensive implementation plan
+
+### Phase 1: UMLS Integration (Week 1-2)
+- [ ] Apply for UMLS license from NLM
+- [ ] Create UTS (UMLS Terminology Services) account
+- [ ] Sign Data Use Agreement
+- [ ] Download UMLS Metathesaurus files (~10-15 GB)
+- [ ] Download UMLS Semantic Network
+- [ ] Download SPECIALIST Lexicon
+- [ ] Set up MySQL/PostgreSQL database for UMLS
+- [ ] Run UMLS database load scripts
+- [ ] Index UMLS tables for performance
+- [ ] Create tRPC procedures for concept lookup
+- [ ] Create tRPC procedures for synonym finding
+- [ ] Create tRPC procedures for relationship queries
+- [ ] Create tRPC procedures for ICD-10/SNOMED CT mapping
+- [ ] Add caching layer for UMLS queries
+- [ ] Integrate UMLS with symptom checker
+- [ ] Add concept normalization to Clinical Reasoning Engine
+- [ ] Enhance drug interaction checker with RxNorm data
+- [ ] Map symptoms to standardized medical codes
+- [ ] Write tests for UMLS integration
+
+### Phase 2: RAG Knowledge Base (Week 3-4)
+- [ ] Install vector database (Qdrant or Weaviate)
+- [ ] Configure embedding model
+- [ ] Set up vector DB collection schemas
+- [ ] Download PubMed Central Open Access articles
+- [ ] Collect clinical practice guidelines (WHO, CDC, Iraqi MOH)
+- [ ] Download open-access medical textbooks (StatPearls)
+- [ ] Process documents into 500-1000 token chunks
+- [ ] Generate embeddings for document chunks
+- [ ] Store embeddings in vector database with metadata
+- [ ] Create document retrieval API
+- [ ] Modify Clinical Reasoning Engine for RAG
+- [ ] Implement query embedding
+- [ ] Implement top-K document retrieval
+- [ ] Inject retrieved context into LLM prompts
+- [ ] Add citation support to responses
+- [ ] Add confidence scoring based on evidence quality
+- [ ] Add Iraqi-specific medical data
+- [ ] Translate key medical terms to Arabic
+- [ ] Test RAG system with sample queries
+- [ ] Optimize retrieval performance
+
+### Phase 3: Medical Imaging with MedGemma (Week 5-6)
+- [ ] Download MedSigLIP model (400M parameters)
+- [ ] Download MedGemma 4B Multimodal (optional)
+- [ ] Set up GPU inference server (or CPU fallback)
+- [ ] Create image embedding API
+- [ ] Replace current X-ray analysis with MedSigLIP
+- [ ] Add zero-shot classification for common findings
+- [ ] Generate confidence scores for diagnoses
+- [ ] Build medical image similarity search
+- [ ] Implement case retrieval system
+- [ ] Use MedGemma 4B for automatic report generation
+- [ ] Fine-tune on Iraqi medical report format
+- [ ] Add Arabic language support for reports
+- [ ] Test with sample X-ray images
+- [ ] Validate accuracy with medical professionals
+- [ ] Optimize inference speed
+
+### Phase 4: MIMIC-III Integration (Optional - Week 7-8)
+- [ ] Complete CITI "Data or Specimens Only Research" training
+- [ ] Request MIMIC-III access from PhysioNet
+- [ ] Download MIMIC-III CSV files (~50 GB)
+- [ ] Load MIMIC-III into PostgreSQL database
+- [ ] Create analytics dashboards
+- [ ] Build vital signs analysis models
+- [ ] Implement patient deterioration prediction
+- [ ] Add mortality risk calculation
+- [ ] Create length of stay prediction
+
+### Testing & Validation
+- [ ] Test diagnosis accuracy on medical benchmarks
+- [ ] Measure response time with RAG
+- [ ] Verify citation accuracy
+- [ ] Test terminology coverage
+- [ ] Validate Iraqi medical context
+- [ ] Test Arabic language support
+- [ ] Get feedback from Iraqi clinicians
+- [ ] Measure system performance under load

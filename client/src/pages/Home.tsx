@@ -317,6 +317,15 @@ export default function Home() {
               <div className="flex flex-wrap gap-4">
                 <Button
                   size="lg"
+                  onClick={() => setLocation("/brain")}
+                  className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Brain className="w-5 h-5 mr-2" />
+                  {language === 'ar' ? 'جرب BRAIN' : 'Try BRAIN'}
+                  <Sparkles className="w-5 h-5 ml-2" />
+                </Button>
+                <Button
+                  size="lg"
                   onClick={() => setLocation("/symptom-checker")}
                   className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
                 >
