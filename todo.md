@@ -662,3 +662,33 @@
 - [x] Add user management table with actions
 - [x] Add pending clinicians review tab
 - [x] Add route protection (admin-only access)
+
+
+## Mediktor-Inspired Redesign
+- [x] Analyze Mediktor website design
+  - [x] Study homepage layout and structure
+  - [x] Document color scheme and typography
+  - [x] Analyze navigation patterns
+  - [x] Study feature presentation style
+  - [x] Document animations and interactions
+- [x] Redesign homepage
+  - [x] Update hero section with modern gradient background
+  - [x] Redesign CTA buttons with better visual hierarchy
+  - [x] Update features section with card-based layout
+  - [x] Improve statistics presentation
+  - [x] Add business models section with 4 cards
+  - [x] Add "Why MediTriage" section with 3 features
+  - [x] Add impact/stats section with 4 metrics
+- [x] Update global design system
+  - [x] Update color palette to teal/turquoise primary (oklch(0.65 0.15 180))
+  - [x] Update typography (fonts, sizes, weights)
+  - [x] Update spacing and layout system
+  - [x] Add hover effects and transitions
+- [ ] Redesign patient portal
+  - [ ] Update dashboard layout
+  - [ ] Improve navigation structure
+  - [ ] Add better data visualization
+- [ ] Redesign clinician portal
+  - [ ] Update dashboard layout
+  - [ ] Improve workflow efficiency
+  - [ ] Add quick actions panel
