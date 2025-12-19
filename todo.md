@@ -388,18 +388,16 @@
 - [ ] Implement highlight animations for affected areas
 
 ## Telemedicine Integration
-- [ ] Design video consultation interface
-- [ ] Implement WebRTC video/audio streaming
-- [ ] Add appointment scheduling system
-- [ ] Create doctor availability calendar
-- [ ] Implement consultation booking flow
+- [x] Create consultations database table
+- [x] Implement consultation backend (create, get, update, start, end)
+- [x] Add consultation tRPC router with authorization
+- [x] Create Socket.IO server for WebRTC signaling
+- [x] Add consultation history tracking
+- [ ] Build video consultation frontend interface
+- [ ] Implement WebRTC video/audio streaming (requires Socket.IO integration)
 - [ ] Add waiting room interface
 - [ ] Include in-consultation chat
 - [ ] Add screen sharing for document review
-- [ ] Implement consultation notes saving
-- [ ] Add prescription generation during consultation
-- [ ] Include payment integration for consultations
-- [ ] Add consultation history tracking
 
 
 ## Feature Enhancement Phase - Remaining Items

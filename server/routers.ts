@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { clinicalRouter } from "./clinical-routers";
 import { authRouter } from "./auth-router";
+import { consultationRouter } from "./consultation-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -38,6 +39,7 @@ import { nanoid } from "nanoid";
 
 export const appRouter = router({
   system: systemRouter,
+  consultation: consultationRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),

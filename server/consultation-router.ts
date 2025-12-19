@@ -1,0 +1,214 @@
+import { router, protectedProcedure } from "./_core/trpc";
+import { z } from "zod";
+import {
+  createConsultation,
+  getConsultationById,
+  getConsultationByRoomId,
+  getConsultationsByPatient,
+  getConsultationsByClinician,
+  getUpcomingConsultations,
+  updateConsultationStatus,
+  startConsultation,
+  endConsultation,
+  saveChatTranscript,
+  rateConsultation,
+} from "./consultation-db";
+
+export const consultationRouter = router({
+  // Create new consultation
+  create: protectedProcedure
+    .input(z.object({
+      patientId: z.number(),
+      clinicianId: z.number(),
+      scheduledTime: z.string().transform(str => new Date(str)),
+      chiefComplaint: z.string().optional(),
+      appointmentId: z.number().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      return await createConsultation(input);
+    }),
+
+  // Get consultation by ID
+  getById: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.id);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Check authorization
+      if (
+        ctx.user.role !== 'admin' &&
+        consultation.patientId !== ctx.user.id &&
+        consultation.clinicianId !== ctx.user.id
+      ) {
+        throw new Error('Unauthorized');
+      }
+
+      return consultation;
+    }),
+
+  // Get consultation by room ID
+  getByRoomId: protectedProcedure
+    .input(z.object({ roomId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const consultation = await getConsultationByRoomId(input.roomId);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Check authorization
+      if (
+        ctx.user.role !== 'admin' &&
+        consultation.patientId !== ctx.user.id &&
+        consultation.clinicianId !== ctx.user.id
+      ) {
+        throw new Error('Unauthorized');
+      }
+
+      return consultation;
+    }),
+
+  // Get my consultations
+  getMy: protectedProcedure.query(async ({ ctx }) => {
+    const role = ctx.user.role === 'clinician' || ctx.user.role === 'admin' ? 'clinician' : 'patient';
+    
+    if (role === 'patient') {
+      return await getConsultationsByPatient(ctx.user.id);
+    } else {
+      return await getConsultationsByClinician(ctx.user.id);
+    }
+  }),
+
+  // Get upcoming consultations
+  getUpcoming: protectedProcedure.query(async ({ ctx }) => {
+    const role = ctx.user.role === 'clinician' || ctx.user.role === 'admin' ? 'clinician' : 'patient';
+    return await getUpcomingConsultations(ctx.user.id, role);
+  }),
+
+  // Update status
+  updateStatus: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      status: z.enum(["scheduled", "waiting", "in_progress", "completed", "cancelled", "no_show"]),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.id);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Only clinician or admin can update status
+      if (ctx.user.role !== 'admin' && consultation.clinicianId !== ctx.user.id) {
+        throw new Error('Unauthorized');
+      }
+
+      await updateConsultationStatus(input.id, input.status);
+      return { success: true };
+    }),
+
+  // Start consultation
+  start: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.id);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Check authorization
+      if (
+        ctx.user.role !== 'admin' &&
+        consultation.patientId !== ctx.user.id &&
+        consultation.clinicianId !== ctx.user.id
+      ) {
+        throw new Error('Unauthorized');
+      }
+
+      await startConsultation(input.id);
+      return { success: true };
+    }),
+
+  // End consultation
+  end: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      notes: z.string().optional(),
+      diagnosis: z.string().optional(),
+      prescriptionGenerated: z.boolean().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.id);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Only clinician can end consultation
+      if (ctx.user.role !== 'admin' && consultation.clinicianId !== ctx.user.id) {
+        throw new Error('Unauthorized');
+      }
+
+      await endConsultation(input.id, {
+        notes: input.notes,
+        diagnosis: input.diagnosis,
+        prescriptionGenerated: input.prescriptionGenerated,
+      });
+      
+      return { success: true };
+    }),
+
+  // Save chat transcript
+  saveChatTranscript: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      messages: z.array(z.any()),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.id);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Check authorization
+      if (
+        ctx.user.role !== 'admin' &&
+        consultation.patientId !== ctx.user.id &&
+        consultation.clinicianId !== ctx.user.id
+      ) {
+        throw new Error('Unauthorized');
+      }
+
+      await saveChatTranscript(input.id, input.messages);
+      return { success: true };
+    }),
+
+  // Rate consultation
+  rate: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      rating: z.number().min(1).max(5),
+      feedback: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.id);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Only patient can rate
+      if (consultation.patientId !== ctx.user.id) {
+        throw new Error('Unauthorized');
+      }
+
+      await rateConsultation(input.id, input.rating, input.feedback);
+      return { success: true };
+    }),
+});
