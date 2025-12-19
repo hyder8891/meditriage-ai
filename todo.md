@@ -1247,3 +1247,16 @@
 - [x] Configure environment parameters per use case
 - [x] Test dual-model performance and accuracy
 - [x] Remove old LLM integrations (DeepSeek, etc.)
+
+
+## Batch Processing & Audio Input Features
+- [x] Create Gemini Flash batch processing API wrapper
+- [x] Implement historical case analysis batch processor
+- [x] Add training data generation batch jobs
+- [x] Create retrospective analysis scheduler
+- [x] Build audio recording UI component
+- [x] Implement native audio input for symptom checker
+- [x] Add Iraqi Arabic audio processing
+- [x] Create audio playback and review features
+- [x] Test batch processing cost savings
+- [x] Test audio input accuracy with Iraqi dialects

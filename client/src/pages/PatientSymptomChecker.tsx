@@ -17,11 +17,14 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
+import { AudioInput } from "@/components/AudioInput";
 
 export default function PatientSymptomChecker() {
   const [, setLocation] = useLocation();
   const [symptoms, setSymptoms] = useState("");
   const [analysis, setAnalysis] = useState<any>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [useAudioInput, setUseAudioInput] = useState(false);
 
   const analyzeMutation = trpc.clinical.patientSymptomAnalysis.useMutation({
     onSuccess: (data) => {
@@ -33,7 +36,42 @@ export default function PatientSymptomChecker() {
     },
   });
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    // Audio input mode
+    if (useAudioInput && audioBlob) {
+      try {
+        // Convert blob to base64
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64Audio = (reader.result as string).split(',')[1];
+          const mimeType = audioBlob.type;
+
+          // Call audio analysis endpoint
+          const result = await fetch('/api/trpc/audioSymptom.analyzeAudioSymptoms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              audioBase64: base64Audio,
+              mimeType,
+              language: 'ar'
+            })
+          });
+
+          const data = await result.json();
+          if (data.result?.data) {
+            setAnalysis(data.result.data.analysis);
+            toast.success("Audio analysis complete");
+          }
+        };
+      } catch (error) {
+        toast.error("Audio analysis failed");
+        console.error(error);
+      }
+      return;
+    }
+
+    // Text input mode
     if (!symptoms.trim()) {
       toast.error("Please describe your symptoms");
       return;
@@ -106,17 +144,57 @@ export default function PatientSymptomChecker() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Textarea
-                value={symptoms}
-                onChange={(e) => setSymptoms(e.target.value)}
-                placeholder="Example: I've had a persistent headache for 3 days, along with fever and body aches. The headache gets worse when I stand up..."
-                rows={12}
-                className="resize-none"
-              />
+              {/* Input Mode Toggle */}
+              <div className="flex gap-2 mb-4">
+                <Button
+                  variant={!useAudioInput ? "default" : "outline"}
+                  onClick={() => setUseAudioInput(false)}
+                  size="sm"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Text Input
+                </Button>
+                <Button
+                  variant={useAudioInput ? "default" : "outline"}
+                  onClick={() => setUseAudioInput(true)}
+                  size="sm"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Voice Input (Arabic)
+                </Button>
+              </div>
+
+              {/* Text Input */}
+              {!useAudioInput && (
+                <Textarea
+                  value={symptoms}
+                  onChange={(e) => setSymptoms(e.target.value)}
+                  placeholder="Example: I've had a persistent headache for 3 days, along with fever and body aches. The headache gets worse when I stand up..."
+                  rows={12}
+                  className="resize-none"
+                />
+              )}
+
+              {/* Audio Input */}
+              {useAudioInput && (
+                <AudioInput
+                  onAudioCapture={(blob, url) => {
+                    setAudioBlob(blob);
+                    toast.success("Audio recorded successfully");
+                  }}
+                  onClear={() => {
+                    setAudioBlob(null);
+                    setSymptoms("");
+                  }}
+                  language="ar"
+                  maxDuration={180}
+                  disabled={analyzeMutation.isPending}
+                />
+              )}
 
               <Button
                 onClick={handleAnalyze}
-                disabled={analyzeMutation.isPending}
+                disabled={analyzeMutation.isPending || (useAudioInput && !audioBlob) || (!useAudioInput && !symptoms.trim())}
                 className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
                 size="lg"
               >

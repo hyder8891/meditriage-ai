@@ -9,6 +9,7 @@ import { triageEnhancedRouter } from "./triage-enhanced";
 import { symptomCheckerStructuredRouter } from "./symptom-checker-structured";
 import { brainRouter } from "./brain/api/brain-router";
 import { trainingRouter } from "./brain/training/training-router";
+import { audioSymptomRouter } from "./routers/audio-symptom-analysis";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -48,6 +49,7 @@ export const appRouter = router({
   admin: adminRouter,
   brain: brainRouter,
   training: trainingRouter,
+  audioSymptom: audioSymptomRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
