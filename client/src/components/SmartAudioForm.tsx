@@ -4,7 +4,7 @@
  * and automatically fills form fields using AI field detection
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,26 +43,26 @@ export function SmartAudioForm({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<'ar' | 'en'>(language);
 
-  const mediaRecorderRef = useState<MediaRecorder | null>(null);
-  const audioChunksRef = useState<Blob[]>([]);
-  const timerRef = useState<NodeJS.Timeout | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       
-      mediaRecorderRef[0] = mediaRecorder;
-      audioChunksRef[0] = [];
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          audioChunksRef[0].push(event.data);
+          audioChunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef[0], { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         await processAudio(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
@@ -72,7 +72,7 @@ export function SmartAudioForm({
       setRecordingTime(0);
 
       // Start timer
-      timerRef[0] = setInterval(() => {
+      timerRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
@@ -84,13 +84,13 @@ export function SmartAudioForm({
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef[0] && isRecording) {
-      mediaRecorderRef[0].stop();
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
       setIsRecording(false);
       
-      if (timerRef[0]) {
-        clearInterval(timerRef[0]);
-        timerRef[0] = null;
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     }
   };

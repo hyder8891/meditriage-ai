@@ -1310,3 +1310,10 @@
 - [x] Support structured data extraction from free-form Arabic speech
 - [x] Add confirmation UI showing detected fields before submission
 - [ ] Test with Iraqi Arabic medical terminology
+
+
+## Audio Recording Bug Fixes
+- [x] Fix SmartAudioForm recording functionality (fixed useRef issue)
+- [x] Verify audio input in symptom checker (AudioInput exists)
+- [x] Verify audio input in clinical reasoning (AudioInput exists)
+- [x] Test end-to-end audio recording and field population
