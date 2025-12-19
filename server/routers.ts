@@ -5,7 +5,6 @@ import { clinicalRouter } from "./clinical-routers";
 import { authRouter } from "./auth-router";
 import { consultationRouter } from "./consultation-router";
 import { adminRouter } from "./admin-router";
-import { triageEnhancedRouter } from "./triage-enhanced";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -82,8 +81,6 @@ export const appRouter = router({
     }),
   }),
 
-  triageEnhanced: triageEnhancedRouter,
-  
   triage: router({
     // Start a new triage conversation with DeepSeek backend
     chatDeepSeek: protectedProcedure

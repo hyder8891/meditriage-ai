@@ -9,8 +9,6 @@ import { TourProvider } from "./contexts/TourContext";
 import { GuidedTour } from "./components/GuidedTour";
 import Home from "./pages/Home";
 import NewHome from "./pages/NewHome";
-import MedHome from "./pages/MedHome";
-import SymptomChecker from "./pages/SymptomChecker";
 import PatientLogin from "./pages/PatientLogin";
 import ClinicianLoginNew from "./pages/ClinicianLoginNew";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -43,8 +41,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={MedHome} />
-      <Route path={"/old-home2"} component={NewHome} />
+      <Route path={"/"} component={NewHome} />
       <Route path={"/old-home"} component={Home} />
       <Route path={"/patient-login"} component={PatientLogin} />
       <Route path={"/clinician-login"} component={ClinicianLoginNew} />
@@ -80,7 +77,6 @@ function Router() {
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/login/traditional"} component={AdminLoginTraditional} />
       <Route path={"/admin/training"} component={AdminTraining} />
-      <Route path={"/symptom-checker"} component={SymptomChecker} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
