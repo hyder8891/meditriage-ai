@@ -1,407 +1,262 @@
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Check, AlertCircle, FileText, Printer } from "lucide-react";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { TriageRecommendation } from "@/components/TriageRecommendation";
+import { Loader2, Stethoscope, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
 interface Question {
   id: string;
   text: string;
   textAr: string;
-  type: "single" | "multiple" | "text";
+  type: "text" | "select";
   options?: Array<{
     value: string;
     label: string;
     labelAr: string;
   }>;
-  required: boolean;
-}
-
-interface Answer {
-  questionId: string;
-  question: string;
-  questionAr: string;
-  answer: string;
-  answerLabel: string;
-  answerLabelAr: string;
 }
 
 export default function SymptomCheckerStructured() {
-  const [sessionId, setSessionId] = useState<string>("");
-  const [initialQuestions, setInitialQuestions] = useState<Question[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [answerHistory, setAnswerHistory] = useState<Answer[]>([]);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [totalSteps, setTotalSteps] = useState(3);
-  const [selectedOption, setSelectedOption] = useState<string>("");
-  const [isComplete, setIsComplete] = useState(false);
-  const [finalAssessment, setFinalAssessment] = useState<any>(null);
-  const [language, setLanguage] = useState<"en" | "ar">("ar");
+  const { language } = useLanguage();
+  const [started, setStarted] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [assessment, setAssessment] = useState<any>(null);
 
-  const startMutation = trpc.symptomCheckerStructured.startAssessment.useMutation({
-    onSuccess: (data) => {
-      setSessionId(data.sessionId);
-      setInitialQuestions(data.questions);
-      setCurrentQuestion(data.questions[0]);
-      setTotalSteps(data.totalSteps);
-      setCurrentStep(0);
-      toast.success(language === "ar" ? "بدأ التقييم" : "Assessment started");
-    },
-    onError: () => {
-      toast.error(language === "ar" ? "فشل بدء التقييم" : "Failed to start assessment");
-    },
-  });
+  const startMutation = trpc.symptomCheckerStructured.startAssessment.useMutation();
+  const assessMutation = trpc.symptomCheckerStructured.generateAssessment.useMutation();
 
-  const nextQuestionMutation = trpc.symptomCheckerStructured.getNextQuestion.useMutation({
-    onSuccess: (data) => {
-      if (data.isComplete) {
-        setIsComplete(true);
-        generateFinalAssessment();
-      } else {
-        setCurrentQuestion(data.question);
-        setCurrentStep(data.currentStep);
-        setSelectedOption("");
-      }
-    },
-    onError: () => {
-      toast.error(language === "ar" ? "فشل في الحصول على السؤال التالي" : "Failed to get next question");
-    },
-  });
-
-  const finalAssessmentMutation = trpc.symptomCheckerStructured.generateFinalAssessment.useMutation({
-    onSuccess: (data) => {
-      setFinalAssessment(data);
-      toast.success(language === "ar" ? "اكتمل التقييم" : "Assessment complete");
-    },
-    onError: () => {
-      toast.error(language === "ar" ? "فشل في إنشاء التقييم النهائي" : "Failed to generate final assessment");
-    },
-  });
-
-  const startAssessment = () => {
-    setAnswers({});
-    setAnswerHistory([]);
-    setCurrentStep(0);
-    setIsComplete(false);
-    setFinalAssessment(null);
-    setInitialQuestions([]);
-    startMutation.mutate();
+  const t = {
+    title: language === "ar" ? "فحص الأعراض" : "Symptom Checker",
+    subtitle: language === "ar"
+      ? "أجب عن 10 أسئلة بسيطة للحصول على تقييم طبي شامل"
+      : "Answer 10 simple questions to get a comprehensive medical assessment",
+    start: language === "ar" ? "ابدأ التقييم" : "Start Assessment",
+    submit: language === "ar" ? "احصل على التقييم" : "Get Assessment",
+    submitting: language === "ar" ? "جاري التحليل..." : "Analyzing...",
+    required: language === "ar" ? "مطلوب" : "Required",
+    optional: language === "ar" ? "اختياري" : "Optional",
+    fillAll: language === "ar"
+      ? "يرجى ملء جميع الحقول المطلوبة"
+      : "Please fill all required fields",
+    newAssessment: language === "ar" ? "تقييم جديد" : "New Assessment",
   };
 
-  const handleAnswerSelect = (value: string, label: string, labelAr: string) => {
-    setSelectedOption(value);
+  const handleStart = async () => {
+    const result = await startMutation.mutateAsync({});
+    setQuestions(result.questions);
+    setStarted(true);
   };
 
-  const handleNext = () => {
-    if (!selectedOption || !currentQuestion) return;
-
-    const selectedOpt = currentQuestion.options?.find(opt => opt.value === selectedOption);
+  const handleSubmit = async () => {
+    // Validate required fields (first 7 questions)
+    const requiredFields = questions.slice(0, 7).map(q => q.id);
+    const missingFields = requiredFields.filter(id => !answers[id] || answers[id].trim() === "");
     
-    // Save answer
-    const newAnswers = {
-      ...answers,
-      [currentQuestion.id]: selectedOption,
-    };
-    setAnswers(newAnswers);
+    if (missingFields.length > 0) {
+      toast.error(t.fillAll);
+      return;
+    }
 
-    // Add to history
-    const newHistory = [
-      ...answerHistory,
-      {
-        questionId: currentQuestion.id,
-        question: currentQuestion.text,
-        questionAr: currentQuestion.textAr,
-        answer: selectedOption,
-        answerLabel: selectedOpt?.label || selectedOption,
-        answerLabelAr: selectedOpt?.labelAr || selectedOption,
-      },
-    ];
-    setAnswerHistory(newHistory);
+    const result = await assessMutation.mutateAsync({
+      answers,
+      language,
+    });
 
-    // Check if we're still in the initial questions phase
-    const nextInitialQuestionIndex = currentStep + 1;
-    if (nextInitialQuestionIndex < initialQuestions.length) {
-      // Move to next initial question
-      setCurrentQuestion(initialQuestions[nextInitialQuestionIndex]);
-      setCurrentStep(nextInitialQuestionIndex);
-      setSelectedOption("");
+    if (result.success) {
+      setAssessment(result);
+      toast.success(language === "ar" ? "اكتمل التقييم" : "Assessment complete");
     } else {
-      // All initial questions answered, get AI-generated next question
-      nextQuestionMutation.mutate({
-        sessionId,
-        answers: newAnswers,
-        currentStep,
-      });
+      toast.error(language === "ar" ? "فشل التقييم" : "Assessment failed");
     }
   };
 
-  const handleBack = () => {
-    if (answerHistory.length === 0) return;
-
-    // Remove last answer
-    const newHistory = answerHistory.slice(0, -1);
-    setAnswerHistory(newHistory);
-
-    const lastAnswer = answerHistory[answerHistory.length - 1];
-    const newAnswers = { ...answers };
-    delete newAnswers[lastAnswer.questionId];
-    setAnswers(newAnswers);
-
-    setCurrentStep(Math.max(0, currentStep - 1));
-    setSelectedOption("");
+  const handleAnswerChange = (questionId: string, value: string) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: value,
+    }));
   };
 
-  const generateFinalAssessment = () => {
-    finalAssessmentMutation.mutate({
-      sessionId,
-      answers,
-    });
+  const handleReset = () => {
+    setAssessment(null);
+    setAnswers({});
+    setStarted(false);
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleExport = () => {
-    const exportData = {
-      timestamp: new Date().toISOString(),
-      answers: answerHistory,
-      assessment: finalAssessment,
-    };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `symptom-assessment-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success(language === "ar" ? "تم التصدير بنجاح" : "Exported successfully");
-  };
-
-  if (!sessionId) {
+  if (assessment) {
     return (
-      <div className="container max-w-4xl py-12">
-        <Card className="p-8 text-center">
-          <div className="mb-6">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-10 h-10 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold mb-2">
-              {language === "ar" ? "فاحص الأعراض" : "Symptom Checker"}
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              {language === "ar"
-                ? "أجب على بعض الأسئلة للحصول على تقييم طبي شخصي"
-                : "Answer a few questions to get a personalized medical assessment"}
-            </p>
-          </div>
-
-          <div className="flex gap-4 justify-center mb-6">
-            <Button
-              variant={language === "ar" ? "default" : "outline"}
-              onClick={() => setLanguage("ar")}
-            >
-              العربية
-            </Button>
-            <Button
-              variant={language === "en" ? "default" : "outline"}
-              onClick={() => setLanguage("en")}
-            >
-              English
-            </Button>
-          </div>
-
-          <Button size="lg" onClick={startAssessment} disabled={startMutation.isPending}>
-            {startMutation.isPending
-              ? language === "ar"
-                ? "جاري البدء..."
-                : "Starting..."
-              : language === "ar"
-              ? "ابدأ التقييم"
-              : "Start Assessment"}
+      <div className="container mx-auto py-8">
+        <TriageRecommendation
+          recommendations={assessment}
+          onPrint={() => window.print()}
+          onExport={() => {
+            const dataStr = JSON.stringify(assessment, null, 2);
+            const dataBlob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "assessment.json";
+            link.click();
+          }}
+        />
+        <div className="mt-6 text-center">
+          <Button onClick={handleReset} variant="outline" size="lg">
+            {t.newAssessment}
           </Button>
-
-          <div className="mt-8 p-4 bg-muted rounded-lg text-sm text-left">
-            <h3 className="font-semibold mb-2 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
-              {language === "ar" ? "إخلاء المسؤولية" : "Disclaimer"}
-            </h3>
-            <p className="text-muted-foreground">
-              {language === "ar"
-                ? "هذه الأداة للأغراض التعليمية فقط ولا تحل محل المشورة الطبية المهنية. استشر دائمًا مقدم الرعاية الصحية للحصول على التشخيص والعلاج المناسبين."
-                : "This tool is for educational purposes only and does not replace professional medical advice. Always consult a healthcare provider for proper diagnosis and treatment."}
-            </p>
-          </div>
-        </Card>
+        </div>
       </div>
     );
   }
 
-  if (isComplete && finalAssessment) {
+  if (!started) {
     return (
-      <div className="container max-w-6xl py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">
-              {language === "ar" ? "نتائج التقييم" : "Assessment Results"}
-            </h1>
-            <p className="text-muted-foreground">
-              {language === "ar"
-                ? "بناءً على إجاباتك، إليك تقييمنا الطبي"
-                : "Based on your answers, here is our medical assessment"}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handlePrint}>
-              <Printer className="w-4 h-4 mr-2" />
-              {language === "ar" ? "طباعة" : "Print"}
+      <div className="container mx-auto py-16">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <Stethoscope className="h-16 w-16 text-primary" />
+            </div>
+            <CardTitle className="text-3xl mb-2">{t.title}</CardTitle>
+            <p className="text-muted-foreground">{t.subtitle}</p>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button
+              onClick={handleStart}
+              size="lg"
+              disabled={startMutation.isPending}
+              className="min-w-[200px]"
+            >
+              {startMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {language === "ar" ? "جاري التحميل..." : "Loading..."}
+                </>
+              ) : (
+                <>
+                  {t.start}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExport}>
-              <FileText className="w-4 h-4 mr-2" />
-              {language === "ar" ? "تصدير" : "Export"}
-            </Button>
-            <Button onClick={startAssessment}>
-              {language === "ar" ? "تقييم جديد" : "New Assessment"}
-            </Button>
-          </div>
-        </div>
-
-        {/* Conversation Summary */}
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            {language === "ar" ? "ملخص المحادثة" : "Conversation Summary"}
-          </h2>
-          <div className="space-y-3">
-            {answerHistory.map((answer, index) => (
-              <div key={index} className="flex gap-4 p-3 bg-muted rounded-lg">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-sm font-semibold text-primary">
-                  {index + 1}
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-muted-foreground mb-1">
-                    {language === "ar" ? answer.questionAr : answer.question}
-                  </p>
-                  <p className="font-semibold">
-                    {language === "ar" ? answer.answerLabelAr : answer.answerLabel}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          </CardContent>
         </Card>
-
-        {/* Final Assessment */}
-        <TriageRecommendation recommendations={finalAssessment} />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-4xl py-8">
-      {/* Progress */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium">
-            {language === "ar"
-              ? `السؤال ${currentStep + 1} من ${totalSteps}+`
-              : `Question ${currentStep + 1} of ${totalSteps}+`}
-          </span>
-          <span className="text-sm text-muted-foreground">
-            {Math.round(((currentStep + 1) / (totalSteps + 3)) * 100)}%
-          </span>
-        </div>
-        <Progress value={((currentStep + 1) / (totalSteps + 3)) * 100} />
-      </div>
+    <div className="container mx-auto py-8">
+      <Card className="max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Stethoscope className="h-6 w-6" />
+            {t.title}
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {questions.map((question, index) => {
+              const isRequired = index < 7; // First 7 questions are required
+              const questionText = language === "ar" ? question.textAr : question.text;
 
-      {/* Current Question */}
-      {currentQuestion && (
-        <Card className="p-8 mb-6">
-          <h2 className="text-2xl font-bold mb-6">
-            {language === "ar" ? currentQuestion.textAr : currentQuestion.text}
-          </h2>
+              return (
+                <div key={question.id} className="space-y-2">
+                  <Label htmlFor={question.id} className="text-base">
+                    {index + 1}. {questionText}
+                    {isRequired && (
+                      <span className="text-red-500 ml-1">*</span>
+                    )}
+                    {!isRequired && (
+                      <span className="text-xs text-muted-foreground ml-2">
+                        ({t.optional})
+                      </span>
+                    )}
+                  </Label>
 
-          <div className="space-y-3">
-            {currentQuestion.options?.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleAnswerSelect(option.value, option.label, option.labelAr)}
-                className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                  selectedOption === option.value
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50 hover:bg-muted"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">
-                    {language === "ar" ? option.labelAr : option.label}
-                  </span>
-                  {selectedOption === option.value && (
-                    <Check className="w-5 h-5 text-primary" />
+                  {question.type === "select" && question.options ? (
+                    <Select
+                      value={answers[question.id] || ""}
+                      onValueChange={(value) => handleAnswerChange(question.id, value)}
+                    >
+                      <SelectTrigger id={question.id}>
+                        <SelectValue placeholder={language === "ar" ? "اختر..." : "Select..."} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {question.options.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {language === "ar" ? option.labelAr : option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <>
+                      {question.id === "chiefComplaint" ||
+                      question.id === "additionalSymptoms" ||
+                      question.id === "triggers" ||
+                      question.id === "medicalHistory" ||
+                      question.id === "recentChanges" ? (
+                        <Textarea
+                          id={question.id}
+                          value={answers[question.id] || ""}
+                          onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                          placeholder={language === "ar" ? "اكتب هنا..." : "Type here..."}
+                          rows={3}
+                          className="resize-none"
+                        />
+                      ) : (
+                        <Input
+                          id={question.id}
+                          type="text"
+                          value={answers[question.id] || ""}
+                          onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                          placeholder={language === "ar" ? "اكتب هنا..." : "Type here..."}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
-              </button>
-            ))}
+              );
+            })}
+
+            <div className="pt-6 border-t">
+              <Button
+                onClick={handleSubmit}
+                disabled={assessMutation.isPending}
+                className="w-full"
+                size="lg"
+              >
+                {assessMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t.submitting}
+                  </>
+                ) : (
+                  <>
+                    {t.submit}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </Card>
-      )}
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={handleBack}
-          disabled={answerHistory.length === 0}
-        >
-          <ChevronLeft className="w-4 h-4 mr-2" />
-          {language === "ar" ? "السابق" : "Back"}
-        </Button>
-
-        <Button
-          onClick={handleNext}
-          disabled={!selectedOption || nextQuestionMutation.isPending}
-        >
-          {nextQuestionMutation.isPending
-            ? language === "ar"
-              ? "جاري التحميل..."
-              : "Loading..."
-            : language === "ar"
-            ? "التالي"
-            : "Next"}
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
-      </div>
-
-      {/* Answer History Summary */}
-      {answerHistory.length > 0 && (
-        <Card className="p-6 mt-8">
-          <h3 className="font-semibold mb-4">
-            {language === "ar" ? "إجاباتك حتى الآن" : "Your Answers So Far"}
-          </h3>
-          <div className="space-y-2">
-            {answerHistory.slice(-3).map((answer, index) => (
-              <div key={index} className="text-sm">
-                <span className="text-muted-foreground">
-                  {language === "ar" ? answer.questionAr : answer.question}:
-                </span>{" "}
-                <span className="font-medium">
-                  {language === "ar" ? answer.answerLabelAr : answer.answerLabel}
-                </span>
-              </div>
-            ))}
-            {answerHistory.length > 3 && (
-              <p className="text-xs text-muted-foreground">
-                {language === "ar"
-                  ? `+ ${answerHistory.length - 3} إجابات أخرى`
-                  : `+ ${answerHistory.length - 3} more answers`}
-              </p>
-            )}
-          </div>
-        </Card>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

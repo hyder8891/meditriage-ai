@@ -810,3 +810,4 @@
 - [x] Add condition comparison view - side-by-side comparison of top 2-3 conditions with probability scores, symptoms match, and distinguishing features
 - [x] Implement "Learn More" modal for conditions - expandable information cards with causes, typical progression, when to seek care, and prevention tips
 - [x] Integrate AI-powered condition details generation for Learn More modal
+- [x] Redesign symptom checker from scratch with simple text input, minimal selections, and Gemini-powered recommendations
