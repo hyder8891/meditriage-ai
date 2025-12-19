@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { clinicalRouter } from "./clinical-routers";
+import { authRouter } from "./auth-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -38,6 +39,7 @@ import { nanoid } from "nanoid";
 export const appRouter = router({
   system: systemRouter,
   auth: router({
+    ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
     
     // Traditional admin login with username/password

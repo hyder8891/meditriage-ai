@@ -8,10 +8,12 @@ import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function PatientLogin() {
   const [, setLocation] = useLocation();
   const { language } = useLanguage();
+  const { setAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +39,28 @@ export default function PatientLogin() {
     orContinue: language === 'ar' ? 'أو تابع مع' : 'Or continue with',
   };
 
+  const registerMutation = trpc.auth.registerPatient.useMutation({
+    onSuccess: (data) => {
+      setAuth(data.token, data.user as any);
+      toast.success(language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully');
+      setLocation("/patient/portal");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: (data) => {
+      setAuth(data.token, data.user as any);
+      toast.success(language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
+      setLocation("/patient/portal");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -45,17 +69,13 @@ export default function PatientLogin() {
         toast.error(language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields');
         return;
       }
-      // Registration logic here
-      toast.success(language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully');
-      setLocation("/patient/portal");
+      registerMutation.mutate({ name, email, password });
     } else {
       if (!email || !password) {
         toast.error(language === 'ar' ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور' : 'Please enter email and password');
         return;
       }
-      // Login logic here
-      toast.success(language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
-      setLocation("/patient/portal");
+      loginMutation.mutate({ email, password });
     }
   };
 

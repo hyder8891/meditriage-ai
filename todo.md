@@ -605,3 +605,38 @@
   - [x] Add /patient-login route
   - [x] Add /clinician-login route
   - [x] Update homepage to NewHome component
+
+
+## Authentication Backend Implementation
+- [x] Set up authentication database schema
+  - [x] Add users table with role field (patient, clinician, admin)
+  - [x] Add password_hash field
+  - [x] Add email_verified field
+  - [x] Add verification_token field
+  - [x] Add reset_token and reset_token_expiry fields
+  - [x] Add clinician-specific fields (licenseNumber, specialty, verified)
+- [x] Install authentication dependencies
+  - [x] Install bcrypt for password hashing
+  - [x] Install jsonwebtoken for JWT
+  - [x] Install zustand for state management
+- [x] Implement authentication utilities
+  - [x] Create password hashing functions
+  - [x] Create JWT token generation and verification
+  - [x] Create session management utilities
+  - [x] Add email and password validation
+- [x] Create authentication tRPC procedures
+  - [x] Patient registration endpoint
+  - [x] Clinician registration endpoint
+  - [x] Login endpoint (unified for both roles)
+  - [x] Logout endpoint
+  - [x] Get current user endpoint
+- [x] Implement role-based access control
+  - [x] Create authentication middleware
+  - [x] Create role verification middleware (patient, clinician, admin)
+  - [x] Add protected procedure wrappers
+- [x] Create frontend authentication
+  - [x] Create useAuth hook with Zustand
+  - [x] Update PatientLogin to use real authentication
+  - [x] Update ClinicianLoginNew to use real authentication
+  - [x] Add ProtectedRoute component
+  - [x] Implement automatic redirects based on role

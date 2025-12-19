@@ -5,11 +5,27 @@ import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, da
  */
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  openId: varchar("openId", { length: 64 }).unique(),
   name: text("name"),
-  email: varchar("email", { length: 320 }),
+  email: varchar("email", { length: 320 }).unique(),
+  passwordHash: varchar("password_hash", { length: 255 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["patient", "clinician", "admin"]).default("patient").notNull(),
+  
+  // Clinician-specific fields
+  licenseNumber: varchar("license_number", { length: 100 }),
+  specialty: varchar("specialty", { length: 100 }),
+  verified: boolean("verified").default(false).notNull(),
+  
+  // Email verification
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  verificationToken: varchar("verification_token", { length: 255 }),
+  verificationTokenExpiry: timestamp("verification_token_expiry"),
+  
+  // Password reset
+  resetToken: varchar("reset_token", { length: 255 }),
+  resetTokenExpiry: timestamp("reset_token_expiry"),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

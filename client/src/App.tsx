@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import NewHome from "./pages/NewHome";
 import PatientLogin from "./pages/PatientLogin";
 import ClinicianLoginNew from "./pages/ClinicianLoginNew";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Triage from "./pages/Triage";
 import Advice from "./pages/Advice";
@@ -46,7 +47,9 @@ function Router() {
       <Route path={"/portal-selection"} component={PortalSelection} />
       <Route path={"/home"} component={Landing} />
       <Route path={"/clinician/login"} component={ClinicianLogin} />
-      <Route path={"/clinician/dashboard"} component={ClinicianDashboard} />
+      <Route path={"/clinician/dashboard"}>
+        {() => <ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>}
+      </Route>
       <Route path={"/clinician/reasoning"} component={ClinicalReasoning} />
       <Route path={"/patient/symptom-checker"} component={PatientSymptomChecker} />
       <Route path={"/clinician/pharmaguard"} component={PharmaGuard} />
@@ -58,7 +61,9 @@ function Router() {
       <Route path={"/clinician/calendar"} component={ClinicianCalendar} />      <Route path={"/clinician/medications"} component={MedicationManagement} />
       <Route path={"/clinician/messages"} component={SecureMessaging} />
       <Route path={"/patient/medications"} component={PatientMedications} />
-      <Route path={"/patient/portal"} component={PatientPortal} />
+      <Route path={"/patient/portal"}>
+        {() => <ProtectedRoute requiredRole="patient"><PatientPortal /></ProtectedRoute>}
+      </Route>
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
