@@ -89,7 +89,22 @@ export function TriageRecommendation({
     },
   };
 
-  const config = urgencyConfig[recommendations.urgencyLevel];
+  // Map backend urgency levels to frontend config keys
+  const urgencyMapping: Record<string, keyof typeof urgencyConfig> = {
+    'EMERGENCY': 'emergency',
+    'emergency': 'emergency',
+    'URGENT': 'urgent',
+    'urgent': 'urgent',
+    'SEMI-URGENT': 'urgent',
+    'NON-URGENT': 'routine',
+    'ROUTINE': 'routine',
+    'routine': 'routine',
+    'SELF-CARE': 'self-care',
+    'self-care': 'self-care',
+  };
+
+  const mappedUrgency = urgencyMapping[recommendations.urgencyLevel] || 'routine';
+  const config = urgencyConfig[mappedUrgency];
   const UrgencyIcon = config.icon;
 
   return (

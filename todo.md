@@ -803,3 +803,4 @@
   - [x] Add print/export functionality
 - [x] Update symptom checker to ask 10-14 questions based on severity (AI dynamically decides when complete)
 - [x] Fix symptom checker stuck on question 3 - keeps asking same question repeatedly and very slow after question 2
+- [x] Fix TypeError in TriageRecommendation component - cannot read 'icon' property of undefined urgency level
