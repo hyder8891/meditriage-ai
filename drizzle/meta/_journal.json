@@ -85,6 +85,20 @@
       "when": 1766105590013,
       "tag": "0011_illegal_skreet",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1766179276801,
+      "tag": "0012_glossy_leo",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1766179485790,
+      "tag": "0013_round_yellowjacket",
+      "breakpoints": true
     }
   ]
 }

@@ -1079,3 +1079,180 @@ export const clinicSubscriptions = mysqlTable("clinic_subscriptions", {
 
 export type ClinicSubscription = typeof clinicSubscriptions.$inferSelect;
 export type InsertClinicSubscription = typeof clinicSubscriptions.$inferInsert;
+
+
+/**
+ * BRAIN Training Sessions - tracks automated training runs
+ */
+export const brainTrainingSessions = mysqlTable("brain_training_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: varchar("session_id", { length: 100 }).notNull().unique(),
+  
+  // Training metrics
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time"),
+  casesProcessed: int("cases_processed").default(0),
+  accuracyBefore: decimal("accuracy_before", { precision: 5, scale: 4 }),
+  accuracyAfter: decimal("accuracy_after", { precision: 5, scale: 4 }),
+  improvementRate: decimal("improvement_rate", { precision: 6, scale: 2 }),
+  
+  // Status
+  status: mysqlEnum("status", ["running", "completed", "failed"]).notNull().default("running"),
+  errorMessage: text("error_message"),
+  
+  // Approval
+  approved: boolean("approved").default(false),
+  approvedAt: timestamp("approved_at"),
+  approvedBy: int("approved_by"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BrainTrainingSession = typeof brainTrainingSessions.$inferSelect;
+export type InsertBrainTrainingSession = typeof brainTrainingSessions.$inferInsert;
+
+/**
+ * BRAIN Learned Patterns - stores diagnostic patterns extracted from training
+ */
+export const brainLearnedPatterns = mysqlTable("brain_learned_patterns", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Pattern information
+  patternType: varchar("pattern_type", { length: 100 }).notNull(), // diagnostic_pattern, symptom_cluster, etc.
+  patternData: text("pattern_data").notNull(), // JSON with pattern details
+  
+  // Metadata
+  condition: varchar("condition", { length: 255 }),
+  symptoms: text("symptoms"), // JSON array
+  confidence: decimal("confidence", { precision: 5, scale: 4 }).notNull(),
+  
+  // Usage tracking
+  timesApplied: int("times_applied").default(0),
+  successRate: decimal("success_rate", { precision: 5, scale: 4 }),
+  
+  // Source
+  sourceSessionId: varchar("source_session_id", { length: 100 }),
+  derivedFromCases: int("derived_from_cases").default(1),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BrainLearnedPattern = typeof brainLearnedPatterns.$inferSelect;
+export type InsertBrainLearnedPattern = typeof brainLearnedPatterns.$inferInsert;
+
+/**
+ * BRAIN Error Analysis - tracks diagnostic errors for learning
+ */
+export const brainErrorAnalysis = mysqlTable("brain_error_analysis", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Case reference
+  caseId: varchar("case_id", { length: 100 }).notNull(),
+  
+  // Error details
+  predictedCondition: varchar("predicted_condition", { length: 255 }),
+  actualCondition: varchar("actual_condition", { length: 255 }).notNull(),
+  missedSymptoms: text("missed_symptoms"),
+  
+  // Error classification
+  errorType: mysqlEnum("error_type", [
+    "missed_diagnosis",
+    "incorrect_ranking",
+    "no_diagnosis",
+    "false_positive",
+    "unknown"
+  ]).notNull(),
+  
+  // Severity
+  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).default("medium"),
+  
+  // Analysis
+  rootCause: text("root_cause"),
+  correctionApplied: text("correction_applied"),
+  
+  // Learning status
+  reviewed: boolean("reviewed").default(false),
+  reviewedBy: int("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type BrainErrorAnalysis = typeof brainErrorAnalysis.$inferSelect;
+export type InsertBrainErrorAnalysis = typeof brainErrorAnalysis.$inferInsert;
+
+/**
+ * BRAIN Training Notifications - alerts for training events
+ */
+export const brainTrainingNotifications = mysqlTable("brain_training_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Notification details
+  sessionId: varchar("session_id", { length: 100 }),
+  notificationType: mysqlEnum("notification_type", [
+    "training_complete",
+    "training_failed",
+    "accuracy_improved",
+    "accuracy_degraded",
+    "new_pattern_learned",
+    "error_threshold_exceeded",
+    "approval_required"
+  ]).notNull(),
+  
+  // Message
+  message: text("message").notNull(),
+  details: text("details"), // JSON with additional info
+  
+  // Priority
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium"),
+  
+  // Status
+  read: boolean("read").default(false),
+  readAt: timestamp("read_at"),
+  readBy: int("read_by"),
+  
+  // Action
+  actionRequired: boolean("action_required").default(false),
+  actionTaken: boolean("action_taken").default(false),
+  actionTakenAt: timestamp("action_taken_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type BrainTrainingNotification = typeof brainTrainingNotifications.$inferSelect;
+export type InsertBrainTrainingNotification = typeof brainTrainingNotifications.$inferInsert;
+
+/**
+ * BRAIN Medical Literature Cache - stores PubMed search results
+ */
+export const brainMedicalLiterature = mysqlTable("brain_medical_literature", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Literature metadata
+  source: varchar("source", { length: 50 }).notNull().default("pubmed"),
+  title: varchar("title", { length: 500 }).notNull(),
+  authors: text("authors"),
+  journal: varchar("journal", { length: 255 }),
+  publicationDate: varchar("publication_date", { length: 50 }),
+  
+  // Content
+  abstract: text("abstract"),
+  literatureData: text("literature_data"), // Full JSON data
+  
+  // References
+  pmid: varchar("pmid", { length: 50 }),
+  doi: varchar("doi", { length: 255 }),
+  url: varchar("url", { length: 1024 }),
+  
+  // Usage
+  timesReferenced: int("times_referenced").default(0),
+  relevanceScore: decimal("relevance_score", { precision: 5, scale: 4 }),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BrainMedicalLiterature = typeof brainMedicalLiterature.$inferSelect;
+export type InsertBrainMedicalLiterature = typeof brainMedicalLiterature.$inferInsert;

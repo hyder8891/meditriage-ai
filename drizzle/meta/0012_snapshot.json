@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "81c9286b-9b2c-4fde-aaff-f1a0bdddb23d",
+  "id": "7e14e361-10a9-40cf-8e36-1ad5e1c7a7e3",
   "prevId": "0c285003-7198-40a3-bb4a-a5f4b7b94771",
   "tables": {
     "appointments": {
