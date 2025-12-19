@@ -1,0 +1,316 @@
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Activity,
+  Send,
+  User,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  Info,
+} from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { toast } from "sonner";
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
+export default function SymptomChecker() {
+  const { language } = useLanguage();
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "welcome",
+      role: "assistant",
+      content:
+        language === "ar"
+          ? "مرحباً! أنا مساعدك الصحي الذكي. سأساعدك في تقييم أعراضك. ما هي الأعراض التي تعاني منها؟"
+          : "Hello! I'm your AI health assistant. I'll help you assess your symptoms. What symptoms are you experiencing?",
+      timestamp: new Date(),
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const sendMessage = trpc.triage.chatDeepSeek.useMutation({
+    onSuccess: (data: { content: string }) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: data.content,
+          timestamp: new Date(),
+        },
+      ]);
+    },
+    onError: (error: any) => {
+      toast.error(
+        language === "ar"
+          ? "حدث خطأ. يرجى المحاولة مرة أخرى."
+          : "An error occurred. Please try again."
+      );
+    },
+  });
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+
+    sendMessage.mutate({
+      messages: [
+        ...messages.filter(m => m.id !== "welcome").map(m => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        })),
+        { role: "user" as const, content: input },
+      ],
+      language: language === "ar" ? "ar" : "en",
+    });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const t = {
+    title: language === "ar" ? "فاحص الأعراض" : "Symptom Checker",
+    subtitle:
+      language === "ar"
+        ? "احصل على تقييم فوري لأعراضك بواسطة الذكاء الاصطناعي"
+        : "Get instant AI-powered assessment of your symptoms",
+    placeholder:
+      language === "ar"
+        ? "اكتب أعراضك هنا..."
+        : "Describe your symptoms here...",
+    send: language === "ar" ? "إرسال" : "Send",
+    typing: language === "ar" ? "جاري الكتابة..." : "Typing...",
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4" dir={language === "ar" ? "rtl" : "ltr"}>
+      <div className="container max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Activity className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold">{t.title}</h1>
+          </div>
+          <p className="text-muted-foreground">{t.subtitle}</p>
+        </div>
+
+        {/* Chat Card */}
+        <Card className="shadow-xl border-2">
+          <CardHeader className="border-b bg-gradient-to-r from-primary/10 to-primary/5">
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              {language === "ar"
+                ? "محادثة التقييم الصحي"
+                : "Health Assessment Chat"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {/* Messages Area */}
+            <ScrollArea className="h-[500px] p-4" ref={scrollRef}>
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex gap-3 ${
+                      message.role === "user" ? "flex-row-reverse" : "flex-row"
+                    }`}
+                  >
+                    <Avatar
+                      className={`h-10 w-10 ${
+                        message.role === "assistant"
+                          ? "bg-primary/10"
+                          : "bg-slate-200"
+                      }`}
+                    >
+                      <AvatarFallback>
+                        {message.role === "assistant" ? (
+                          <Activity className="h-5 w-5 text-primary" />
+                        ) : (
+                          <User className="h-5 w-5 text-slate-600" />
+                        )}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div
+                      className={`flex-1 max-w-[80%] ${
+                        message.role === "user" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <div
+                        className={`rounded-2xl px-4 py-3 ${
+                          message.role === "user"
+                            ? "bg-primary text-white ml-auto"
+                            : "bg-slate-100 text-slate-900"
+                        }`}
+                      >
+                        <p className="whitespace-pre-wrap leading-relaxed">
+                          {message.content}
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 px-2">
+                        {message.timestamp.toLocaleTimeString(
+                          language === "ar" ? "ar-IQ" : "en-US",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Typing Indicator */}
+                {sendMessage.isPending && (
+                  <div className="flex gap-3">
+                    <Avatar className="h-10 w-10 bg-primary/10">
+                      <AvatarFallback>
+                        <Activity className="h-5 w-5 text-primary" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="bg-slate-100 rounded-2xl px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        <span className="text-sm text-muted-foreground">
+                          {t.typing}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+
+            {/* Input Area */}
+            <div className="border-t p-4 bg-white">
+              <div className="flex gap-2">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={t.placeholder}
+                  disabled={sendMessage.isPending}
+                  className="flex-1 rounded-xl border-2 focus:border-primary"
+                />
+                <Button
+                  onClick={handleSend}
+                  disabled={!input.trim() || sendMessage.isPending}
+                  className="rounded-xl px-6"
+                  size="lg"
+                >
+                  {sendMessage.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Send className="h-5 w-5" />
+                      <span className="ml-2 hidden sm:inline">{t.send}</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Disclaimer */}
+              <div className="mt-3 flex items-start gap-2 text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <Info className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <p>
+                  {language === "ar"
+                    ? "هذا التقييم للأغراض الإعلامية فقط ولا يحل محل الاستشارة الطبية المهنية. استشر دائماً مقدم الرعاية الصحية للحصول على التشخيص والعلاج المناسب."
+                    : "This assessment is for informational purposes only and does not replace professional medical consultation. Always consult a healthcare provider for proper diagnosis and treatment."}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Tips */}
+        <div className="mt-6 grid md:grid-cols-3 gap-4">
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardContent className="p-4 flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">
+                  {language === "ar" ? "كن محدداً" : "Be Specific"}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {language === "ar"
+                    ? "صف أعراضك بالتفصيل للحصول على تقييم أفضل"
+                    : "Describe your symptoms in detail for better assessment"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardContent className="p-4 flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <Info className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">
+                  {language === "ar" ? "اذكر المدة" : "Mention Duration"}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {language === "ar"
+                    ? "أخبرنا منذ متى تعاني من هذه الأعراض"
+                    : "Tell us how long you've had these symptoms"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardContent className="p-4 flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">
+                  {language === "ar" ? "حالات الطوارئ" : "Emergencies"}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {language === "ar"
+                    ? "للحالات الطارئة، اتصل بـ 122 فوراً"
+                    : "For emergencies, call 122 immediately"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

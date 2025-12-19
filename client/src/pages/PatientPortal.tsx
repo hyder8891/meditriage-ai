@@ -15,7 +15,8 @@ import {
   AlertCircle,
   Heart,
   Thermometer,
-  Droplet
+  Droplet,
+  Stethoscope
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -48,6 +49,8 @@ export default function PatientPortal() {
     activeMedications: language === "ar" ? "الأدوية النشطة" : "Active Medications",
     recentVitals: language === "ar" ? "العلامات الحيوية الأخيرة" : "Recent Vitals",
     unreadMessages: language === "ar" ? "رسائل غير مقروءة" : "Unread Messages",
+    symptomChecker: language === "ar" ? "فاحص الأعراض" : "Symptom Checker",
+    checkSymptoms: language === "ar" ? "فحص الأعراض" : "Check Symptoms",
     viewAll: language === "ar" ? "عرض الكل" : "View All",
     noAppointments: language === "ar" ? "لا توجد مواعيد قادمة" : "No upcoming appointments",
     noMedications: language === "ar" ? "لا توجد أدوية نشطة" : "No active medications",
@@ -145,6 +148,35 @@ export default function PatientPortal() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            {/* Symptom Checker Banner */}
+            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Stethoscope className="h-8 w-8 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">{t.symptomChecker}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {language === "ar" 
+                          ? "احصل على تقييم فوري لأعراضك بواسطة الذكاء الاصطناعي"
+                          : "Get instant AI-powered assessment of your symptoms"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button 
+                    size="lg"
+                    onClick={() => setLocation("/symptom-checker")}
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    <Activity className="mr-2 h-5 w-5" />
+                    {t.checkSymptoms}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Upcoming Appointments Card */}
               <Card>

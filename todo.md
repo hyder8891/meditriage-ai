@@ -692,3 +692,24 @@
   - [ ] Update dashboard layout
   - [ ] Improve workflow efficiency
   - [ ] Add quick actions panel
+
+
+## Mediktor-Style Symptom Checker
+- [x] Analyze Mediktor symptom checker
+  - [x] Study conversational UI flow
+  - [x] Document question progression logic
+  - [x] Analyze visual design and animations
+- [x] Create interactive symptom checker component
+  - [x] Build conversational chat interface
+  - [x] Add message bubbles (user/AI)
+  - [x] Implement typing indicators
+  - [x] Add symptom input with send button
+  - [x] Add bilingual support (Arabic/English)
+- [x] Integrate with triage AI backend
+  - [x] Connect to existing triage.chatDeepSeek endpoint
+  - [x] Format responses for conversational UI
+  - [x] Add conversation history management
+- [x] Add to patient portal
+  - [x] Create dedicated symptom checker page at /symptom-checker
+  - [x] Add prominent banner in patient dashboard
+  - [x] Add quick tips cards (be specific, mention duration, emergencies)

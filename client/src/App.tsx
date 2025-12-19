@@ -10,6 +10,7 @@ import { GuidedTour } from "./components/GuidedTour";
 import Home from "./pages/Home";
 import NewHome from "./pages/NewHome";
 import MedHome from "./pages/MedHome";
+import SymptomChecker from "./pages/SymptomChecker";
 import PatientLogin from "./pages/PatientLogin";
 import ClinicianLoginNew from "./pages/ClinicianLoginNew";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -79,6 +80,7 @@ function Router() {
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/login/traditional"} component={AdminLoginTraditional} />
       <Route path={"/admin/training"} component={AdminTraining} />
+      <Route path={"/symptom-checker"} component={SymptomChecker} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
