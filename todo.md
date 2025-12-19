@@ -662,3 +662,70 @@
 - [x] Add user management table with actions
 - [x] Add pending clinicians review tab
 - [x] Add route protection (admin-only access)
+
+
+## Mediktor-Inspired Redesign
+- [x] Analyze Mediktor website design
+  - [x] Study homepage layout and structure
+  - [x] Document color scheme and typography
+  - [x] Analyze navigation patterns
+  - [x] Study feature presentation style
+  - [x] Document animations and interactions
+- [x] Redesign homepage
+  - [x] Update hero section with modern gradient background
+  - [x] Redesign CTA buttons with better visual hierarchy
+  - [x] Update features section with card-based layout
+  - [x] Improve statistics presentation
+  - [x] Add business models section with 4 cards
+  - [x] Add "Why MediTriage" section with 3 features
+  - [x] Add impact/stats section with 4 metrics
+- [x] Update global design system
+  - [x] Update color palette to teal/turquoise primary (oklch(0.65 0.15 180))
+  - [x] Update typography (fonts, sizes, weights)
+  - [x] Update spacing and layout system
+  - [x] Add hover effects and transitions
+- [ ] Redesign patient portal
+  - [ ] Update dashboard layout
+  - [ ] Improve navigation structure
+  - [ ] Add better data visualization
+- [ ] Redesign clinician portal
+  - [ ] Update dashboard layout
+  - [ ] Improve workflow efficiency
+  - [ ] Add quick actions panel
+
+
+## Mediktor-Style Symptom Checker
+- [x] Analyze Mediktor symptom checker
+  - [x] Study conversational UI flow
+  - [x] Document question progression logic
+  - [x] Analyze visual design and animations
+- [x] Create interactive symptom checker component
+  - [x] Build conversational chat interface
+  - [x] Add message bubbles (user/AI)
+  - [x] Implement typing indicators
+  - [x] Add symptom input with send button
+  - [x] Add bilingual support (Arabic/English)
+- [x] Integrate with triage AI backend
+  - [x] Connect to existing triage.chatDeepSeek endpoint
+  - [x] Format responses for conversational UI
+  - [x] Add conversation history management
+- [x] Add to patient portal
+  - [x] Create dedicated symptom checker page at /symptom-checker
+  - [x] Add prominent banner in patient dashboard
+  - [x] Add quick tips cards (be specific, mention duration, emergencies)
+
+
+## Symptom Checker Improvements
+- [x] Enhance final recommendations
+  - [x] Add urgency level assessment (emergency, urgent, routine, self-care)
+  - [x] Include color-coded urgency indicators
+  - [x] Add specialist referral suggestions
+  - [x] Include actionable next steps
+  - [x] Add timeline for seeking care
+  - [x] Include self-care instructions when appropriate
+  - [x] Add red flag symptoms warnings
+  - [x] Include nearby facility recommendations (link to Care Locator)
+- [x] Improve conversation flow
+  - [x] Add structured final assessment after 5+ messages
+  - [x] Include ability to save/export assessment (JSON)
+  - [x] Add print-friendly format (print button)
