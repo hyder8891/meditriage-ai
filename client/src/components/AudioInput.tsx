@@ -7,16 +7,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, Square, Play, Pause, Trash2, Upload } from 'lucide-react';
+import { Mic, Square, Play, Pause, Trash2, Upload, Languages } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AudioInputProps {
   onAudioCapture: (audioBlob: Blob, audioUrl: string) => void;
   onClear?: () => void;
-  language?: 'ar' | 'en';
+  initialLanguage?: 'ar' | 'en';
   maxDuration?: number; // seconds
   maxFileSizeMB?: number; // megabytes
   disabled?: boolean;
+  showLanguageToggle?: boolean;
 }
 
 // Audio validation constants
@@ -27,11 +28,13 @@ const ALLOWED_FORMATS = ['audio/webm', 'audio/mp4', 'audio/mp3', 'audio/wav', 'a
 export function AudioInput({
   onAudioCapture,
   onClear,
-  language = 'ar',
+  initialLanguage = 'ar',
   maxDuration = 120, // 2 minutes default
   maxFileSizeMB = MAX_FILE_SIZE_MB,
   disabled = false,
+  showLanguageToggle = true,
 }: AudioInputProps) {
+  const [language, setLanguage] = useState<'ar' | 'en'>(initialLanguage);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -293,10 +296,22 @@ export function AudioInput({
             </h3>
             <p className="text-sm text-muted-foreground">
               {language === 'ar' 
-                ? 'سجل أعراضك بالعربية العراقية'
-                : 'Record your symptoms in Iraqi Arabic'}
+                ? 'سجل الأعراض باللهجة العراقية' 
+                : 'Record symptoms in English'}
             </p>
           </div>
+          {showLanguageToggle && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+              disabled={isRecording || disabled}
+              className="gap-2"
+            >
+              <Languages className="w-4 h-4" />
+              {language === 'ar' ? 'EN' : 'عربي'}
+            </Button>
+          )}
           <div className="text-2xl font-mono font-bold text-primary">
             {formatTime(recordingTime)}
           </div>

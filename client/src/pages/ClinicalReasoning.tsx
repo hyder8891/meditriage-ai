@@ -18,12 +18,15 @@ import {
   Shield,
   BookOpen,
   Calendar,
-  Info
+  Info,
+  Mic,
+  MessageSquare
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import ClinicianLayout from "@/components/ClinicianLayout";
+import { AudioInput } from "@/components/AudioInput";
 
 function ClinicalReasoningContent() {
   const [, setLocation] = useLocation();
@@ -36,6 +39,8 @@ function ClinicalReasoningContent() {
   const [temperature, setTemperature] = useState("");
   const [oxygenSaturation, setOxygenSaturation] = useState("");
   const [reasoning, setReasoning] = useState<any>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [useAudioInput, setUseAudioInput] = useState(false);
 
   const generateDiagnosisMutation = trpc.clinical.generateDifferentialDiagnosis.useMutation({
     onSuccess: (data) => {
@@ -47,7 +52,59 @@ function ClinicalReasoningContent() {
     },
   });
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    // Audio input mode - process audio first
+    if (useAudioInput && audioBlob) {
+      try {
+        // Convert blob to base64
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64Audio = (reader.result as string).split(',')[1];
+          const mimeType = audioBlob.type;
+
+          // Call audio analysis endpoint to get symptoms text
+          const result = await fetch('/api/trpc/audioSymptom.analyzeAudioSymptoms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              audioBase64: base64Audio,
+              mimeType,
+              language: 'ar'
+            })
+          });
+
+          const data = await result.json();
+          if (data.result?.data?.transcription) {
+            // Use transcribed symptoms
+            const transcribedSymptoms = data.result.data.transcription;
+            setSymptoms(transcribedSymptoms);
+            
+            // Continue with diagnosis
+            const symptomList = transcribedSymptoms.split(",").map((s: string) => s.trim()).filter((s: string) => s);
+            generateDiagnosisMutation.mutate({
+              caseId: 1,
+              chiefComplaint: chiefComplaint || "Patient complaint (from audio)",
+              symptoms: symptomList,
+              vitals: {
+                bloodPressure,
+                heartRate: heartRate ? parseInt(heartRate) : undefined,
+                temperature,
+                oxygenSaturation: oxygenSaturation ? parseInt(oxygenSaturation) : undefined,
+              },
+              patientAge: patientAge ? parseInt(patientAge) : undefined,
+              patientGender,
+            });
+          }
+        };
+      } catch (error) {
+        toast.error("Audio processing failed");
+        console.error(error);
+      }
+      return;
+    }
+
+    // Text input mode
     if (!chiefComplaint || !symptoms) {
       toast.error("Please enter chief complaint and symptoms");
       return;
@@ -116,14 +173,52 @@ function ClinicalReasoningContent() {
               </div>
 
               <div>
-                <Label htmlFor="symptoms">Symptoms (comma-separated) *</Label>
-                <Textarea
-                  id="symptoms"
-                  value={symptoms}
-                  onChange={(e) => setSymptoms(e.target.value)}
-                  placeholder="e.g., fever, cough, shortness of breath, fatigue"
-                  rows={3}
-                />
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="symptoms">Symptoms *</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={!useAudioInput ? "default" : "outline"}
+                      onClick={() => setUseAudioInput(false)}
+                      size="sm"
+                      type="button"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Text
+                    </Button>
+                    <Button
+                      variant={useAudioInput ? "default" : "outline"}
+                      onClick={() => setUseAudioInput(true)}
+                      size="sm"
+                      type="button"
+                    >
+                      <Mic className="h-4 w-4 mr-2" />
+                      Voice
+                    </Button>
+                  </div>
+                </div>
+                {!useAudioInput ? (
+                  <Textarea
+                    id="symptoms"
+                    value={symptoms}
+                    onChange={(e) => setSymptoms(e.target.value)}
+                    placeholder="e.g., fever, cough, shortness of breath, fatigue"
+                    rows={3}
+                  />
+                ) : (
+                  <AudioInput
+                    onAudioCapture={(blob, url) => {
+                      setAudioBlob(blob);
+                      toast.success("Audio recorded successfully");
+                    }}
+                    onClear={() => {
+                      setAudioBlob(null);
+                      setSymptoms("");
+                    }}
+                    initialLanguage="ar"
+                    maxDuration={180}
+                    disabled={generateDiagnosisMutation.isPending}
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">

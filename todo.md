@@ -1292,3 +1292,10 @@
 - [x] Wrap all existing pages with ClinicianLayout
 - [x] Ensure sidebar persists on all pages
 - [x] Test all navigation links end-to-end
+
+
+## Arabic Audio Input Support
+- [x] Add Arabic language toggle to AudioInput component
+- [x] Support Iraqi Arabic dialect in audio recording
+- [x] Integrate audio input into Clinical Reasoning page
+- [x] Test Arabic audio transcription with Gemini Flash

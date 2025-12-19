@@ -186,7 +186,7 @@ export default function PatientSymptomChecker() {
                     setAudioBlob(null);
                     setSymptoms("");
                   }}
-                  language="ar"
+                  initialLanguage="ar"
                   maxDuration={180}
                   disabled={analyzeMutation.isPending}
                 />
