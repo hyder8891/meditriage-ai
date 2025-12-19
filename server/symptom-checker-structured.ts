@@ -33,6 +33,7 @@ export const symptomCheckerStructuredRouter = router({
    * Returns initial triage questions
    */
   startAssessment: protectedProcedure
+    .input(z.object({}).optional())
     .mutation(async ({ ctx }) => {
       // Initial triage questions
       const initialQuestions: Question[] = [
