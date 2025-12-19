@@ -1,6 +1,7 @@
 import { router, publicProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
+import { invokeGeminiFlash } from "./_core/gemini-dual";
 import { IRAQI_MEDICAL_CONTEXT_PROMPT } from "@shared/iraqiMedicalContext";
 
 /**
@@ -208,20 +209,20 @@ Based on this complete patient assessment, provide:
 Return ONLY valid JSON, no markdown formatting.`;
 
       try {
-        const response = await invokeLLM({
-          messages: [
+        // Use Gemini Flash for fast triage (temperature 0.2 for strict adherence)
+        const content = await invokeGeminiFlash(
+          [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
-        });
-
-        const rawContent = response.choices[0]?.message?.content;
-        let content = "";
-        if (typeof rawContent === "string") {
-          content = rawContent;
-        } else if (Array.isArray(rawContent) && rawContent[0]?.type === "text") {
-          content = rawContent[0].text;
-        }
+          {
+            temperature: 0.2,
+            thinkingLevel: 'low',
+            systemInstruction: 'Provide immediate triage assessment. Use urgency levels: Red (Emergency), Yellow (Urgent), Green (Routine). Be concise and actionable.'
+          }
+        );
+        
+        // content is already a string from invokeGeminiFlash
 
         // Extract JSON from markdown code blocks if present
         let jsonContent = content;
@@ -314,20 +315,20 @@ Include:
 Return ONLY valid JSON, no markdown formatting.`;
 
       try {
-        const response = await invokeLLM({
-          messages: [
+        // Use Gemini Flash for fast triage (temperature 0.2 for strict adherence)
+        const content = await invokeGeminiFlash(
+          [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
-        });
-
-        const rawContent = response.choices[0]?.message?.content;
-        let content = "";
-        if (typeof rawContent === "string") {
-          content = rawContent;
-        } else if (Array.isArray(rawContent) && rawContent[0]?.type === "text") {
-          content = rawContent[0].text;
-        }
+          {
+            temperature: 0.2,
+            thinkingLevel: 'low',
+            systemInstruction: 'Provide immediate triage assessment. Use urgency levels: Red (Emergency), Yellow (Urgent), Green (Routine). Be concise and actionable.'
+          }
+        );
+        
+        // content is already a string from invokeGeminiFlash
 
         // Extract JSON from markdown code blocks if present
         let jsonContent = content;

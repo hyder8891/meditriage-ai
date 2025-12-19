@@ -5,6 +5,7 @@
 
 import { medicalKnowledge, MedicalConcept } from './knowledge/medical-knowledge';
 import { invokeLLM } from '../_core/llm';
+import { invokeGeminiPro } from '../_core/gemini-dual';
 import mysql from 'mysql2/promise';
 import { searchAndCachePubMed, formatCitation, generatePubMedQuery } from './knowledge/pubmed-client';
 
@@ -330,17 +331,24 @@ ${context.literature.length > 0 ?
 \`\`\``;
 
     try {
-      const response = await invokeLLM({
-        messages: [
+      // Use Gemini Pro for deep clinical reasoning with grounding
+      const responseText = await invokeGeminiPro(
+        [
           { 
             role: 'system', 
-            content: 'You are BRAIN, an advanced medical AI system. Provide evidence-based, accurate medical assessments. Always respond in valid JSON format.' 
+            content: 'You are BRAIN, an advanced medical AI system. Provide evidence-based, accurate medical assessments with PubMed citations. Always respond in valid JSON format.' 
           },
           { role: 'user', content: prompt }
-        ]
-      });
+        ],
+        {
+          temperature: 1.0,
+          thinkingLevel: 'high',
+          grounding: true,
+          systemInstruction: 'Use Chain-of-Thought reasoning. Verify information against current medical guidelines using Google Search. Provide evidence-based recommendations with citations.'
+        }
+      );
 
-      const content = response.choices[0].message.content;
+      const content = responseText;
       
       // Extract JSON from markdown code blocks if present
       let jsonStr = typeof content === 'string' ? content : JSON.stringify(content);
