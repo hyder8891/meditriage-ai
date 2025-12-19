@@ -8,6 +8,43 @@ import { z } from "zod";
 import { invokeGeminiFlashAudio } from "../_core/gemini-dual";
 import { storagePut } from "../storage";
 
+// Audio validation constants
+const MAX_FILE_SIZE_MB = 16; // Gemini Flash limit
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const ALLOWED_FORMATS = ['audio/webm', 'audio/mp4', 'audio/mp3', 'audio/wav', 'audio/mpeg', 'audio/x-m4a'];
+
+/**
+ * Server-side audio validation
+ */
+function validateAudioServer(buffer: Buffer, mimeType: string): { valid: boolean; error?: string } {
+  // Check file size
+  if (buffer.length > MAX_FILE_SIZE_BYTES) {
+    const sizeMB = (buffer.length / (1024 * 1024)).toFixed(1);
+    return {
+      valid: false,
+      error: `File too large (${sizeMB}MB). Maximum ${MAX_FILE_SIZE_MB}MB allowed.`
+    };
+  }
+
+  // Check format
+  if (!ALLOWED_FORMATS.includes(mimeType)) {
+    return {
+      valid: false,
+      error: `Unsupported audio format: ${mimeType}. Allowed formats: ${ALLOWED_FORMATS.join(', ')}`
+    };
+  }
+
+  // Check minimum size (at least 1KB)
+  if (buffer.length < 1024) {
+    return {
+      valid: false,
+      error: 'Audio file too small. Must be at least 1KB.'
+    };
+  }
+
+  return { valid: true };
+}
+
 export const audioSymptomRouter = router({
   /**
    * Analyze symptoms from audio recording
@@ -25,6 +62,12 @@ export const audioSymptomRouter = router({
       try {
         // Convert base64 to buffer
         const audioBuffer = Buffer.from(input.audioBase64, 'base64');
+
+        // Server-side validation
+        const validation = validateAudioServer(audioBuffer, input.mimeType);
+        if (!validation.valid) {
+          throw new Error(validation.error);
+        }
 
         // Upload to storage for record keeping
         const audioKey = `symptom-audio/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${input.mimeType.split('/')[1]}`;

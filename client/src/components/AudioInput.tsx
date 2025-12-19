@@ -15,14 +15,21 @@ interface AudioInputProps {
   onClear?: () => void;
   language?: 'ar' | 'en';
   maxDuration?: number; // seconds
+  maxFileSizeMB?: number; // megabytes
   disabled?: boolean;
 }
+
+// Audio validation constants
+const MAX_FILE_SIZE_MB = 16; // Gemini Flash limit
+const MAX_DURATION_SECONDS = 180; // 3 minutes
+const ALLOWED_FORMATS = ['audio/webm', 'audio/mp4', 'audio/mp3', 'audio/wav', 'audio/mpeg'];
 
 export function AudioInput({
   onAudioCapture,
   onClear,
   language = 'ar',
   maxDuration = 120, // 2 minutes default
+  maxFileSizeMB = MAX_FILE_SIZE_MB,
   disabled = false,
 }: AudioInputProps) {
   const [isRecording, setIsRecording] = useState(false);
@@ -79,6 +86,20 @@ export function AudioInput({
       // Handle recording stop
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        
+        // Validate audio quality
+        const validation = validateAudio(audioBlob, recordingTime);
+        if (!validation.valid) {
+          toast.error(
+            language === 'ar'
+              ? `خطأ في التسجيل: ${validation.error}`
+              : `Recording error: ${validation.error}`
+          );
+          // Stop all tracks
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+        
         const url = URL.createObjectURL(audioBlob);
         
         setAudioBlob(audioBlob);
@@ -202,11 +223,63 @@ export function AudioInput({
     toast.info(language === 'ar' ? 'تم حذف التسجيل' : 'Recording cleared');
   };
 
+  // Validate audio quality
+  const validateAudio = (blob: Blob, duration: number): { valid: boolean; error?: string } => {
+    // Check file size
+    const fileSizeMB = blob.size / (1024 * 1024);
+    if (fileSizeMB > maxFileSizeMB) {
+      return {
+        valid: false,
+        error: language === 'ar'
+          ? `حجم الملف كبير جداً (${fileSizeMB.toFixed(1)}MB). الحد الأقصى ${maxFileSizeMB}MB`
+          : `File too large (${fileSizeMB.toFixed(1)}MB). Maximum ${maxFileSizeMB}MB`
+      };
+    }
+
+    // Check duration
+    if (duration > MAX_DURATION_SECONDS) {
+      return {
+        valid: false,
+        error: language === 'ar'
+          ? `التسجيل طويل جداً (${duration}s). الحد الأقصى ${MAX_DURATION_SECONDS}s`
+          : `Recording too long (${duration}s). Maximum ${MAX_DURATION_SECONDS}s`
+      };
+    }
+
+    // Check format
+    if (!ALLOWED_FORMATS.includes(blob.type)) {
+      return {
+        valid: false,
+        error: language === 'ar'
+          ? `تنسيق غير مدعوم: ${blob.type}`
+          : `Unsupported format: ${blob.type}`
+      };
+    }
+
+    // Check minimum duration (at least 1 second)
+    if (duration < 1) {
+      return {
+        valid: false,
+        error: language === 'ar'
+          ? 'التسجيل قصير جداً. يجب أن يكون ثانية واحدة على الأقل'
+          : 'Recording too short. Must be at least 1 second'
+      };
+    }
+
+    return { valid: true };
+  };
+
   // Format time
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Format file size
+  const formatFileSize = (bytes: number): string => {
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(2)} MB`;
   };
 
   return (
