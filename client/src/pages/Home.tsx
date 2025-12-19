@@ -516,15 +516,44 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {platformFunctions.map((func, index) => (
+            {platformFunctions.map((func, index) => {
+              const functionImages: Record<string, string> = {
+                'Clinical Reasoning Engine': '/images/ai-brain-analysis.webp',
+                'X-Ray Analysis': '/images/xray-chest.jpg',
+                '3D Bio-Scanner': '/images/3d-body-scan.jpg',
+                'Live Scribe': '/images/doctor-recording.jpg',
+                'PharmaGuard': '/images/medication-bottles.jpg',
+                'Care Locator': '/images/hospital-map.webp',
+                'مولد ملاحظات SOAP': '/images/soap-notes.jpg',
+                'الجدول الزمني للحالة': '/images/vital-signs-timeline.jpg',
+                'الرسائل الآمنة': '/images/telemedicine-video.png',
+              };
+              const imageUrl = functionImages[func.title];
+              
+              return (
               <Card
                 key={index}
-                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-teal-200"
+                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-teal-200 overflow-hidden"
               >
-                <CardContent className="p-6">
-                  <div className={`inline-flex items-center justify-center w-14 h-14 ${func.bgColor} rounded-xl mb-4 group-hover:scale-110 transition-transform`}>
-                    <func.icon className={`w-7 h-7 ${func.color}`} />
+                {imageUrl && (
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={imageUrl}
+                      alt={func.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className={`absolute top-4 right-4 inline-flex items-center justify-center w-12 h-12 ${func.bgColor} rounded-xl shadow-lg`}>
+                      <func.icon className={`w-6 h-6 ${func.color}`} />
+                    </div>
                   </div>
+                )}
+                <CardContent className="p-6">
+                  {!imageUrl && (
+                    <div className={`inline-flex items-center justify-center w-14 h-14 ${func.bgColor} rounded-xl mb-4 group-hover:scale-110 transition-transform`}>
+                      <func.icon className={`w-7 h-7 ${func.color}`} />
+                    </div>
+                  )}
                   <h3 className="text-xl font-bold mb-2 text-slate-900">{func.title}</h3>
                   <p className="text-slate-600 leading-relaxed">{func.description}</p>
                   <div className="mt-4 flex items-center text-teal-600 font-medium group-hover:gap-2 transition-all">
@@ -533,7 +562,7 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         </div>
       </section>
