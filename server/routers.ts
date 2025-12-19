@@ -6,6 +6,7 @@ import { authRouter } from "./auth-router";
 import { consultationRouter } from "./consultation-router";
 import { adminRouter } from "./admin-router";
 import { triageEnhancedRouter } from "./triage-enhanced";
+import { symptomCheckerStructuredRouter } from "./symptom-checker-structured";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -83,6 +84,7 @@ export const appRouter = router({
   }),
 
   triageEnhanced: triageEnhancedRouter,
+  symptomCheckerStructured: symptomCheckerStructuredRouter,
   
   triage: router({
     // Start a new triage conversation with DeepSeek backend

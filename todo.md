@@ -771,3 +771,33 @@
   - [ ] Add intervention effectiveness tracking
   - [ ] Include predicted outcomes
   - [ ] Add care quality metrics
+
+
+## Symptom Checker Redesign (Structured Q&A Flow)
+- [x] Design question flow logic
+  - [x] Create initial triage questions (age, gender, chief complaint)
+  - [x] Design symptom-specific follow-up questions
+  - [x] Implement branching logic based on responses
+  - [x] Create question database with multiple choice options
+- [x] Create backend endpoint for dynamic questions
+  - [x] Build AI-powered question generator
+  - [x] Generate tailored multiple choice options (4-6 options per question)
+  - [x] Track conversation state and history
+  - [x] Generate final assessment after 7+ questions
+- [x] Build interactive UI
+  - [x] Create step-by-step question interface
+  - [x] Add multiple choice button options with selection state
+  - [x] Show progress indicator with percentage
+  - [x] Add ability to go back to previous questions
+  - [x] Display conversation summary (last 3 answers)
+  - [x] Add language toggle (Arabic/English)
+- [x] Implement comprehensive final report
+  - [x] Show all questions and answers summary
+  - [x] Display urgency level with color coding (via TriageRecommendation)
+  - [x] List possible conditions with confidence scores
+  - [x] Provide detailed recommendations
+  - [x] Add specialist referral suggestions
+  - [x] Include self-care instructions
+  - [x] Add red flag warnings
+  - [x] Provide Care Locator integration
+  - [x] Add print/export functionality
