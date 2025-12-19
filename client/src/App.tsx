@@ -36,6 +36,7 @@ import MedicationManagement from "./pages/MedicationManagement";
 import PatientMedications from "./pages/PatientMedications";
 import PatientPortal from "./pages/PatientPortal";
 import SecureMessaging from "./pages/SecureMessaging";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   return (
@@ -68,6 +69,11 @@ function Router() {
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={Admin} />
+      <Route path={"/admin/dashboard"}>
+        <ProtectedRoute requiredRole="admin">
+          <AdminDashboard />
+        </ProtectedRoute>
+      </Route>
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/login/traditional"} component={AdminLoginTraditional} />
       <Route path={"/admin/training"} component={AdminTraining} />

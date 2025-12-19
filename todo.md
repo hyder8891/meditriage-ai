@@ -648,3 +648,17 @@
 - [x] Allow admin to access both patient and clinician portals
 - [x] Update login pages to accept admin credentials
 - [x] Update ProtectedRoute to allow admin access to all portals
+
+
+## Admin Dashboard
+- [x] Create admin router with user management procedures
+- [x] Implement getAllUsers endpoint
+- [x] Implement getSystemStats endpoint (users, consultations, triage sessions)
+- [x] Add verifyClinician mutation
+- [x] Add updateUserRole mutation
+- [x] Add deleteUser mutation
+- [x] Create AdminDashboard page with tabs (overview, users, pending clinicians)
+- [x] Add system statistics cards
+- [x] Add user management table with actions
+- [x] Add pending clinicians review tab
+- [x] Add route protection (admin-only access)
