@@ -10,7 +10,10 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }).unique(),
   passwordHash: varchar("password_hash", { length: 255 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["patient", "clinician", "admin"]).default("patient").notNull(),
+  role: mysqlEnum("role", ["patient", "doctor", "nurse", "clinic_admin", "super_admin", "admin", "clinician"]).default("patient").notNull(),
+  
+  // Clinic association
+  clinicId: int("clinic_id"), // null for patients not linked to clinic, or super_admins
   
   // Clinician-specific fields
   licenseNumber: varchar("license_number", { length: 100 }),
@@ -899,3 +902,180 @@ export const fhirObservations = mysqlTable("fhir_observations", {
 
 export type FhirObservation = typeof fhirObservations.$inferSelect;
 export type InsertFhirObservation = typeof fhirObservations.$inferInsert;
+
+/**
+ * Clinics table - stores clinic information
+ */
+export const clinics = mysqlTable("clinics", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  arabicName: varchar("arabic_name", { length: 255 }),
+  
+  // Contact information
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 50 }),
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }).default("Iraq"),
+  
+  // Location
+  latitude: varchar("latitude", { length: 50 }),
+  longitude: varchar("longitude", { length: 50 }),
+  
+  // Subscription
+  subscriptionTier: mysqlEnum("subscription_tier", ["individual", "small", "medium", "enterprise"]).default("small").notNull(),
+  subscriptionStatus: mysqlEnum("subscription_status", ["trial", "active", "suspended", "cancelled"]).default("trial").notNull(),
+  subscriptionStartDate: timestamp("subscription_start_date"),
+  subscriptionEndDate: timestamp("subscription_end_date"),
+  
+  // Limits based on subscription
+  maxDoctors: int("max_doctors").default(5),
+  maxPatients: int("max_patients").default(500),
+  
+  // Settings
+  logo: varchar("logo", { length: 1024 }),
+  primaryColor: varchar("primary_color", { length: 7 }).default("#10b981"),
+  workingHours: text("working_hours"), // JSON
+  specialties: text("specialties"), // JSON array
+  services: text("services"), // JSON array
+  
+  // Owner
+  ownerId: int("owner_id").notNull(),
+  
+  // Status
+  isActive: boolean("is_active").default(true).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Clinic = typeof clinics.$inferSelect;
+export type InsertClinic = typeof clinics.$inferInsert;
+
+/**
+ * Clinic employees table - links users to clinics with roles
+ */
+export const clinicEmployees = mysqlTable("clinic_employees", {
+  id: int("id").autoincrement().primaryKey(),
+  clinicId: int("clinic_id").notNull(),
+  userId: int("user_id").notNull(),
+  
+  role: mysqlEnum("role", ["doctor", "nurse", "admin"]).notNull(),
+  specialty: varchar("specialty", { length: 100 }),
+  
+  // Employment details
+  employmentType: mysqlEnum("employment_type", ["full_time", "part_time", "contract"]).default("full_time"),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "active", "suspended", "terminated"]).default("pending").notNull(),
+  invitationToken: varchar("invitation_token", { length: 255 }),
+  invitationExpiry: timestamp("invitation_expiry"),
+  
+  // Permissions
+  canManagePatients: boolean("can_manage_patients").default(true),
+  canManageEmployees: boolean("can_manage_employees").default(false),
+  canManageSettings: boolean("can_manage_settings").default(false),
+  canViewReports: boolean("can_view_reports").default(true),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ClinicEmployee = typeof clinicEmployees.$inferSelect;
+export type InsertClinicEmployee = typeof clinicEmployees.$inferInsert;
+
+/**
+ * Patient-Clinic links table - manages patient associations with clinics
+ */
+export const patientClinicLinks = mysqlTable("patient_clinic_links", {
+  id: int("id").autoincrement().primaryKey(),
+  patientId: int("patient_id").notNull(),
+  clinicId: int("clinic_id").notNull(),
+  
+  // Primary doctor assignment
+  primaryDoctorId: int("primary_doctor_id"),
+  
+  // Registration details
+  registrationMethod: mysqlEnum("registration_method", ["in_clinic", "online", "qr_code", "referral"]).default("in_clinic"),
+  registrationDate: timestamp("registration_date").defaultNow().notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["active", "inactive", "transferred"]).default("active").notNull(),
+  
+  // Patient number at this clinic
+  patientNumber: varchar("patient_number", { length: 50 }),
+  
+  // Notes
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PatientClinicLink = typeof patientClinicLinks.$inferSelect;
+export type InsertPatientClinicLink = typeof patientClinicLinks.$inferInsert;
+
+/**
+ * Clinic invitations table - tracks pending employee invitations
+ */
+export const clinicInvitations = mysqlTable("clinic_invitations", {
+  id: int("id").autoincrement().primaryKey(),
+  clinicId: int("clinic_id").notNull(),
+  
+  // Invitee information
+  email: varchar("email", { length: 320 }).notNull(),
+  role: mysqlEnum("role", ["doctor", "nurse", "admin"]).notNull(),
+  specialty: varchar("specialty", { length: 100 }),
+  
+  // Invitation details
+  invitationToken: varchar("invitation_token", { length: 255 }).notNull().unique(),
+  invitedBy: int("invited_by").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "accepted", "expired", "cancelled"]).default("pending").notNull(),
+  acceptedAt: timestamp("accepted_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ClinicInvitation = typeof clinicInvitations.$inferSelect;
+export type InsertClinicInvitation = typeof clinicInvitations.$inferInsert;
+
+/**
+ * Clinic subscriptions table - tracks subscription history and payments
+ */
+export const clinicSubscriptions = mysqlTable("clinic_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  clinicId: int("clinic_id").notNull(),
+  
+  tier: mysqlEnum("tier", ["individual", "small", "medium", "enterprise"]).notNull(),
+  status: mysqlEnum("status", ["trial", "active", "past_due", "cancelled", "expired"]).notNull(),
+  
+  // Billing
+  amount: int("amount").notNull(), // in cents
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  billingCycle: mysqlEnum("billing_cycle", ["monthly", "yearly"]).default("monthly"),
+  
+  // Dates
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  nextBillingDate: timestamp("next_billing_date"),
+  
+  // Payment
+  paymentMethod: varchar("payment_method", { length: 50 }),
+  lastPaymentDate: timestamp("last_payment_date"),
+  lastPaymentAmount: int("last_payment_amount"),
+  
+  // Trial
+  isTrialPeriod: boolean("is_trial_period").default(false),
+  trialEndsAt: timestamp("trial_ends_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ClinicSubscription = typeof clinicSubscriptions.$inferSelect;
+export type InsertClinicSubscription = typeof clinicSubscriptions.$inferInsert;

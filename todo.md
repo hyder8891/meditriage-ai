@@ -811,3 +811,17 @@
 - [x] Implement "Learn More" modal for conditions - expandable information cards with causes, typical progression, when to seek care, and prevention tips
 - [x] Integrate AI-powered condition details generation for Learn More modal
 - [x] Redesign symptom checker from scratch with simple text input, minimal selections, and Gemini-powered recommendations
+
+## Multi-Tenant Clinic Management System
+- [x] Design database schema for clinics, subscriptions, employees, patient-clinic links
+- [ ] Create clinic registration and onboarding flow
+- [ ] Implement subscription tier management (Individual/Small/Medium/Enterprise)
+- [ ] Build admin dashboard for clinic owners
+- [ ] Create employee management system (add/remove/invite doctors/nurses)
+- [ ] Implement role-based access control (admin/doctor/nurse/patient)
+- [ ] Build patient-clinic linking system
+- [ ] Create doctor-patient assignment functionality
+- [ ] Update existing features for multi-tenant architecture
+- [ ] Add clinic-specific patient lists for doctors
+- [ ] Implement clinic settings and branding
+- [ ] Create employee invitation system with email notifications
