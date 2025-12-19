@@ -23,8 +23,9 @@ import {
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import ClinicianLayout from "@/components/ClinicianLayout";
 
-export default function ClinicalReasoning() {
+function ClinicalReasoningContent() {
   const [, setLocation] = useLocation();
   const [chiefComplaint, setChiefComplaint] = useState("");
   const [symptoms, setSymptoms] = useState("");
@@ -70,7 +71,7 @@ export default function ClinicalReasoning() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -419,5 +420,13 @@ export default function ClinicalReasoning() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ClinicalReasoning() {
+  return (
+    <ClinicianLayout>
+      <ClinicalReasoningContent />
+    </ClinicianLayout>
   );
 }

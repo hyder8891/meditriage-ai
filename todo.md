@@ -1278,5 +1278,8 @@
 
 ## Dashboard Sidebar Improvement
 - [x] Fix clinic dashboard to keep left sidebar always visible
-- [x] Ensure sidebar doesn't disappear on navigation
-- [x] Test sidebar persistence across all pages
+- [x] Create shared ClinicianLayout component with persistent sidebar
+- [x] Wrap all clinician pages with shared layout
+- [x] Ensure sidebar persists across all clinician pages
+- [x] Test sidebar collapse/expand functionality
+- [x] Test navigation between different clinician features

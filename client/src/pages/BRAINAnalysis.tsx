@@ -14,8 +14,9 @@ import { Badge } from '../components/ui/badge';
 import { Brain, Activity, AlertTriangle, FileText, TrendingUp, Loader2, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
+import ClinicianLayout from '../components/ClinicianLayout';
 
-export default function BRAINAnalysis() {
+function BRAINAnalysisContent() {
   const [, navigate] = useLocation();
   const [symptoms, setSymptoms] = useState<string[]>(['']);
   const [age, setAge] = useState('');
@@ -393,5 +394,13 @@ export default function BRAINAnalysis() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BRAINAnalysis() {
+  return (
+    <ClinicianLayout>
+      <BRAINAnalysisContent />
+    </ClinicianLayout>
   );
 }
