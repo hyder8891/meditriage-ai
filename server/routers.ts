@@ -8,6 +8,7 @@ import { adminRouter } from "./admin-router";
 import { triageEnhancedRouter } from "./triage-enhanced";
 import { symptomCheckerStructuredRouter } from "./symptom-checker-structured";
 import { brainRouter } from "./brain/api/brain-router";
+import { trainingRouter } from "./brain/training/training-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -46,6 +47,7 @@ export const appRouter = router({
   consultation: consultationRouter,
   admin: adminRouter,
   brain: brainRouter,
+  training: trainingRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -404,7 +406,7 @@ export const appRouter = router({
     }),
   }),
 
-  training: router({
+  trainingMaterials: router({
     // Batch process multiple files (directory upload)
     batchProcess: protectedProcedure
       .input(z.object({
