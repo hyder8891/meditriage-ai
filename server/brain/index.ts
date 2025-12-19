@@ -79,6 +79,14 @@ export class BRAIN {
     const startTime = Date.now();
     console.log('🧠 BRAIN: Starting clinical reasoning...');
 
+    // Validate input
+    if (!input.symptoms || input.symptoms.length === 0) {
+      throw new Error('At least one symptom is required');
+    }
+    if (!input.patientInfo || input.patientInfo.age <= 0) {
+      throw new Error('Valid patient age is required');
+    }
+
     try {
       // Step 1: Normalize symptoms using medical knowledge base
       const normalizedSymptoms = await this.normalizeSymptoms(input.symptoms);
@@ -405,7 +413,7 @@ ${context.knowledgeBaseDiagnoses.length > 0 ?
     actualDiagnosis: any;
     clinicianCorrection?: string;
     outcome: string;
-  }): Promise<{ accuracy: number; learned: boolean }> {
+  }): Promise<{ success: boolean; message: string; accuracy?: number }> {
     console.log('🧠 BRAIN: Learning from feedback...');
 
     const conn = await getConnection();
@@ -438,7 +446,11 @@ ${context.knowledgeBaseDiagnoses.length > 0 ?
 
       console.log(`✓ Feedback processed, accuracy: ${(accuracy * 100).toFixed(1)}%`);
 
-      return { accuracy, learned: true };
+      return { 
+        success: true, 
+        message: `Feedback processed successfully. Accuracy: ${(accuracy * 100).toFixed(1)}%`,
+        accuracy 
+      };
     } catch (error) {
       console.error('[BRAIN] Error processing feedback:', error);
       throw error;
@@ -506,9 +518,23 @@ ${context.knowledgeBaseDiagnoses.length > 0 ?
   /**
    * Get BRAIN performance metrics
    */
-  async getMetrics(startDate: string, endDate: string): Promise<any[]> {
+  async getMetrics(startDate: string, endDate: string): Promise<{
+    totalCases: number;
+    accuracy: number;
+    averageConfidence: number;
+    averageProcessingTime: number;
+    dailyMetrics: any[];
+  }> {
     const conn = await getConnection();
-    if (!conn) return [];
+    if (!conn) {
+      return {
+        totalCases: 0,
+        accuracy: 0,
+        averageConfidence: 0,
+        averageProcessingTime: 0,
+        dailyMetrics: []
+      };
+    }
 
     try {
       const [rows] = await conn.execute(`
@@ -518,10 +544,28 @@ ${context.knowledgeBaseDiagnoses.length > 0 ?
         ORDER BY metric_date DESC
       `, [startDate, endDate]);
 
-      return rows as any[];
+      const metrics = rows as any[];
+      const totalCases = metrics.reduce((sum, m) => sum + (m.total_cases || 0), 0);
+      const avgAccuracy = metrics.length > 0 
+        ? metrics.reduce((sum, m) => sum + (m.accuracy_rate || 0), 0) / metrics.length 
+        : 0;
+
+      return {
+        totalCases,
+        accuracy: avgAccuracy,
+        averageConfidence: 0.75, // TODO: Calculate from case history
+        averageProcessingTime: 3500, // TODO: Calculate from case history
+        dailyMetrics: metrics
+      };
     } catch (error) {
       console.error('[BRAIN] Error fetching metrics:', error);
-      return [];
+      return {
+        totalCases: 0,
+        accuracy: 0,
+        averageConfidence: 0,
+        averageProcessingTime: 0,
+        dailyMetrics: []
+      };
     }
   }
 
@@ -539,7 +583,24 @@ ${context.knowledgeBaseDiagnoses.length > 0 ?
         WHERE case_id = ?
       `, [caseId]);
 
-      return (rows as any[])[0] || null;
+      const row = (rows as any[])[0];
+      if (!row) return null;
+
+      // Parse JSON fields and return structured data
+      try {
+        return {
+          caseId: row.case_id,
+          symptoms: typeof row.symptoms === 'string' ? JSON.parse(row.symptoms) : row.symptoms || [],
+          patientDemographics: typeof row.patient_demographics === 'string' ? JSON.parse(row.patient_demographics) : row.patient_demographics || {},
+          vitalSigns: typeof row.vital_signs === 'string' ? JSON.parse(row.vital_signs) : row.vital_signs || {},
+          diagnosis: typeof row.diagnosis === 'string' ? JSON.parse(row.diagnosis) : row.diagnosis || {},
+          confidenceScore: row.confidence_score,
+          createdAt: row.created_at
+        };
+      } catch (parseError) {
+        console.error('[BRAIN] Error parsing case history JSON:', parseError);
+        return null;
+      }
     } catch (error) {
       console.error('[BRAIN] Error fetching case history:', error);
       return null;

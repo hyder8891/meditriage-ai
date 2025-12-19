@@ -1,0 +1,20 @@
+{
+  "query": "SELECT COUNT(*) as total, semantic_type, source FROM brain_knowledge_concepts GROUP BY semantic_type, source",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT COUNT(*) as total, semantic_type, source FROM brain_knowledge_concepts GROUP BY semantic_type, source",
+  "rows": [
+    {
+      "total": "3",
+      "semantic_type": "Disease or Syndrome",
+      "source": "UMLS"
+    },
+    {
+      "total": "2",
+      "semantic_type": "Sign or Symptom",
+      "source": "UMLS"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tsemantic_type\tsource\n3\tDisease or Syndrome\tUMLS\n2\tSign or Symptom\tUMLS\n",
+  "stderr": "",
+  "execution_time_ms": 1674
+}

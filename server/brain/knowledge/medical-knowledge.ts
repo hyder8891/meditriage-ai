@@ -40,6 +40,11 @@ export class MedicalKnowledge {
    * Find medical concept by term
    */
   async findConcept(term: string, language: 'en' | 'ar' = 'en'): Promise<MedicalConcept[]> {
+    // Return empty array for empty queries
+    if (!term || term.trim().length === 0) {
+      return [];
+    }
+
     const conn = await getConnection();
     if (!conn) throw new Error('Database not available');
 
