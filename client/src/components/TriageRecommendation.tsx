@@ -15,10 +15,17 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+interface ConditionDetail {
+  condition: string;
+  confidence?: number;
+  description?: string;
+  severity?: 'mild' | 'moderate' | 'severe' | 'critical';
+}
+
 interface Recommendations {
   urgencyLevel: "emergency" | "urgent" | "routine" | "self-care";
   urgencyDescription: string;
-  possibleConditions?: string[];
+  possibleConditions?: (string | ConditionDetail)[];
   recommendedActions?: string[];
   specialistReferral?: string;
   redFlagSymptoms?: string[];
@@ -60,6 +67,7 @@ export function TriageRecommendation({
     disclaimer: language === "ar"
       ? "هذا التقييم للأغراض الإعلامية فقط ولا يحل محل الاستشارة الطبية المهنية."
       : "This assessment is for informational purposes only and does not replace professional medical consultation.",
+    confidence: language === "ar" ? "ثقة" : "confidence",
   };
 
   const urgencyConfig = {
@@ -188,12 +196,38 @@ export function TriageRecommendation({
               <h3 className="text-sm font-semibold text-muted-foreground mb-2">
                 {t.possibleConditions}
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {recommendations.possibleConditions.map((condition, idx) => (
-                  <Badge key={idx} variant="outline" className="text-sm py-1 px-3">
-                    {condition}
-                  </Badge>
-                ))}
+              <div className="space-y-3">
+                {recommendations.possibleConditions.map((condition, idx) => {
+                  // Handle both string and object formats
+                  const conditionName = typeof condition === 'string' ? condition : condition.condition;
+                  const confidence = typeof condition === 'object' && condition.confidence ? condition.confidence : null;
+                  const description = typeof condition === 'object' && condition.description ? condition.description : null;
+                  const severity = typeof condition === 'object' && condition.severity ? condition.severity : null;
+                  
+                  return (
+                    <div key={idx} className="border rounded-lg p-3 bg-card">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-sm">{conditionName}</span>
+                        {confidence && (
+                          <Badge variant="secondary" className="text-xs">
+                            {confidence}% {t.confidence || 'confidence'}
+                          </Badge>
+                        )}
+                      </div>
+                      {description && (
+                        <p className="text-xs text-muted-foreground mb-2">{description}</p>
+                      )}
+                      {severity && (
+                        <Badge 
+                          variant={severity === 'critical' || severity === 'severe' ? 'destructive' : 'outline'}
+                          className="text-xs"
+                        >
+                          {severity}
+                        </Badge>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
