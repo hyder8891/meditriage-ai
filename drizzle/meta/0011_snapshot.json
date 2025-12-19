@@ -2881,7 +2881,7 @@
         },
         "role": {
           "name": "role",
-          "type": "enum('patient','clinician','admin')",
+          "type": "enum('patient','doctor','nurse','clinic_admin','super_admin','admin','clinician')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
