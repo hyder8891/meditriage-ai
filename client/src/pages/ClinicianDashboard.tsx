@@ -30,7 +30,7 @@ export default function ClinicianDashboard() {
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const sidebarOpen = true; // Always keep sidebar open
 
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
@@ -67,23 +67,13 @@ export default function ClinicianDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-50 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
+      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 overflow-y-auto">
         <div className="p-4">
-          <div className="flex items-center justify-between mb-8">
-            {sidebarOpen && (
-              <div>
-                <h2 className="font-bold text-lg text-gray-900">MediTriage AI</h2>
-                <p className="text-xs text-gray-500">Medical OS</p>
-              </div>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="ml-auto"
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
+          <div className="mb-8">
+            <div>
+              <h2 className="font-bold text-lg text-gray-900">MediTriage AI</h2>
+              <p className="text-xs text-gray-500">Medical OS</p>
+            </div>
           </div>
 
           <nav className="space-y-2">
@@ -93,7 +83,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/dashboard")}
             >
               <Activity className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Dashboard"}
+              Dashboard
             </Button>
             <Button
               variant="ghost"
@@ -101,7 +91,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/reasoning")}
             >
               <TrendingUp className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Clinical Reasoning"}
+              Clinical Reasoning
             </Button>
             <Button
               variant="ghost"
@@ -109,7 +99,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/pharmaguard")}
             >
               <FileText className="w-5 h-5 mr-3" />
-              {sidebarOpen && "PharmaGuard"}
+              PharmaGuard
             </Button>
             <Button
               variant="ghost"
@@ -117,7 +107,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/care-locator")}
             >
               <Users className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Care Locator"}
+              Care Locator
             </Button>
             <Button
               variant="ghost"
@@ -125,7 +115,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/bio-scanner")}
             >
               <Activity className="w-5 h-5 mr-3" />
-              {sidebarOpen && "3D Bio-Scanner"}
+              3D Bio-Scanner
             </Button>
             <Button
               variant="ghost"
@@ -133,7 +123,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/live-scribe")}
             >
               <Mic className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Live Scribe"}
+              Live Scribe
             </Button>
             <Button
               variant="ghost"
@@ -141,7 +131,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/xray-analysis")}
             >
               <FileImage className="w-5 h-5 mr-3" />
-              {sidebarOpen && "X-Ray Analysis"}
+              X-Ray Analysis
             </Button>
             <Button
               variant="ghost"
@@ -149,7 +139,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/calendar")}
             >
               <Calendar className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Calendar"}
+              Calendar
             </Button>
             <Button
               variant="ghost"
@@ -157,7 +147,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/medications")}
             >
               <Pill className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Medications"}
+              Medications
             </Button>
             <Button
               variant="ghost"
@@ -165,7 +155,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/messages")}
             >
               <MessageSquare className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Messages"}
+              Messages
             </Button>
           </nav>
 
@@ -176,14 +166,14 @@ export default function ClinicianDashboard() {
               onClick={handleLogout}
             >
               <LogOut className="w-5 h-5 mr-3" />
-              {sidebarOpen && "Logout"}
+              Logout
             </Button>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={`transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
+      <main className="ml-64">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 p-6">
           <div className="flex items-center justify-between">
