@@ -34,6 +34,7 @@ interface DeepSeekOptions {
   max_tokens?: number;
   stream?: boolean;
   model?: string;
+  response_format?: { type: 'json_object' };
 }
 
 /**
@@ -50,13 +51,17 @@ export async function invokeDeepSeek(options: DeepSeekOptions): Promise<DeepSeek
   // Fluid compute: Choose model based on complexity
   const model = options.model || 'deepseek-chat';
   
-  const requestBody = {
+  const requestBody: Record<string, unknown> = {
     model,
     messages: options.messages,
     temperature: options.temperature ?? 0.7,
     max_tokens: options.max_tokens ?? 2000,
     stream: options.stream ?? false,
   };
+
+  if (options.response_format) {
+    requestBody.response_format = options.response_format;
+  }
 
   const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
     method: 'POST',

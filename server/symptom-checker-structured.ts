@@ -135,7 +135,7 @@ For complex or severe issues: continue up to 14 questions to gather comprehensiv
 
 ${IRAQI_MEDICAL_CONTEXT_PROMPT}
 
-Always provide multiple choice options. Be thorough but efficient.`,
+Always provide multiple choice options. Be thorough but efficient. Return ONLY valid JSON, no markdown formatting.`,
           },
           {
             role: "user",
@@ -144,12 +144,20 @@ Always provide multiple choice options. Be thorough but efficient.`,
         ],
         temperature: 0.7,
         max_tokens: 1000,
+        response_format: { type: 'json_object' },
       });
 
       const content = response.choices[0]?.message?.content || "";
 
+      // Extract JSON from markdown code blocks if present
+      let jsonContent = content;
+      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (jsonMatch) {
+        jsonContent = jsonMatch[1].trim();
+      }
+
       try {
-        const parsed = JSON.parse(content);
+        const parsed = JSON.parse(jsonContent);
         return {
           question: {
             id: `q_${currentStep + 1}`,
