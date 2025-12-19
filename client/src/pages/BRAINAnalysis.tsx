@@ -11,10 +11,12 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
-import { Brain, Activity, AlertTriangle, FileText, TrendingUp, Loader2 } from 'lucide-react';
+import { Brain, Activity, AlertTriangle, FileText, TrendingUp, Loader2, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLocation } from 'wouter';
 
 export default function BRAINAnalysis() {
+  const [, navigate] = useLocation();
   const [symptoms, setSymptoms] = useState<string[]>(['']);
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | 'other'>('male');
@@ -75,14 +77,24 @@ export default function BRAINAnalysis() {
     <div className="container py-8 max-w-7xl">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg">
-            <Brain className="w-8 h-8 text-white" />
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg">
+              <Brain className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">BRAIN Analysis</h1>
+              <p className="text-muted-foreground">Biomedical Reasoning and Intelligence Network</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">BRAIN Analysis</h1>
-            <p className="text-muted-foreground">Biomedical Reasoning and Intelligence Network</p>
-          </div>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/brain/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <BarChart3 className="w-4 h-4" />
+            View Dashboard
+          </Button>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
           Evidence-based clinical reasoning powered by 900,000+ medical concepts and continuous learning

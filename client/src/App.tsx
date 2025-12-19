@@ -13,6 +13,7 @@ import MedHome from "./pages/MedHome";
 import SymptomChecker from "./pages/SymptomChecker";
 import SymptomCheckerStructured from "./pages/SymptomCheckerStructured";
 import BRAINAnalysis from "./pages/BRAINAnalysis";
+import BRAINDashboard from "./pages/BRAINDashboard";
 import PatientLogin from "./pages/PatientLogin";
 import ClinicianLoginNew from "./pages/ClinicianLoginNew";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -84,6 +85,7 @@ function Router() {
       <Route path={"/admin/training"} component={AdminTraining} />
       <Route path={"/symptom-checker"} component={SymptomCheckerStructured} />
       <Route path={"/brain"} component={BRAINAnalysis} />
+      <Route path={"/brain/dashboard"} component={BRAINDashboard} />
       <Route path={"/symptom-checker-old"} component={SymptomChecker} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

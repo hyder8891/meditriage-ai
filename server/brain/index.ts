@@ -6,6 +6,7 @@
 import { medicalKnowledge, MedicalConcept } from './knowledge/medical-knowledge';
 import { invokeLLM } from '../_core/llm';
 import mysql from 'mysql2/promise';
+import { searchAndCachePubMed, formatCitation, generatePubMedQuery } from './knowledge/pubmed-client';
 
 let _connection: mysql.Connection | null = null;
 
@@ -100,27 +101,44 @@ export class BRAIN {
       const similarCases = await this.findSimilarCases(normalizedSymptoms, input.patientInfo);
       console.log(`✓ Found ${similarCases.length} similar historical cases`);
 
-      // Step 4: Generate differential diagnosis using LLM with all context
+      // Step 4: Search medical literature for evidence
+      const literatureQuery = generatePubMedQuery(
+        normalizedSymptoms[0]?.standardTerm || input.symptoms[0],
+        input.symptoms
+      );
+      const literature = await searchAndCachePubMed(literatureQuery, 5);
+      console.log(`✓ Found ${literature.length} relevant medical articles`);
+
+      // Step 5: Generate differential diagnosis using LLM with all context
       const diagnosis = await this.generateDifferentialDiagnosis({
         symptoms: normalizedSymptoms,
         knowledgeBaseDiagnoses,
         similarCases,
+        literature,
         patientInfo: input.patientInfo,
         vitalSigns: input.vitalSigns,
         language: input.language
       });
       console.log('✓ Differential diagnosis generated');
 
-      // Step 5: Generate clinical assessment
+      // Step 6: Generate clinical assessment
       const assessment = this.generateClinicalAssessment(diagnosis, knowledgeBaseDiagnoses.length);
 
-      // Step 6: Store case for learning
+      // Format literature sources for output
+      const literatureSources = literature.map(article => ({
+        title: article.title,
+        citation: formatCitation(article),
+        url: article.url
+      }));
+
+      // Step 7: Store case for learning
       const caseId = await this.storeCaseHistory({
         symptoms: normalizedSymptoms,
         patientInfo: input.patientInfo,
         vitalSigns: input.vitalSigns,
         diagnosis,
-        assessment
+        assessment,
+        literature: literatureSources
       });
       console.log(`✓ Case stored: ${caseId}`);
 
@@ -131,11 +149,18 @@ export class BRAIN {
         caseId,
         diagnosis,
         assessment,
-        evidence: knowledgeBaseDiagnoses.map((d, i) => ({
-          title: d.diagnosis.conceptName,
-          source: d.diagnosis.source,
-          relevance: d.confidence
-        })).slice(0, 5),
+        evidence: [
+          ...literatureSources.slice(0, 3).map((lit: any) => ({
+            title: lit.title,
+            source: 'PubMed',
+            relevance: 0.9
+          })),
+          ...knowledgeBaseDiagnoses.map((d: any) => ({
+            title: d.diagnosis.conceptName,
+            source: d.diagnosis.source,
+            relevance: d.confidence
+          })).slice(0, 2)
+        ],
         processingTime
       };
     } catch (error) {
@@ -224,6 +249,7 @@ export class BRAIN {
     symptoms: any[];
     knowledgeBaseDiagnoses: any[];
     similarCases: any[];
+    literature: any[];
     patientInfo: PatientInfo;
     vitalSigns?: Record<string, number>;
     language: 'en' | 'ar';
@@ -254,6 +280,13 @@ ${context.knowledgeBaseDiagnoses.length > 0 ?
   : 'No direct matches in knowledge base'}
 
 **Similar Historical Cases:** ${context.similarCases.length} cases with similar symptom patterns found in database.
+
+**Recent Medical Literature (PubMed):**
+${context.literature.length > 0 ? 
+  context.literature.map((article: any, i: number) => 
+    `${i + 1}. ${article.title}\n   ${formatCitation(article)}\n   ${article.url}`
+  ).join('\n\n') 
+  : 'No recent literature found'}
 
 **Task:** Generate a comprehensive differential diagnosis following these guidelines:
 
@@ -369,6 +402,7 @@ ${context.knowledgeBaseDiagnoses.length > 0 ?
     vitalSigns?: Record<string, number>;
     diagnosis: any;
     assessment: any;
+    literature?: any[];
   }): Promise<string> {
     const conn = await getConnection();
     if (!conn) throw new Error('Database not available');
