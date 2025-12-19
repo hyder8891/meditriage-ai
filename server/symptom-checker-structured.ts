@@ -297,4 +297,95 @@ Consider Iraqi healthcare context and available facilities.`,
         };
       }
     }),
+
+  /**
+   * Get detailed information about a specific condition
+   * Returns causes, progression, when to seek care, and prevention tips
+   */
+  getConditionDetails: publicProcedure
+    .input(
+      z.object({
+        conditionName: z.string(),
+        language: z.enum(["en", "ar"]).optional().default("en"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { conditionName, language } = input;
+
+      const systemPrompt = `You are a medical information expert. Provide detailed, accurate, and easy-to-understand information about medical conditions.
+${IRAQI_MEDICAL_CONTEXT_PROMPT}
+
+Provide information in ${language === "ar" ? "Arabic" : "English"}.
+
+Return a JSON object with this exact structure:
+{
+  "causes": ["cause 1", "cause 2", "cause 3"],
+  "typicalProgression": "description of how the condition typically progresses",
+  "whenToSeekCare": ["warning sign 1", "warning sign 2", "warning sign 3"],
+  "prevention": ["prevention tip 1", "prevention tip 2", "prevention tip 3"],
+  "overview": "brief overview of the condition"
+}`;
+
+      const userPrompt = `Provide detailed medical information about: ${conditionName}
+
+Include:
+1. Common causes
+2. Typical progression and timeline
+3. When to seek medical care (warning signs)
+4. Prevention tips
+5. Brief overview
+
+Return ONLY valid JSON, no markdown formatting.`;
+
+      try {
+        const response = await invokeLLM({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+        });
+
+        const rawContent = response.choices[0]?.message?.content;
+        let content = "";
+        if (typeof rawContent === "string") {
+          content = rawContent;
+        } else if (Array.isArray(rawContent) && rawContent[0]?.type === "text") {
+          content = rawContent[0].text;
+        }
+
+        // Extract JSON from markdown code blocks if present
+        let jsonContent = content;
+        const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (jsonMatch) {
+          jsonContent = jsonMatch[1].trim();
+        }
+
+        const details = JSON.parse(jsonContent);
+
+        return {
+          conditionName,
+          causes: details.causes || [],
+          typicalProgression: details.typicalProgression || "Information not available",
+          whenToSeekCare: details.whenToSeekCare || [],
+          prevention: details.prevention || [],
+          overview: details.overview || "",
+        };
+      } catch (error) {
+        console.error("Error getting condition details:", error);
+        
+        // Return fallback information
+        return {
+          conditionName,
+          causes: ["Consult a healthcare provider for specific information"],
+          typicalProgression: "Progression varies by individual. Consult a healthcare provider for personalized information.",
+          whenToSeekCare: [
+            "Severe or worsening symptoms",
+            "Symptoms that don't improve with treatment",
+            "New or unusual symptoms develop",
+          ],
+          prevention: ["Maintain a healthy lifestyle", "Follow medical advice", "Regular check-ups"],
+          overview: "Please consult a healthcare provider for detailed information about this condition.",
+        };
+      }
+    }),
 });

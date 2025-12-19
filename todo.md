@@ -807,3 +807,6 @@
 - [x] Fix TypeError in TriageRecommendation line 327 - cannot read 'length' property of undefined
 - [x] Optimize symptom checker AI response speed - reduced from 10-15s to 3-5s (60-70% improvement by switching to invokeLLM)
 - [x] Fix React rendering error in TriageRecommendation - object with keys {condition, confidence, description, severity} being rendered directly
+- [x] Add condition comparison view - side-by-side comparison of top 2-3 conditions with probability scores, symptoms match, and distinguishing features
+- [x] Implement "Learn More" modal for conditions - expandable information cards with causes, typical progression, when to seek care, and prevention tips
+- [x] Integrate AI-powered condition details generation for Learn More modal

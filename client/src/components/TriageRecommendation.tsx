@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,8 +13,19 @@ import {
   MapPin,
   Printer,
   Download,
+  Info,
+  ArrowLeftRight,
+  X,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { trpc } from "@/lib/trpc";
 
 interface ConditionDetail {
   condition: string;
@@ -46,6 +58,11 @@ export function TriageRecommendation({
   onExport,
 }: TriageRecommendationProps) {
   const { language } = useLanguage();
+  const [showComparison, setShowComparison] = useState(false);
+  const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
+  const [conditionDetails, setConditionDetails] = useState<any>(null);
+  
+  const getConditionDetailsMutation = trpc.symptomCheckerStructured.getConditionDetails.useMutation();
 
   const t = {
     finalAssessment: language === "ar" ? "التقييم النهائي" : "Final Assessment",
@@ -68,6 +85,17 @@ export function TriageRecommendation({
       ? "هذا التقييم للأغراض الإعلامية فقط ولا يحل محل الاستشارة الطبية المهنية."
       : "This assessment is for informational purposes only and does not replace professional medical consultation.",
     confidence: language === "ar" ? "ثقة" : "confidence",
+    compareConditions: language === "ar" ? "مقارنة الحالات" : "Compare Conditions",
+    learnMore: language === "ar" ? "معرفة المزيد" : "Learn More",
+    conditionDetails: language === "ar" ? "تفاصيل الحالة" : "Condition Details",
+    causes: language === "ar" ? "الأسباب" : "Causes",
+    progression: language === "ar" ? "التطور" : "Typical Progression",
+    whenToSeekCare: language === "ar" ? "متى تطلب الرعاية" : "When to Seek Care",
+    prevention: language === "ar" ? "الوقاية" : "Prevention",
+    loading: language === "ar" ? "جاري التحميل..." : "Loading...",
+    close: language === "ar" ? "إغلاق" : "Close",
+    symptomsMatch: language === "ar" ? "تطابق الأعراض" : "Symptoms Match",
+    distinguishingFeatures: language === "ar" ? "الميزات المميزة" : "Distinguishing Features",
   };
 
   const urgencyConfig = {
@@ -193,9 +221,23 @@ export function TriageRecommendation({
           {/* Possible Conditions */}
           {recommendations.possibleConditions && recommendations.possibleConditions.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-muted-foreground mb-2">
-                {t.possibleConditions}
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                  <Stethoscope className="h-4 w-4" />
+                  {t.possibleConditions}
+                </h3>
+                {recommendations.possibleConditions.length >= 2 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowComparison(!showComparison)}
+                    className="text-xs"
+                  >
+                    <ArrowLeftRight className="h-3 w-3 mr-1" />
+                    {t.compareConditions}
+                  </Button>
+                )}
+              </div>
               <div className="space-y-3">
                 {recommendations.possibleConditions.map((condition, idx) => {
                   // Handle both string and object formats
@@ -225,6 +267,23 @@ export function TriageRecommendation({
                           {severity}
                         </Badge>
                       )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          setSelectedCondition(conditionName);
+                          setConditionDetails(null);
+                          const details = await getConditionDetailsMutation.mutateAsync({
+                            conditionName,
+                            language,
+                          });
+                          setConditionDetails(details);
+                        }}
+                        className="mt-2 w-full text-xs"
+                      >
+                        <Info className="h-3 w-3 mr-1" />
+                        {t.learnMore}
+                      </Button>
                     </div>
                   );
                 })}
@@ -316,6 +375,188 @@ export function TriageRecommendation({
           </div>
         </CardContent>
       </Card>
+
+      {/* Learn More Modal */}
+      <Dialog open={selectedCondition !== null} onOpenChange={(open) => !open && setSelectedCondition(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              {t.conditionDetails}: {selectedCondition}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {getConditionDetailsMutation.isPending || !conditionDetails ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <p className="text-sm text-muted-foreground">{t.loading}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {conditionDetails.overview && (
+                <div>
+                  <p className="text-sm text-muted-foreground">{conditionDetails.overview}</p>
+                </div>
+              )}
+
+              <div>
+                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  {t.causes}
+                </h4>
+                <ul className="space-y-1">
+                  {conditionDetails.causes?.map((cause: string, idx: number) => (
+                    <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span>{cause}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  {t.progression}
+                </h4>
+                <p className="text-sm text-muted-foreground">{conditionDetails.typicalProgression}</p>
+              </div>
+
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2 text-orange-900">
+                  <AlertTriangle className="h-4 w-4" />
+                  {t.whenToSeekCare}
+                </h4>
+                <ul className="space-y-1">
+                  {conditionDetails.whenToSeekCare?.map((sign: string, idx: number) => (
+                    <li key={idx} className="text-sm text-orange-800 flex items-start gap-2">
+                      <span className="text-orange-600 mt-1">•</span>
+                      <span>{sign}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2 text-green-900">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {t.prevention}
+                </h4>
+                <ul className="space-y-1">
+                  {conditionDetails.prevention?.map((tip: string, idx: number) => (
+                    <li key={idx} className="text-sm text-green-800 flex items-start gap-2">
+                      <span className="text-green-600 mt-1">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Button
+                onClick={() => setSelectedCondition(null)}
+                className="w-full"
+              >
+                {t.close}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Comparison View Modal */}
+      {showComparison && recommendations.possibleConditions && recommendations.possibleConditions.length >= 2 && (
+        <Dialog open={showComparison} onOpenChange={setShowComparison}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <ArrowLeftRight className="h-5 w-5" />
+                {t.compareConditions}
+              </DialogTitle>
+              <DialogDescription>
+                {language === "ar" 
+                  ? "مقارنة بين أهم الحالات المحتملة"
+                  : "Side-by-side comparison of top possible conditions"}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recommendations.possibleConditions.slice(0, 3).map((condition, idx) => {
+                const conditionName = typeof condition === 'string' ? condition : condition.condition;
+                const confidence = typeof condition === 'object' && condition.confidence ? condition.confidence : null;
+                const description = typeof condition === 'object' && condition.description ? condition.description : null;
+                const severity = typeof condition === 'object' && condition.severity ? condition.severity : null;
+                
+                return (
+                  <div key={idx} className="border-2 rounded-lg p-4 space-y-3">
+                    <div>
+                      <div className="font-semibold text-base mb-2">{conditionName}</div>
+                      {confidence && (
+                        <div className="mb-2">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-muted-foreground">{t.confidence}</span>
+                            <span className="font-medium">{confidence}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all"
+                              style={{ width: `${confidence}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {severity && (
+                        <Badge 
+                          variant={severity === 'critical' || severity === 'severe' ? 'destructive' : 'outline'}
+                          className="text-xs"
+                        >
+                          {severity}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    {description && (
+                      <div>
+                        <div className="text-xs font-semibold text-muted-foreground mb-1">
+                          {t.distinguishingFeatures}
+                        </div>
+                        <p className="text-xs text-muted-foreground">{description}</p>
+                      </div>
+                    )}
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        setShowComparison(false);
+                        setSelectedCondition(conditionName);
+                        setConditionDetails(null);
+                        const details = await getConditionDetailsMutation.mutateAsync({
+                          conditionName,
+                          language,
+                        });
+                        setConditionDetails(details);
+                      }}
+                      className="w-full text-xs"
+                    >
+                      <Info className="h-3 w-3 mr-1" />
+                      {t.learnMore}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+
+            <Button
+              onClick={() => setShowComparison(false)}
+              className="w-full"
+            >
+              {t.close}
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
