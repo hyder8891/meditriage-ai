@@ -1,4 +1,4 @@
-import { router, protectedProcedure } from "./_core/trpc";
+import { router, publicProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { invokeDeepSeek } from "./_core/deepseek";
 import { IRAQI_MEDICAL_CONTEXT_PROMPT } from "@shared/iraqiMedicalContext";
@@ -32,7 +32,7 @@ export const symptomCheckerStructuredRouter = router({
    * Start new symptom assessment
    * Returns initial triage questions
    */
-  startAssessment: protectedProcedure
+  startAssessment: publicProcedure
     .input(z.object({}).optional())
     .mutation(async ({ ctx }) => {
       // Initial triage questions
@@ -93,10 +93,10 @@ export const symptomCheckerStructuredRouter = router({
   /**
    * Get next question based on previous answers
    */
-  getNextQuestion: protectedProcedure
+  getNextQuestion: publicProcedure
     .input(z.object({
       sessionId: z.string(),
-      answers: z.record(z.any()),
+      answers: z.record(z.string(), z.unknown()),
       currentStep: z.number(),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -123,7 +123,9 @@ Return JSON in this exact format:
   "isComplete": false
 }
 
-If you have enough information to make an assessment (after 5-7 questions), set isComplete to true.`;
+If you have enough information to make an assessment (after 10-14 questions depending on severity), set isComplete to true.
+For routine issues: 10 questions is sufficient.
+For complex or severe issues: continue up to 14 questions to gather comprehensive information.`;
 
       const response = await invokeDeepSeek({
         messages: [
@@ -157,7 +159,7 @@ Always provide multiple choice options. Be thorough but efficient.`,
             options: parsed.question.options,
             required: true,
           },
-          isComplete: parsed.isComplete || currentStep >= 7,
+          isComplete: parsed.isComplete || currentStep >= 13,
           currentStep: currentStep + 1,
         };
       } catch (e) {
@@ -177,7 +179,7 @@ Always provide multiple choice options. Be thorough but efficient.`,
             ],
             required: true,
           },
-          isComplete: currentStep >= 7,
+          isComplete: currentStep >= 13,
           currentStep: currentStep + 1,
         };
       }
@@ -186,10 +188,10 @@ Always provide multiple choice options. Be thorough but efficient.`,
   /**
    * Generate final assessment and recommendations
    */
-  generateFinalAssessment: protectedProcedure
+  generateFinalAssessment: publicProcedure
     .input(z.object({
       sessionId: z.string(),
-      answers: z.record(z.any()),
+      answers: z.record(z.string(), z.unknown()),
     }))
     .mutation(async ({ ctx, input }) => {
       const { answers } = input;

@@ -801,3 +801,4 @@
   - [x] Add red flag warnings
   - [x] Provide Care Locator integration
   - [x] Add print/export functionality
+- [x] Update symptom checker to ask 10-14 questions based on severity (AI dynamically decides when complete)

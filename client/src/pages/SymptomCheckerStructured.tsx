@@ -31,6 +31,7 @@ interface Answer {
 
 export default function SymptomCheckerStructured() {
   const [sessionId, setSessionId] = useState<string>("");
+  const [initialQuestions, setInitialQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [answerHistory, setAnswerHistory] = useState<Answer[]>([]);
@@ -44,6 +45,7 @@ export default function SymptomCheckerStructured() {
   const startMutation = trpc.symptomCheckerStructured.startAssessment.useMutation({
     onSuccess: (data) => {
       setSessionId(data.sessionId);
+      setInitialQuestions(data.questions);
       setCurrentQuestion(data.questions[0]);
       setTotalSteps(data.totalSteps);
       setCurrentStep(0);
@@ -86,6 +88,7 @@ export default function SymptomCheckerStructured() {
     setCurrentStep(0);
     setIsComplete(false);
     setFinalAssessment(null);
+    setInitialQuestions([]);
     startMutation.mutate();
   };
 
@@ -106,7 +109,7 @@ export default function SymptomCheckerStructured() {
     setAnswers(newAnswers);
 
     // Add to history
-    setAnswerHistory([
+    const newHistory = [
       ...answerHistory,
       {
         questionId: currentQuestion.id,
@@ -116,14 +119,24 @@ export default function SymptomCheckerStructured() {
         answerLabel: selectedOpt?.label || selectedOption,
         answerLabelAr: selectedOpt?.labelAr || selectedOption,
       },
-    ]);
+    ];
+    setAnswerHistory(newHistory);
 
-    // Get next question
-    nextQuestionMutation.mutate({
-      sessionId,
-      answers: newAnswers,
-      currentStep,
-    });
+    // Check if we're still in the initial questions phase
+    const nextInitialQuestionIndex = currentStep + 1;
+    if (nextInitialQuestionIndex < initialQuestions.length) {
+      // Move to next initial question
+      setCurrentQuestion(initialQuestions[nextInitialQuestionIndex]);
+      setCurrentStep(nextInitialQuestionIndex);
+      setSelectedOption("");
+    } else {
+      // All initial questions answered, get AI-generated next question
+      nextQuestionMutation.mutate({
+        sessionId,
+        answers: newAnswers,
+        currentStep,
+      });
+    }
   };
 
   const handleBack = () => {
