@@ -44,6 +44,7 @@ import PatientPortal from "./pages/PatientPortal";
 import SecureMessaging from "./pages/SecureMessaging";
 import AdminDashboard from "./pages/AdminDashboard";
 import Patients from "./pages/Patients";
+import AddPatient from "./pages/AddPatient";
 import Reports from "./pages/Reports";
 
 function Router() {
@@ -71,6 +72,7 @@ function Router() {
       <Route path={"/clinician/calendar"} component={ClinicianCalendar} />      <Route path={"/clinician/medications"} component={MedicationManagement} />
       <Route path={"/clinician/messages"} component={SecureMessaging} />
       <Route path={"/clinician/patients"} component={Patients} />
+      <Route path={"/clinician/patients/add"} component={AddPatient} />
       <Route path={"/clinician/reports"} component={Reports} />
       <Route path={"/patient/medications"} component={PatientMedications} />
       <Route path={"/patient/portal"}>

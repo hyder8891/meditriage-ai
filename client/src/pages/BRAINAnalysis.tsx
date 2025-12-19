@@ -11,7 +11,8 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
-import { Brain, Activity, AlertTriangle, FileText, TrendingUp, Loader2, BarChart3 } from 'lucide-react';
+import { Brain, Activity, AlertTriangle, FileText, TrendingUp, Loader2, BarChart3, Mic } from 'lucide-react';
+import { SmartAudioForm } from '../components/SmartAudioForm';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import ClinicianLayout from '../components/ClinicianLayout';
@@ -23,6 +24,27 @@ function BRAINAnalysisContent() {
   const [gender, setGender] = useState<'male' | 'female' | 'other'>('male');
   const [medicalHistory, setMedicalHistory] = useState('');
   const [location, setLocation] = useState('Iraq');
+  const [showVoiceInput, setShowVoiceInput] = useState(false);
+
+  const handleVoiceFieldsDetected = (fields: Record<string, string>) => {
+    if (fields.age) setAge(fields.age);
+    if (fields.gender) setGender(fields.gender as 'male' | 'female' | 'other');
+    if (fields.medicalHistory) setMedicalHistory(fields.medicalHistory);
+    if (fields.symptoms) {
+      // Parse symptoms from voice input
+      const symptomList = fields.symptoms.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      setSymptoms(symptomList.length > 0 ? symptomList : ['']);
+    }
+    setShowVoiceInput(false);
+    toast.success('تم ملء النموذج من الصوت / Form filled from voice');
+  };
+
+  const brainFormFields = [
+    { name: 'symptoms', label: 'الأعراض / Symptoms', type: 'text' as const },
+    { name: 'age', label: 'العمر / Age', type: 'number' as const },
+    { name: 'gender', label: 'الجنس / Gender', type: 'select' as const },
+    { name: 'medicalHistory', label: 'التاريخ الطبي / Medical History', type: 'text' as const },
+  ];
 
   const analyzeMutation = trpc.brain.analyze.useMutation({
     onSuccess: () => {
@@ -105,10 +127,29 @@ function BRAINAnalysisContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input Form */}
         <div className="space-y-6">
+          {/* Voice Input Toggle */}
+          <Button
+            onClick={() => setShowVoiceInput(!showVoiceInput)}
+            variant={showVoiceInput ? "default" : "outline"}
+            className="w-full gap-2"
+          >
+            <Mic className="w-4 h-4" />
+            {showVoiceInput ? 'إخفاء الإدخال الصوتي / Hide Voice Input' : 'استخدام الإدخال الصوتي / Use Voice Input'}
+          </Button>
+
+          {/* Voice Input Component */}
+          {showVoiceInput && (
+            <SmartAudioForm
+              fields={brainFormFields}
+              onFieldsDetected={handleVoiceFieldsDetected}
+              language="ar"
+            />
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>Patient Information</CardTitle>
-              <CardDescription>Enter patient demographics and symptoms</CardDescription>
+              <CardDescription>Enter patient demographics and symptoms or use voice input</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Age */}

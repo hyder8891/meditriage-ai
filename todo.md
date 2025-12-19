@@ -1299,3 +1299,14 @@
 - [x] Support Iraqi Arabic dialect in audio recording
 - [x] Integrate audio input into Clinical Reasoning page
 - [x] Test Arabic audio transcription with Gemini Flash
+
+
+## Voice-to-Form Intelligent System
+- [x] Create SmartAudioForm component with field detection
+- [x] Implement Arabic audio transcription with Gemini Flash
+- [x] Add intelligent field mapping (name, age, symptoms, etc.)
+- [x] Integrate voice registration into patient registration form
+- [x] Add voice input to BRAIN diagnosis form
+- [x] Support structured data extraction from free-form Arabic speech
+- [x] Add confirmation UI showing detected fields before submission
+- [ ] Test with Iraqi Arabic medical terminology
