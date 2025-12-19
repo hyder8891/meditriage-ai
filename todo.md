@@ -1223,3 +1223,12 @@
 - [x] Create brain_training_notifications table
 - [x] Push schema changes to database
 - [x] Verify database integration with training system
+
+
+## BRAIN & Clinical Reasoning Merger
+- [x] Audit ClinicalReasoning.tsx to identify unique features
+- [x] Refactor Clinical Reasoning to use BRAIN engine/API
+- [x] Maintain BRAIN as dedicated section for advanced features
+- [x] Update clinician navigation to reflect integration
+- [x] Ensure backward compatibility for existing routes
+- [x] Test merged functionality end-to-end

@@ -2,6 +2,7 @@ import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { makeRequest } from "./_core/map";
 import { invokeDeepSeek, deepMedicalReasoning } from "./_core/deepseek";
+import { brain } from "./brain/index";
 import { IRAQI_MEDICAL_CONTEXT_PROMPT } from "@shared/iraqiMedicalContext";
 import {
   createCase,
@@ -153,27 +154,47 @@ export const clinicalRouter = router({
         throw new Error('Unauthorized');
       }
 
-      // Use DeepSeek for advanced medical reasoning
-      const reasoning = await deepMedicalReasoning({
+      // Use BRAIN engine for comprehensive medical reasoning
+      const brainResult = await brain.reason({
         symptoms: input.symptoms,
-        history: `Chief Complaint: ${input.chiefComplaint}. Age: ${input.patientAge || 'unknown'}. Gender: ${input.patientGender || 'unknown'}.`,
+        patientInfo: {
+          age: input.patientAge || 30,
+          gender: (input.patientGender as 'male' | 'female' | 'other') || 'other',
+          location: 'Iraq',
+        },
         vitalSigns: input.vitals ? {
-          bloodPressure: input.vitals.bloodPressure || '',
-          heartRate: input.vitals.heartRate?.toString() || '',
-          temperature: input.vitals.temperature || '',
-          oxygenSaturation: input.vitals.oxygenSaturation?.toString() || '',
+          bloodPressure: parseFloat(input.vitals.bloodPressure?.split('/')[0] || '0'),
+          heartRate: input.vitals.heartRate || 0,
+          temperature: parseFloat(input.vitals.temperature || '0'),
+          oxygenSaturation: input.vitals.oxygenSaturation || 0,
         } : undefined,
+        language: 'en',
       });
 
+      // Format BRAIN output to match expected reasoning structure
+      const reasoning = {
+        differentialDiagnosis: brainResult.diagnosis.differentialDiagnosis.map((dx: any) => ({
+          condition: dx.condition,
+          probability: dx.probability,
+          reasoning: dx.reasoning,
+          keyFindings: dx.supportingEvidence,
+        })),
+        recommendedTests: brainResult.diagnosis.recommendations.tests,
+        urgencyLevel: brainResult.diagnosis.redFlags.length > 0 ? 'urgent' : 'routine',
+        redFlags: brainResult.diagnosis.redFlags,
+        clinicalPearls: brainResult.diagnosis.recommendations.immediateActions,
+        citations: brainResult.evidence.map((e: any) => `${e.title} (${e.source})`),
+      };
+
       // Save top diagnoses to database
-      for (const diagnosisItem of reasoning.differentialDiagnosis) {
+      for (const diagnosisItem of reasoning.differentialDiagnosis.slice(0, 5)) {
         await saveDiagnosis({
           caseId: input.caseId,
-          diagnosis: diagnosisItem.diagnosis,
-          probability: diagnosisItem.confidence,
-          reasoning: `${diagnosisItem.clinicalPresentation}\n\nSupporting Evidence: ${diagnosisItem.supportingEvidence.join(', ')}`,
+          diagnosis: diagnosisItem.condition,
+          probability: diagnosisItem.probability,
+          reasoning: diagnosisItem.reasoning,
           redFlags: JSON.stringify(reasoning.redFlags),
-          recommendedActions: JSON.stringify(diagnosisItem.nextSteps),
+          recommendedActions: JSON.stringify(reasoning.recommendedTests),
         });
       }
 

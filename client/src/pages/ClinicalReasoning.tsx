@@ -85,9 +85,10 @@ export default function ClinicalReasoning() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <Brain className="w-8 h-8 text-purple-600" />
-                Clinical Reasoning Engine
+                Clinical Reasoning
+                <Badge variant="default" className="bg-purple-600">Powered by BRAIN</Badge>
               </h1>
-              <p className="text-gray-600 mt-1">AI-powered differential diagnosis with DeepSeek</p>
+              <p className="text-gray-600 mt-1">Advanced AI diagnostic system with 20,000+ medical concepts & PubMed integration</p>
             </div>
           </div>
         </div>
