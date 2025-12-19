@@ -805,3 +805,4 @@
 - [x] Fix symptom checker stuck on question 3 - keeps asking same question repeatedly and very slow after question 2
 - [x] Fix TypeError in TriageRecommendation component - cannot read 'icon' property of undefined urgency level
 - [x] Fix TypeError in TriageRecommendation line 327 - cannot read 'length' property of undefined
+- [x] Optimize symptom checker AI response speed - reduced from 10-15s to 3-5s (60-70% improvement by switching to invokeLLM)

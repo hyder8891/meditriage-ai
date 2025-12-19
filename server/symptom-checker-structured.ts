@@ -1,6 +1,6 @@
 import { router, publicProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { invokeDeepSeek } from "./_core/deepseek";
+import { invokeLLM } from "./_core/llm";
 import { IRAQI_MEDICAL_CONTEXT_PROMPT } from "@shared/iraqiMedicalContext";
 
 /**
@@ -127,27 +127,27 @@ If you have enough information to make an assessment (after 10-14 questions depe
 For routine issues: 10 questions is sufficient.
 For complex or severe issues: continue up to 14 questions to gather comprehensive information.`;
 
-      const response = await invokeDeepSeek({
+      const response = await invokeLLM({
         messages: [
           {
             role: "system",
-            content: `You are a medical triage AI. Ask relevant follow-up questions based on symptoms.
+            content: `You are a medical triage AI. Ask relevant follow-up questions.
 
 ${IRAQI_MEDICAL_CONTEXT_PROMPT}
 
-Always provide multiple choice options. Be thorough but efficient. Return ONLY valid JSON, no markdown formatting.`,
+Provide multiple choice options. Be efficient. Return ONLY valid JSON.`,
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 400,
         response_format: { type: 'json_object' },
       });
 
-      const content = response.choices[0]?.message?.content || "";
+      const rawContent = response.choices[0]?.message?.content || "";
+      const content = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
 
       // Extract JSON from markdown code blocks if present
       let jsonContent = content;
@@ -240,26 +240,27 @@ Provide a detailed JSON assessment with this exact structure:
   "monitoringInstructions": "what to watch for"
 }`;
 
-      const response = await invokeDeepSeek({
+      const response = await invokeLLM({
         messages: [
           {
             role: "system",
-            content: `You are an expert medical triage AI. Provide comprehensive, evidence-based assessments.
+            content: `You are an expert medical triage AI. Provide comprehensive assessments.
 
 ${IRAQI_MEDICAL_CONTEXT_PROMPT}
 
-Consider Iraqi healthcare context, common diseases, and available facilities.`,
+Consider Iraqi healthcare context and available facilities.`,
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 0.5,
-        max_tokens: 2500,
+        max_tokens: 1500,
+        response_format: { type: 'json_object' },
       });
 
-      const content = response.choices[0]?.message?.content || "";
+      const rawContent = response.choices[0]?.message?.content || "";
+      const content = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
 
       try {
         const assessment = JSON.parse(content);
