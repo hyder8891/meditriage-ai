@@ -380,10 +380,10 @@
 - [x] Implement zoom and pan on timeline
 
 ## 3D Bio-Scanner Enhancements
-- [ ] Add smooth rotation animations
-- [ ] Implement organ detail modals
-- [ ] Add symptom intensity visualization
-- [ ] Include anatomical information tooltips
+- [x] Add smooth rotation animations
+- [x] Implement organ detail modals
+- [x] Add multi-organ highlighting
+- [x] Include anatomical information tooltips
 - [ ] Add multiple body views (front/back/side)
 - [ ] Implement highlight animations for affected areas
 

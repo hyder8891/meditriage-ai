@@ -29,6 +29,9 @@ interface OrganDetail {
   commonConditions: string[];
   diagnosticTests: string[];
   icon: any;
+  riskFactors?: string[];
+  preventiveMeasures?: string[];
+  emergencySymptoms?: string[];
 }
 
 interface BodyRegion {
@@ -56,6 +59,9 @@ const bodyRegions: BodyRegion[] = [
         commonConditions: ["Migraine", "Stroke", "Meningitis", "Concussion", "Brain tumor"],
         diagnosticTests: ["CT scan", "MRI", "EEG", "Neurological examination"],
         icon: Brain,
+        riskFactors: ["Hypertension", "Diabetes", "Smoking", "High cholesterol", "Family history", "Head trauma"],
+        preventiveMeasures: ["Regular exercise", "Healthy diet", "Blood pressure control", "Avoid smoking", "Mental stimulation"],
+        emergencySymptoms: ["Sudden severe headache", "Loss of consciousness", "Seizures", "Sudden weakness or numbness", "Difficulty speaking"],
       },
       {
         name: "Eyes",
@@ -81,6 +87,9 @@ const bodyRegions: BodyRegion[] = [
         commonConditions: ["Coronary artery disease", "Heart failure", "Arrhythmia", "Myocardial infarction", "Pericarditis"],
         diagnosticTests: ["ECG", "Echocardiogram", "Cardiac enzymes", "Stress test", "Coronary angiography"],
         icon: Heart,
+        riskFactors: ["High blood pressure", "High cholesterol", "Smoking", "Diabetes", "Obesity", "Sedentary lifestyle", "Family history"],
+        preventiveMeasures: ["Regular exercise", "Heart-healthy diet", "Maintain healthy weight", "Quit smoking", "Manage stress", "Regular checkups"],
+        emergencySymptoms: ["Chest pain or pressure", "Shortness of breath", "Pain radiating to arm/jaw", "Severe palpitations", "Sudden dizziness or fainting"],
       },
       {
         name: "Lungs",
@@ -222,7 +231,10 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
   const [zoom, setZoom] = useState(1);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [symptomIntensity, setSymptomIntensity] = useState<Record<string, number>>({});
   const svgRef = useRef<SVGSVGElement>(null);
+  const rotationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleRegionClick = (region: BodyRegion) => {
     setIsAnimating(true);
@@ -239,9 +251,31 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
 
   const handleRotate = () => {
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 300);
+    setTimeout(() => setIsAnimating(false), 500);
     setRotation((prev) => (prev + 90) % 360);
   };
+
+  const toggleAutoRotate = () => {
+    setAutoRotate(!autoRotate);
+  };
+
+  // Auto-rotate effect
+  useEffect(() => {
+    if (autoRotate) {
+      rotationIntervalRef.current = setInterval(() => {
+        setRotation((prev) => (prev + 1) % 360);
+      }, 50);
+    } else {
+      if (rotationIntervalRef.current) {
+        clearInterval(rotationIntervalRef.current);
+      }
+    }
+    return () => {
+      if (rotationIntervalRef.current) {
+        clearInterval(rotationIntervalRef.current);
+      }
+    };
+  }, [autoRotate]);
 
   const handleZoomIn = () => {
     setZoom((prev) => Math.min(prev + 0.2, 2));
@@ -265,6 +299,19 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
     );
   };
 
+  const getRegionIntensity = (region: BodyRegion) => {
+    const matchCount = selectedSymptoms.filter((symptom) =>
+      region.commonSymptoms.some((s) => s.toLowerCase().includes(symptom.toLowerCase()))
+    ).length;
+    return Math.min(matchCount / Math.max(selectedSymptoms.length, 1), 1);
+  };
+
+  const getIntensityColor = (intensity: number) => {
+    if (intensity >= 0.7) return '#ef4444'; // Red - high intensity
+    if (intensity >= 0.4) return '#f59e0b'; // Orange - medium intensity
+    return '#fbbf24'; // Yellow - low intensity
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* 3D Viewer */}
@@ -278,10 +325,19 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
               </CardTitle>
               <div className="flex items-center gap-2">
                 <Button
+                  variant={autoRotate ? "default" : "outline"}
+                  size="sm"
+                  onClick={toggleAutoRotate}
+                  title="Auto Rotate"
+                  className={autoRotate ? "bg-blue-600 hover:bg-blue-700" : ""}
+                >
+                  <RotateCw className={`w-4 h-4 ${autoRotate ? 'animate-spin' : ''}`} />
+                </Button>
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={handleRotate}
-                  title="Rotate"
+                  title="Rotate 90°"
                 >
                   <RotateCw className="w-4 h-4" />
                 </Button>
@@ -337,15 +393,17 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
                   const isHighlighted = isRegionHighlighted(region);
                   const isSelected = selectedRegion?.id === region.id;
                   const isHovered = hoveredRegion === region.id;
+                  const intensity = getRegionIntensity(region);
+                  const intensityColor = getIntensityColor(intensity);
 
                   return (
                     <g key={region.id}>
                       <path
                         d={region.path}
-                        fill={region.color}
+                        fill={isHighlighted ? intensityColor : region.color}
                         opacity={isSelected ? 0.9 : isHighlighted ? 0.7 : isHovered ? 0.5 : 0.3}
-                        stroke={isSelected ? region.color : isHighlighted ? "#fbbf24" : region.color}
-                        strokeWidth={isSelected ? 3 : isHighlighted ? 2 : 1}
+                        stroke={isSelected ? region.color : isHighlighted ? intensityColor : region.color}
+                        strokeWidth={isSelected ? 3 : isHighlighted ? 3 : 1}
                         className={`cursor-pointer ${isAnimating ? 'transition-all duration-300 ease-in-out' : 'transition-all duration-200'}`}
                         onClick={() => handleRegionClick(region)}
                         onMouseEnter={() => setHoveredRegion(region.id)}
@@ -388,14 +446,22 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
               <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
                 <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
                   <Info className="w-4 h-4" />
-                  <span className="font-semibold">Legend</span>
+                  <span className="font-semibold">Symptom Intensity</span>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                    <span>Symptom detected</span>
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span>High (70%+)</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                    <span>Medium (40-70%)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <span>Low (&lt;40%)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs mt-2 pt-2 border-t border-gray-200">
                     <div className="w-3 h-3 rounded-full bg-blue-400 opacity-50"></div>
                     <span>Click to view details</span>
                   </div>
@@ -533,6 +599,62 @@ export default function BioScanner3D({ selectedSymptoms = [], onRegionClick }: B
                   ))}
                 </ul>
               </div>
+
+              {selectedOrgan.riskFactors && selectedOrgan.riskFactors.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-orange-600" />
+                    Risk Factors
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedOrgan.riskFactors.map((factor, index) => (
+                      <Badge key={index} variant="outline" className="text-xs border-orange-300 text-orange-700">
+                        {factor}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedOrgan.preventiveMeasures && selectedOrgan.preventiveMeasures.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-green-600" />
+                    Preventive Measures
+                  </h4>
+                  <ul className="space-y-1">
+                    {selectedOrgan.preventiveMeasures.map((measure, index) => (
+                      <li
+                        key={index}
+                        className="text-sm text-gray-600 flex items-center gap-2"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                        {measure}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedOrgan.emergencySymptoms && selectedOrgan.emergencySymptoms.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-red-900 mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    Emergency Symptoms - Seek Immediate Care
+                  </h4>
+                  <ul className="space-y-1">
+                    {selectedOrgan.emergencySymptoms.map((symptom, index) => (
+                      <li
+                        key={index}
+                        className="text-sm text-red-800 flex items-center gap-2"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-600"></div>
+                        {symptom}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
