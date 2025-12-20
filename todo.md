@@ -1346,3 +1346,13 @@
 - [ ] Fix transcript generation from captured audio
 - [ ] Verify audio processing backend endpoint
 - [ ] Test complete recording-to-transcript flow
+
+
+## Audio Transcription Bug (ALL AUDIO INPUTS)
+- [x] Add debug logging to voiceTranscription backend
+- [ ] User needs to test recording again and check server logs
+- [ ] Fix transcription returning placeholder text instead of real audio
+- [ ] Investigate why audio blob is not being sent to backend properly
+- [ ] Ensure audio blob has data before sending to backend
+- [ ] Add validation for audio blob size and format
+- [ ] Test real Arabic speech transcription end-to-end

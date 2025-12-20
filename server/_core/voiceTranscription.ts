@@ -91,10 +91,12 @@ export async function transcribeAudio(
     }
 
     // Step 2: Download audio from URL
+    console.log('[VoiceTranscription] Downloading audio from:', options.audioUrl);
     let audioBuffer: Buffer;
     let mimeType: string;
     try {
       const response = await fetch(options.audioUrl);
+      console.log('[VoiceTranscription] Fetch response status:', response.status);
       if (!response.ok) {
         return {
           error: "Failed to download audio file",
@@ -105,9 +107,12 @@ export async function transcribeAudio(
       
       audioBuffer = Buffer.from(await response.arrayBuffer());
       mimeType = response.headers.get('content-type') || 'audio/mpeg';
+      console.log('[VoiceTranscription] Audio buffer size:', audioBuffer.length, 'bytes');
+      console.log('[VoiceTranscription] MIME type:', mimeType);
       
       // Check file size (16MB limit)
       const sizeMB = audioBuffer.length / (1024 * 1024);
+      console.log('[VoiceTranscription] Audio size:', sizeMB.toFixed(2), 'MB');
       if (sizeMB > 16) {
         return {
           error: "Audio file exceeds maximum size limit",
@@ -141,6 +146,8 @@ export async function transcribeAudio(
         : "Transcribe the user's voice to text"
     );
     formData.append("prompt", prompt);
+    console.log('[VoiceTranscription] Sending to Whisper API with prompt:', prompt);
+    console.log('[VoiceTranscription] Language:', options.language);
 
     // Step 4: Call the transcription service
     const baseUrl = ENV.forgeApiUrl.endsWith("/")
@@ -172,6 +179,9 @@ export async function transcribeAudio(
 
     // Step 5: Parse and return the transcription result
     const whisperResponse = await response.json() as WhisperResponse;
+    console.log('[VoiceTranscription] Whisper response text length:', whisperResponse.text?.length);
+    console.log('[VoiceTranscription] Whisper response text:', whisperResponse.text);
+    console.log('[VoiceTranscription] Whisper detected language:', whisperResponse.language);
     
     // Validate response structure
     if (!whisperResponse.text || typeof whisperResponse.text !== 'string') {
