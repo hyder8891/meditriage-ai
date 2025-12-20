@@ -62,7 +62,8 @@ function XRayAnalysisContent() {
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  const analyzeMutation = trpc.imaging.analyzeXRay.useMutation();
+  const analyzeMutation = trpc.imaging.analyzeMedicalImage.useMutation();
+  const [imagingModality, setImagingModality] = useState<'xray' | 'mri' | 'ct' | 'ultrasound' | 'mammography' | 'ecg' | 'pathology' | 'retinal' | 'pet' | 'dexa' | 'fluoroscopy'>('xray');
 
   // Convert file to base64
   async function fileToBase64(file: File): Promise<string> {
@@ -124,6 +125,8 @@ function XRayAnalysisContent() {
       const result = await analyzeMutation.mutateAsync({
         imageBase64: base64,
         mimeType: selectedFile.type,
+        modality: imagingModality,
+        filename: selectedFile.name,
         clinicalContext: undefined,
         language,
       });
@@ -424,10 +427,32 @@ function XRayAnalysisContent() {
           <CardHeader>
             <CardTitle>{language === 'ar' ? 'تحميل الصورة' : 'Upload Image'}</CardTitle>
             <CardDescription>
-              {language === 'ar' ? 'اختر صورة أشعة سينية للتحليل' : 'Select an X-ray image to analyze'}
+              {language === 'ar' ? 'اختر نوع الفحص وحمّل الصورة للتحليل' : 'Select modality and upload medical image for analysis'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Imaging Modality Selector */}
+            <div className="space-y-2">
+              <Label>{language === 'ar' ? 'نوع الفحص' : 'Imaging Modality'}</Label>
+              <select
+                value={imagingModality}
+                onChange={(e) => setImagingModality(e.target.value as any)}
+                className="w-full px-3 py-2 border rounded-md bg-background"
+              >
+                <option value="xray">{language === 'ar' ? 'أشعة سينية (X-Ray)' : 'X-Ray'}</option>
+                <option value="mri">{language === 'ar' ? 'رنين مغناطيسي (MRI)' : 'MRI'}</option>
+                <option value="ct">{language === 'ar' ? 'أشعة مقطعية (CT)' : 'CT Scan'}</option>
+                <option value="ultrasound">{language === 'ar' ? 'موجات فوق صوتية' : 'Ultrasound'}</option>
+                <option value="mammography">{language === 'ar' ? 'تصوير الثدي' : 'Mammography'}</option>
+                <option value="ecg">{language === 'ar' ? 'تخطيط القلب (ECG)' : 'ECG/EKG'}</option>
+                <option value="pathology">{language === 'ar' ? 'علم الأمراض' : 'Pathology'}</option>
+                <option value="retinal">{language === 'ar' ? 'تصوير الشبكية' : 'Retinal Imaging'}</option>
+                <option value="pet">{language === 'ar' ? 'PET Scan' : 'PET Scan'}</option>
+                <option value="dexa">{language === 'ar' ? 'قياس كثافة العظام' : 'DEXA Scan'}</option>
+                <option value="fluoroscopy">{language === 'ar' ? 'تنظير فلوري' : 'Fluoroscopy'}</option>
+              </select>
+            </div>
+
             {/* File Upload */}
             <div className="border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors">
               <input

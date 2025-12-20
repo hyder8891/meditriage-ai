@@ -17,6 +17,7 @@ import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
 import { invokeDeepSeek, trainOnMedicalMaterial, deepMedicalReasoning } from "./_core/deepseek";
 import { analyzeXRayBackend } from "./_core/gemini";
+import { analyzeMedicalImage, detectImagingModality, type ImagingModality } from "./_core/medical-imaging";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import { 
@@ -670,7 +671,7 @@ export const appRouter = router({
   }),
 
   imaging: router({
-    // Analyze X-ray using Gemini (secure backend)
+    // Analyze X-ray using Gemini (secure backend) - Legacy endpoint
     analyzeXRay: protectedProcedure
       .input(z.object({
         imageBase64: z.string(),
@@ -683,6 +684,37 @@ export const appRouter = router({
           imageBase64: input.imageBase64,
           mimeType: input.mimeType,
           clinicalContext: input.clinicalContext,
+          language: input.language,
+        });
+
+        return analysis;
+      }),
+
+    // Comprehensive medical image analysis for all modalities
+    analyzeMedicalImage: protectedProcedure
+      .input(z.object({
+        imageBase64: z.string(),
+        mimeType: z.string(),
+        modality: z.enum(['xray', 'mri', 'ct', 'ultrasound', 'mammography', 'ecg', 'pathology', 'retinal', 'pet', 'dexa', 'fluoroscopy']).optional(),
+        filename: z.string().optional(),
+        clinicalContext: z.string().optional(),
+        patientAge: z.number().optional(),
+        patientGender: z.enum(['male', 'female', 'other']).optional(),
+        bodyPart: z.string().optional(),
+        language: z.enum(['en', 'ar']).default('en'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Auto-detect modality if not provided
+        const modality: ImagingModality = input.modality || detectImagingModality(input.mimeType, input.filename);
+
+        const analysis = await analyzeMedicalImage({
+          imageBase64: input.imageBase64,
+          mimeType: input.mimeType,
+          modality,
+          clinicalContext: input.clinicalContext,
+          patientAge: input.patientAge,
+          patientGender: input.patientGender,
+          bodyPart: input.bodyPart,
           language: input.language,
         });
 
