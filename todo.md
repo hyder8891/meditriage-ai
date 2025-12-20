@@ -1390,3 +1390,12 @@
 - [x] Added error handling for FileReader
 - [x] Added logging for audioAnalysisMutation call
 - [ ] User needs to test again and check console logs to see where it fails
+
+## CRITICAL: audioBlob is null in Clinical Reasoning
+- [x] Console logs show: useAudioInput: true, audioBlob: null
+- [x] AudioInput component doesn't have upload/transcribe logic (checked source)
+- [x] Added logging to onAudioCapture callback to see if it's called
+- [x] Added logging for blob size, type, and URL
+- [ ] User needs to test again and check if onAudioCapture logs appear
+- [ ] If onAudioCapture is NOT called, AudioInput has a bug
+- [ ] If onAudioCapture IS called but audioBlob still null, state update issue

@@ -240,7 +240,13 @@ function ClinicalReasoningContent() {
                   <AudioInput
                     initialLanguage="ar"
                     onAudioCapture={(blob, url) => {
+                      console.log('[ClinicalReasoning] onAudioCapture called!');
+                      console.log('[ClinicalReasoning] Blob received:', blob);
+                      console.log('[ClinicalReasoning] Blob size:', blob?.size, 'bytes');
+                      console.log('[ClinicalReasoning] Blob type:', blob?.type);
+                      console.log('[ClinicalReasoning] URL:', url);
                       setAudioBlob(blob);
+                      console.log('[ClinicalReasoning] audioBlob state updated');
                       toast.success("Audio recorded successfully");
                     }}
                     onClear={() => {
