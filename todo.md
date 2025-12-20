@@ -66,3 +66,34 @@
 - [ ] Test subscription and payment
 - [ ] Test usage limits
 - [ ] Create checkpoint for B2B2C platform
+
+
+### Phase 7: Complete Website Redesign for B2B2C (IN PROGRESS)
+- [ ] Homepage redesign
+  - [ ] Clear patient/doctor portal selection
+  - [ ] Subscription pricing preview
+  - [ ] Feature comparison table
+  - [ ] Trust signals and testimonials
+  - [ ] Clear CTAs for both user types
+- [ ] Patient dashboard redesign
+  - [ ] Prominent subscription status card
+  - [ ] Usage stats with progress bars
+  - [ ] Quick access to upgrade
+  - [ ] Doctor connection status
+  - [ ] Recent consultation history
+- [ ] Doctor dashboard redesign
+  - [ ] Patient count and capacity display
+  - [ ] Revenue metrics and ROI calculator
+  - [ ] Subscription tier badge
+  - [ ] Quick stats for active patients
+  - [ ] Upgrade to Premium CTA
+- [ ] Onboarding flow
+  - [ ] Welcome screen for new users
+  - [ ] User type selection (patient/doctor)
+  - [ ] Plan selection wizard
+  - [ ] Feature tour
+- [ ] Monetization touchpoints
+  - [ ] Upgrade prompts when limits reached
+  - [ ] Feature comparison modals
+  - [ ] Success stories from premium users
+  - [ ] Limited-time offers

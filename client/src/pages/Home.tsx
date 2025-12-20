@@ -211,6 +211,82 @@ export default function Home() {
     },
   ];
 
+  const pricingPlans = {
+    patient: [
+      {
+        name: language === 'ar' ? 'مجاني' : 'Free',
+        price: language === 'ar' ? 'مجاناً' : 'Free',
+        period: language === 'ar' ? '3 استشارات/شهر' : '3 consultations/month',
+        features: [
+          language === 'ar' ? '3 استشارات ذكاء اصطناعي شهرياً' : '3 AI consultations per month',
+          language === 'ar' ? 'تقييم أساسي للأعراض' : 'Basic symptom assessment',
+          language === 'ar' ? 'سجلات صحية محدودة' : 'Limited health records',
+          language === 'ar' ? 'دعم عبر البريد الإلكتروني' : 'Email support',
+        ],
+        cta: language === 'ar' ? 'ابدأ مجاناً' : 'Start Free',
+        popular: false,
+      },
+      {
+        name: language === 'ar' ? 'لايت' : 'Lite',
+        price: '$5',
+        period: language === 'ar' ? '/شهر' : '/month',
+        features: [
+          language === 'ar' ? '20 استشارة ذكاء اصطناعي شهرياً' : '20 AI consultations per month',
+          language === 'ar' ? 'تقييم متقدم للأعراض' : 'Advanced symptom assessment',
+          language === 'ar' ? 'سجلات صحية كاملة' : 'Full health records',
+          language === 'ar' ? 'اتصال مع الأطباء' : 'Doctor connections',
+          language === 'ar' ? 'دعم ذو أولوية' : 'Priority support',
+        ],
+        cta: language === 'ar' ? 'ترقية إلى لايت' : 'Upgrade to Lite',
+        popular: true,
+      },
+      {
+        name: language === 'ar' ? 'برو' : 'Pro',
+        price: '$15',
+        period: language === 'ar' ? '/شهر' : '/month',
+        features: [
+          language === 'ar' ? 'استشارات غير محدودة' : 'Unlimited consultations',
+          language === 'ar' ? 'جميع ميزات لايت' : 'All Lite features',
+          language === 'ar' ? 'أولوية في الاتصال بالأطباء' : 'Priority doctor connections',
+          language === 'ar' ? 'تحليل الأشعة السينية' : 'X-ray analysis',
+          language === 'ar' ? 'دعم 24/7' : '24/7 support',
+        ],
+        cta: language === 'ar' ? 'ترقية إلى برو' : 'Upgrade to Pro',
+        popular: false,
+      },
+    ],
+    doctor: [
+      {
+        name: language === 'ar' ? 'أساسي' : 'Basic',
+        price: '$120',
+        period: language === 'ar' ? '/شهر' : '/month',
+        features: [
+          language === 'ar' ? 'حتى 100 مريض نشط' : 'Up to 100 active patients',
+          language === 'ar' ? 'جميع أدوات التشخيص' : 'All diagnostic tools',
+          language === 'ar' ? 'رسائل آمنة' : 'Secure messaging',
+          language === 'ar' ? 'تقارير أساسية' : 'Basic reports',
+          language === 'ar' ? 'دعم قياسي' : 'Standard support',
+        ],
+        cta: language === 'ar' ? 'ابدأ الأساسي' : 'Start Basic',
+        popular: false,
+      },
+      {
+        name: language === 'ar' ? 'بريميوم' : 'Premium',
+        price: '$250',
+        period: language === 'ar' ? '/شهر' : '/month',
+        features: [
+          language === 'ar' ? 'مرضى غير محدودين' : 'Unlimited patients',
+          language === 'ar' ? 'جميع ميزات الأساسي' : 'All Basic features',
+          language === 'ar' ? 'تحليلات متقدمة' : 'Advanced analytics',
+          language === 'ar' ? 'تكامل API' : 'API integration',
+          language === 'ar' ? 'دعم مخصص 24/7' : 'Dedicated 24/7 support',
+        ],
+        cta: language === 'ar' ? 'ترقية إلى بريميوم' : 'Upgrade to Premium',
+        popular: true,
+      },
+    ],
+  };
+
   const testimonials = [
     {
       name: language === 'ar' ? 'د. أحمد الحسيني' : 'Dr. Ahmed Al-Husseini',
