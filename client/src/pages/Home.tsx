@@ -127,8 +127,8 @@ export default function Home() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 to-purple-500/20 rounded-3xl blur-3xl"></div>
                 <img 
-                  src="/images/ai-technology.jpg" 
-                  alt="AI Healthcare Technology"
+                  src="/images/ai-brain-neural.jpeg" 
+                  alt="AI Neural Network Medical Diagnosis"
                   className="relative rounded-3xl shadow-2xl w-full h-auto"
                 />
                 {/* Floating Stats Cards */}
@@ -426,6 +426,101 @@ export default function Home() {
               {language === 'ar' ? 'عرض جميع الأطباء' : 'View All Doctors'}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Technology Infrastructure Showcase */}
+      <section className="py-20 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-white/10 text-white border-white/20">
+              <Zap className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'البنية التحتية' : 'Infrastructure'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              {language === 'ar' ? 'بنية تحتية قوية وموثوقة' : 'Robust & Reliable Infrastructure'}
+            </h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'مدعومة بملايين الحالات الطبية وأحدث تقنيات الحوسبة السحابية'
+                : 'Powered by millions of medical cases and latest cloud computing technology'}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+              <CardContent className="p-6">
+                <img 
+                  src="/images/big-data-healthcare.jpg" 
+                  alt="Big Data in Healthcare"
+                  className="rounded-xl mb-4 w-full h-48 object-cover"
+                />
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {language === 'ar' ? 'ملايين الحالات الطبية' : 'Millions of Medical Cases'}
+                </h3>
+                <p className="text-slate-300 text-sm">
+                  {language === 'ar'
+                    ? 'قاعدة بيانات ضخمة تحتوي على ملايين الحالات الطبية لتحسين دقة التشخيص'
+                    : 'Massive database containing millions of medical cases to improve diagnosis accuracy'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+              <CardContent className="p-6">
+                <img 
+                  src="/images/cloud-infrastructure.jpg" 
+                  alt="Cloud Infrastructure"
+                  className="rounded-xl mb-4 w-full h-48 object-cover"
+                />
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {language === 'ar' ? 'بنية سحابية متطورة' : 'Advanced Cloud Infrastructure'}
+                </h3>
+                <p className="text-slate-300 text-sm">
+                  {language === 'ar'
+                    ? 'خوادم سحابية عالية الأداء تضمن الاستجابة الفورية والموثوقية 99.9%'
+                    : 'High-performance cloud servers ensuring instant response and 99.9% reliability'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+              <CardContent className="p-6">
+                <img 
+                  src="/images/ai-xray-analysis.jpg" 
+                  alt="AI X-Ray Analysis"
+                  className="rounded-xl mb-4 w-full h-48 object-cover"
+                />
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {language === 'ar' ? 'تحليل الأشعة بالذكاء الاصطناعي' : 'AI-Powered X-Ray Analysis'}
+                </h3>
+                <p className="text-slate-300 text-sm">
+                  {language === 'ar'
+                    ? 'تحليل فوري للصور الطبية والأشعة بدقة تفوق الطرق التقليدية'
+                    : 'Instant analysis of medical images and X-rays with accuracy exceeding traditional methods'}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-6 text-center">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <div className="text-4xl font-bold text-rose-400 mb-2">10M+</div>
+              <div className="text-slate-300">{language === 'ar' ? 'حالة طبية' : 'Medical Cases'}</div>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <div className="text-4xl font-bold text-blue-400 mb-2">500+</div>
+              <div className="text-slate-300">{language === 'ar' ? 'طبيب معتمد' : 'Certified Doctors'}</div>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <div className="text-4xl font-bold text-purple-400 mb-2">99.9%</div>
+              <div className="text-slate-300">{language === 'ar' ? 'وقت التشغيل' : 'Uptime'}</div>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <div className="text-4xl font-bold text-green-400 mb-2">&lt;3s</div>
+              <div className="text-slate-300">{language === 'ar' ? 'وقت الاستجابة' : 'Response Time'}</div>
+            </div>
           </div>
         </div>
       </section>
@@ -805,8 +900,8 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-8 mb-12">
               <div>
                 <img 
-                  src="/images/patient-consultation.jpg" 
-                  alt="Patient Consultation"
+                  src="/images/healthcare-dashboard.png" 
+                  alt="Medical Analytics Dashboard"
                   className="rounded-2xl shadow-xl w-full h-auto"
                 />
               </div>
