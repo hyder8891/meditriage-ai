@@ -261,3 +261,13 @@
 - [ ] Update seed script with complete doctor profiles (bio, education, experience, languages)
 - [ ] Update seed script with complete patient profiles (demographics, medical history, contact info)
 - [ ] Add profile photos/avatars for seeded users
+
+## Comprehensive Testing
+- [x] Test all public pages (Home, About, Features, Pricing, Contact)
+- [x] Test authentication flows (Login, Signup, Logout)
+- [x] Test patient features (Triage, Find Doctors, Portal, Appointments)
+- [x] Test doctor/clinician features (Dashboard, Patients, Cases, Messages)
+- [x] Test admin features (if applicable)
+- [x] Test all tRPC API endpoints
+- [x] Document all issues found
+- [ ] Fix all identified issues (3 minor issues found, non-critical)
