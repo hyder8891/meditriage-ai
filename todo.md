@@ -1374,3 +1374,11 @@
 - [x] Fixed Clinical Reasoning to properly extract symptoms from audio analysis
 - [ ] User needs to test LiveScribe again to verify transcription accuracy
 - [ ] User needs to test Clinical Reasoning audio → diagnosis flow
+
+## URGENT: Switch Back to Whisper API
+- [x] Gemini Flash not working for transcription in both languages
+- [x] Restored Whisper API transcription in routers.ts and clinical-routers.ts
+- [x] Fixed root cause: Removed misleading "prompt" parameter from Whisper API call
+- [x] Whisper "prompt" is for context/spelling hints, NOT instructions
+- [x] Now using "language" parameter instead for language hint
+- [ ] User needs to test Whisper transcription with Arabic and English audio
