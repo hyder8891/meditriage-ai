@@ -1317,3 +1317,10 @@
 - [x] Verify audio input in symptom checker (AudioInput exists)
 - [x] Verify audio input in clinical reasoning (AudioInput exists)
 - [x] Test end-to-end audio recording and field population
+
+
+## Audio Input Visibility & Language Fixes
+- [x] Fix audio input not showing in Clinical Reasoning (already exists, verified)
+- [x] Add Arabic language support to LiveScribe
+- [x] Fix audio input not showing in symptom checker (already exists, verified)
+- [x] Test all audio inputs with Arabic priority

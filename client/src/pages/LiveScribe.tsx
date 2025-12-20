@@ -21,6 +21,7 @@ import {
   Copy,
   Download,
   FileCheck,
+  Languages,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import ClinicianLayout from "@/components/ClinicianLayout";
@@ -45,6 +46,7 @@ function LiveScribeContent() {
   const [isGeneratingSOAP, setIsGeneratingSOAP] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [recordingQuality, setRecordingQuality] = useState<'good' | 'fair' | 'poor'>('good');
+  const [language, setLanguage] = useState<'ar' | 'en'>('ar'); // Arabic first priority
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);  
@@ -236,7 +238,7 @@ function LiveScribeContent() {
       // After upload, transcribe the audio
       transcribeAudioMutation.mutate({
         audioUrl: data.url,
-        language: "en",
+        language: language,
       });
     },
     onError: (error) => {
@@ -283,7 +285,7 @@ function LiveScribeContent() {
     createTranscriptionMutation.mutate({
       caseId: selectedCase || undefined,
       transcriptionText: transcriptionText,
-      language: "en",
+      language: language,
       speaker: speaker,
       duration: recordingTime,
     });
@@ -544,6 +546,27 @@ function LiveScribeContent() {
                         <SelectItem value="clinician">Clinician</SelectItem>
                         <SelectItem value="patient">Patient</SelectItem>
                         <SelectItem value="mixed">Mixed (Both)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Language Selection */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Languages className="w-4 h-4" />
+                      Language / اللغة
+                    </label>
+                    <Select
+                      value={language}
+                      onValueChange={(value: 'ar' | 'en') => setLanguage(value)}
+                      disabled={isRecording}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ar">🇮🇶 Arabic (عربي)</SelectItem>
+                        <SelectItem value="en">🇬🇧 English</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
