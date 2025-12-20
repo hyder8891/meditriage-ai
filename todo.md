@@ -185,3 +185,16 @@
 - [ ] Add FAQ section
 - [ ] Include doctor images (currently using gradient avatars)
 - [ ] Add feature screenshots/illustrations
+
+
+### Homepage Images & Detailed Content
+- [x] Add hero section illustration/image (AI technology image with floating stats)
+- [x] Add real doctor profile photos (3 professional doctor images)
+- [x] Add medical imagery throughout (patient consultation image)
+- [x] Add detailed "How It Works" section with step-by-step guide (already exists)
+- [x] Add comprehensive "About the Platform" section (Vision, Why Us, How We're Different)
+- [x] Add detailed B2B2C model explanation (in About section)
+- [x] Add FAQ section (8 comprehensive questions covering all aspects)
+- [ ] Add feature screenshots for AI tools
+- [ ] Add use cases and patient/doctor journey examples
+- [ ] Add security and privacy details section

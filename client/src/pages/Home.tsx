@@ -122,6 +122,42 @@ export default function Home() {
       <section className="py-20 bg-gradient-to-br from-rose-50 via-white to-blue-50">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Hero Image - Right Side */}
+            <div className="order-first lg:order-last">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 to-purple-500/20 rounded-3xl blur-3xl"></div>
+                <img 
+                  src="/images/ai-technology.jpg" 
+                  alt="AI Healthcare Technology"
+                  className="relative rounded-3xl shadow-2xl w-full h-auto"
+                />
+                {/* Floating Stats Cards */}
+                <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-xl p-4 hidden md:block">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-slate-900">99.2%</div>
+                      <div className="text-sm text-slate-600">{language === 'ar' ? 'دقة التشخيص' : 'Accuracy'}</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -top-6 -right-6 bg-white rounded-xl shadow-xl p-4 hidden md:block">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-500 to-purple-500 flex items-center justify-center">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-slate-900">500+</div>
+                      <div className="text-sm text-slate-600">{language === 'ar' ? 'طبيب' : 'Doctors'}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Hero Content - Left Side */}
             <div className="space-y-8">
               <Badge className="bg-rose-100 text-rose-700 border-rose-200">
                 <Heart className="w-4 h-4 mr-2" />
@@ -353,9 +389,11 @@ export default function Home() {
               <Card key={idx} className="border-2 hover:shadow-2xl transition-all hover:-translate-y-2">
                 <CardContent className="p-6">
                   <div className="relative mb-4">
-                    <div className="w-full h-48 bg-gradient-to-br from-slate-200 to-slate-300 rounded-xl flex items-center justify-center">
-                      <Users className="w-20 h-20 text-slate-400" />
-                    </div>
+                    <img 
+                      src={doctor.image} 
+                      alt={doctor.name}
+                      className="w-full h-48 object-cover rounded-xl"
+                    />
                     {doctor.available && (
                       <Badge className="absolute top-3 right-3 bg-green-500 text-white">
                         <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />
@@ -746,6 +784,177 @@ export default function Home() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Platform - Detailed */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <Badge className="mb-4 bg-purple-100 text-purple-700 border-purple-200">
+                <Heart className="w-4 h-4 mr-2" />
+                {language === 'ar' ? 'عن المنصة' : 'About the Platform'}
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                {language === 'ar' ? 'مستقبل الرعاية الصحية في العراق' : 'The Future of Healthcare in Iraq'}
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <img 
+                  src="/images/patient-consultation.jpg" 
+                  alt="Patient Consultation"
+                  className="rounded-2xl shadow-xl w-full h-auto"
+                />
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'رؤيتنا' : 'Our Vision'}
+                  </h3>
+                  <p className="text-slate-700 leading-relaxed">
+                    {language === 'ar'
+                      ? 'نسعى لتوفير رعاية صحية عالية الجودة وميسورة التكلفة لجميع العراقيين من خلال الجمع بين قوة الذكاء الاصطناعي وخبرة الأطباء المحليين المعتمدين. نؤمن بأن التكنولوجيا يجب أن تعزز العلاقة بين الطبيب والمريض، لا أن تحل محلها.'
+                      : 'We strive to provide high-quality, affordable healthcare to all Iraqis by combining the power of artificial intelligence with the expertise of certified local doctors. We believe technology should enhance the doctor-patient relationship, not replace it.'}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'لماذا MediTriage AI Pro؟' : 'Why MediTriage AI Pro?'}
+                  </h3>
+                  <ul className="space-y-3">
+                    {[
+                      language === 'ar' ? 'تقليل وقت الانتظار من ساعات إلى ثوانٍ' : 'Reduce waiting time from hours to seconds',
+                      language === 'ar' ? 'وصول فوري لأطباء مختصين في أي وقت' : 'Instant access to specialist doctors anytime',
+                      language === 'ar' ? 'تكلفة أقل من العيادات التقليدية' : 'Lower cost than traditional clinics',
+                      language === 'ar' ? 'خصوصية وأمان بياناتك الطبية' : 'Privacy and security of your medical data',
+                      language === 'ar' ? 'متابعة مستمرة لحالتك الصحية' : 'Continuous monitoring of your health',
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-slate-700">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
+                {language === 'ar' ? 'كيف نختلف عن المنصات الأخرى؟' : 'How Are We Different?'}
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  {
+                    title: language === 'ar' ? 'نموذج B2B2C' : 'B2B2C Model',
+                    desc: language === 'ar' 
+                      ? 'نجمع بين المرضى والأطباء في منصة واحدة متكاملة'
+                      : 'We bring patients and doctors together on one integrated platform',
+                  },
+                  {
+                    title: language === 'ar' ? 'ذكاء محلي' : 'Local Intelligence',
+                    desc: language === 'ar'
+                      ? 'مدرب على حالات عراقية ويفهم السياق المحلي'
+                      : 'Trained on Iraqi cases and understands local context',
+                  },
+                  {
+                    title: language === 'ar' ? 'دعم مستمر' : 'Continuous Support',
+                    desc: language === 'ar'
+                      ? 'متابعة طويلة الأمد لا تقتصر على استشارة واحدة'
+                      : 'Long-term follow-up, not just one-time consultation',
+                  },
+                ].map((item, idx) => (
+                  <div key={idx} className="bg-white rounded-xl p-6 shadow-sm">
+                    <h4 className="font-bold text-slate-900 mb-2">{item.title}</h4>
+                    <p className="text-sm text-slate-600">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                {language === 'ar' ? 'الأسئلة الشائعة' : 'FAQ'}
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+                {language === 'ar' ? 'إجابات على أسئلتك' : 'Answers to Your Questions'}
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                {
+                  q: language === 'ar' ? 'هل الذكاء الاصطناعي يحل محل الطبيب؟' : 'Does AI replace the doctor?',
+                  a: language === 'ar'
+                    ? 'لا، الذكاء الاصطناعي هو أداة مساعدة توفر تقييماً أولياً سريعاً. التشخيص النهائي والخطة العلاجية يتم بواسطة طبيب مختص معتمد. نحن نجمع بين سرعة التكنولوجيا وخبرة الطبيب البشري.'
+                    : 'No, AI is an assistive tool that provides quick initial assessment. Final diagnosis and treatment plan are made by a certified specialist doctor. We combine the speed of technology with human doctor expertise.',
+                },
+                {
+                  q: language === 'ar' ? 'هل بياناتي آمنة؟' : 'Is my data secure?',
+                  a: language === 'ar'
+                    ? 'نعم، نستخدم تشفيراً من الدرجة الطبية لحماية جميع بياناتك الطبية. لا يمكن لأحد الوصول إلى معلوماتك إلا الأطباء المعتمدين الذين تمنحهم الإذن. نلتزم بأعلى معايير الخصوصية الطبية.'
+                    : 'Yes, we use medical-grade encryption to protect all your medical data. Only certified doctors you authorize can access your information. We comply with the highest medical privacy standards.',
+                },
+                {
+                  q: language === 'ar' ? 'كم تكلفة الخدمة؟' : 'How much does it cost?',
+                  a: language === 'ar'
+                    ? 'نقدم خطة مجانية للتجربة (3 استشارات شهرياً). الخطط المدفوعة تبدأ من 15,000 دينار عراقي شهرياً (15 استشارة). هذا أقل بكثير من تكلفة زيارة عيادة واحدة تقليدية.'
+                    : 'We offer a free trial plan (3 consultations/month). Paid plans start from 15,000 IQD monthly (15 consultations). This is much less than the cost of a single traditional clinic visit.',
+                },
+                {
+                  q: language === 'ar' ? 'هل يمكنني اختيار طبيبي؟' : 'Can I choose my doctor?',
+                  a: language === 'ar'
+                    ? 'نعم، يمكنك تصفح واختيار الطبيب بناءً على التخصص، التقييم، والتوفر. كل طبيب لديه ملف شخصي مفصل يوضح خبرته وتقييمات المرضى السابقين.'
+                    : 'Yes, you can browse and choose your doctor based on specialty, rating, and availability. Each doctor has a detailed profile showing their expertise and previous patient ratings.',
+                },
+                {
+                  q: language === 'ar' ? 'ماذا لو كانت حالتي طارئة؟' : 'What if my case is urgent?',
+                  a: language === 'ar'
+                    ? 'المنصة متاحة 24/7 للحالات الطارئة. سيقيّم الذكاء الاصطناعي درجة الخطورة ويربطك فوراً بطبيب طوارئ. في الحالات الحرجة جداً، ننصح بالاتصال بالإسعاف أو زيارة أقرب مستشفى.'
+                    : 'The platform is available 24/7 for urgent cases. AI will assess the severity and immediately connect you with an emergency doctor. For very critical cases, we recommend calling ambulance or visiting the nearest hospital.',
+                },
+                {
+                  q: language === 'ar' ? 'هل يمكن للطبيب وصف أدوية؟' : 'Can doctors prescribe medications?',
+                  a: language === 'ar'
+                    ? 'نعم، الأطباء المعتمدون يمكنهم وصف الأدوية إلكترونياً. ستحصل على وصفة طبية رقمية يمكنك استخدامها في أي صيدلية. نعمل أيضاً على شراكات لتوصيل الأدوية إلى منزلك.'
+                    : 'Yes, certified doctors can prescribe medications electronically. You will receive a digital prescription you can use at any pharmacy. We are also working on partnerships for home medication delivery.',
+                },
+                {
+                  q: language === 'ar' ? 'كيف يستفيد الأطباء من المنصة؟' : 'How do doctors benefit from the platform?',
+                  a: language === 'ar'
+                    ? 'المنصة تساعد الأطباء على الوصول لمرضى جدد، إدارة ممارستهم بكفاءة، وزيادة دخلهم. نوفر أدوات ذكية للتشخيص، نظام حجز متطور، وتقارير تحليلية لمتابعة الأداء.'
+                    : 'The platform helps doctors reach new patients, manage their practice efficiently, and increase their income. We provide smart diagnostic tools, advanced booking system, and analytical reports to track performance.',
+                },
+                {
+                  q: language === 'ar' ? 'هل الخدمة متاحة في جميع محافظات العراق؟' : 'Is the service available in all Iraqi governorates?',
+                  a: language === 'ar'
+                    ? 'نعم، الخدمة متاحة عبر الإنترنت في جميع أنحاء العراق. لدينا أطباء من مختلف المحافظات ونعمل على توسيع التغطية باستمرار. كل ما تحتاجه هو اتصال بالإنترنت.'
+                    : 'Yes, the service is available online throughout Iraq. We have doctors from different governorates and are continuously expanding coverage. All you need is an internet connection.',
+                },
+              ].map((faq, idx) => (
+                <Card key={idx} className="border-2 hover:shadow-lg transition-all">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-start gap-3">
+                      <span className="text-rose-500 flex-shrink-0">Q:</span>
+                      <span>{faq.q}</span>
+                    </h3>
+                    <p className="text-slate-700 leading-relaxed pl-8">{faq.a}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </section>
