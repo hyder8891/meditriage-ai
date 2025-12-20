@@ -28,13 +28,13 @@ async function seedBRAINKnowledge() {
       
       await connection.execute(
         `INSERT INTO brain_knowledge_concepts 
-         (concept_id, concept_name, semantic_type, definition, source, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+         (concept_type, name, description, category, source, created_at, updated_at)
+         VALUES ('disease', ?, ?, ?, ?, NOW(), NOW())
          ON DUPLICATE KEY UPDATE
-         definition = VALUES(definition),
+         description = VALUES(description),
          source = VALUES(source),
          updated_at = NOW()`,
-        [conceptId, guideline.condition, guideline.category, definition, guideline.source]
+        [guideline.condition, definition, guideline.category, guideline.source]
       );
       
       console.log(`  ✓ Added: ${guideline.condition}`);
@@ -46,28 +46,44 @@ async function seedBRAINKnowledge() {
       const symptomId = `SYM-${mapping.symptom.replace(/\s+/g, '-').toUpperCase()}`;
       
       // Add symptom as a concept
-      await connection.execute(
+      const [symptomResult] = await connection.execute(
         `INSERT INTO brain_knowledge_concepts 
-         (concept_id, concept_name, semantic_type, definition, source, created_at, updated_at)
-         VALUES (?, ?, 'Symptom', ?, 'BRAIN Training Data', NOW(), NOW())
+         (concept_type, name, description, source, created_at, updated_at)
+         VALUES ('symptom', ?, ?, 'BRAIN Training Data', NOW(), NOW())
          ON DUPLICATE KEY UPDATE updated_at = NOW()`,
-        [symptomId, mapping.symptom, JSON.stringify(mapping.possibleDiseases)]
+        [mapping.symptom, JSON.stringify(mapping.possibleDiseases)]
       );
+      
+      const symptomConceptId = symptomResult.insertId || (
+        await connection.execute(
+          `SELECT id FROM brain_knowledge_concepts WHERE name = ? AND concept_type = 'symptom'`,
+          [mapping.symptom]
+        )
+      )[0][0].id;
       
       // Create relationships between symptoms and diseases
       for (const disease of mapping.possibleDiseases) {
         const diseaseId = `DIS-${disease.disease.replace(/\s+/g, '-').toUpperCase()}`;
         
         // Add disease as a concept if not exists
-        await connection.execute(
-          `INSERT IGNORE INTO brain_knowledge_concepts 
-           (concept_id, concept_name, semantic_type, definition, source, created_at, updated_at)
-           VALUES (?, ?, 'Disease', ?, 'BRAIN Training Data', NOW(), NOW())`,
-          [diseaseId, disease.disease, JSON.stringify({
+        const [diseaseResult] = await connection.execute(
+          `INSERT INTO brain_knowledge_concepts 
+           (concept_type, name, description, source, created_at, updated_at)
+           VALUES ('disease', ?, ?, 'BRAIN Training Data', NOW(), NOW())
+           ON DUPLICATE KEY UPDATE updated_at = NOW()`,
+          [disease.disease, JSON.stringify({
             associatedSymptoms: disease.associatedSymptoms,
-            distinguishingFeatures: disease.distinguishingFeatures
+            distinguishingFeatures: disease.distinguishingFeatures,
+            probability: disease.probability
           })]
         );
+        
+        const diseaseConceptId = diseaseResult.insertId || (
+          await connection.execute(
+            `SELECT id FROM brain_knowledge_concepts WHERE name = ? AND concept_type = 'disease'`,
+            [disease.disease]
+          )
+        )[0][0].id;
         
         // Create symptom-disease relationship
         const confidence = {
@@ -79,12 +95,18 @@ async function seedBRAINKnowledge() {
         
         await connection.execute(
           `INSERT INTO brain_knowledge_relationships 
-           (from_concept_id, relationship_type, to_concept_id, confidence, created_at, updated_at)
-           VALUES (?, 'may_indicate', ?, ?, NOW(), NOW())
+           (from_concept_id, relationship_type, to_concept_id, confidence, associated_symptoms, distinguishing_features, created_at, updated_at)
+           VALUES (?, 'may_indicate', ?, ?, ?, ?, NOW(), NOW())
            ON DUPLICATE KEY UPDATE
            confidence = VALUES(confidence),
            updated_at = NOW()`,
-          [symptomId, diseaseId, confidence]
+          [
+            symptomConceptId, 
+            diseaseConceptId, 
+            confidence,
+            JSON.stringify(disease.associatedSymptoms),
+            JSON.stringify(disease.distinguishingFeatures)
+          ]
         );
       }
       

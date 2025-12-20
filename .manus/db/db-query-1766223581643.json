@@ -1,0 +1,37 @@
+{
+  "query": "SHOW CREATE TABLE brain_knowledge_concepts",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SHOW CREATE TABLE brain_knowledge_concepts",
+  "rows": [
+    {
+      "Table": "brain_knowledge_concepts",
+      "Create Table": "CREATE TABLE `brain_knowledge_concepts` ("
+    }
+  ],
+  "messages": [
+    "  `concept_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `concept_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `semantic_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `definition` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `synonyms` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `source` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'UMLS, SNOMED, ICD-10, etc.',",
+    "  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `concept_type` enum('disease','symptom','treatment','investigation','risk_factor') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'disease',",
+    "  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `category` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `icd10_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `snomed_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `prevalence` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `severity` enum('mild','moderate','severe','critical') COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `evidence_level` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  KEY `idx_concept_name` (`concept_name`(255)),",
+    "  KEY `idx_semantic_type` (`semantic_type`),",
+    "  KEY `idx_source` (`source`),",
+    "  PRIMARY KEY (`concept_id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\nbrain_knowledge_concepts\tCREATE TABLE `brain_knowledge_concepts` (\n  `concept_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `concept_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `semantic_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `definition` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `synonyms` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `source` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'UMLS, SNOMED, ICD-10, etc.',\n  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `concept_type` enum('disease','symptom','treatment','investigation','risk_factor') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'disease',\n  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `category` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `icd10_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `snomed_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `prevalence` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `severity` enum('mild','moderate','severe','critical') COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `evidence_level` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  KEY `idx_concept_name` (`concept_name`(255)),\n  KEY `idx_semantic_type` (`semantic_type`),\n  KEY `idx_source` (`source`),\n  PRIMARY KEY (`concept_id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 1537
+}

@@ -1,0 +1,32 @@
+{
+  "query": "SHOW CREATE TABLE brain_knowledge_relationships",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SHOW CREATE TABLE brain_knowledge_relationships",
+  "rows": [
+    {
+      "Table": "brain_knowledge_relationships",
+      "Create Table": "CREATE TABLE `brain_knowledge_relationships` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `from_concept_id` int(11) NOT NULL,",
+    "  `concept_id_1` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `relationship_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'is_a, part_of, treats, causes, associated_with',",
+    "  `to_concept_id` int(11) NOT NULL,",
+    "  `concept_id_2` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `confidence` float DEFAULT '1' COMMENT 'Confidence score 0-1',",
+    "  `source` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `idx_concept_1` (`concept_id_1`),",
+    "  KEY `idx_concept_2` (`concept_id_2`),",
+    "  KEY `idx_relationship_type` (`relationship_type`),",
+    "  CONSTRAINT `fk_1` FOREIGN KEY (`concept_id_1`) REFERENCES `hfH9ioTEzRzswFjESim83C`.`brain_knowledge_concepts` (`concept_id`) ON DELETE CASCADE,",
+    "  CONSTRAINT `fk_2` FOREIGN KEY (`concept_id_2`) REFERENCES `hfH9ioTEzRzswFjESim83C`.`brain_knowledge_concepts` (`concept_id`) ON DELETE CASCADE",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\nbrain_knowledge_relationships\tCREATE TABLE `brain_knowledge_relationships` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `from_concept_id` int(11) NOT NULL,\n  `concept_id_1` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `relationship_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'is_a, part_of, treats, causes, associated_with',\n  `to_concept_id` int(11) NOT NULL,\n  `concept_id_2` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `confidence` float DEFAULT '1' COMMENT 'Confidence score 0-1',\n  `source` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `idx_concept_1` (`concept_id_1`),\n  KEY `idx_concept_2` (`concept_id_2`),\n  KEY `idx_relationship_type` (`relationship_type`),\n  CONSTRAINT `fk_1` FOREIGN KEY (`concept_id_1`) REFERENCES `hfH9ioTEzRzswFjESim83C`.`brain_knowledge_concepts` (`concept_id`) ON DELETE CASCADE,\n  CONSTRAINT `fk_2` FOREIGN KEY (`concept_id_2`) REFERENCES `hfH9ioTEzRzswFjESim83C`.`brain_knowledge_concepts` (`concept_id`) ON DELETE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 1556
+}

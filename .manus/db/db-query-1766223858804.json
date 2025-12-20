@@ -1,0 +1,18 @@
+{
+  "query": "SELECT concept_type, COUNT(*) as count FROM brain_knowledge_concepts GROUP BY concept_type",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT concept_type, COUNT(*) as count FROM brain_knowledge_concepts GROUP BY concept_type",
+  "rows": [
+    {
+      "concept_type": "symptom",
+      "count": "10"
+    },
+    {
+      "concept_type": "disease",
+      "count": "105"
+    }
+  ],
+  "messages": [],
+  "stdout": "concept_type\tcount\nsymptom\t10\ndisease\t105\n",
+  "stderr": "",
+  "execution_time_ms": 1514
+}

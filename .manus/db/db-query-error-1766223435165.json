@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE brain_knowledge_concepts \nADD COLUMN concept_type ENUM('disease', 'symptom', 'treatment', 'investigation', 'risk_factor') NOT NULL DEFAULT 'disease' AFTER id",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE brain_knowledge_concepts \nADD COLUMN concept_type ENUM('disease', 'symptom', 'treatment', 'investigation', 'risk_factor') NOT NULL DEFAULT 'disease' AFTER id",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'id' in 'brain_knowledge_concepts'"
+  ]
+}

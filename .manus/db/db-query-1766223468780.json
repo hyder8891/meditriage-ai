@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE brain_knowledge_concepts \nADD COLUMN name VARCHAR(255),\nADD COLUMN description TEXT,\nADD COLUMN category VARCHAR(100),\nADD COLUMN icd10_code VARCHAR(20),\nADD COLUMN snomed_code VARCHAR(50),\nADD COLUMN prevalence VARCHAR(50),\nADD COLUMN severity ENUM('mild', 'moderate', 'severe', 'critical'),\nADD COLUMN evidence_level VARCHAR(50)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE brain_knowledge_concepts \nADD COLUMN name VARCHAR(255),\nADD COLUMN description TEXT,\nADD COLUMN category VARCHAR(100),\nADD COLUMN icd10_code VARCHAR(20),\nADD COLUMN snomed_code VARCHAR(50),\nADD COLUMN prevalence VARCHAR(50),\nADD COLUMN severity ENUM('mild', 'moderate', 'severe', 'critical'),\nADD COLUMN evidence_level VARCHAR(50)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3888
+}

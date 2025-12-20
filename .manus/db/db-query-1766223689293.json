@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE brain_knowledge_relationships \nMODIFY COLUMN concept_id_1 VARCHAR(255) NOT NULL,\nMODIFY COLUMN concept_id_2 VARCHAR(255) NOT NULL",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE brain_knowledge_relationships \nMODIFY COLUMN concept_id_1 VARCHAR(255) NOT NULL,\nMODIFY COLUMN concept_id_2 VARCHAR(255) NOT NULL",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1714
+}

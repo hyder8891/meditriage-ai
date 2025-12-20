@@ -2399,3 +2399,192 @@ export const criticalDrugInteractions = [
     management: 'Avoid combination. If necessary, use with extreme caution and cardiac monitoring.'
   }
 ];
+
+
+/**
+ * Medical Imaging Interpretation Guidelines
+ * Key radiological findings for common conditions
+ */
+export const imagingGuidelines = [
+  {
+    condition: 'Pneumonia',
+    modality: 'Chest X-ray',
+    keyFindings: [
+      'Lobar consolidation (air-space opacification)',
+      'Air bronchograms (air-filled bronchi visible against consolidated lung)',
+      'Patchy infiltrates (bronchopneumonia pattern)',
+      'Pleural effusion (blunted costophrenic angle)',
+      'Cavitation (suggests necrotizing pneumonia or abscess)'
+    ],
+    differentialImaging: {
+      'Pulmonary edema': 'Bilateral perihilar infiltrates, Kerley B lines, cardiomegaly',
+      'Pulmonary embolism': 'Wedge-shaped opacity (Hampton hump), oligemia (Westermark sign)',
+      'Lung cancer': 'Mass with irregular borders, hilar lymphadenopathy'
+    },
+    advancedImaging: 'CT chest: Better delineation of consolidation, empyema, lung abscess'
+  },
+  {
+    condition: 'Acute Appendicitis',
+    modality: 'CT Abdomen/Pelvis with IV contrast',
+    keyFindings: [
+      'Dilated appendix >6mm diameter',
+      'Appendiceal wall thickening and enhancement',
+      'Periappendiceal fat stranding',
+      'Appendicolith (calcified fecalith)',
+      'Fluid collection (suggests perforation/abscess)',
+      'Free air (indicates perforation)'
+    ],
+    differentialImaging: {
+      'Ovarian torsion': 'Enlarged ovary, twisted pedicle on Doppler ultrasound',
+      'Ectopic pregnancy': 'Adnexal mass, free fluid, no intrauterine pregnancy on ultrasound',
+      'Diverticulitis': 'Colonic wall thickening, pericolic fat stranding'
+    },
+    advancedImaging: 'Ultrasound (first-line in children/pregnancy): Non-compressible appendix >6mm'
+  },
+  {
+    condition: 'Acute Stroke (Ischemic)',
+    modality: 'Non-contrast CT Brain + CT Angiography',
+    keyFindings: [
+      'Hyperdense MCA sign (acute thrombus in middle cerebral artery)',
+      'Loss of gray-white matter differentiation',
+      'Insular ribbon sign (loss of insular cortex definition)',
+      'Sulcal effacement (mass effect from edema)',
+      'Hypodensity in vascular territory (appears 6-24 hours post-stroke)',
+      'CTA: Vessel cut-off or filling defect'
+    ],
+    differentialImaging: {
+      'Hemorrhagic stroke': 'Hyperdense (bright) area on non-contrast CT',
+      'Brain tumor': 'Mass effect, ring enhancement, vasogenic edema',
+      'Seizure (Todd paralysis)': 'Normal CT, transient symptoms'
+    },
+    advancedImaging: 'MRI with DWI: Detects ischemia within minutes (gold standard for early stroke)'
+  },
+  {
+    condition: 'Pulmonary Embolism',
+    modality: 'CT Pulmonary Angiography (CTPA)',
+    keyFindings: [
+      'Filling defect in pulmonary artery (central or peripheral)',
+      'Railway track sign (thrombus outlined by contrast)',
+      'Wedge-shaped peripheral opacity (pulmonary infarction)',
+      'Pleural effusion',
+      'Right heart strain (RV/LV ratio >1)',
+      'Mosaic attenuation (patchy lung perfusion)'
+    ],
+    differentialImaging: {
+      'Pneumonia': 'Consolidation without vascular filling defect',
+      'Aortic dissection': 'Intimal flap in aorta',
+      'Pneumothorax': 'Visceral pleural line, absent lung markings peripherally'
+    },
+    advancedImaging: 'V/Q scan (if contrast contraindicated): Mismatch between ventilation and perfusion'
+  },
+  {
+    condition: 'Acute Myocardial Infarction',
+    modality: 'ECG + Echocardiography',
+    keyFindings: [
+      'ECG: ST-segment elevation (STEMI) or depression (NSTEMI)',
+      'ECG: T-wave inversion, pathological Q waves',
+      'Echo: Regional wall motion abnormality',
+      'Echo: Reduced ejection fraction',
+      'Echo: Complications (mitral regurgitation, VSD, free wall rupture)'
+    ],
+    differentialImaging: {
+      'Pericarditis': 'Diffuse ST elevation, PR depression, pericardial effusion on echo',
+      'Takotsubo cardiomyopathy': 'Apical ballooning on echo, normal coronaries on angiography',
+      'Aortic dissection': 'Widened mediastinum on CXR, intimal flap on CT/echo'
+    },
+    advancedImaging: 'Coronary angiography: Gold standard for identifying culprit lesion and guiding PCI'
+  },
+  {
+    condition: 'Acute Cholecystitis',
+    modality: 'Ultrasound Abdomen',
+    keyFindings: [
+      'Gallbladder wall thickening >3mm',
+      'Pericholecystic fluid',
+      'Gallstones or sludge',
+      'Sonographic Murphy sign (tenderness over gallbladder with probe)',
+      'Distended gallbladder >10cm length or >4cm width',
+      'Hyperemia on Doppler (increased blood flow to gallbladder wall)'
+    ],
+    differentialImaging: {
+      'Choledocholithiasis': 'Dilated common bile duct >6mm, stone in CBD',
+      'Acute pancreatitis': 'Enlarged pancreas, peripancreatic fluid',
+      'Hepatitis': 'Hepatomegaly, periportal edema'
+    },
+    advancedImaging: 'HIDA scan: Non-visualization of gallbladder indicates cystic duct obstruction'
+  },
+  {
+    condition: 'Bowel Obstruction',
+    modality: 'CT Abdomen/Pelvis with IV contrast',
+    keyFindings: [
+      'Dilated bowel loops (small bowel >3cm, large bowel >6cm)',
+      'Transition point (abrupt caliber change)',
+      'Collapsed distal bowel',
+      'Air-fluid levels on upright X-ray',
+      'Closed-loop obstruction (C-shaped or U-shaped dilated loop)',
+      'Pneumatosis intestinalis (air in bowel wall - ischemia)',
+      'Free air (perforation)'
+    ],
+    differentialImaging: {
+      'Ileus': 'Diffuse bowel dilatation without transition point',
+      'Volvulus': 'Whirl sign (twisted mesentery), coffee bean sign (sigmoid volvulus)',
+      'Intussusception': 'Target sign, crescent sign'
+    },
+    advancedImaging: 'MR enterography (Crohn disease): Bowel wall thickening, fistulas, abscesses'
+  },
+  {
+    condition: 'Fractures (Long Bone)',
+    modality: 'X-ray (2 views minimum)',
+    keyFindings: [
+      'Cortical disruption (break in bone cortex)',
+      'Fracture line (lucent line through bone)',
+      'Displacement (angulation, rotation, shortening)',
+      'Comminution (multiple fragments)',
+      'Soft tissue swelling',
+      'Joint effusion (fat-fluid level in lipohemarthrosis)'
+    ],
+    differentialImaging: {
+      'Stress fracture': 'Subtle cortical irregularity, periosteal reaction (may be X-ray negative initially)',
+      'Bone tumor': 'Lytic or sclerotic lesion, pathological fracture through tumor',
+      'Osteomyelitis': 'Bone destruction, periosteal reaction, soft tissue abscess'
+    },
+    advancedImaging: 'CT: Better for complex fractures (pelvis, spine, intra-articular). MRI: Occult fractures, bone marrow edema'
+  },
+  {
+    condition: 'Urinary Tract Infection (Pyelonephritis)',
+    modality: 'CT Abdomen/Pelvis with IV contrast',
+    keyFindings: [
+      'Renal enlargement',
+      'Striated nephrogram (alternating areas of enhancement)',
+      'Perinephric fat stranding',
+      'Renal abscess (low-density fluid collection)',
+      'Emphysematous pyelonephritis (gas in renal parenchyma - diabetics)',
+      'Hydronephrosis (if obstructive component)'
+    ],
+    differentialImaging: {
+      'Renal calculi': 'Hyperdense stone, hydronephrosis, perinephric stranding',
+      'Renal infarction': 'Wedge-shaped perfusion defect',
+      'Renal cell carcinoma': 'Heterogeneous enhancing mass'
+    },
+    advancedImaging: 'Ultrasound (first-line): Hydronephrosis, abscess, renal size. Non-contrast CT: Best for stones'
+  },
+  {
+    condition: 'Congestive Heart Failure',
+    modality: 'Chest X-ray + Echocardiography',
+    keyFindings: [
+      'CXR: Cardiomegaly (cardiothoracic ratio >0.5)',
+      'CXR: Pulmonary venous congestion (cephalization)',
+      'CXR: Interstitial edema (Kerley B lines)',
+      'CXR: Alveolar edema (bat-wing or perihilar infiltrates)',
+      'CXR: Pleural effusions (bilateral)',
+      'Echo: Reduced ejection fraction (<40% systolic dysfunction)',
+      'Echo: Diastolic dysfunction (impaired relaxation)',
+      'Echo: Valvular abnormalities (regurgitation, stenosis)'
+    ],
+    differentialImaging: {
+      'Pneumonia': 'Focal consolidation, air bronchograms',
+      'ARDS': 'Bilateral infiltrates, normal heart size',
+      'Pulmonary fibrosis': 'Reticular opacities, honeycombing, reduced lung volumes'
+    },
+    advancedImaging: 'Cardiac MRI: Tissue characterization (scar, fibrosis), viability assessment'
+  }
+];
