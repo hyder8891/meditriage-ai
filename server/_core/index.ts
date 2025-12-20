@@ -92,11 +92,15 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
+  server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
     
     // Initialize automated batch processing scheduler
     initializeBatchScheduler();
+    
+    // Initialize AEC alert system (daily reports at 8 AM and 8 PM)
+    const { initializeAlertSystem } = await import("../aec/alerts/index.js");
+    initializeAlertSystem();
   });
 }
 

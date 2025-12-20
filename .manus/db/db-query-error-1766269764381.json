@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE aec_detected_errors ADD COLUMN last_occurrence timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER first_occurrence;\nALTER TABLE aec_detected_errors ADD COLUMN occurrence_count int NOT NULL DEFAULT 1 AFTER last_occurrence;\nALTER TABLE aec_detected_errors ADD COLUMN resolved_at timestamp NULL AFTER status;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE aec_detected_errors ADD COLUMN last_occurrence timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER first_occurrence;\nALTER TABLE aec_detected_errors ADD COLUMN occurrence_count int NOT NULL DEFAULT 1 AFTER last_occurrence;\nALTER TABLE aec_detected_errors ADD COLUMN resolved_at timestamp NULL AFTER status;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1060 (42S21) at line 3: Duplicate column name 'resolved_at'"
+  ]
+}

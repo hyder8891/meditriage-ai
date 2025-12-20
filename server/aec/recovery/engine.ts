@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { runAllTests, runSmokeTests } from "./test-runner";
 import { deployPatch, rollbackDeployment, performHealthCheck, shouldAutoDeployPatch } from "./deployment-manager";
 import { updatePatchValidation, updatePatchDeployment } from "../surgical/engine";
+import { sendDeploymentSuccessAlert, sendDeploymentFailedAlert, sendRollbackAlert, sendHealthCheckFailedAlert } from "../alerts/notification-service";
 
 export interface RecoveryResult {
   success: boolean;
@@ -138,6 +139,10 @@ export async function runRecoveryProcedure(
         result.deployed = true;
 
         await updatePatchDeployment(patchId, "deployed");
+        
+        // Send deployment success alert
+        console.log(`[AEC Alerts] Sending deployment success alert for patch ${patchId}`);
+        await sendDeploymentSuccessAlert(patchId);
 
         // Update error status to resolved
         await db
@@ -163,6 +168,10 @@ export async function runRecoveryProcedure(
           } else {
             console.log(`[AEC Recovery Engine] ❌ Health check failed, rolling back...`);
             result.errors.push("Post-deployment health check failed");
+            
+            // Send health check failed alert
+            console.log(`[AEC Alerts] Sending health check failed alert`);
+            await sendHealthCheckFailedAlert({ healthy: healthCheck.healthy });
 
             // Rollback
             const rollbackResult = await rollbackDeployment();
@@ -170,6 +179,10 @@ export async function runRecoveryProcedure(
             if (rollbackResult.success) {
               console.log(`[AEC Recovery Engine] ✅ Rollback successful`);
               await updatePatchDeployment(patchId, "rolled_back", "Health check failed");
+              
+              // Send rollback alert
+              console.log(`[AEC Alerts] Sending rollback alert for patch ${patchId}`);
+              await sendRollbackAlert(patchId, "Health check failed after deployment");
             } else {
               console.log(`[AEC Recovery Engine] ❌ Rollback failed`);
               result.errors.push("Rollback failed");
@@ -187,6 +200,10 @@ export async function runRecoveryProcedure(
         result.errors.push(...deploymentResult.errors);
 
         await updatePatchDeployment(patchId, "rejected", "Deployment failed");
+        
+        // Send deployment failed alert
+        console.log(`[AEC Alerts] Sending deployment failed alert for patch ${patchId}`);
+        await sendDeploymentFailedAlert(patchId, deploymentResult.errors.join(", "));
       }
     } else {
       console.log(`[AEC Recovery Engine] Patch ready but not deployed (autoDeploy=false or blocked)`);
@@ -235,6 +252,11 @@ export async function manuallyRollbackPatch(patchId: number): Promise<boolean> {
     if (rollbackResult.success) {
       await updatePatchDeployment(patchId, "rolled_back", "Manual rollback");
       console.log(`[AEC Recovery Engine] ✅ Manual rollback successful`);
+      
+      // Send rollback alert
+      console.log(`[AEC Alerts] Sending rollback alert for patch ${patchId}`);
+      await sendRollbackAlert(patchId, "Manual rollback requested");
+      
       return true;
     } else {
       console.log(`[AEC Recovery Engine] ❌ Manual rollback failed`);

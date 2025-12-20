@@ -5,6 +5,10 @@
 
 import { runDiagnostic } from "./engine";
 import { runSurgicalProcedure } from "../surgical/engine";
+import { sendCriticalErrorAlert, sendManualReviewAlert, sendPatchGeneratedAlert } from "../alerts/notification-service";
+import { getDb } from "../../db";
+import { aecDetectedErrors, aecDiagnostics } from "../../../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * Trigger diagnostic for an error
@@ -12,6 +16,21 @@ import { runSurgicalProcedure } from "../surgical/engine";
  */
 export async function triggerDiagnostic(errorId: number): Promise<void> {
   console.log(`[AEC Diagnostic] Diagnostic triggered for error ${errorId}`);
+  
+  // Send critical error alert if severity is critical or high
+  const db = await getDb();
+  if (db) {
+    const [error] = await db
+      .select()
+      .from(aecDetectedErrors)
+      .where(eq(aecDetectedErrors.id, errorId))
+      .limit(1);
+    
+    if (error && (error.severity === "critical" || error.severity === "high")) {
+      console.log(`[AEC Alerts] Sending critical error alert for error ${errorId}`);
+      await sendCriticalErrorAlert(errorId);
+    }
+  }
   
   // Run diagnostic asynchronously (don't block)
   runDiagnostic(errorId)
@@ -33,6 +52,21 @@ export async function triggerDiagnostic(errorId: number): Promise<void> {
           console.log(`[AEC Diagnostic] ✅ Surgical procedure complete`);
           console.log(`[AEC Diagnostic] Patch ID: ${surgicalResult.patchId}`);
           console.log(`[AEC Diagnostic] Files to modify: ${surgicalResult.filesModified.length}`);
+          
+          // Send patch generated alert
+          console.log(`[AEC Alerts] Sending patch generated alert for patch ${surgicalResult.patchId}`);
+          await sendPatchGeneratedAlert(surgicalResult.patchId!);
+          
+          // Check if manual review is required
+          const [diagnostic] = await db!.select().from(aecDiagnostics).where(eq(aecDiagnostics.errorId, errorId)).limit(1);
+          const requiresManualReview = 
+            diagnostic?.impact === "high" ||
+            diagnostic?.affectedFeatures?.some(f => f.toLowerCase().includes("medical") || f.toLowerCase().includes("triage") || f.toLowerCase().includes("diagnosis"));
+          
+          if (requiresManualReview) {
+            console.log(`[AEC Alerts] Sending manual review alert for patch ${surgicalResult.patchId}`);
+            await sendManualReviewAlert(surgicalResult.patchId!);
+          }
           
           if (surgicalResult.warnings.length > 0) {
             console.log(`[AEC Diagnostic] ⚠️  Warnings:`);
