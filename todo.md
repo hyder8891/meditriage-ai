@@ -316,3 +316,6 @@
 - [x] Optimize logo rendering with proper CSS
 - [x] Ensure crisp display at all sizes
 - [x] Add proper image rendering attributes
+
+## UI Spacing Improvements
+- [x] Improve spacing on tab switcher buttons

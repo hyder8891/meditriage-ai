@@ -185,10 +185,10 @@ export default function Home() {
               </p>
 
               {/* Tab Switcher */}
-              <div className="flex gap-2 p-1 bg-slate-100 rounded-lg w-fit">
+              <div className="flex gap-3 p-1.5 bg-slate-100 rounded-lg w-fit">
                 <button
                   onClick={() => setActiveTab('patient')}
-                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                  className={`px-8 py-3.5 rounded-md font-medium transition-all ${
                     activeTab === 'patient'
                       ? 'bg-white text-slate-900 shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
@@ -199,7 +199,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setActiveTab('doctor')}
-                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                  className={`px-8 py-3.5 rounded-md font-medium transition-all ${
                     activeTab === 'doctor'
                       ? 'bg-white text-slate-900 shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
