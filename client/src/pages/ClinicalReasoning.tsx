@@ -83,15 +83,40 @@ function ClinicalReasoningContent() {
   });
 
   const handleGenerate = async () => {
+    console.log('[ClinicalReasoning] handleGenerate called');
+    console.log('[ClinicalReasoning] useAudioInput:', useAudioInput);
+    console.log('[ClinicalReasoning] audioBlob:', audioBlob);
+    
     // Audio input mode - process audio first
     if (useAudioInput && audioBlob) {
+      console.log('[ClinicalReasoning] Processing audio input...');
+      console.log('[ClinicalReasoning] Audio blob size:', audioBlob.size, 'bytes');
+      console.log('[ClinicalReasoning] Audio blob type:', audioBlob.type);
+      
       try {
         // Convert blob to base64
         const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
-        reader.onloadend = async () => {
+        
+        reader.onerror = (error) => {
+          console.error('[ClinicalReasoning] FileReader error:', error);
+          toast.error("Failed to read audio file");
+        };
+        
+        reader.onloadend = () => {
+          console.log('[ClinicalReasoning] FileReader onloadend triggered');
+          
+          if (!reader.result) {
+            console.error('[ClinicalReasoning] FileReader result is null');
+            toast.error("Failed to read audio file");
+            return;
+          }
+          
           const base64Audio = (reader.result as string).split(',')[1];
           const mimeType = audioBlob.type;
+          
+          console.log('[ClinicalReasoning] Base64 audio length:', base64Audio.length);
+          console.log('[ClinicalReasoning] MIME type:', mimeType);
+          console.log('[ClinicalReasoning] Calling audioAnalysisMutation...');
 
           // Call audio analysis via tRPC
           audioAnalysisMutation.mutate({
@@ -100,9 +125,13 @@ function ClinicalReasoningContent() {
             language: 'ar'
           });
         };
+        
+        console.log('[ClinicalReasoning] Starting FileReader.readAsDataURL...');
+        reader.readAsDataURL(audioBlob);
+        
       } catch (error) {
-        toast.error("Audio processing failed");
-        console.error(error);
+        console.error('[ClinicalReasoning] Error processing audio:', error);
+        toast.error("Audio processing failed: " + (error instanceof Error ? error.message : 'Unknown error'));
       }
       return;
     }

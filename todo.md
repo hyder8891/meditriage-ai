@@ -1382,3 +1382,11 @@
 - [x] Whisper "prompt" is for context/spelling hints, NOT instructions
 - [x] Now using "language" parameter instead for language hint
 - [ ] User needs to test Whisper transcription with Arabic and English audio
+
+## Clinical Reasoning Audio Flow Not Working
+- [x] Audio upload succeeds (clinical.uploadAudioFile - 200 OK)
+- [x] Transcription succeeds (clinical.transcribeAudio - 200 OK)
+- [x] Added comprehensive logging to handleGenerate function
+- [x] Added error handling for FileReader
+- [x] Added logging for audioAnalysisMutation call
+- [ ] User needs to test again and check console logs to see where it fails
