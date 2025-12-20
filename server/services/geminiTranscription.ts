@@ -89,14 +89,20 @@ export async function transcribeAudioWithGemini(
     // Step 2: Prepare transcription prompt
     const languageName = options.language ? getLanguageName(options.language) : 'Arabic or English';
     const transcriptionPrompt = options.prompt || 
-      `Transcribe this audio recording to text. The speaker is speaking ${languageName}. 
+      `You are a medical transcription AI. Listen carefully to this audio recording and transcribe EXACTLY what you hear.
       
-      Instructions:
-      - Transcribe exactly what is said
-      - Preserve the original language (Arabic or English)
-      - Include all medical terms and symptoms mentioned
-      - Do not add explanations or interpretations
-      - Return ONLY the transcribed text, nothing else
+      Language: ${languageName}
+      
+      CRITICAL RULES:
+      1. Transcribe ONLY the actual spoken words - nothing more, nothing less
+      2. If the audio is unclear or silent, respond with: "[Audio unclear or silent]"
+      3. Do NOT repeat words unless they were actually repeated in the audio
+      4. Do NOT add greetings, pleasantries, or filler words that weren't spoken
+      5. Do NOT hallucinate or make up content
+      6. Preserve the exact language spoken (Arabic or English)
+      7. Include medical terms exactly as spoken
+      
+      Return ONLY the transcribed text with no additional commentary.
       
       Transcription:`;
 
@@ -109,13 +115,19 @@ export async function transcribeAudioWithGemini(
       transcriptionPrompt,
       {
         temperature: 0.1, // Low temperature for accurate transcription
-        systemInstruction: `You are a medical transcription assistant. Your ONLY job is to transcribe audio to text accurately. 
-        Do not provide medical advice, analysis, or interpretation. 
-        Just transcribe what you hear word-for-word.
+        systemInstruction: `You are a professional medical transcription assistant with these strict rules:
         
-        If the audio is in Arabic, transcribe in Arabic.
-        If the audio is in English, transcribe in English.
-        If you cannot understand the audio, respond with: "Unable to transcribe audio clearly"`,
+        PRIMARY RULE: Transcribe ONLY what you actually hear in the audio. Do not make up, repeat, or hallucinate content.
+        
+        - If you hear clear speech: transcribe it exactly word-for-word
+        - If audio is unclear/muffled: transcribe what you can hear and mark unclear parts with [unclear]
+        - If audio is silent or contains no speech: respond with "[No speech detected]"
+        - Do NOT add greetings, filler words, or repetitive content that wasn't spoken
+        - Do NOT provide medical analysis, advice, or interpretation
+        - Preserve the original language (Arabic or English)
+        - Medical terms should be transcribed exactly as spoken
+        
+        Your output should be ONLY the transcribed text, nothing else.`,
       }
     );
 

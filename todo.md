@@ -1365,3 +1365,12 @@
 - [ ] Test audio recording in Clinical Reasoning with real microphone
 - [ ] Test audio recording in Patient Symptom Checker with real microphone
 - [ ] Verify transcription returns actual spoken words, not placeholder text
+
+## CRITICAL: Audio Issues After Gemini Switch
+- [x] LiveScribe: Improved Gemini transcription prompt with strict anti-hallucination rules
+- [x] Clinical Reasoning: Fixed to use tRPC audioAnalysisMutation instead of fetch()
+- [x] Added PRIMARY RULE to system instruction: transcribe ONLY what is heard
+- [x] Added rules to prevent repetitive content and hallucinations
+- [x] Fixed Clinical Reasoning to properly extract symptoms from audio analysis
+- [ ] User needs to test LiveScribe again to verify transcription accuracy
+- [ ] User needs to test Clinical Reasoning audio → diagnosis flow

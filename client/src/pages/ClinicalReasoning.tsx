@@ -52,6 +52,36 @@ function ClinicalReasoningContent() {
     },
   });
 
+  const audioAnalysisMutation = trpc.audioSymptom.analyzeAudioSymptoms.useMutation({
+    onSuccess: (data) => {
+      if (data.analysis) {
+        // Extract symptoms from analysis
+        const symptomList = data.analysis.symptoms || [];
+        setSymptoms(symptomList.join(", "));
+        
+        // Continue with diagnosis using extracted symptoms
+        generateDiagnosisMutation.mutate({
+          caseId: 1,
+          chiefComplaint: chiefComplaint || data.analysis.urgencyReason || "Patient complaint (from audio)",
+          symptoms: symptomList,
+          vitals: {
+            bloodPressure,
+            heartRate: heartRate ? parseInt(heartRate) : undefined,
+            temperature,
+            oxygenSaturation: oxygenSaturation ? parseInt(oxygenSaturation) : undefined,
+          },
+          patientAge: patientAge ? parseInt(patientAge) : undefined,
+          patientGender,
+        });
+        
+        toast.success("Audio analyzed successfully");
+      }
+    },
+    onError: (error) => {
+      toast.error("Audio analysis failed: " + error.message);
+    },
+  });
+
   const handleGenerate = async () => {
     // Audio input mode - process audio first
     if (useAudioInput && audioBlob) {
@@ -63,39 +93,12 @@ function ClinicalReasoningContent() {
           const base64Audio = (reader.result as string).split(',')[1];
           const mimeType = audioBlob.type;
 
-          // Call audio analysis endpoint to get symptoms text
-          const result = await fetch('/api/trpc/audioSymptom.analyzeAudioSymptoms', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              audioBase64: base64Audio,
-              mimeType,
-              language: 'ar'
-            })
+          // Call audio analysis via tRPC
+          audioAnalysisMutation.mutate({
+            audioBase64: base64Audio,
+            mimeType,
+            language: 'ar'
           });
-
-          const data = await result.json();
-          if (data.result?.data?.transcription) {
-            // Use transcribed symptoms
-            const transcribedSymptoms = data.result.data.transcription;
-            setSymptoms(transcribedSymptoms);
-            
-            // Continue with diagnosis
-            const symptomList = transcribedSymptoms.split(",").map((s: string) => s.trim()).filter((s: string) => s);
-            generateDiagnosisMutation.mutate({
-              caseId: 1,
-              chiefComplaint: chiefComplaint || "Patient complaint (from audio)",
-              symptoms: symptomList,
-              vitals: {
-                bloodPressure,
-                heartRate: heartRate ? parseInt(heartRate) : undefined,
-                temperature,
-                oxygenSaturation: oxygenSaturation ? parseInt(oxygenSaturation) : undefined,
-              },
-              patientAge: patientAge ? parseInt(patientAge) : undefined,
-              patientGender,
-            });
-          }
         };
       } catch (error) {
         toast.error("Audio processing failed");
