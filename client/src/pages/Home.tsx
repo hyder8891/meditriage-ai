@@ -194,7 +194,7 @@ export default function Home() {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Users className="w-4 h-4 inline mr-2" />
+                  <Users className="w-4 h-4 inline mr-3" />
                   {language === 'ar' ? 'للمرضى' : 'For Patients'}
                 </button>
                 <button
@@ -205,7 +205,7 @@ export default function Home() {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Stethoscope className="w-4 h-4 inline mr-2" />
+                  <Stethoscope className="w-4 h-4 inline mr-3" />
                   {language === 'ar' ? 'للأطباء' : 'For Doctors'}
                 </button>
               </div>

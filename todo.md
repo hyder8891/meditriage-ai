@@ -319,3 +319,4 @@
 
 ## UI Spacing Improvements
 - [x] Improve spacing on tab switcher buttons
+- [x] Fix spacing between icons and text in tab buttons
