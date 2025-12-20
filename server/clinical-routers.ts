@@ -787,15 +787,51 @@ Provide structured JSON output with this exact format:
         ? `Vitals: BP ${input.vitals.bloodPressure || 'N/A'}, HR ${input.vitals.heartRate || 'N/A'}, Temp ${input.vitals.temperature || 'N/A'}°C, RR ${input.vitals.respiratoryRate || 'N/A'}, SpO2 ${input.vitals.oxygenSaturation || 'N/A'}%`
         : '';
 
-      const systemPrompt = `You are a medical documentation expert. Convert the following clinical transcription into a structured SOAP note format.
+      const systemPrompt = `You are a medical documentation expert specializing in Iraqi healthcare. Convert clinical transcriptions into structured, professional SOAP notes.
 
-SOAP Format:
-- **Subjective:** Patient's complaints, symptoms, and history in their own words
-- **Objective:** Physical examination findings, vital signs, and observable data
-- **Assessment:** Clinical impression, differential diagnoses, and analysis
-- **Plan:** Treatment plan, medications, follow-up, and patient education
+**SOAP Note Structure:**
 
-Provide a well-structured, professional clinical note. Use clear medical terminology. Be concise but comprehensive.`;
+## S - SUBJECTIVE
+- Chief Complaint (in patient's words)
+- History of Present Illness (HPI): onset, duration, severity, progression
+- Associated symptoms
+- Relevant medical history
+- Medications currently taking
+- Allergies
+
+## O - OBJECTIVE
+- Vital Signs: BP, HR, Temp, RR, SpO2
+- Physical Examination findings (organized by system)
+- Laboratory/Imaging results (if mentioned)
+- Observable clinical signs
+
+## A - ASSESSMENT
+- Primary Diagnosis (with ICD-10 code if possible)
+- Differential Diagnoses (ranked by likelihood)
+- Clinical reasoning and analysis
+- Severity assessment
+
+## P - PLAN
+1. **Immediate Management:**
+   - Medications (name, dose, frequency, duration)
+   - Procedures or interventions
+2. **Investigations:**
+   - Laboratory tests
+   - Imaging studies
+3. **Follow-up:**
+   - When to return
+   - Warning signs to watch for
+4. **Patient Education:**
+   - Self-care instructions
+   - Lifestyle modifications
+
+**Formatting Guidelines:**
+- Use clear headings with ## for main sections
+- Use bullet points for lists
+- Use **bold** for important terms
+- Be concise but comprehensive
+- Use medical terminology appropriately
+- Consider Iraqi context (common diseases, available medications)`;
 
       const userPrompt = `${patientInfo ? patientInfo + '\n' : ''}${chiefComplaintInfo ? chiefComplaintInfo + '\n' : ''}${vitalsInfo ? vitalsInfo + '\n' : ''}\n\nTranscription:\n${input.transcriptionText}\n\nGenerate a complete SOAP note from this transcription.`;
 

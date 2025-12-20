@@ -1418,3 +1418,19 @@
 - [x] Fixed: Use Drizzle ORM instead of raw SQL (proper column name mapping)
 - [x] Fixed: Import brainMedicalLiterature, eq, and, desc from Drizzle
 - [x] Now using cacheKey = `pubmed:${queryHash}` (32 chars) instead of full query
+
+## Generate Differential Diagnosis Not Working After Audio
+- [x] Audio extraction works and populates all fields
+- [x] Fixed: After audio analysis, switch to text mode (setUseAudioInput(false))
+- [x] Fixed: Clear audioBlob so handleGenerate doesn't re-analyze
+- [x] Now clicking "Generate Differential Diagnosis" works correctly after audio
+- [x] User flow: record audio → fields populate → click Generate → diagnosis appears
+
+## SOAP Notes Structure Needs Refinement
+- [x] Enhanced SOAP note system prompt with detailed structure
+- [x] Added clear sections: S (Subjective), O (Objective), A (Assessment), P (Plan)
+- [x] Each section has detailed subsections with bullet points
+- [x] Added formatting guidelines (headings, bold, bullets)
+- [x] Added Iraqi healthcare context (common diseases, available medications)
+- [x] Improved Plan section with: Immediate Management, Investigations, Follow-up, Patient Education
+- [ ] User needs to test: generate SOAP note and verify improved structure

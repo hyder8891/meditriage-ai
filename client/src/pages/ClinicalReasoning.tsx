@@ -71,6 +71,10 @@ function ClinicalReasoningContent() {
         if (data.analysis.temperature) setTemperature(data.analysis.temperature);
         if (data.analysis.oxygenSaturation) setOxygenSaturation(data.analysis.oxygenSaturation);
         
+        // Switch to text mode and clear audio blob so Generate button works
+        setUseAudioInput(false);
+        setAudioBlob(null);
+        
         toast.success("Audio analyzed - all fields populated! Click Generate to continue.");
       }
     },
