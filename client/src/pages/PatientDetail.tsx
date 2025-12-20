@@ -27,17 +27,14 @@ export default function PatientDetail() {
   const { language } = useLanguage();
   const isArabic = language === 'ar';
 
-  // Fetch patient profile
-  const { data: patient, isLoading } = trpc.b2b2c.getPatientProfile.useQuery(
+  // Fetch patient profile (includes cases, vitals, and prescriptions)
+  const { data: patientData, isLoading } = trpc.b2b2c.doctor.getPatientProfile.useQuery(
     { patientId: parseInt(id || "0") },
     { enabled: !!id }
   );
 
-  // Fetch patient's medical history (cases)
-  const { data: cases } = trpc.clinical.getCasesByPatient.useQuery(
-    { patientId: parseInt(id || "0") },
-    { enabled: !!id }
-  );
+  const patient = patientData?.patient;
+  const cases = patientData?.cases || [];
 
   if (isLoading) {
     return (

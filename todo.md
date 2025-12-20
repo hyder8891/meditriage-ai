@@ -252,3 +252,12 @@
 - [x] Create hypothetical doctor profiles (5 different specialties)
 - [x] Create seed script to populate database
 - [x] Execute seed script and verify data
+
+## Bug Fixes
+- [x] Fix tRPC procedure error: clinical.getCasesByPatient not found
+- [x] Fix tRPC procedure error: b2b2c.getPatientProfile not found
+
+## Profile Enhancements
+- [ ] Update seed script with complete doctor profiles (bio, education, experience, languages)
+- [ ] Update seed script with complete patient profiles (demographics, medical history, contact info)
+- [ ] Add profile photos/avatars for seeded users
