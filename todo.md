@@ -238,3 +238,11 @@
   - [x] Test doctor profile links (Connect Now goes to /patient/find-doctor)
   - [x] Test pricing plan buttons (all functional)
   - [x] Fix routing for all pages
+
+## Visual Content Updates
+- [ ] Replace doctor images with Middle Eastern doctor photos
+  - [x] Search and download from Vecteezy
+  - [x] Update homepage featured doctors section
+  - [x] Update FindDoctor page doctor cards (uses User icon, no images needed)
+  - [ ] Update any other pages showing doctor images
+  - [ ] Ensure diversity in gender and specialties
