@@ -1006,6 +1006,36 @@ export const symptomDiseaseMappings: SymptomDiseaseMapping[] = [
         probability: 'common',
         associatedSymptoms: ['palpitations', 'trembling', 'fear of dying', 'hyperventilation'],
         distinguishingFeatures: ['Sudden onset', 'Peak within 10 minutes', 'Associated anxiety']
+      },
+      {
+        disease: 'Pericarditis',
+        probability: 'uncommon',
+        associatedSymptoms: ['pleuritic chest pain', 'fever', 'pericardial friction rub'],
+        distinguishingFeatures: ['Sharp pain', 'Better sitting forward', 'Worse lying flat', 'ECG: diffuse ST elevation']
+      },
+      {
+        disease: 'Pneumothorax',
+        probability: 'uncommon',
+        associatedSymptoms: ['sudden dyspnea', 'tachycardia'],
+        distinguishingFeatures: ['Sudden onset', 'Decreased breath sounds', 'Hyperresonance', 'Tall thin males']
+      },
+      {
+        disease: 'Esophageal Spasm',
+        probability: 'uncommon',
+        associatedSymptoms: ['dysphagia', 'regurgitation'],
+        distinguishingFeatures: ['Squeezing pain', 'Can mimic MI', 'Relieved by nitroglycerin', 'Manometry diagnostic']
+      },
+      {
+        disease: 'Herpes Zoster (Shingles)',
+        probability: 'uncommon',
+        associatedSymptoms: ['dermatomal rash', 'vesicles', 'burning pain'],
+        distinguishingFeatures: ['Unilateral', 'Dermatomal distribution', 'Precedes rash by 1-5 days']
+      },
+      {
+        disease: 'Myocarditis',
+        probability: 'rare',
+        associatedSymptoms: ['dyspnea', 'fatigue', 'palpitations', 'recent viral illness'],
+        distinguishingFeatures: ['Recent infection', 'Elevated troponin', 'ECG changes', 'Young patients']
       }
     ]
   },
@@ -1178,6 +1208,397 @@ export const symptomDiseaseMappings: SymptomDiseaseMapping[] = [
         distinguishingFeatures: ['Exertional dyspnea', 'Pallor', 'Low hemoglobin']
       }
     ]
+  },
+  {
+    symptom: 'Fatigue',
+    possibleDiseases: [
+      {
+        disease: 'Anemia',
+        probability: 'very_common',
+        associatedSymptoms: ['pallor', 'dyspnea on exertion', 'tachycardia', 'dizziness'],
+        distinguishingFeatures: ['Low hemoglobin', 'Pale conjunctiva', 'Koilonychia if iron deficiency']
+      },
+      {
+        disease: 'Hypothyroidism',
+        probability: 'common',
+        associatedSymptoms: ['weight gain', 'cold intolerance', 'constipation', 'dry skin'],
+        distinguishingFeatures: ['Elevated TSH', 'Low T4', 'Delayed reflexes', 'Bradycardia']
+      },
+      {
+        disease: 'Depression',
+        probability: 'common',
+        associatedSymptoms: ['anhedonia', 'sleep disturbance', 'appetite change', 'poor concentration'],
+        distinguishingFeatures: ['PHQ-9 score', 'Duration >2 weeks', 'Functional impairment']
+      },
+      {
+        disease: 'Chronic Kidney Disease',
+        probability: 'common',
+        associatedSymptoms: ['nausea', 'edema', 'uremia', 'pruritus'],
+        distinguishingFeatures: ['Elevated creatinine', 'Low eGFR', 'Proteinuria']
+      },
+      {
+        disease: 'Diabetes Mellitus',
+        probability: 'common',
+        associatedSymptoms: ['polyuria', 'polydipsia', 'weight loss', 'blurred vision'],
+        distinguishingFeatures: ['Elevated glucose', 'HbA1c ≥6.5%', 'Glycosuria']
+      },
+      {
+        disease: 'Chronic Fatigue Syndrome',
+        probability: 'uncommon',
+        associatedSymptoms: ['post-exertional malaise', 'unrefreshing sleep', 'cognitive dysfunction'],
+        distinguishingFeatures: ['Duration >6 months', 'Diagnosis of exclusion']
+      },
+      {
+        disease: 'Obstructive Sleep Apnea',
+        probability: 'common',
+        associatedSymptoms: ['snoring', 'daytime sleepiness', 'morning headache', 'obesity'],
+        distinguishingFeatures: ['Epworth score >10', 'Witnessed apneas', 'Polysomnography']
+      },
+      {
+        disease: 'Vitamin D Deficiency',
+        probability: 'very_common',
+        associatedSymptoms: ['muscle weakness', 'bone pain', 'mood changes'],
+        distinguishingFeatures: ['25-OH vitamin D <20 ng/mL', 'Common in Middle East despite sun']
+      },
+      {
+        disease: 'Liver Cirrhosis',
+        probability: 'uncommon',
+        associatedSymptoms: ['jaundice', 'ascites', 'spider nevi', 'easy bruising'],
+        distinguishingFeatures: ['Elevated liver enzymes', 'Low albumin', 'Prolonged PT/INR']
+      },
+      {
+        disease: 'Tuberculosis',
+        probability: 'uncommon',
+        associatedSymptoms: ['chronic cough', 'night sweats', 'weight loss', 'fever'],
+        distinguishingFeatures: ['Positive sputum AFB', 'Cavitary lesions on CXR']
+      },
+      {
+        disease: 'Malignancy',
+        probability: 'uncommon',
+        associatedSymptoms: ['weight loss', 'night sweats', 'lymphadenopathy'],
+        distinguishingFeatures: ['Constitutional symptoms', 'Age >50', 'Red flag features']
+      },
+      {
+        disease: 'Heart Failure',
+        probability: 'common',
+        associatedSymptoms: ['dyspnea', 'orthopnea', 'edema', 'PND'],
+        distinguishingFeatures: ['Elevated BNP', 'Reduced ejection fraction', 'Crackles']
+      }
+    ]
+  },
+  {
+    symptom: 'Dizziness/Vertigo',
+    possibleDiseases: [
+      {
+        disease: 'Benign Paroxysmal Positional Vertigo (BPPV)',
+        probability: 'very_common',
+        associatedSymptoms: ['nystagmus', 'nausea'],
+        distinguishingFeatures: ['Triggered by head movement', 'Dix-Hallpike positive', 'Episodes <1 minute']
+      },
+      {
+        disease: 'Vestibular Neuritis',
+        probability: 'common',
+        associatedSymptoms: ['nausea', 'vomiting', 'imbalance'],
+        distinguishingFeatures: ['Sudden onset', 'Continuous vertigo', 'No hearing loss', 'Viral prodrome']
+      },
+      {
+        disease: 'Meniere\'s Disease',
+        probability: 'uncommon',
+        associatedSymptoms: ['tinnitus', 'hearing loss', 'aural fullness'],
+        distinguishingFeatures: ['Episodic vertigo >20 min', 'Fluctuating hearing loss', 'Low-frequency']
+      },
+      {
+        disease: 'Orthostatic Hypotension',
+        probability: 'common',
+        associatedSymptoms: ['lightheadedness on standing', 'syncope', 'blurred vision'],
+        distinguishingFeatures: ['BP drop >20/10 mmHg on standing', 'Elderly', 'Medications']
+      },
+      {
+        disease: 'Anemia',
+        probability: 'common',
+        associatedSymptoms: ['fatigue', 'pallor', 'dyspnea'],
+        distinguishingFeatures: ['Low hemoglobin', 'Pale conjunctiva']
+      },
+      {
+        disease: 'Hypoglycemia',
+        probability: 'common',
+        associatedSymptoms: ['sweating', 'tremor', 'palpitations', 'confusion'],
+        distinguishingFeatures: ['Blood glucose <70 mg/dL', 'Diabetic on insulin/sulfonylurea']
+      },
+      {
+        disease: 'Stroke/TIA',
+        probability: 'uncommon',
+        associatedSymptoms: ['focal neurological deficit', 'headache', 'ataxia'],
+        distinguishingFeatures: ['FAST positive', 'Sudden onset', 'Risk factors (HTN, AF, DM)']
+      },
+      {
+        disease: 'Cardiac Arrhythmia',
+        probability: 'uncommon',
+        associatedSymptoms: ['palpitations', 'chest discomfort', 'syncope'],
+        distinguishingFeatures: ['Irregular pulse', 'ECG abnormalities', 'Structural heart disease']
+      },
+      {
+        disease: 'Anxiety/Panic Disorder',
+        probability: 'common',
+        associatedSymptoms: ['palpitations', 'trembling', 'fear', 'hyperventilation'],
+        distinguishingFeatures: ['Episodic', 'Triggers', 'Normal physical exam']
+      },
+      {
+        disease: 'Medication Side Effect',
+        probability: 'common',
+        associatedSymptoms: ['varies by drug'],
+        distinguishingFeatures: ['Recent medication change', 'Antihypertensives, sedatives common']
+      },
+      {
+        disease: 'Acoustic Neuroma',
+        probability: 'rare',
+        associatedSymptoms: ['unilateral hearing loss', 'tinnitus', 'facial numbness'],
+        distinguishingFeatures: ['Gradual onset', 'MRI showing cerebellopontine angle mass']
+      },
+      {
+        disease: 'Multiple Sclerosis',
+        probability: 'rare',
+        associatedSymptoms: ['visual disturbances', 'weakness', 'sensory changes'],
+        distinguishingFeatures: ['Young adults', 'Relapsing-remitting', 'MRI lesions']
+      }
+    ]
+  },
+  {
+    symptom: 'Back Pain',
+    possibleDiseases: [
+      {
+        disease: 'Mechanical Low Back Pain',
+        probability: 'very_common',
+        associatedSymptoms: ['muscle spasm', 'stiffness'],
+        distinguishingFeatures: ['Worse with activity', 'Better with rest', 'No red flags']
+      },
+      {
+        disease: 'Lumbar Disc Herniation',
+        probability: 'common',
+        associatedSymptoms: ['radicular pain (sciatica)', 'numbness', 'weakness'],
+        distinguishingFeatures: ['Positive straight leg raise', 'Dermatomal distribution', 'MRI confirmation']
+      },
+      {
+        disease: 'Spinal Stenosis',
+        probability: 'common',
+        associatedSymptoms: ['neurogenic claudication', 'bilateral leg pain'],
+        distinguishingFeatures: ['Age >60', 'Better with forward flexion', 'MRI showing canal narrowing']
+      },
+      {
+        disease: 'Compression Fracture',
+        probability: 'uncommon',
+        associatedSymptoms: ['acute onset', 'point tenderness'],
+        distinguishingFeatures: ['Osteoporosis', 'Trauma', 'X-ray showing wedge deformity']
+      },
+      {
+        disease: 'Ankylosing Spondylitis',
+        probability: 'uncommon',
+        associatedSymptoms: ['morning stiffness >30 min', 'improves with exercise'],
+        distinguishingFeatures: ['Young male', 'Inflammatory back pain', 'HLA-B27 positive', 'Sacroiliitis']
+      },
+      {
+        disease: 'Kidney Stone',
+        probability: 'common',
+        associatedSymptoms: ['flank pain', 'hematuria', 'nausea'],
+        distinguishingFeatures: ['Colicky pain', 'Radiates to groin', 'CT showing stone']
+      },
+      {
+        disease: 'Pyelonephritis',
+        probability: 'uncommon',
+        associatedSymptoms: ['fever', 'dysuria', 'CVA tenderness'],
+        distinguishingFeatures: ['Fever', 'Positive urine culture', 'Flank pain']
+      },
+      {
+        disease: 'Abdominal Aortic Aneurysm',
+        probability: 'rare',
+        associatedSymptoms: ['pulsatile abdominal mass', 'syncope if ruptured'],
+        distinguishingFeatures: ['Age >60', 'Smoking', 'Hypotension if ruptured', 'Ultrasound >3cm']
+      },
+      {
+        disease: 'Spinal Infection (Osteomyelitis/Epidural Abscess)',
+        probability: 'rare',
+        associatedSymptoms: ['fever', 'neurological deficit', 'night pain'],
+        distinguishingFeatures: ['Fever', 'Elevated CRP/ESR', 'MRI showing infection']
+      },
+      {
+        disease: 'Malignancy (Metastases, Myeloma)',
+        probability: 'rare',
+        associatedSymptoms: ['weight loss', 'night pain', 'neurological symptoms'],
+        distinguishingFeatures: ['Age >50', 'History of cancer', 'Night pain', 'MRI/CT showing lesion']
+      },
+      {
+        disease: 'Cauda Equina Syndrome',
+        probability: 'rare',
+        associatedSymptoms: ['saddle anesthesia', 'bowel/bladder dysfunction', 'bilateral leg weakness'],
+        distinguishingFeatures: ['Surgical emergency', 'MRI showing massive disc herniation']
+      },
+      {
+        disease: 'Fibromyalgia',
+        probability: 'common',
+        associatedSymptoms: ['widespread pain', 'fatigue', 'sleep disturbance'],
+        distinguishingFeatures: ['Tender points', 'Chronic >3 months', 'Diagnosis of exclusion']
+      }
+    ]
+  },
+  {
+    symptom: 'Joint Pain (Arthralgia)',
+    possibleDiseases: [
+      {
+        disease: 'Osteoarthritis',
+        probability: 'very_common',
+        associatedSymptoms: ['stiffness <30 min', 'crepitus', 'bony enlargement'],
+        distinguishingFeatures: ['Age >50', 'Weight-bearing joints', 'Worse with activity', 'X-ray showing joint space narrowing']
+      },
+      {
+        disease: 'Rheumatoid Arthritis',
+        probability: 'common',
+        associatedSymptoms: ['morning stiffness >1 hour', 'symmetrical', 'swelling'],
+        distinguishingFeatures: ['Small joints (MCP, PIP)', 'Positive RF/anti-CCP', 'Erosions on X-ray']
+      },
+      {
+        disease: 'Gout',
+        probability: 'common',
+        associatedSymptoms: ['acute monoarthritis', 'erythema', 'severe pain'],
+        distinguishingFeatures: ['First MTP joint', 'Elevated uric acid', 'Crystals on joint aspiration']
+      },
+      {
+        disease: 'Septic Arthritis',
+        probability: 'uncommon',
+        associatedSymptoms: ['fever', 'monoarthritis', 'inability to bear weight'],
+        distinguishingFeatures: ['Fever', 'WBC >50,000 in synovial fluid', 'Positive culture']
+      },
+      {
+        disease: 'Reactive Arthritis',
+        probability: 'uncommon',
+        associatedSymptoms: ['urethritis', 'conjunctivitis', 'diarrhea'],
+        distinguishingFeatures: ['Post-infectious', 'Asymmetric oligoarthritis', 'HLA-B27']
+      },
+      {
+        disease: 'Psoriatic Arthritis',
+        probability: 'uncommon',
+        associatedSymptoms: ['psoriasis', 'nail changes', 'dactylitis'],
+        distinguishingFeatures: ['Psoriatic plaques', 'DIP involvement', 'Negative RF']
+      },
+      {
+        disease: 'Systemic Lupus Erythematosus (SLE)',
+        probability: 'uncommon',
+        associatedSymptoms: ['malar rash', 'photosensitivity', 'serositis'],
+        distinguishingFeatures: ['Young female', 'Positive ANA', 'Multi-system involvement']
+      },
+      {
+        disease: 'Viral Arthritis',
+        probability: 'common',
+        associatedSymptoms: ['fever', 'rash', 'myalgia'],
+        distinguishingFeatures: ['Self-limited', 'Recent viral illness', 'Polyarticular']
+      },
+      {
+        disease: 'Lyme Disease',
+        probability: 'rare',
+        associatedSymptoms: ['erythema migrans', 'fever', 'fatigue'],
+        distinguishingFeatures: ['Tick exposure', 'Migratory arthritis', 'Positive Lyme serology']
+      },
+      {
+        disease: 'Polymyalgia Rheumatica',
+        probability: 'uncommon',
+        associatedSymptoms: ['shoulder/hip girdle pain', 'morning stiffness', 'fatigue'],
+        distinguishingFeatures: ['Age >50', 'Elevated ESR/CRP', 'Rapid response to steroids']
+      },
+      {
+        disease: 'Fibromyalgia',
+        probability: 'common',
+        associatedSymptoms: ['widespread pain', 'fatigue', 'sleep disturbance'],
+        distinguishingFeatures: ['Tender points', 'Normal labs', 'Chronic >3 months']
+      },
+      {
+        disease: 'Tendinitis/Bursitis',
+        probability: 'common',
+        associatedSymptoms: ['localized pain', 'swelling'],
+        distinguishingFeatures: ['Overuse', 'Point tenderness', 'Worse with specific movements']
+      }
+    ]
+  },
+  {
+    symptom: 'Skin Rash',
+    possibleDiseases: [
+      {
+        disease: 'Eczema (Atopic Dermatitis)',
+        probability: 'very_common',
+        associatedSymptoms: ['pruritus', 'dry skin', 'lichenification'],
+        distinguishingFeatures: ['Flexural distribution', 'Personal/family atopy', 'Chronic relapsing']
+      },
+      {
+        disease: 'Psoriasis',
+        probability: 'common',
+        associatedSymptoms: ['silvery scales', 'nail changes', 'joint pain'],
+        distinguishingFeatures: ['Well-demarcated plaques', 'Extensor surfaces', 'Auspitz sign']
+      },
+      {
+        disease: 'Urticaria (Hives)',
+        probability: 'common',
+        associatedSymptoms: ['pruritus', 'wheals', 'angioedema'],
+        distinguishingFeatures: ['Transient (<24h per lesion)', 'Blanching', 'Triggers (food, drugs)']
+      },
+      {
+        disease: 'Contact Dermatitis',
+        probability: 'common',
+        associatedSymptoms: ['pruritus', 'vesicles', 'oozing'],
+        distinguishingFeatures: ['Exposure history', 'Distribution matches contact', 'Patch test positive']
+      },
+      {
+        disease: 'Fungal Infection (Tinea)',
+        probability: 'very_common',
+        associatedSymptoms: ['pruritus', 'scaling', 'central clearing'],
+        distinguishingFeatures: ['Annular lesions', 'KOH positive', 'Warm/moist areas']
+      },
+      {
+        disease: 'Scabies',
+        probability: 'common',
+        associatedSymptoms: ['intense pruritus (worse at night)', 'burrows'],
+        distinguishingFeatures: ['Web spaces', 'Family members affected', 'Microscopy showing mites']
+      },
+      {
+        disease: 'Drug Eruption',
+        probability: 'common',
+        associatedSymptoms: ['varies (maculopapular, urticarial)'],
+        distinguishingFeatures: ['Recent medication', 'Timing (7-14 days)', 'Resolves with cessation']
+      },
+      {
+        disease: 'Viral Exanthem',
+        probability: 'common',
+        associatedSymptoms: ['fever', 'malaise', 'lymphadenopathy'],
+        distinguishingFeatures: ['Self-limited', 'Viral prodrome', 'Maculopapular']
+      },
+      {
+        disease: 'Cellulitis',
+        probability: 'common',
+        associatedSymptoms: ['erythema', 'warmth', 'swelling', 'pain'],
+        distinguishingFeatures: ['Unilateral', 'Fever', 'Elevated WBC', 'Responds to antibiotics']
+      },
+      {
+        disease: 'Herpes Zoster (Shingles)',
+        probability: 'common',
+        associatedSymptoms: ['pain', 'vesicles', 'dermatomal distribution'],
+        distinguishingFeatures: ['Unilateral', 'Dermatomal', 'Painful vesicles', 'Age >50']
+      },
+      {
+        disease: 'Stevens-Johnson Syndrome/TEN',
+        probability: 'rare',
+        associatedSymptoms: ['fever', 'mucosal involvement', 'skin detachment'],
+        distinguishingFeatures: ['Drug-induced', 'Nikolsky sign', 'ICU admission required']
+      },
+      {
+        disease: 'Cutaneous Lupus',
+        probability: 'uncommon',
+        associatedSymptoms: ['photosensitivity', 'malar rash', 'discoid lesions'],
+        distinguishingFeatures: ['Butterfly rash', 'Positive ANA', 'Biopsy showing interface dermatitis']
+      },
+      {
+        disease: 'Cutaneous Leishmaniasis',
+        probability: 'common',
+        associatedSymptoms: ['painless ulcer', 'raised borders'],
+        distinguishingFeatures: ['Endemic to Iraq', 'Sandfly bite history', 'Slit-skin smear positive']
+      }
+    ]
   }
 ];
 
@@ -1262,6 +1683,140 @@ export const geriatricConsiderations = [
     consideration: 'Frailty',
     impact: ['Increased mortality', 'Longer recovery', 'Higher complication rates'],
     approach: 'Comprehensive geriatric assessment, goals of care discussion'
+  }
+];
+
+/**
+ * Iraqi Pediatric Vaccination Schedule
+ * Based on WHO recommendations and Iraq Ministry of Health guidelines
+ */
+export const iraqiVaccinationSchedule = [
+  {
+    age: 'Birth',
+    vaccines: ['BCG (Tuberculosis)', 'Hepatitis B (1st dose)', 'OPV-0 (Polio birth dose)'],
+    notes: 'Given at birth or within first 2 weeks'
+  },
+  {
+    age: '6 weeks (1.5 months)',
+    vaccines: ['DTP-1 (Diphtheria, Tetanus, Pertussis)', 'OPV-1 (Polio)', 'Hepatitis B (2nd dose)', 'Hib-1 (Haemophilus influenzae)', 'PCV-1 (Pneumococcal)'],
+    notes: 'First dose of pentavalent vaccine (DTP-HepB-Hib)'
+  },
+  {
+    age: '10 weeks (2.5 months)',
+    vaccines: ['DTP-2', 'OPV-2', 'Hib-2', 'PCV-2'],
+    notes: 'Second dose of routine vaccines'
+  },
+  {
+    age: '14 weeks (3.5 months)',
+    vaccines: ['DTP-3', 'OPV-3', 'Hepatitis B (3rd dose)', 'Hib-3', 'PCV-3', 'IPV (Inactivated Polio)'],
+    notes: 'Completes primary series for most vaccines'
+  },
+  {
+    age: '9 months',
+    vaccines: ['Measles-Rubella (MR-1)', 'Vitamin A supplementation'],
+    notes: 'First measles vaccine, critical for outbreak prevention'
+  },
+  {
+    age: '12 months',
+    vaccines: ['MMR (Measles, Mumps, Rubella)'],
+    notes: 'Can be given as early as 9 months in outbreak settings'
+  },
+  {
+    age: '18 months',
+    vaccines: ['DTP booster', 'OPV booster', 'MR-2 (Measles-Rubella booster)'],
+    notes: 'Booster doses for sustained immunity'
+  },
+  {
+    age: '4-6 years (school entry)',
+    vaccines: ['DTP booster', 'OPV booster', 'MMR booster'],
+    notes: 'School entry requirement'
+  },
+  {
+    age: '12 years',
+    vaccines: ['Td (Tetanus-Diphtheria booster)'],
+    notes: 'Adolescent booster'
+  },
+  {
+    age: 'Special populations',
+    vaccines: ['Hepatitis A (endemic areas)', 'Typhoid (high-risk areas)', 'Meningococcal (Hajj pilgrims)', 'Influenza (annual, high-risk)'],
+    notes: 'Additional vaccines based on risk factors and travel'
+  }
+];
+
+/**
+ * Common Obstetric Complications in Iraq
+ */
+export const iraqiObstetricComplications = [
+  {
+    condition: 'Gestational Diabetes Mellitus (GDM)',
+    prevalence: 'Very High (15-20% of pregnancies)',
+    riskFactors: ['High baseline diabetes prevalence', 'Obesity', 'Family history', 'Advanced maternal age'],
+    screening: 'OGTT at 24-28 weeks (earlier if high risk)',
+    management: [
+      'Dietary modification and exercise',
+      'Blood glucose monitoring',
+      'Insulin if fasting glucose >95 mg/dL or 2h post-prandial >120 mg/dL',
+      'Fetal monitoring (growth scans, NST)',
+      'Delivery planning (consider induction at 39-40 weeks)'
+    ],
+    complications: ['Macrosomia', 'Shoulder dystocia', 'Neonatal hypoglycemia', 'Increased cesarean rate']
+  },
+  {
+    condition: 'Anemia in Pregnancy',
+    prevalence: 'Very High (>40% of pregnant women)',
+    riskFactors: ['Iron deficiency', 'Poor nutrition', 'Multiparity', 'Short inter-pregnancy interval'],
+    screening: 'Hemoglobin at first visit and 28 weeks',
+    management: [
+      'Iron supplementation: Ferrous sulfate 200mg daily',
+      'Folic acid 400-800 mcg daily',
+      'Dietary counseling (iron-rich foods)',
+      'Treat underlying causes (hookworm, malaria if applicable)',
+      'Blood transfusion if Hb <7 g/dL or symptomatic'
+    ],
+    complications: ['Preterm delivery', 'Low birth weight', 'Maternal fatigue', 'Postpartum hemorrhage risk']
+  },
+  {
+    condition: 'Preeclampsia/Eclampsia',
+    prevalence: 'Moderate to High (5-8% of pregnancies)',
+    riskFactors: ['Primigravida', 'Chronic hypertension', 'Diabetes', 'Obesity', 'Multiple gestation', 'Previous preeclampsia'],
+    screening: 'BP and urine protein at each antenatal visit',
+    management: [
+      'Mild preeclampsia: Outpatient monitoring, low-dose aspirin',
+      'Severe preeclampsia: Hospitalization, BP control (labetalol, nifedipine)',
+      'Magnesium sulfate for seizure prophylaxis',
+      'Delivery is definitive treatment (timing based on severity and gestational age)',
+      'Eclampsia: IV magnesium sulfate, stabilize, deliver'
+    ],
+    complications: ['Maternal: Stroke, HELLP syndrome, renal failure, placental abruption', 'Fetal: IUGR, preterm delivery, stillbirth']
+  },
+  {
+    condition: 'Postpartum Hemorrhage (PPH)',
+    prevalence: 'High (leading cause of maternal mortality in Iraq)',
+    riskFactors: ['Uterine atony', 'Retained placenta', 'Genital tract trauma', 'Coagulopathy', 'Multiparity', 'Prolonged labor'],
+    prevention: 'Active management of third stage (oxytocin 10 IU IM)',
+    management: [
+      'Uterine massage',
+      'Oxytocin 20-40 IU in 1L saline IV',
+      'Misoprostol 800 mcg sublingual if oxytocin unavailable',
+      'Tranexamic acid 1g IV within 3 hours',
+      'Bimanual uterine compression',
+      'Surgical intervention if refractory (B-Lynch suture, hysterectomy)'
+    ],
+    complications: ['Hypovolemic shock', 'DIC', 'Maternal death', 'Need for hysterectomy']
+  },
+  {
+    condition: 'Preterm Labor',
+    prevalence: 'Moderate (8-12% of deliveries)',
+    riskFactors: ['Infection', 'Multiple gestation', 'Previous preterm birth', 'Cervical insufficiency', 'Maternal stress/conflict'],
+    screening: 'Cervical length ultrasound in high-risk women',
+    management: [
+      'Tocolysis (nifedipine or atosiban) if <34 weeks',
+      'Corticosteroids (betamethasone 12mg IM x2 doses) for fetal lung maturity',
+      'Magnesium sulfate for neuroprotection if <32 weeks',
+      'Antibiotics if PPROM (prolonged rupture of membranes)',
+      'Transfer to tertiary center with NICU if needed'
+    ],
+    complications: ['Neonatal: RDS, IVH, NEC, long-term neurodevelopmental issues', 'Maternal: Cesarean delivery, infection']
   }
 ];
 
@@ -1616,5 +2171,231 @@ export const iraqiTropicalDiseases = [
       'Avoid cyst rupture (anaphylaxis risk)'
     ],
     prevention: 'Deworm dogs, avoid contact with dog feces, food hygiene'
+  }
+];
+
+
+/**
+ * Rare Disease Knowledge Base
+ * Uncommon but important conditions to consider in differential diagnosis
+ */
+export const rareDiseaseKnowledge = [
+  {
+    disease: 'Guillain-Barré Syndrome (GBS)',
+    category: 'Neurological',
+    prevalence: 'Rare (1-2 per 100,000)',
+    clinicalPresentation: [
+      'Ascending symmetrical weakness',
+      'Areflexia or hyporeflexia',
+      'Paresthesias in hands and feet',
+      'Facial weakness (50%)',
+      'Respiratory muscle weakness (30%)',
+      'Autonomic dysfunction'
+    ],
+    triggers: ['Recent infection (Campylobacter, CMV, EBV)', 'Post-vaccination (rare)', 'Surgery'],
+    diagnosis: ['CSF: Elevated protein with normal cell count (albuminocytologic dissociation)', 'Nerve conduction studies: Demyelination', 'Anti-ganglioside antibodies'],
+    treatment: ['IVIG 0.4 g/kg/day x 5 days OR Plasmapheresis', 'Supportive care', 'Monitor respiratory function (FVC)', 'ICU if respiratory compromise', 'VTE prophylaxis'],
+    prognosis: '85% recover fully, 15% have residual weakness'
+  },
+  {
+    disease: 'Addison\'s Disease (Primary Adrenal Insufficiency)',
+    category: 'Endocrine',
+    prevalence: 'Rare (1 per 10,000)',
+    clinicalPresentation: [
+      'Chronic fatigue and weakness',
+      'Weight loss',
+      'Hyperpigmentation (especially palmar creases, buccal mucosa)',
+      'Hypotension',
+      'Salt craving',
+      'Nausea, vomiting, diarrhea'
+    ],
+    triggers: ['Autoimmune (most common)', 'TB (common in Iraq)', 'Hemorrhage', 'Medications'],
+    diagnosis: ['Low cortisol (<3 mcg/dL)', 'Elevated ACTH', 'ACTH stimulation test: No cortisol rise', 'Hyponatremia, hyperkalemia', 'Hypoglycemia'],
+    treatment: ['Hydrocortisone 15-25 mg/day (divided doses)', 'Fludrocortisone 0.1 mg/day', 'Stress dosing during illness/surgery', 'Medical alert bracelet', 'Patient education on crisis management'],
+    emergencyManagement: ['Adrenal crisis: IV hydrocortisone 100mg bolus, then 50mg q6h', 'IV saline resuscitation', 'Treat precipitant']
+  },
+  {
+    disease: 'Kawasaki Disease',
+    category: 'Pediatric Vasculitis',
+    prevalence: 'Rare (peak age 1-5 years)',
+    clinicalPresentation: [
+      'Fever >5 days',
+      'Bilateral conjunctival injection (non-purulent)',
+      'Polymorphous rash',
+      'Oral changes (strawberry tongue, cracked lips)',
+      'Cervical lymphadenopathy',
+      'Extremity changes (erythema, edema, desquamation)'
+    ],
+    diagnosis: ['Clinical (fever + 4/5 criteria)', 'Elevated CRP/ESR', 'Thrombocytosis (after week 1)', 'Echocardiography: Coronary artery aneurysms'],
+    treatment: ['IVIG 2 g/kg single infusion', 'High-dose aspirin 80-100 mg/kg/day (until fever resolves)', 'Low-dose aspirin 3-5 mg/kg/day (6-8 weeks)', 'Echocardiography at diagnosis, 2 weeks, 6-8 weeks'],
+    complications: ['Coronary artery aneurysms (25% if untreated, <5% if treated)', 'Myocardial infarction', 'Sudden death']
+  },
+  {
+    disease: 'Pheochromocytoma',
+    category: 'Endocrine Tumor',
+    prevalence: 'Rare (2-8 per million)',
+    clinicalPresentation: [
+      'Episodic hypertension (paroxysmal)',
+      'Headaches',
+      'Palpitations',
+      'Diaphoresis',
+      'Pallor',
+      'Anxiety/sense of doom',
+      'Hyperglycemia'
+    ],
+    triggers: ['Spontaneous', 'Stress', 'Medications (metoclopramide, TCAs)', 'Abdominal pressure'],
+    diagnosis: ['24-hour urine metanephrines and catecholamines', 'Plasma free metanephrines', 'CT/MRI adrenal glands', 'MIBG scan if extra-adrenal'],
+    treatment: ['Alpha-blockade (phenoxybenzamine) BEFORE beta-blockade', 'Surgical resection (curative)', 'Preoperative preparation critical', 'Genetic testing (40% hereditary)'],
+    emergencyManagement: ['Hypertensive crisis: IV phentolamine 5-15 mg', 'Avoid beta-blockers alone (unopposed alpha stimulation)']
+  },
+  {
+    disease: 'Myasthenia Gravis',
+    category: 'Neuromuscular',
+    prevalence: 'Rare (15-20 per 100,000)',
+    clinicalPresentation: [
+      'Fluctuating muscle weakness (worse with activity)',
+      'Ptosis and diplopia (ocular symptoms first)',
+      'Bulbar weakness (dysphagia, dysarthria)',
+      'Proximal limb weakness',
+      'Respiratory muscle weakness (myasthenic crisis)',
+      'Fatigable weakness'
+    ],
+    diagnosis: ['Anti-AChR antibodies (85%)', 'Anti-MuSK antibodies (if AChR negative)', 'Edrophonium (Tensilon) test', 'Repetitive nerve stimulation: Decremental response', 'Chest CT: Thymoma (15%)'],
+    treatment: ['Pyridostigmine 60mg TID-QID', 'Prednisone (immunosuppression)', 'Azathioprine or mycophenolate', 'Thymectomy if thymoma or age <60', 'IVIG or plasmapheresis for crisis'],
+    emergencyManagement: ['Myasthenic crisis: ICU, intubation if needed', 'IVIG or plasmapheresis', 'Avoid neuromuscular blocking agents']
+  }
+];
+
+/**
+ * Additional Emergency Protocols
+ * Time-critical interventions for life-threatening conditions
+ */
+export const additionalEmergencyProtocols = [
+  {
+    condition: 'Acute Ischemic Stroke',
+    timeWindow: 'Door-to-needle <60 minutes',
+    protocol: [
+      '0-10 min: Triage, activate stroke code',
+      '10-25 min: Non-contrast CT head, labs (glucose, CBC, PT/INR, aPTT)',
+      '25-45 min: Neurology assessment, NIHSS score',
+      '45-60 min: IV tPA 0.9 mg/kg (10% bolus, 90% over 1 hour)',
+      'Inclusion: Onset <4.5 hours, no hemorrhage, BP <185/110',
+      'Exclusion: Recent surgery, bleeding disorder, platelets <100k'
+    ],
+    postTreatment: ['ICU monitoring 24 hours', 'No anticoagulation/antiplatelet x24h', 'BP control <180/105', 'Repeat CT at 24h']
+  },
+  {
+    condition: 'Massive Pulmonary Embolism',
+    timeWindow: 'Immediate intervention',
+    protocol: [
+      'Hemodynamic instability: SBP <90 mmHg or drop >40 mmHg',
+      'Oxygen support, IV access x2',
+      'Thrombolysis: Alteplase 100mg IV over 2 hours',
+      'Alternative: Catheter-directed thrombolysis',
+      'Surgical embolectomy if thrombolysis contraindicated',
+      'ECMO as bridge in refractory shock'
+    ],
+    postTreatment: ['ICU monitoring', 'Anticoagulation after thrombolysis', 'Echo to assess RV function', 'IVC filter if recurrent despite anticoagulation']
+  },
+  {
+    condition: 'Acute Mesenteric Ischemia',
+    timeWindow: '<6 hours for bowel viability',
+    protocol: [
+      'High suspicion: Severe abdominal pain out of proportion to exam',
+      'Risk factors: Atrial fibrillation, recent MI, atherosclerosis',
+      'CT angiography (diagnostic)',
+      'Labs: Elevated lactate, leukocytosis, metabolic acidosis',
+      'NPO, IV fluids, broad-spectrum antibiotics',
+      'Immediate vascular surgery consultation',
+      'Revascularization: Embolectomy, bypass, or endovascular',
+      'Bowel resection if necrotic'
+    ],
+    mortality: 'High (60-80% if delayed diagnosis)'
+  },
+  {
+    condition: 'Acute Angle-Closure Glaucoma',
+    timeWindow: '<24 hours to prevent permanent vision loss',
+    protocol: [
+      'Symptoms: Severe eye pain, blurred vision, halos, nausea/vomiting',
+      'Signs: Red eye, mid-dilated fixed pupil, corneal edema, IOP >40 mmHg',
+      'Immediate treatment:',
+      '  - Acetazolamide 500mg IV/PO',
+      '  - Topical beta-blocker (timolol)',
+      '  - Topical alpha-agonist (apraclonidine)',
+      '  - Topical pilocarpine 2% (after IOP starts to drop)',
+      '  - IV mannitol 1-2 g/kg if refractory',
+      'Definitive: Laser peripheral iridotomy within 24-48 hours',
+      'Treat fellow eye prophylactically'
+    ]
+  },
+  {
+    condition: 'Necrotizing Fasciitis',
+    timeWindow: 'Surgical debridement within 6 hours',
+    protocol: [
+      'Clinical: Rapidly spreading cellulitis, severe pain, systemic toxicity',
+      'LRINEC score >6 (lab risk indicator)',
+      'Imaging: CT/MRI showing fascial involvement, gas',
+      'Immediate broad-spectrum antibiotics:',
+      '  - Vancomycin + Piperacillin-tazobactam + Clindamycin',
+      'Urgent surgical debridement (may require multiple operations)',
+      'ICU admission',
+      'Hyperbaric oxygen (adjunct)',
+      'Mortality: 20-40% even with treatment'
+    ]
+  }
+];
+
+/**
+ * Drug Interaction Warnings
+ * Critical medication interactions to avoid
+ */
+export const criticalDrugInteractions = [
+  {
+    drugPair: ['Warfarin', 'NSAIDs'],
+    risk: 'Severe bleeding',
+    mechanism: 'Additive antiplatelet effect + GI irritation',
+    management: 'Avoid combination. Use acetaminophen for pain. If unavoidable, add PPI and monitor INR closely.'
+  },
+  {
+    drugPair: ['ACE Inhibitors/ARBs', 'Potassium-sparing diuretics'],
+    risk: 'Hyperkalemia',
+    mechanism: 'Both increase potassium retention',
+    management: 'Monitor potassium levels. Avoid in CKD. Consider alternative diuretic (thiazide, loop).'
+  },
+  {
+    drugPair: ['Metformin', 'IV Contrast'],
+    risk: 'Lactic acidosis',
+    mechanism: 'Contrast-induced nephropathy + metformin accumulation',
+    management: 'Hold metformin 48h before and after contrast. Check renal function before restarting.'
+  },
+  {
+    drugPair: ['Statins', 'Macrolides (Clarithromycin)'],
+    risk: 'Rhabdomyolysis',
+    mechanism: 'CYP3A4 inhibition increases statin levels',
+    management: 'Temporarily stop statin during macrolide course. Use azithromycin instead (no interaction).'
+  },
+  {
+    drugPair: ['SSRIs', 'Tramadol'],
+    risk: 'Serotonin syndrome',
+    mechanism: 'Additive serotonergic effect',
+    management: 'Avoid combination. Use alternative analgesic (acetaminophen, NSAIDs). Monitor for agitation, tremor, hyperthermia.'
+  },
+  {
+    drugPair: ['Digoxin', 'Amiodarone'],
+    risk: 'Digoxin toxicity',
+    mechanism: 'Amiodarone increases digoxin levels',
+    management: 'Reduce digoxin dose by 50%. Monitor digoxin levels and ECG.'
+  },
+  {
+    drugPair: ['Levothyroxine', 'Iron/Calcium'],
+    risk: 'Reduced thyroid hormone absorption',
+    mechanism: 'Chelation in GI tract',
+    management: 'Separate administration by 4 hours. Take levothyroxine on empty stomach.'
+  },
+  {
+    drugPair: ['Beta-blockers', 'Verapamil/Diltiazem'],
+    risk: 'Bradycardia, heart block, hypotension',
+    mechanism: 'Additive negative chronotropic and inotropic effects',
+    management: 'Avoid combination. If necessary, use with extreme caution and cardiac monitoring.'
   }
 ];

@@ -1232,6 +1232,68 @@ export type BrainTrainingNotification = typeof brainTrainingNotifications.$infer
 export type InsertBrainTrainingNotification = typeof brainTrainingNotifications.$inferInsert;
 
 /**
+ * BRAIN Knowledge Concepts - stores medical concepts (diseases, symptoms, treatments)
+ */
+export const brainKnowledgeConcepts = mysqlTable("brain_knowledge_concepts", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Concept identification
+  conceptType: mysqlEnum("concept_type", ["disease", "symptom", "treatment", "investigation", "risk_factor"]).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  
+  // Clinical data
+  category: varchar("category", { length: 100 }),
+  icd10Code: varchar("icd10_code", { length: 20 }),
+  snomedCode: varchar("snomed_code", { length: 50 }),
+  
+  // Metadata
+  prevalence: varchar("prevalence", { length: 50 }),
+  severity: mysqlEnum("severity", ["mild", "moderate", "severe", "critical"]),
+  
+  // Knowledge source
+  source: varchar("source", { length: 255 }),
+  evidenceLevel: varchar("evidence_level", { length: 50 }),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BrainKnowledgeConcept = typeof brainKnowledgeConcepts.$inferSelect;
+export type InsertBrainKnowledgeConcept = typeof brainKnowledgeConcepts.$inferInsert;
+
+/**
+ * BRAIN Knowledge Relationships - stores relationships between medical concepts
+ */
+export const brainKnowledgeRelationships = mysqlTable("brain_knowledge_relationships", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Relationship definition
+  fromConceptId: int("from_concept_id").notNull(),
+  relationshipType: varchar("relationship_type", { length: 100 }).notNull(), // e.g., "may_indicate", "treats", "causes", "risk_factor_for"
+  toConceptId: int("to_concept_id").notNull(),
+  
+  // Relationship strength
+  confidence: decimal("confidence", { precision: 5, scale: 4 }), // 0.0 to 1.0
+  strength: mysqlEnum("strength", ["weak", "moderate", "strong"]),
+  
+  // Clinical context
+  context: text("context"), // Additional clinical context or conditions
+  associatedSymptoms: text("associated_symptoms"), // JSON array
+  distinguishingFeatures: text("distinguishing_features"), // JSON array
+  
+  // Metadata
+  source: varchar("source", { length: 255 }),
+  timesUsed: int("times_used").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BrainKnowledgeRelationship = typeof brainKnowledgeRelationships.$inferSelect;
+export type InsertBrainKnowledgeRelationship = typeof brainKnowledgeRelationships.$inferInsert;
+
+/**
  * BRAIN Medical Literature Cache - stores PubMed search results
  */
 export const brainMedicalLiterature = mysqlTable("brain_medical_literature", {
