@@ -1,0 +1,170 @@
+{
+  "query": "SHOW COLUMNS FROM aec_detected_errors;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SHOW COLUMNS FROM aec_detected_errors;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "severity",
+      "Type": "enum('low','medium','high','critical')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "message",
+      "Type": "text",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "error_type",
+      "Type": "varchar(100)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "source",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "endpoint",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "user_context",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "first_occurrence",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "last_occurrence",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "occurrence_count",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "error_message",
+      "Type": "text",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "stack_trace",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "context",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "screenshot_url",
+      "Type": "varchar(1024)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "recent_logs",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('detected','diagnosing','patching','resolved','ignored')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "detected",
+      "Extra": ""
+    },
+    {
+      "Field": "detected_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "resolved_at",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "created_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updated_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nseverity\tenum('low','medium','high','critical')\tNO\t\tNULL\t\nmessage\ttext\tNO\t\tNULL\t\nerror_type\tvarchar(100)\tNO\t\tNULL\t\nsource\tvarchar(255)\tNO\t\tNULL\t\nendpoint\tvarchar(255)\tYES\t\tNULL\t\nuser_context\ttext\tYES\t\tNULL\t\nfirst_occurrence\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nlast_occurrence\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\noccurrence_count\tint(11)\tNO\t\t1\t\nerror_message\ttext\tNO\t\tNULL\t\nstack_trace\ttext\tYES\t\tNULL\t\ncontext\ttext\tYES\t\tNULL\t\nscreenshot_url\tvarchar(1024)\tYES\t\tNULL\t\nrecent_logs\ttext\tYES\t\tNULL\t\nstatus\tenum('detected','diagnosing','patching','resolved','ignored')\tNO\t\tdetected\t\ndetected_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nresolved_at\ttimestamp\tYES\t\tNULL\t\ncreated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\n",
+  "stderr": "",
+  "execution_time_ms": 1522
+}

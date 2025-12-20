@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE aec_health_checks ADD COLUMN response_time int AFTER status;\nALTER TABLE aec_health_checks ADD COLUMN failed_checks text AFTER critical_endpoints_healthy;\nALTER TABLE aec_health_checks ADD COLUMN error_details text AFTER failed_checks;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE aec_health_checks ADD COLUMN response_time int AFTER status;\nALTER TABLE aec_health_checks ADD COLUMN failed_checks text AFTER critical_endpoints_healthy;\nALTER TABLE aec_health_checks ADD COLUMN error_details text AFTER failed_checks;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1060 (42S21) at line 1: Duplicate column name 'response_time'"
+  ]
+}

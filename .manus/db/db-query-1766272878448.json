@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, error_type, severity, message, source, endpoint, occurrence_count, created_at \nFROM aec_detected_errors \nORDER BY created_at DESC \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, error_type, severity, message, source, endpoint, occurrence_count, created_at \nFROM aec_detected_errors \nORDER BY created_at DESC \nLIMIT 5;",
+  "rows": [
+    {
+      "id": "30001",
+      "error_type": "PAGE_NOT_FOUND",
+      "severity": "medium",
+      "message": "404 Not Found: /another-404-test",
+      "source": "client-router",
+      "endpoint": "/another-404-test",
+      "occurrence_count": "1",
+      "created_at": "2025-12-20 23:21:00"
+    },
+    {
+      "id": "67",
+      "error_type": "API_TIMEOUT",
+      "severity": "high",
+      "message": "Find Doctors health check failed",
+      "source": "b2b2c.getDoctors",
+      "endpoint": "NULL",
+      "occurrence_count": "1",
+      "created_at": "2025-12-20 22:30:16"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\terror_type\tseverity\tmessage\tsource\tendpoint\toccurrence_count\tcreated_at\n30001\tPAGE_NOT_FOUND\tmedium\t404 Not Found: /another-404-test\tclient-router\t/another-404-test\t1\t2025-12-20 23:21:00\n67\tAPI_TIMEOUT\thigh\tFind Doctors health check failed\tb2b2c.getDoctors\tNULL\t1\t2025-12-20 22:30:16\n",
+  "stderr": "",
+  "execution_time_ms": 1530
+}

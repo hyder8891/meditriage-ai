@@ -2,9 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Home } from "lucide-react";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
+import { useErrorReporting } from "@/hooks/useErrorReporting";
 
 export default function NotFound() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { report404 } = useErrorReporting();
+
+  // Report 404 error to AEC when component mounts
+  useEffect(() => {
+    report404(location);
+  }, [location, report404]);
 
   const handleGoHome = () => {
     setLocation("/");

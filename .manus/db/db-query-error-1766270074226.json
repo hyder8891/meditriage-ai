@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE aec_patches ADD COLUMN rolled_back_at timestamp NULL AFTER deployment_notes;\nALTER TABLE aec_patches ADD COLUMN rollback_reason text AFTER rolled_back_at;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE aec_patches ADD COLUMN rolled_back_at timestamp NULL AFTER deployment_notes;\nALTER TABLE aec_patches ADD COLUMN rollback_reason text AFTER rolled_back_at;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1060 (42S21) at line 1: Duplicate column name 'rolled_back_at'"
+  ]
+}

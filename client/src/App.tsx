@@ -8,6 +8,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { TourProvider } from "./contexts/TourContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { GuidedTour } from "./components/GuidedTour";
+import { useErrorReporting } from "./hooks/useErrorReporting";
 import Home from "./pages/Home";
 import NewHome from "./pages/NewHome";
 import MedHome from "./pages/MedHome";
@@ -120,7 +121,10 @@ function Router() {
 }
 
 function App() {
-    return (
+  // Initialize AEC error reporting
+  useErrorReporting();
+  
+  return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <LanguageProvider>

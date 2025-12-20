@@ -69,6 +69,10 @@ async function startServer() {
   app.use(sanitizeInput);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  
+  // AEC error reporting endpoint
+  const { handleErrorReport } = await import("../aec/error-reporter.js");
+  app.post("/api/aec/report-error", handleErrorReport);
   // tRPC API with rate limiting
   app.use(
     "/api/trpc",
@@ -84,6 +88,13 @@ async function startServer() {
   } else {
     serveStatic(app);
   }
+
+  // AEC Sentinel: 404 handler (must be after all other routes)
+  const { notFoundHandler, errorHandler } = await import("../aec/sentinel-layer.js");
+  app.use(notFoundHandler);
+  
+  // AEC Sentinel: Error handler (must be last middleware)
+  app.use(errorHandler);
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
@@ -101,6 +112,10 @@ async function startServer() {
     // Initialize AEC alert system (daily reports at 8 AM and 8 PM)
     const { initializeAlertSystem } = await import("../aec/alerts/index.js");
     initializeAlertSystem();
+    
+    // Initialize AEC Sentinel (error monitoring)
+    const { initializeSentinel } = await import("../aec/sentinel-layer.js");
+    initializeSentinel();
   });
 }
 

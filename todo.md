@@ -395,3 +395,17 @@
 - [x] Test daily report generation
 - [x] Test alert prioritization
 - [x] End-to-end alert workflow testing
+
+
+## AEC Error Detection Issues
+
+- [x] Fix AEC not detecting 404 errors (e.g., /care-locator page)
+- [x] Implement server-side error monitoring middleware
+- [x] Add client-side error boundary integration
+- [x] Hook AEC into Express error handlers
+- [x] Test error detection with real scenarios
+- [x] Verify alerts are sent for detected errors
+- [x] Fix database schema mismatch (error_message vs message column)
+- [x] Create client-side error reporting hook (useErrorReporting)
+- [x] Add /api/aec/report-error endpoint for client errors
+- [x] Integrate error reporting into NotFound component
