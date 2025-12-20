@@ -127,8 +127,8 @@ export default function Home() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 to-purple-500/20 rounded-3xl blur-3xl"></div>
                 <img 
-                  src="/images/ai-brain-neural.jpeg" 
-                  alt="AI Neural Network Medical Diagnosis"
+                  src="/images/telemedicine-consultation.jpg" 
+                  alt="Doctor-Patient Telemedicine Consultation"
                   className="relative rounded-3xl shadow-2xl w-full h-auto"
                 />
                 {/* Floating Stats Cards */}
@@ -367,7 +367,7 @@ export default function Home() {
       </section>
 
       {/* Featured Doctors */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-white" id="doctors">
+      <section id="doctors" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-rose-100 text-rose-700 border-rose-200">
@@ -412,7 +412,7 @@ export default function Home() {
                       {doctor.patients} {language === 'ar' ? 'مريض' : 'patients'}
                     </div>
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600">
+                  <Button onClick={() => setLocation("/patient/find-doctor")} className="w-full bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600">
                     <MessageSquare className="w-4 h-4 mr-2" />
                     {language === 'ar' ? 'تواصل الآن' : 'Connect Now'}
                   </Button>
@@ -422,7 +422,7 @@ export default function Home() {
           </div>
 
           <div className="text-center">
-            <Button size="lg" variant="outline" onClick={() => setLocation("/patient-login")} className="border-2">
+            <Button size="lg" variant="outline" onClick={() => setLocation("/patient/find-doctor")} className="border-2">
               {language === 'ar' ? 'عرض جميع الأطباء' : 'View All Doctors'}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -449,56 +449,56 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all">
               <CardContent className="p-6">
                 <img 
-                  src="/images/big-data-healthcare.jpg" 
-                  alt="Big Data in Healthcare"
+                  src="/images/ai-doctor-collaboration.jpg" 
+                  alt="AI and Doctor Collaboration"
                   className="rounded-xl mb-4 w-full h-48 object-cover"
                 />
                 <h3 className="text-xl font-bold text-white mb-2">
-                  {language === 'ar' ? 'ملايين الحالات الطبية' : 'Millions of Medical Cases'}
+                  {language === 'ar' ? 'ذكاء اصطناعي + طبيب بشري' : 'AI + Human Doctor'}
                 </h3>
                 <p className="text-slate-300 text-sm">
                   {language === 'ar'
-                    ? 'قاعدة بيانات ضخمة تحتوي على ملايين الحالات الطبية لتحسين دقة التشخيص'
-                    : 'Massive database containing millions of medical cases to improve diagnosis accuracy'}
+                    ? 'الجمع بين قوة الذكاء الاصطناعي وخبرة الطبيب لتشخيص أكثر دقة'
+                    : 'Combining AI power with doctor expertise for more accurate diagnosis'}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all">
               <CardContent className="p-6">
                 <img 
-                  src="/images/cloud-infrastructure.jpg" 
-                  alt="Cloud Infrastructure"
+                  src="/images/video-call-doctor.jpg" 
+                  alt="Video Consultation"
                   className="rounded-xl mb-4 w-full h-48 object-cover"
                 />
                 <h3 className="text-xl font-bold text-white mb-2">
-                  {language === 'ar' ? 'بنية سحابية متطورة' : 'Advanced Cloud Infrastructure'}
+                  {language === 'ar' ? 'استشارات فيديو مباشرة' : 'Live Video Consultations'}
                 </h3>
                 <p className="text-slate-300 text-sm">
                   {language === 'ar'
-                    ? 'خوادم سحابية عالية الأداء تضمن الاستجابة الفورية والموثوقية 99.9%'
-                    : 'High-performance cloud servers ensuring instant response and 99.9% reliability'}
+                    ? 'تواصل مباشر مع طبيبك عبر مكالمات فيديو آمنة ومشفرة'
+                    : 'Direct communication with your doctor via secure encrypted video calls'}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all">
               <CardContent className="p-6">
                 <img 
-                  src="/images/ai-xray-analysis.jpg" 
-                  alt="AI X-Ray Analysis"
+                  src="/images/doctor-tablet-records.jpg" 
+                  alt="Digital Medical Records"
                   className="rounded-xl mb-4 w-full h-48 object-cover"
                 />
                 <h3 className="text-xl font-bold text-white mb-2">
-                  {language === 'ar' ? 'تحليل الأشعة بالذكاء الاصطناعي' : 'AI-Powered X-Ray Analysis'}
+                  {language === 'ar' ? 'سجلات طبية رقمية' : 'Digital Medical Records'}
                 </h3>
                 <p className="text-slate-300 text-sm">
                   {language === 'ar'
-                    ? 'تحليل فوري للصور الطبية والأشعة بدقة تفوق الطرق التقليدية'
-                    : 'Instant analysis of medical images and X-rays with accuracy exceeding traditional methods'}
+                    ? 'الطبيب يصل لسجلك الطبي الكامل لتقديم رعاية مخصصة'
+                    : 'Doctor accesses your complete medical record for personalized care'}
                 </p>
               </CardContent>
             </Card>
@@ -521,6 +521,184 @@ export default function Home() {
               <div className="text-4xl font-bold text-green-400 mb-2">&lt;3s</div>
               <div className="text-slate-300">{language === 'ar' ? 'وقت الاستجابة' : 'Response Time'}</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Strengths - 6 Key Features */}
+      <section id="features" className="py-20 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-rose-100 text-rose-700 border-rose-200">
+              <Heart className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'قوتنا الأساسية' : 'Our Core Strengths'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'لماذا نحن الأفضل' : 'Why We\'re the Best'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'منصة متكاملة تجمع بين التكنولوجيا والرعاية البشرية'
+                : 'Complete platform combining technology with human care'}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* 1. AI + Doctor Collaboration */}
+            <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-rose-200">
+              <CardContent className="p-0">
+                <div className="relative overflow-hidden rounded-t-xl">
+                  <img 
+                    src="/images/ai-health-assistance.png" 
+                    alt="AI Health Assistance"
+                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    #1
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'ذكاء اصطناعي متقدم' : 'Advanced AI Technology'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'نظام ذكاء اصطناعي يحلل أعراضك بدقة 99.2% في أقل من 3 ثواني ويساعد الطبيب في التشخيص'
+                      : 'AI system analyzes your symptoms with 99.2% accuracy in under 3 seconds and assists doctors in diagnosis'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 2. Video Consultations */}
+            <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-purple-200">
+              <CardContent className="p-0">
+                <div className="relative overflow-hidden rounded-t-xl">
+                  <img 
+                    src="/images/doctor-patient-app.jpg" 
+                    alt="Doctor Patient App"
+                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    #2
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'اتصل بطبيب حقيقي' : 'Connect with Real Doctors'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'بعد التقييم الذكي، تواصل مباشرة مع أكثر من 500 طبيب معتمد عبر مكالمات فيديو آمنة'
+                      : 'After AI assessment, connect directly with 500+ certified doctors via secure video calls'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 3. 24/7 Availability */}
+            <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-blue-200">
+              <CardContent className="p-0">
+                <div className="relative overflow-hidden rounded-t-xl">
+                  <img 
+                    src="/images/healthcare-app-ui.png" 
+                    alt="Healthcare App UI"
+                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    #3
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'متاح 24/7' : '24/7 Availability'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'احصل على استشارة طبية في أي وقت من اليوم من أي مكان عبر هاتفك'
+                      : 'Get medical consultation anytime, anywhere from your phone'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 4. Secure & Private */}
+            <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-green-200">
+              <CardContent className="p-0">
+                <div className="relative overflow-hidden rounded-t-xl">
+                  <img 
+                    src="/images/happy-patient-doctor.jpg" 
+                    alt="Happy Patient with Doctor"
+                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    #4
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'رعاية مخصصة' : 'Personalized Care'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'كل مريض يحصل على خطة علاج مخصصة بناءً على حالته وتاريخه الطبي'
+                      : 'Each patient receives a personalized treatment plan based on their condition and medical history'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 5. Affordable Pricing */}
+            <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-yellow-200">
+              <CardContent className="p-0">
+                <div className="relative overflow-hidden rounded-t-xl">
+                  <img 
+                    src="/images/telemedicine-consultation.jpg" 
+                    alt="Telemedicine Consultation"
+                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    #5
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'أسعار مناسبة' : 'Affordable Pricing'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'ابدأ مجاناً مع الخطة المجانية، أو اختر خطة مدفوعة تناسب احتياجاتك'
+                      : 'Start free with our Free plan, or choose a paid plan that fits your needs'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 6. Complete Medical Tools */}
+            <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-indigo-200">
+              <CardContent className="p-0">
+                <div className="relative overflow-hidden rounded-t-xl">
+                  <img 
+                    src="/images/ai-xray-analysis.jpg" 
+                    alt="AI X-Ray Analysis"
+                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    #6
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    {language === 'ar' ? 'أدوات طبية متكاملة' : 'Complete Medical Tools'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'من تحليل الأشعة إلى مراقبة العلامات الحيوية، نوفر جميع الأدوات الطبية'
+                      : 'From X-ray analysis to vital signs monitoring, we provide all medical tools'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -642,7 +820,7 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-white" id="pricing">
+      <section id="pricing" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white">
