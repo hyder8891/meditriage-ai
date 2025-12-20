@@ -1,0 +1,87 @@
+🧠 BRAIN Baseline Performance Test (Simplified)
+
+Testing 12 representative cases using BRAIN API...
+
+Testing EMG-001: Severe crushing chest pain...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing EMG-006: Sudden severe headache...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing COM-001: Fever and cough...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing COM-006: Diarrhea and vomiting...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing CPX-001: Fatigue and weight loss...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing CPX-006: Numbness and vision problems...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing PED-001: Fever and difficulty breathing...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing PED-006: Sore throat and rash...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing GER-001: Fall and hip pain...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing GER-006: Sudden confusion...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing IRQ-001: Chronic fever and weight loss...
+  ✗ Error: API call failed: 400 Bad Request
+
+Testing IRQ-006: Chronic cough and fever...
+  ✗ Error: API call failed: 400 Bad Request
+
+  emergency: 0/2 top-1 (0%), 0/2 top-3 (0%)
+  common: 0/2 top-1 (0%), 0/2 top-3 (0%)
+  complex: 0/2 top-1 (0%), 0/2 top-3 (0%)
+  pediatric: 0/2 top-1 (0%), 0/2 top-3 (0%)
+  geriatric: 0/2 top-1 (0%), 0/2 top-3 (0%)
+  iraqi-specific: 0/2 top-1 (0%), 0/2 top-3 (0%)
+
+🎯 DIFFICULTY BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  easy: 0/4 top-1 (0%), 0/4 top-3 (0%)
+  medium: 0/4 top-1 (0%), 0/4 top-3 (0%)
+  hard: 0/4 top-1 (0%), 0/4 top-3 (0%)
+
+❌ FAILED CASES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  EMG-001: Expected "Acute Myocardial Infarction", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  EMG-006: Expected "Subarachnoid Hemorrhage", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  COM-001: Expected "Community-Acquired Pneumonia", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  COM-006: Expected "Acute Gastroenteritis", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  CPX-001: Expected "Lymphoma", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  CPX-006: Expected "Multiple Sclerosis", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  PED-001: Expected "Bronchiolitis", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  PED-006: Expected "Scarlet Fever", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  GER-001: Expected "Hip Fracture", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  GER-006: Expected "Normal Pressure Hydrocephalus", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  IRQ-001: Expected "Brucellosis", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+  IRQ-006: Expected "Pulmonary Tuberculosis", Got "ERROR"
+    Error: API call failed: 400 Bad Request
+
+======================================================================
+✅ Baseline test complete! Top-1: 0.00%, Top-3: 0.00%
+======================================================================
+
+Test runner error: ReferenceError: require is not defined
+    at runBaselineTest (/home/ubuntu/meditriage-ai/server/brain/baseline-test-simple.ts:229:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
