@@ -1406,5 +1406,15 @@
 - [x] Added recording timer and visual feedback
 - [x] Convert audio blob to base64 in handleGenerate
 - [x] Call audioAnalysisMutation with base64 audio (uses Gemini Flash)
-- [x] Simplified flow: record → convert → send to Gemini → extract symptoms → generate diagnosis
-- [ ] User needs to test: record audio → click Generate → check if diagnosis appears
+- [x] Updated audio analysis to extract ALL patient data (not just symptoms)
+- [x] New extraction: chiefComplaint, symptoms, age, gender, BP, HR, temp, O2
+- [x] Audio analysis now populates ALL form fields automatically
+- [x] User only needs to: record audio → stop → all fields auto-fill
+- [ ] User needs to test: record audio describing patient → check if all fields populate
+
+## SQL Error in BRAIN Literature Lookup
+- [x] Error: SELECT from brain_medical_literature WHERE title = very long symptom string
+- [x] Fixed: Use MD5 hash of query instead of full query string as title
+- [x] Fixed: Use Drizzle ORM instead of raw SQL (proper column name mapping)
+- [x] Fixed: Import brainMedicalLiterature, eq, and, desc from Drizzle
+- [x] Now using cacheKey = `pubmed:${queryHash}` (32 chars) instead of full query

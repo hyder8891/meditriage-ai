@@ -75,57 +75,53 @@ export const audioSymptomRouter = router({
 
         // Process with Gemini Flash native audio
         const prompt = input.language === 'ar'
-          ? `استمع إلى هذا التسجيل الصوتي للمريض وقم بتحليل الأعراض.
+          ? `استمع إلى هذا التسجيل الصوتي للمريض واستخرج جميع المعلومات الطبية.
 
-قدم تقييماً شاملاً يتضمن:
-1. **الأعراض المذكورة**: قائمة بجميع الأعراض التي ذكرها المريض
-2. **مستوى الإلحاح**: (طارئ/عاجل/شبه عاجل/روتيني)
-3. **التشخيص المحتمل**: الحالات الطبية المحتملة
-4. **التوصيات**: ماذا يجب أن يفعل المريض
-5. **علامات الخطر**: أي علامات تحذيرية تتطلب عناية فورية
-
-انتبه إلى:
-- نبرة الصوت (ألم، ضيق تنفس، ضعف)
-- السياق العراقي والثقافي
-- الأمراض الشائعة في العراق
+استخرج:
+1. **الشكوى الرئيسية**: السبب الرئيسي للزيارة (مثل: ألم في الصدر، صداع، حمى)
+2. **الأعراض**: جميع الأعراض المذكورة بالتفصيل
+3. **العمر**: عمر المريض (إذا ذُكر)
+4. **الجنس**: ذكر أو أنثى (إذا ذُكر)
+5. **العلامات الحيوية** (إذا ذُكرت):
+   - ضغط الدم (مثل: 120/80)
+   - معدل ضربات القلب (مثل: 75)
+   - درجة الحرارة (مثل: 37.5)
+   - تشبع الأكسجين (مثل: 98)
 
 قدم الإجابة بصيغة JSON:
 {
-  "symptoms": ["symptom1", "symptom2"],
-  "urgency": "emergency|urgent|semi-urgent|routine",
-  "urgencyReason": "explanation",
-  "possibleConditions": [{"name": "condition", "probability": 0.8, "reasoning": "why"}],
-  "recommendations": ["recommendation1", "recommendation2"],
-  "redFlags": ["flag1", "flag2"],
-  "nextSteps": "what to do next",
-  "estimatedWaitTime": "time estimate",
-  "vocalMarkers": "observations about voice (pain, distress, etc.)"
+  "chiefComplaint": "الشكوى الرئيسية",
+  "symptoms": "وصف تفصيلي لجميع الأعراض",
+  "patientAge": "العمر (أو null)",
+  "patientGender": "male|female|null",
+  "bloodPressure": "120/80 (أو null)",
+  "heartRate": "75 (أو null)",
+  "temperature": "37.5 (أو null)",
+  "oxygenSaturation": "98 (أو null)"
 }`
-          : `Listen to this patient's audio recording and analyze their symptoms.
+          : `Listen to this patient's audio recording and extract ALL medical information.
 
-Provide a comprehensive assessment including:
-1. **Mentioned Symptoms**: List all symptoms the patient described
-2. **Urgency Level**: (emergency/urgent/semi-urgent/routine)
-3. **Possible Diagnosis**: Potential medical conditions
-4. **Recommendations**: What the patient should do
-5. **Red Flags**: Any warning signs requiring immediate attention
-
-Pay attention to:
-- Voice tone (pain, breathing difficulty, weakness)
-- Iraqi cultural context
-- Common diseases in Iraq
+Extract:
+1. **Chief Complaint**: Main reason for visit (e.g., chest pain, headache, fever)
+2. **Symptoms**: All mentioned symptoms in detail
+3. **Age**: Patient's age (if mentioned)
+4. **Gender**: Male or female (if mentioned)
+5. **Vital Signs** (if mentioned):
+   - Blood pressure (e.g., 120/80)
+   - Heart rate (e.g., 75)
+   - Temperature (e.g., 37.5)
+   - Oxygen saturation (e.g., 98)
 
 Provide response in JSON format:
 {
-  "symptoms": ["symptom1", "symptom2"],
-  "urgency": "emergency|urgent|semi-urgent|routine",
-  "urgencyReason": "explanation",
-  "possibleConditions": [{"name": "condition", "probability": 0.8, "reasoning": "why"}],
-  "recommendations": ["recommendation1", "recommendation2"],
-  "redFlags": ["flag1", "flag2"],
-  "nextSteps": "what to do next",
-  "estimatedWaitTime": "time estimate",
-  "vocalMarkers": "observations about voice (pain, distress, etc.)"
+  "chiefComplaint": "main complaint",
+  "symptoms": "detailed description of all symptoms",
+  "patientAge": "age (or null)",
+  "patientGender": "male|female|null",
+  "bloodPressure": "120/80 (or null)",
+  "heartRate": "75 (or null)",
+  "temperature": "37.5 (or null)",
+  "oxygenSaturation": "98 (or null)"
 }`;
 
         // Invoke Gemini Flash with native audio processing
@@ -147,15 +143,14 @@ Provide response in JSON format:
         } catch {
           // Fallback if not JSON
           analysis = {
-            symptoms: [analysisText],
-            urgency: 'semi-urgent',
-            urgencyReason: 'Unable to parse structured response',
-            possibleConditions: [],
-            recommendations: [analysisText],
-            redFlags: [],
-            nextSteps: 'Please consult a healthcare provider',
-            estimatedWaitTime: 'Unknown',
-            vocalMarkers: 'Analysis completed'
+            chiefComplaint: analysisText.substring(0, 200),
+            symptoms: analysisText,
+            patientAge: null,
+            patientGender: null,
+            bloodPressure: null,
+            heartRate: null,
+            temperature: null,
+            oxygenSaturation: null
           };
         }
 

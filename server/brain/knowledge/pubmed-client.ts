@@ -4,6 +4,8 @@
  */
 
 import { getDb } from "../../db";
+import { brainMedicalLiterature } from "../../../drizzle/schema";
+import { eq, and, desc } from "drizzle-orm";
 
 // PubMed E-utilities base URL
 const PUBMED_BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
@@ -139,18 +141,27 @@ export async function searchAndCachePubMed(
   const db = await getDb();
   if (!db) return [];
 
-  // Check cache first
-  const cacheKey = `pubmed:${query}:${maxResults}`;
-  const cached: any[] = await db.execute(
-    `SELECT literature_data FROM brain_medical_literature 
-     WHERE source = 'pubmed' AND title = '${cacheKey}' 
-     ORDER BY created_at DESC LIMIT 1`
-  );
+  // Check cache first - use hash of query to avoid title length issues
+  const crypto = require('crypto');
+  const queryHash = crypto.createHash('md5').update(`${query}:${maxResults}`).digest('hex');
+  const cacheKey = `pubmed:${queryHash}`;
+  
+  const cached = await db.select({
+    literatureData: brainMedicalLiterature.literatureData
+  })
+  .from(brainMedicalLiterature)
+  .where(
+    and(
+      eq(brainMedicalLiterature.source, 'pubmed'),
+      eq(brainMedicalLiterature.title, cacheKey)
+    )
+  )
+  .orderBy(desc(brainMedicalLiterature.createdAt))
+  .limit(1);
 
-  if (cached && cached.length > 0) {
-    const data = cached[0] as any;
+  if (cached && cached.length > 0 && cached[0].literatureData) {
     try {
-      return JSON.parse(data.literature_data as string);
+      return JSON.parse(cached[0].literatureData);
     } catch {
       // Cache corrupted, continue to fetch
     }
@@ -159,18 +170,17 @@ export async function searchAndCachePubMed(
   // Fetch from PubMed
   const result = await searchPubMed(query, maxResults);
 
-  // Cache in database
+  // Cache in database using Drizzle ORM
   if (result.articles.length > 0) {
-    const literatureData = JSON.stringify(result.articles).replace(/'/g, "''");
-    const authors = result.articles[0].authors.join(", ").replace(/'/g, "''");
-    const abstract = result.articles[0].abstract.replace(/'/g, "''");
-    const url = result.articles[0].url;
-    
-    await db.execute(
-      `INSERT INTO brain_medical_literature 
-       (source, title, authors, publication_date, abstract_text, url, literature_data, created_at)
-       VALUES ('pubmed', '${cacheKey}', '${authors}', '${result.articles[0].pubDate}', '${abstract}', '${url}', '${literatureData}', NOW())`
-    );
+    await db.insert(brainMedicalLiterature).values({
+      source: 'pubmed',
+      title: cacheKey,
+      authors: result.articles[0].authors.join(", "),
+      publicationDate: result.articles[0].pubDate,
+      abstract: result.articles[0].abstract,
+      url: result.articles[0].url,
+      literatureData: JSON.stringify(result.articles),
+    });
   }
 
   return result.articles;

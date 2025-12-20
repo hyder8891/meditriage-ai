@@ -61,26 +61,17 @@ function ClinicalReasoningContent() {
   const audioAnalysisMutation = trpc.audioSymptom.analyzeAudioSymptoms.useMutation({
     onSuccess: (data) => {
       if (data.analysis) {
-        // Extract symptoms from analysis
-        const symptomList = data.analysis.symptoms || [];
-        setSymptoms(symptomList.join(", "));
+        // Populate ALL form fields from audio analysis
+        if (data.analysis.chiefComplaint) setChiefComplaint(data.analysis.chiefComplaint);
+        if (data.analysis.symptoms) setSymptoms(data.analysis.symptoms);
+        if (data.analysis.patientAge) setPatientAge(data.analysis.patientAge);
+        if (data.analysis.patientGender) setPatientGender(data.analysis.patientGender);
+        if (data.analysis.bloodPressure) setBloodPressure(data.analysis.bloodPressure);
+        if (data.analysis.heartRate) setHeartRate(data.analysis.heartRate);
+        if (data.analysis.temperature) setTemperature(data.analysis.temperature);
+        if (data.analysis.oxygenSaturation) setOxygenSaturation(data.analysis.oxygenSaturation);
         
-        // Continue with diagnosis using extracted symptoms
-        generateDiagnosisMutation.mutate({
-          caseId: 1,
-          chiefComplaint: chiefComplaint || data.analysis.urgencyReason || "Patient complaint (from audio)",
-          symptoms: symptomList,
-          vitals: {
-            bloodPressure,
-            heartRate: heartRate ? parseInt(heartRate) : undefined,
-            temperature,
-            oxygenSaturation: oxygenSaturation ? parseInt(oxygenSaturation) : undefined,
-          },
-          patientAge: patientAge ? parseInt(patientAge) : undefined,
-          patientGender,
-        });
-        
-        toast.success("Audio analyzed successfully");
+        toast.success("Audio analyzed - all fields populated! Click Generate to continue.");
       }
     },
     onError: (error) => {
