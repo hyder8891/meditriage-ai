@@ -59,7 +59,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
           <div className="flex items-center justify-between mb-8">
             {sidebarOpen && (
               <div>
-                <h2 className="font-bold text-lg text-gray-900">MediTriage AI</h2>
+                <h2 className="font-bold text-lg text-gray-900">My Doctor طبيبي</h2>
                 <p className="text-xs text-gray-500">Medical OS</p>
               </div>
             )}

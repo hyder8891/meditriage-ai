@@ -71,7 +71,7 @@ export default function MedHome() {
       ],
     },
     why: {
-      title: language === 'ar' ? 'لماذا MediTriage AI Pro' : 'Why MediTriage AI Pro',
+      title: language === 'ar' ? 'لماذا My Doctor طبيبي' : 'Why My Doctor طبيبي',
       subtitle: language === 'ar' 
         ? 'ندعم المستخدمين طوال رحلة الرعاية الخاصة بهم'
         : 'We support users throughout their care journey',
@@ -111,8 +111,8 @@ export default function MedHome() {
     cta: {
       title: language === 'ar' ? 'ابدأ اليوم' : 'Get Started Today',
       subtitle: language === 'ar' 
-        ? 'انضم إلى آلاف المهنيين الطبيين والمرضى الذين يستخدمون MediTriage AI Pro'
-        : 'Join thousands of medical professionals and patients using MediTriage AI Pro',
+        ? 'انضم إلى آلاف المهنيين الطبيين والمرضى الذين يستخدمون My Doctor طبيبي'
+        : 'Join thousands of medical professionals and patients using My Doctor طبيبي',
       patientCTA: language === 'ar' ? 'دخول المريض' : 'Patient Login',
       clinicianCTA: language === 'ar' ? 'دخول الطبيب' : 'Clinician Login',
     },
@@ -125,7 +125,7 @@ export default function MedHome() {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Activity className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">MediTriage AI Pro</span>
+            <span className="text-xl font-bold">My Doctor طبيبي</span>
           </div>
           
           <nav className="hidden md:flex items-center gap-6">
@@ -199,7 +199,7 @@ export default function MedHome() {
         <div className="container">
           <div className="text-center mb-12">
             <p className="text-primary font-semibold mb-2">
-              {language === 'ar' ? 'MediTriage لأعمالك' : 'MediTriage for your business'}
+              {language === 'ar' ? 'My Doctor طبيبي لأعمالك' : 'My Doctor طبيبي for your business'}
             </p>
             <h2 className="text-4xl font-bold">{t.business.title}</h2>
           </div>
@@ -231,7 +231,7 @@ export default function MedHome() {
         <div className="container">
           <div className="text-center mb-12">
             <p className="text-primary font-semibold mb-2">
-              {language === 'ar' ? 'لماذا MediTriage' : 'Why MediTriage'}
+              {language === 'ar' ? 'لماذا My Doctor طبيبي' : 'Why My Doctor طبيبي'}
             </p>
             <h2 className="text-4xl font-bold mb-4">{t.why.title}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -260,7 +260,7 @@ export default function MedHome() {
         <div className="container">
           <div className="text-center mb-12">
             <p className="text-primary font-semibold mb-2">
-              {language === 'ar' ? 'بصمة MediTriage' : 'MediTriage\'s footprint'}
+              {language === 'ar' ? 'بصمة My Doctor طبيبي' : 'My Doctor طبيبي\'s footprint'}
             </p>
             <h2 className="text-4xl font-bold">{t.stats.title}</h2>
           </div>
@@ -313,12 +313,12 @@ export default function MedHome() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
               <Activity className="h-6 w-6 text-primary" />
-              <span className="font-bold">MediTriage AI Pro</span>
+              <span className="font-bold">My Doctor طبيبي</span>
             </div>
             <p className="text-sm text-muted-foreground">
               {language === 'ar' 
-                ? '© 2024 MediTriage AI Pro. جميع الحقوق محفوظة.'
-                : '© 2024 MediTriage AI Pro. All rights reserved.'}
+                ? '© 2024 My Doctor طبيبي. جميع الحقوق محفوظة.'
+                : '© 2024 My Doctor طبيبي. All rights reserved.'}
             </p>
           </div>
         </div>

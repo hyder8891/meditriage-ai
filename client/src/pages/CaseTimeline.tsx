@@ -342,7 +342,7 @@ export default function CaseTimeline() {
         pdf.setFontSize(8);
         pdf.setFont('helvetica', 'italic');
         pdf.text(
-          `MediTriage AI Pro - Page ${i} of ${totalPages}`,
+          `My Doctor طبيبي - Page ${i} of ${totalPages}`,
           pageWidth / 2,
           pageHeight - 10,
           { align: 'center' }

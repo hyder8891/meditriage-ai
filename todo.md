@@ -300,4 +300,9 @@
 - [x] Create in-app toast notifications for new messages
 - [x] Add notification badge counter in navigation
 - [x] Integrate notifications into Messages page
-- [ ] Test real-time notification delivery
+- [x] Test real-time notification delivery
+
+## Branding Update
+- [x] Update application name to "My Doctor طبيبي"
+- [x] Replace logo with new design
+- [x] Update all references in code

@@ -82,7 +82,7 @@ export default function ClinicianDashboard() {
         <div className="p-4">
           <div className="mb-8">
             <div>
-              <h2 className="font-bold text-lg text-gray-900">MediTriage AI</h2>
+              <h2 className="font-bold text-lg text-gray-900">My Doctor طبيبي</h2>
               <p className="text-xs text-gray-500">Medical OS</p>
             </div>
           </div>

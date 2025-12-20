@@ -86,7 +86,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
       // Show browser notification if permitted
       if (hasPermission && 'Notification' in window) {
-        const notification = new Notification('رسالة جديدة - MediTriage', {
+        const notification = new Notification('رسالة جديدة - My Doctor طبيبي', {
           body: data.content.substring(0, 100),
           icon: '/favicon.ico',
           badge: '/favicon.ico',

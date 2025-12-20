@@ -120,7 +120,7 @@ export default function ClinicianLoginNew() {
             <Activity className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">MediTriage AI Pro</h1>
+            <h1 className="text-2xl font-bold text-gray-900">My Doctor طبيبي</h1>
             <p className="text-sm text-gray-500">
               {language === 'ar' ? 'لوحة تحكم الطبيب' : 'Clinician Dashboard'}
             </p>

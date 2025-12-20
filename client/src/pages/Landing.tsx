@@ -168,7 +168,7 @@ export default function Landing() {
             </Badge>
             <h3 className="text-4xl md:text-5xl font-bold">
               {language === 'en' ? 'Why Choose' : 'لماذا تختار'}{' '}
-              <span className="text-gradient">MediTriage AI</span>
+              <span className="text-gradient">My Doctor طبيبي</span>
             </h3>
           </div>
 

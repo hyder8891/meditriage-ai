@@ -97,7 +97,7 @@ export default function Home() {
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
                 <Heart className="w-8 h-8 text-rose-500" />
-                <span className="text-xl font-bold text-slate-900">MediTriage AI Pro</span>
+                <span className="text-xl font-bold text-slate-900">My Doctor طبيبي</span>
               </div>
               <div className="hidden md:flex items-center gap-6 text-sm">
                 <a href="#features" className="text-slate-600 hover:text-slate-900">{language === 'ar' ? 'المميزات' : 'Features'}</a>
@@ -1096,7 +1096,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                    {language === 'ar' ? 'لماذا MediTriage AI Pro؟' : 'Why MediTriage AI Pro?'}
+                    {language === 'ar' ? 'لماذا My Doctor طبيبي؟' : 'Why My Doctor طبيبي?'}
                   </h3>
                   <ul className="space-y-3">
                     {[
@@ -1240,8 +1240,8 @@ export default function Home() {
           </h2>
           <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
             {language === 'ar'
-              ? 'انضم إلى آلاف المرضى والأطباء الذين يثقون في MediTriage AI Pro'
-              : 'Join thousands of patients and doctors who trust MediTriage AI Pro'}
+              ? 'انضم إلى آلاف المرضى والأطباء الذين يثقون في My Doctor طبيبي'
+              : 'Join thousands of patients and doctors who trust My Doctor طبيبي'}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" onClick={() => setLocation("/patient-login")} className="bg-white text-rose-600 hover:bg-slate-100 px-8 py-6 text-lg">
@@ -1263,7 +1263,7 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Heart className="w-6 h-6 text-rose-500" />
-                <span className="text-xl font-bold">MediTriage AI Pro</span>
+                <span className="text-xl font-bold">My Doctor طبيبي</span>
               </div>
               <p className="text-slate-400 text-sm">
                 {language === 'ar'
@@ -1295,7 +1295,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-400">
-            <p>© 2024 MediTriage AI Pro. {language === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
+            <p>© 2024 My Doctor طبيبي. {language === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
           </div>
         </div>
       </footer>
