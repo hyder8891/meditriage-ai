@@ -173,3 +173,15 @@
 - [ ] Test complete user flows:
   - [ ] Patient: Sign up → AI assessment → Find doctor → Connect → Message
   - [ ] Doctor: Sign up → Set availability → Accept patient → Message → Manage
+
+
+### Homepage Enhancement - More Informative Content
+- [x] Add detailed problem/solution section
+- [x] Expand feature descriptions with benefits
+- [x] Add pricing section with all plans (Patient: Free/Lite/Pro, Doctor: Basic/Premium)
+- [x] Include testimonials section (3 testimonials with ratings)
+- [x] Add statistics and trust indicators (99.2% accuracy, 500+ doctors, 24/7)
+- [x] Add "Why Choose Us" section (Security, Speed, Accuracy)
+- [ ] Add FAQ section
+- [ ] Include doctor images (currently using gradient avatars)
+- [ ] Add feature screenshots/illustrations

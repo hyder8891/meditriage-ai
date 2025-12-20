@@ -426,6 +426,330 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Why Choose Us */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200">
+              <Award className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'لماذا نحن' : 'Why Choose Us'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'المنصة الأكثر تطوراً في العراق' : 'Iraq\'s Most Advanced Platform'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'نجمع بين قوة الذكاء الاصطناعي وخبرة الأطباء المعتمدين لتقديم رعاية صحية متكاملة وموثوقة'
+                : 'Combining the power of AI with certified doctors\' expertise for comprehensive and reliable healthcare'}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Shield,
+                title: language === 'ar' ? 'آمن ومعتمد طبياً' : 'Secure & Medically Certified',
+                desc: language === 'ar' 
+                  ? 'جميع أطبائنا معتمدون ومرخصون. نحافظ على خصوصية بياناتك الطبية بأعلى معايير الأمان والتشفير.'
+                  : 'All our doctors are certified and licensed. We protect your medical data with highest security and encryption standards.',
+                features: [
+                  language === 'ar' ? 'تشفير من الدرجة الطبية' : 'Medical-grade encryption',
+                  language === 'ar' ? 'أطباء معتمدون 100%' : '100% certified doctors',
+                  language === 'ar' ? 'خصوصية تامة' : 'Complete privacy',
+                ],
+                color: 'from-green-500 to-emerald-500',
+              },
+              {
+                icon: Zap,
+                title: language === 'ar' ? 'سريع ومتاح 24/7' : 'Fast & Available 24/7',
+                desc: language === 'ar'
+                  ? 'احصل على تقييم فوري بالذكاء الاصطناعي في أقل من 3 ثوانٍ، وتواصل مع الأطباء في أي وقت على مدار الساعة.'
+                  : 'Get instant AI assessment in less than 3 seconds, and connect with doctors anytime, 24/7.',
+                features: [
+                  language === 'ar' ? 'استجابة فورية <3 ثوانٍ' : 'Instant response <3s',
+                  language === 'ar' ? 'متاح 24/7' : 'Available 24/7',
+                  language === 'ar' ? 'لا حاجة للانتظار' : 'No waiting time',
+                ],
+                color: 'from-purple-500 to-indigo-500',
+              },
+              {
+                icon: TrendingUp,
+                title: language === 'ar' ? 'دقة عالية 99.2%' : 'High Accuracy 99.2%',
+                desc: language === 'ar'
+                  ? 'نستخدم أحدث نماذج الذكاء الاصطناعي المدربة على ملايين الحالات الطبية لتقديم تشخيصات دقيقة وموثوقة.'
+                  : 'We use latest AI models trained on millions of medical cases to provide accurate and reliable diagnoses.',
+                features: [
+                  language === 'ar' ? 'دقة 99.2% في التشخيص' : '99.2% diagnosis accuracy',
+                  language === 'ar' ? 'مدرب على ملايين الحالات' : 'Trained on millions of cases',
+                  language === 'ar' ? 'تحديثات مستمرة' : 'Continuous updates',
+                ],
+                color: 'from-rose-500 to-pink-500',
+              },
+            ].map((item, idx) => (
+              <Card key={idx} className="border-2 hover:shadow-xl transition-all">
+                <CardContent className="p-8">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-6`}>
+                    <item.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                  <p className="text-slate-600 mb-6 leading-relaxed">{item.desc}</p>
+                  <ul className="space-y-2">
+                    {item.features.map((feature, fidx) => (
+                      <li key={fidx} className="flex items-center gap-2 text-sm text-slate-700">
+                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-white" id="pricing">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'خطط الاشتراك' : 'Subscription Plans'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'استثمر في صحتك أو ممارستك الطبية' : 'Invest in Your Health or Medical Practice'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'خطط مرنة تناسب احتياجات المرضى والأطباء مع إمكانية الترقية في أي وقت'
+                : 'Flexible plans for patients and doctors with upgrade anytime'}
+            </p>
+          </div>
+
+          {/* Patient Plans */}
+          <div className="mb-16">
+            <h3 className="text-3xl font-bold text-center mb-4 text-rose-600">
+              {language === 'ar' ? 'للمرضى' : 'For Patients'}
+            </h3>
+            <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
+              {language === 'ar' ? 'احصل على تقييم فوري بالذكاء الاصطناعي وتواصل مع أطباء مختصين معتمدين' : 'Get instant AI assessment and connect with certified specialist doctors'}
+            </p>
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {[
+                {
+                  name: language === 'ar' ? 'مجاني' : 'Free',
+                  price: language === 'ar' ? '0 دينار' : '$0',
+                  period: language === 'ar' ? '/شهرياً' : '/month',
+                  desc: language === 'ar' ? 'للتجربة والاستخدام الأساسي' : 'For trial and basic use',
+                  features: [
+                    language === 'ar' ? '3 استشارات شهرياً' : '3 consultations/month',
+                    language === 'ar' ? 'تقييم ذكي أساسي' : 'Basic AI assessment',
+                    language === 'ar' ? 'اتصال بطبيب واحد' : 'Connect with 1 doctor',
+                    language === 'ar' ? 'دعم عبر البريد' : 'Email support',
+                  ],
+                  color: 'border-slate-200',
+                  buttonClass: 'bg-slate-600 hover:bg-slate-700',
+                  popular: false,
+                },
+                {
+                  name: language === 'ar' ? 'لايت' : 'Lite',
+                  price: language === 'ar' ? '15,000 دينار' : '$15',
+                  period: language === 'ar' ? '/شهرياً' : '/month',
+                  desc: language === 'ar' ? 'للاستخدام المنتظم' : 'For regular use',
+                  features: [
+                    language === 'ar' ? '15 استشارة شهرياً' : '15 consultations/month',
+                    language === 'ar' ? 'تقييم ذكي متقدم' : 'Advanced AI assessment',
+                    language === 'ar' ? 'اتصال بـ 3 أطباء' : 'Connect with 3 doctors',
+                    language === 'ar' ? 'رسائل غير محدودة' : 'Unlimited messaging',
+                    language === 'ar' ? 'أولوية في الرد' : 'Priority response',
+                  ],
+                  color: 'border-rose-300 bg-rose-50',
+                  buttonClass: 'bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600',
+                  popular: true,
+                },
+                {
+                  name: language === 'ar' ? 'برو' : 'Pro',
+                  price: language === 'ar' ? '30,000 دينار' : '$30',
+                  period: language === 'ar' ? '/شهرياً' : '/month',
+                  desc: language === 'ar' ? 'للاستخدام المكثف' : 'For intensive use',
+                  features: [
+                    language === 'ar' ? 'استشارات غير محدودة' : 'Unlimited consultations',
+                    language === 'ar' ? 'جميع أدوات الذكاء الاصطناعي' : 'All AI tools',
+                    language === 'ar' ? 'اتصال بأطباء غير محدود' : 'Unlimited doctor connections',
+                    language === 'ar' ? 'دعم على مدار الساعة' : '24/7 support',
+                    language === 'ar' ? 'تقارير مفصلة' : 'Detailed reports',
+                  ],
+                  color: 'border-purple-300',
+                  buttonClass: 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600',
+                  popular: false,
+                },
+              ].map((plan, idx) => (
+                <Card key={idx} className={`border-2 ${plan.color} relative hover:shadow-2xl transition-all`}>
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <Badge className="bg-gradient-to-r from-rose-500 to-purple-500 text-white px-4 py-1">
+                        <Star className="w-3 h-3 mr-1" />
+                        {language === 'ar' ? 'الأكثر شعبية' : 'Most Popular'}
+                      </Badge>
+                    </div>
+                  )}
+                  <CardContent className="p-8">
+                    <h4 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h4>
+                    <p className="text-slate-600 text-sm mb-4">{plan.desc}</p>
+                    <div className="mb-6">
+                      <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
+                      <span className="text-slate-600">{plan.period}</span>
+                    </div>
+                    <Button className={`w-full mb-6 ${plan.buttonClass}`} onClick={() => setLocation('/patient-login')}>
+                      {language === 'ar' ? 'ابدأ الآن' : 'Get Started'}
+                    </Button>
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, fidx) => (
+                        <li key={fidx} className="flex items-start gap-2 text-sm">
+                          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span className="text-slate-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Doctor Plans */}
+          <div>
+            <h3 className="text-3xl font-bold text-center mb-4 text-purple-600">
+              {language === 'ar' ? 'للأطباء' : 'For Doctors'}
+            </h3>
+            <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
+              {language === 'ar' ? 'وسّع قاعدة مرضاك وأدر ممارستك بكفاءة باستخدام أدوات ذكية' : 'Expand your patient base and manage your practice efficiently with smart tools'}
+            </p>
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {[
+                {
+                  name: language === 'ar' ? 'أساسي' : 'Basic',
+                  price: language === 'ar' ? '50,000 دينار' : '$50',
+                  period: language === 'ar' ? '/شهرياً' : '/month',
+                  desc: language === 'ar' ? 'للأطباء المبتدئين' : 'For starting doctors',
+                  features: [
+                    language === 'ar' ? 'حتى 50 مريض' : 'Up to 50 patients',
+                    language === 'ar' ? 'جميع أدوات التشخيص' : 'All diagnostic tools',
+                    language === 'ar' ? 'رسائل غير محدودة' : 'Unlimited messaging',
+                    language === 'ar' ? 'لوحة تحكم احترافية' : 'Professional dashboard',
+                    language === 'ar' ? 'تقارير شهرية' : 'Monthly reports',
+                  ],
+                  color: 'border-blue-200',
+                  buttonClass: 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600',
+                },
+                {
+                  name: language === 'ar' ? 'بريميوم' : 'Premium',
+                  price: language === 'ar' ? '100,000 دينار' : '$100',
+                  period: language === 'ar' ? '/شهرياً' : '/month',
+                  desc: language === 'ar' ? 'للأطباء المحترفين' : 'For professional doctors',
+                  features: [
+                    language === 'ar' ? 'مرضى غير محدودين' : 'Unlimited patients',
+                    language === 'ar' ? 'جميع الميزات المتقدمة' : 'All advanced features',
+                    language === 'ar' ? 'أولوية في البحث' : 'Priority in search',
+                    language === 'ar' ? 'تحليلات متقدمة' : 'Advanced analytics',
+                    language === 'ar' ? 'دعم مخصص' : 'Dedicated support',
+                    language === 'ar' ? 'تدريب مجاني' : 'Free training',
+                  ],
+                  color: 'border-purple-300 bg-purple-50',
+                  buttonClass: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
+                },
+              ].map((plan, idx) => (
+                <Card key={idx} className={`border-2 ${plan.color} hover:shadow-2xl transition-all`}>
+                  <CardContent className="p-8">
+                    <h4 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h4>
+                    <p className="text-slate-600 text-sm mb-4">{plan.desc}</p>
+                    <div className="mb-6">
+                      <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
+                      <span className="text-slate-600">{plan.period}</span>
+                    </div>
+                    <Button className={`w-full mb-6 ${plan.buttonClass}`} onClick={() => setLocation('/clinician-login')}>
+                      {language === 'ar' ? 'انضم الآن' : 'Join Now'}
+                    </Button>
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, fidx) => (
+                        <li key={fidx} className="flex items-start gap-2 text-sm">
+                          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span className="text-slate-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-yellow-100 text-yellow-700 border-yellow-200">
+              <Star className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'آراء العملاء' : 'Testimonials'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'ماذا يقول مستخدمونا' : 'What Our Users Say'}
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: language === 'ar' ? 'أحمد محمد' : 'Ahmed Mohammed',
+                role: language === 'ar' ? 'مريض' : 'Patient',
+                rating: 5,
+                text: language === 'ar'
+                  ? 'منصة رائعة! حصلت على تقييم فوري لأعراضي ثم تواصلت مع طبيب مختص في دقائق. التجربة كانت سلسة جداً.'
+                  : 'Amazing platform! Got instant assessment of my symptoms then connected with a specialist in minutes. Very smooth experience.',
+              },
+              {
+                name: language === 'ar' ? 'د. سارة الجبوري' : 'Dr. Sarah Al-Jubouri',
+                role: language === 'ar' ? 'طبيبة عائلة' : 'Family Doctor',
+                rating: 5,
+                text: language === 'ar'
+                  ? 'ساعدتني المنصة في الوصول لمرضى جدد وإدارة ممارستي بكفاءة. الأدوات الذكية توفر الكثير من الوقت.'
+                  : 'The platform helped me reach new patients and manage my practice efficiently. Smart tools save a lot of time.',
+              },
+              {
+                name: language === 'ar' ? 'فاطمة حسن' : 'Fatima Hassan',
+                role: language === 'ar' ? 'مريضة' : 'Patient',
+                rating: 5,
+                text: language === 'ar'
+                  ? 'أفضل استثمار في صحتي. الاشتراك الشهري يوفر لي استشارات غير محدودة وراحة بال تامة.'
+                  : 'Best investment in my health. Monthly subscription gives me unlimited consultations and complete peace of mind.',
+              },
+            ].map((testimonial, idx) => (
+              <Card key={idx} className="border-2 hover:shadow-xl transition-all">
+                <CardContent className="p-6">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-slate-700 mb-6 leading-relaxed">"{testimonial.text}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-400 to-purple-400 flex items-center justify-center text-white font-bold">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-slate-900">{testimonial.name}</div>
+                      <div className="text-sm text-slate-600">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-br from-rose-500 via-purple-500 to-blue-500 text-white">
         <div className="container mx-auto px-4 text-center">
