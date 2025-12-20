@@ -1335,3 +1335,14 @@
 - [x] Fix language toggle text updates
 - [ ] Verify backend audio endpoints are working
 - [ ] Test complete audio-to-transcription flow with real microphone
+
+
+## Critical Audio Recording Bug
+- [x] Add debug logging to AudioInput component
+- [ ] Test with real microphone to see console logs
+- [ ] Debug why recording animation shows but no audio is captured
+- [ ] Fix MediaRecorder not actually recording audio data
+- [ ] Fix audio blob not being created after stop
+- [ ] Fix transcript generation from captured audio
+- [ ] Verify audio processing backend endpoint
+- [ ] Test complete recording-to-transcript flow

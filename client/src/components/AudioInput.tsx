@@ -65,8 +65,10 @@ export function AudioInput({
 
   // Start recording
   const startRecording = async () => {
+    console.log('[AudioInput] Starting recording...');
     try {
       // Request microphone permission
+      console.log('[AudioInput] Requesting microphone access...');
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -75,25 +77,32 @@ export function AudioInput({
         } 
       });
 
+      console.log('[AudioInput] Microphone access granted');
+      
       // Create MediaRecorder
       const mimeType = MediaRecorder.isTypeSupported('audio/webm') 
         ? 'audio/webm' 
         : 'audio/mp4';
       
+      console.log('[AudioInput] Creating MediaRecorder with mimeType:', mimeType);
       const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       // Handle data available
       mediaRecorder.ondataavailable = (event) => {
+        console.log('[AudioInput] Data available, size:', event.data.size);
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
+          console.log('[AudioInput] Total chunks:', audioChunksRef.current.length);
         }
       };
 
       // Handle recording stop
       mediaRecorder.onstop = () => {
+        console.log('[AudioInput] Recording stopped, chunks collected:', audioChunksRef.current.length);
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        console.log('[AudioInput] Audio blob created, size:', audioBlob.size, 'bytes');
         
         // Validate audio quality
         const validation = validateAudio(audioBlob, recordingTime);
@@ -119,9 +128,11 @@ export function AudioInput({
       };
 
       // Start recording
+      console.log('[AudioInput] Starting MediaRecorder...');
       mediaRecorder.start();
       setIsRecording(true);
       setRecordingTime(0);
+      console.log('[AudioInput] Recording started successfully');
 
       // Start timer
       timerRef.current = setInterval(() => {
@@ -149,18 +160,22 @@ export function AudioInput({
       );
 
     } catch (error) {
-      console.error('Error starting recording:', error);
+      console.error('[AudioInput] Error starting recording:', error);
+      console.error('[AudioInput] Error name:', (error as Error).name);
+      console.error('[AudioInput] Error message:', (error as Error).message);
       toast.error(
         language === 'ar'
-          ? 'فشل الوصول إلى الميكروفون. يرجى التحقق من الأذونات.'
-          : 'Failed to access microphone. Please check permissions.'
+          ? `فشل الوصول إلى الميكروفون: ${(error as Error).message}`
+          : `Failed to access microphone: ${(error as Error).message}`
       );
     }
   };
 
   // Stop recording
   const stopRecording = () => {
+    console.log('[AudioInput] Stopping recording...');
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      console.log('[AudioInput] MediaRecorder state:', mediaRecorderRef.current.state);
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsPaused(false);
