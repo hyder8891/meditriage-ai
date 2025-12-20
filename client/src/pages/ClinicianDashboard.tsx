@@ -81,9 +81,8 @@ export default function ClinicianDashboard() {
       <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 overflow-y-auto">
         <div className="p-4">
           <div className="mb-8">
-            <div>
-              <h2 className="font-bold text-lg text-gray-900">My Doctor طبيبي</h2>
-              <p className="text-xs text-gray-500">Medical OS</p>
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="My Doctor طبيبي" className="h-12 w-auto" />
             </div>
           </div>
 

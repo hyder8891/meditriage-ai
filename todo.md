@@ -306,3 +306,8 @@
 - [x] Update application name to "My Doctor طبيبي"
 - [x] Replace logo with new design
 - [x] Update all references in code
+
+## Logo Display
+- [x] Add logo image to Home page navigation
+- [x] Add logo to other page headers
+- [x] Verify logo displays correctly
