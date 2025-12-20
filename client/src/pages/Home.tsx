@@ -369,56 +369,73 @@ export default function Home() {
             {/* Left: Text Content */}
             <div className={`space-y-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 border border-teal-200 rounded-full">
-                <Sparkles className="w-4 h-4 text-teal-600" />
+                <Users className="w-4 h-4 text-teal-600" />
                 <span className="text-sm font-medium text-teal-900">
-                  {language === 'ar' ? 'الجيل التالي من الرعاية الصحية' : 'Next-Generation Healthcare'}
+                  {language === 'ar' ? 'منصة تربط المرضى بالأطباء' : 'Connecting Patients with Doctors'}
                 </span>
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-teal-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {language === 'ar' ? 'تبسيط إدارة المرضى' : 'Simplify Patient Triage'}
+                  {language === 'ar' ? 'استشارات طبية ذكية' : 'Smart Medical Consultations'}
                 </span>
                 <br />
                 <span className="text-slate-900">
-                  {language === 'ar' ? 'بمنصة شاملة واحدة' : 'with One Comprehensive Platform'}
+                  {language === 'ar' ? 'تجمع بين الذكاء الاصطناعي والأطباء الحقيقيين' : 'Combining AI with Real Doctors'}
                 </span>
               </h1>
               
               <p className="text-xl text-slate-600 leading-relaxed">
                 {language === 'ar' 
-                  ? 'مساعد الرعاية الصحية الذكي المدعوم بالتعاطف. نماذج لغوية كبيرة متقدمة، قاعدة بيانات طبية شاملة، وسياق عراقي محلي لتشخيصات دقيقة وتوصيات قابلة للتنفيذ.'
-                  : 'Empathy-powered intelligent healthcare assistant. Advanced Large Language Models, extensive medical database, and Iraqi local context for accurate diagnoses and actionable recommendations.'}
+                  ? 'منصة طبية متكاملة تربط المرضى بالأطباء المختصين. احصل على تقييم أولي بالذكاء الاصطناعي، ثم تواصل مع طبيب معتمد لاستشارة شاملة وخطة علاجية مخصصة.'
+                  : 'Integrated medical platform connecting patients with specialist doctors. Get an initial AI assessment, then connect with a certified doctor for comprehensive consultation and personalized treatment plan.'}
               </p>
 
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  onClick={() => setLocation("/brain")}
-                  className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  <Brain className="w-5 h-5 mr-2" />
-                  {language === 'ar' ? 'جرب BRAIN' : 'Try BRAIN'}
-                  <Sparkles className="w-5 h-5 ml-2" />
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={() => setLocation("/symptom-checker")}
+                  onClick={() => setLocation("/patient-login")}
                   className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
                 >
-                  <Rocket className="w-5 h-5 mr-2" />
-                  {language === 'ar' ? 'ابدأ التقييم' : 'Start Assessment'}
+                  <Activity className="w-5 h-5 mr-2" />
+                  {language === 'ar' ? 'للمرضى: ابدأ الاستشارة' : 'For Patients: Start Consultation'}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button
                   size="lg"
-                  variant="outline"
                   onClick={() => setLocation("/clinician-login")}
-                  className="border-2 border-teal-600 text-teal-600 hover:bg-teal-50 px-8 py-6 text-lg"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
                 >
-                  <Users className="w-5 h-5 mr-2" />
-                  {language === 'ar' ? 'دخول الأطباء' : 'Clinician Portal'}
+                  <Stethoscope className="w-5 h-5 mr-2" />
+                  {language === 'ar' ? 'للأطباء: إدارة المرضى' : 'For Doctors: Manage Patients'}
+                  <Users className="w-5 h-5 ml-2" />
                 </Button>
+              </div>
+              
+              {/* Value Propositions */}
+              <div className="grid sm:grid-cols-2 gap-4 pt-4">
+                <div className="flex items-start gap-3 p-4 bg-teal-50 rounded-lg border border-teal-100">
+                  <CheckCircle className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900">
+                      {language === 'ar' ? 'للمرضى' : 'For Patients'}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      {language === 'ar' ? 'تقييم فوري + اتصال بطبيب مختص' : 'Instant assessment + Connect with specialist'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-purple-50 rounded-lg border border-purple-100">
+                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900">
+                      {language === 'ar' ? 'للأطباء' : 'For Doctors'}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      {language === 'ar' ? 'إدارة مرضى + أدوات ذكية' : 'Manage patients + Smart tools'}
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Trust Badges */}
@@ -588,16 +605,16 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge variant="secondary" className="mb-4">
-              <Lightbulb className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'الوظائف الشاملة' : 'Comprehensive Functions'}
+              <MessageSquare className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'ميزات المنصة' : 'Platform Features'}
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
-              {language === 'ar' ? 'كل ما تحتاجه في مكان واحد' : 'Everything You Need in One Place'}
+              {language === 'ar' ? 'أدوات متكاملة للمرضى والأطباء' : 'Integrated Tools for Patients & Doctors'}
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
               {language === 'ar' 
-                ? 'مجموعة كاملة من الأدوات الطبية المدعومة بالذكاء الاصطناعي لسير عمل سريري سلس'
-                : 'Complete suite of AI-powered medical tools for seamless clinical workflow'}
+                ? 'منصة شاملة تجمع بين التقييم الذكي للأعراض، والاتصال بالأطباء، وأدوات إدارة المرضى الاحترافية'
+                : 'Comprehensive platform combining smart symptom assessment, doctor connections, and professional patient management tools'}
             </p>
           </div>
 
@@ -787,20 +804,23 @@ export default function Home() {
               {language === 'ar' ? 'خطط الاشتراك' : 'Subscription Plans'}
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              {language === 'ar' ? 'اختر الخطة المناسبة لك' : 'Choose Your Perfect Plan'}
+              {language === 'ar' ? 'استثمر في صحتك أو ممارستك الطبية' : 'Invest in Your Health or Medical Practice'}
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
               {language === 'ar'
-                ? 'خطط مرنة للمرضى والأطباء مع إمكانية الترقية في أي وقت'
-                : 'Flexible plans for patients and doctors with upgrade anytime'}
+                ? 'خطط اشتراك مصممة لتلبية احتياجات المرضى الباحثين عن رعاية طبية متميزة، والأطباء الراغبين في توسيع ممارساتهم'
+                : 'Subscription plans designed for patients seeking premium care and doctors looking to grow their practice'}
             </p>
           </div>
 
           {/* Patient Plans */}
           <div className="mb-16">
-            <h3 className="text-3xl font-bold text-center mb-8 text-teal-600">
+            <h3 className="text-3xl font-bold text-center mb-4 text-teal-600">
               {language === 'ar' ? 'للمرضى' : 'For Patients'}
             </h3>
+            <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
+              {language === 'ar' ? 'احصل على تقييم فوري بالذكاء الاصطناعي وتواصل مع أطباء مختصين معتمدين' : 'Get instant AI assessment and connect with certified specialist doctors'}
+            </p>
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {pricingPlans.patient.map((plan: any, idx: number) => (
                 <Card
@@ -853,9 +873,12 @@ export default function Home() {
 
           {/* Doctor Plans */}
           <div>
-            <h3 className="text-3xl font-bold text-center mb-8 text-purple-600">
+            <h3 className="text-3xl font-bold text-center mb-4 text-purple-600">
               {language === 'ar' ? 'للأطباء' : 'For Doctors'}
             </h3>
+            <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
+              {language === 'ar' ? 'وسّع قاعدة مرضاك وأدر ممارستك بكفاءة باستخدام أدوات ذكية' : 'Expand your patient base and manage your practice efficiently with smart tools'}
+            </p>
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {pricingPlans.doctor.map((plan: any, idx: number) => (
                 <Card
