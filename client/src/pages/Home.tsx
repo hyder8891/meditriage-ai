@@ -6,788 +6,323 @@ import {
   Brain,
   Heart,
   Stethoscope,
-  Zap,
-  Shield,
-  Clock,
   Users,
-  TrendingUp,
-  Sparkles,
+  MessageSquare,
+  Calendar,
+  Shield,
+  Star,
   ArrowRight,
   CheckCircle,
-  Pill,
-  FileText,
-  Mic,
-  BarChart3,
   Microscope,
-  Star,
+  Zap,
+  Clock,
   Award,
-  Globe,
-  Smartphone,
-  Lock,
-  ChevronRight,
-  Database,
-  Cpu,
-  Network,
-  Layers,
-  Target,
-  MessageSquare,
-  Lightbulb,
-  Rocket,
-  BarChart,
-  Crown,
+  TrendingUp,
+  Search,
+  UserPlus,
+  FileText,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const { strings, language } = useLanguage();
-  const [scrollY, setScrollY] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const { language } = useLanguage();
+  const [activeTab, setActiveTab] = useState<'patient' | 'doctor'>('patient');
 
-  useEffect(() => {
-    setIsVisible(true);
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const aiCapabilities = [
-    {
-      icon: Brain,
-      title: language === 'ar' ? 'محرك التفكير السريري' : 'Clinical Reasoning Engine',
-      description: language === 'ar' ? 'نماذج لغوية كبيرة متقدمة (LLM) تحلل الأعراض وتولد تشخيصات تفاضلية بدقة 99.2٪' : 'Advanced Large Language Models (LLM) analyze symptoms and generate differential diagnoses with 99.2% accuracy',
-      features: [
-        language === 'ar' ? 'DeepSeek & Gemini AI' : 'DeepSeek & Gemini AI',
-        language === 'ar' ? 'معالجة اللغة الطبيعية' : 'Natural Language Processing',
-        language === 'ar' ? 'التعلم المستمر' : 'Continuous Learning',
-      ],
-      gradient: "from-purple-600 via-indigo-600 to-blue-600",
-    },
-    {
-      icon: Database,
-      title: language === 'ar' ? 'قاعدة بيانات طبية شاملة' : 'Extensive Medical Database',
-      description: language === 'ar' ? 'أكثر من 10,000 حالة مرضية، 50,000 دواء، وملايين السجلات الطبية للتدريب' : 'Over 10,000 medical conditions, 50,000 medications, and millions of medical records for training',
-      features: [
-        language === 'ar' ? 'سياق عراقي محلي' : 'Iraqi Local Context',
-        language === 'ar' ? 'تحديثات في الوقت الفعلي' : 'Real-time Updates',
-        language === 'ar' ? 'أدلة قائمة على الأدلة' : 'Evidence-based Guidelines',
-      ],
-      gradient: "from-green-600 via-emerald-600 to-teal-600",
-    },
-    {
-      icon: Microscope,
-      title: language === 'ar' ? 'تحليل الصور الطبية بالذكاء الاصطناعي' : 'AI-Powered Medical Imaging',
-      description: language === 'ar' ? 'رؤية حاسوبية متقدمة لتحليل الأشعة السينية، التصوير بالرنين المغناطيسي، والأشعة المقطعية مع اكتشاف الشذوذات' : 'Advanced computer vision for X-ray, MRI, and CT scan analysis with abnormality detection',
-      features: [
-        language === 'ar' ? 'تسجيل الثقة' : 'Confidence Scoring',
-        language === 'ar' ? 'تصنيف الخطورة' : 'Severity Classification',
-        language === 'ar' ? 'توليد التقارير' : 'Report Generation',
-      ],
-      gradient: "from-pink-600 via-rose-600 to-red-600",
-    },
-    {
-      icon: Network,
-      title: language === 'ar' ? 'معالجة متوازية' : 'Parallel Processing',
-      description: language === 'ar' ? 'بنية موزعة للحوسبة السحابية تعالج آلاف الاستشارات الطبية في وقت واحد' : 'Distributed cloud computing architecture processes thousands of medical consultations simultaneously',
-      features: [
-        language === 'ar' ? 'قابلية التوسع' : 'Scalable Infrastructure',
-        language === 'ar' ? 'زمن استجابة منخفض' : 'Low Latency',
-        language === 'ar' ? 'توافر عالي' : 'High Availability',
-      ],
-      gradient: "from-orange-600 via-amber-600 to-yellow-600",
-    },
-  ];
-
-  const platformFunctions = [
-    {
-      icon: Stethoscope,
-      title: strings.homepage.features.clinicalReasoning.title,
-      description: strings.homepage.features.clinicalReasoning.desc,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-    {
-      icon: Microscope,
-      title: strings.homepage.features.xrayAnalysis.title,
-      description: strings.homepage.features.xrayAnalysis.desc,
-      color: "text-pink-600",
-      bgColor: "bg-pink-50",
-    },
-    {
-      icon: Activity,
-      title: strings.homepage.features.bioScanner.title,
-      description: strings.homepage.features.bioScanner.desc,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      icon: Mic,
-      title: strings.homepage.features.liveScribe.title,
-      description: strings.homepage.features.liveScribe.desc,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      icon: Pill,
-      title: strings.homepage.features.pharmaGuard.title,
-      description: strings.homepage.features.pharmaGuard.desc,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-    },
-    {
-      icon: BarChart3,
-      title: strings.homepage.features.careLocator.title,
-      description: strings.homepage.features.careLocator.desc,
-      color: "text-teal-600",
-      bgColor: "bg-teal-50",
-    },
-    {
-      icon: FileText,
-      title: language === 'ar' ? 'مولد ملاحظات SOAP' : 'SOAP Note Generator',
-      description: language === 'ar' ? 'إنشاء تلقائي لملاحظات سريرية منظمة من النصوص الصوتية' : 'Automatically generate structured clinical notes from voice transcriptions',
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-    },
-    {
-      icon: BarChart,
-      title: language === 'ar' ? 'الجدول الزمني للحالة' : 'Case Timeline',
-      description: language === 'ar' ? 'تصور تفاعلي لتقدم المريض مع الرسوم البيانية للعلامات الحيوية' : 'Interactive visualization of patient progression with vital signs charts',
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-50",
-    },
-    {
-      icon: MessageSquare,
-      title: language === 'ar' ? 'الرسائل الآمنة' : 'Secure Messaging',
-      description: language === 'ar' ? 'التواصل المشفر بين المريض والطبيب' : 'Encrypted patient-clinician communication',
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-    },
-  ];
-
-  const stats = [
-    { 
-      value: "99.2%", 
-      label: strings.homepage.stats.accuracy, 
-      icon: Target, 
-      color: "text-green-600",
-      description: language === 'ar' ? 'دقة التشخيص' : 'Diagnostic Accuracy'
-    },
-    { 
-      value: "<3s", 
-      label: language === 'ar' ? 'وقت الاستجابة' : 'Response Time', 
-      icon: Zap, 
-      color: "text-yellow-600",
-      description: language === 'ar' ? 'تحليل فوري' : 'Instant Analysis'
-    },
-    { 
-      value: "50K+", 
-      label: language === 'ar' ? 'الأدوية' : 'Medications', 
-      icon: Pill, 
-      color: "text-blue-600",
-      description: language === 'ar' ? 'في قاعدة البيانات' : 'In Database'
-    },
-    { 
-      value: "10K+", 
-      label: language === 'ar' ? 'الحالات الطبية' : 'Medical Conditions', 
-      icon: Database, 
-      color: "text-purple-600",
-      description: language === 'ar' ? 'تغطية شاملة' : 'Comprehensive Coverage'
-    },
-    { 
-      value: "24/7", 
-      label: language === 'ar' ? 'متاح دائماً' : 'Always Available', 
-      icon: Clock, 
-      color: "text-red-600",
-      description: language === 'ar' ? 'دعم مستمر' : 'Continuous Support'
-    },
-    { 
-      value: "18", 
-      label: language === 'ar' ? 'لغات' : 'Languages', 
-      icon: Globe, 
-      color: "text-teal-600",
-      description: language === 'ar' ? 'دعم متعدد اللغات' : 'Multilingual Support'
-    },
-  ];
-
-  const pricingPlans = {
-    patient: [
-      {
-        name: language === 'ar' ? 'مجاني' : 'Free',
-        price: language === 'ar' ? 'مجاناً' : 'Free',
-        period: language === 'ar' ? '3 استشارات/شهر' : '3 consultations/month',
-        features: [
-          language === 'ar' ? '3 استشارات ذكاء اصطناعي شهرياً' : '3 AI consultations per month',
-          language === 'ar' ? 'تقييم أساسي للأعراض' : 'Basic symptom assessment',
-          language === 'ar' ? 'سجلات صحية محدودة' : 'Limited health records',
-          language === 'ar' ? 'دعم عبر البريد الإلكتروني' : 'Email support',
-        ],
-        cta: language === 'ar' ? 'ابدأ مجاناً' : 'Start Free',
-        popular: false,
-      },
-      {
-        name: language === 'ar' ? 'لايت' : 'Lite',
-        price: '$5',
-        period: language === 'ar' ? '/شهر' : '/month',
-        features: [
-          language === 'ar' ? '20 استشارة ذكاء اصطناعي شهرياً' : '20 AI consultations per month',
-          language === 'ar' ? 'تقييم متقدم للأعراض' : 'Advanced symptom assessment',
-          language === 'ar' ? 'سجلات صحية كاملة' : 'Full health records',
-          language === 'ar' ? 'اتصال مع الأطباء' : 'Doctor connections',
-          language === 'ar' ? 'دعم ذو أولوية' : 'Priority support',
-        ],
-        cta: language === 'ar' ? 'ترقية إلى لايت' : 'Upgrade to Lite',
-        popular: true,
-      },
-      {
-        name: language === 'ar' ? 'برو' : 'Pro',
-        price: '$15',
-        period: language === 'ar' ? '/شهر' : '/month',
-        features: [
-          language === 'ar' ? 'استشارات غير محدودة' : 'Unlimited consultations',
-          language === 'ar' ? 'جميع ميزات لايت' : 'All Lite features',
-          language === 'ar' ? 'أولوية في الاتصال بالأطباء' : 'Priority doctor connections',
-          language === 'ar' ? 'تحليل الأشعة السينية' : 'X-ray analysis',
-          language === 'ar' ? 'دعم 24/7' : '24/7 support',
-        ],
-        cta: language === 'ar' ? 'ترقية إلى برو' : 'Upgrade to Pro',
-        popular: false,
-      },
-    ],
-    doctor: [
-      {
-        name: language === 'ar' ? 'أساسي' : 'Basic',
-        price: '$120',
-        period: language === 'ar' ? '/شهر' : '/month',
-        features: [
-          language === 'ar' ? 'حتى 100 مريض نشط' : 'Up to 100 active patients',
-          language === 'ar' ? 'جميع أدوات التشخيص' : 'All diagnostic tools',
-          language === 'ar' ? 'رسائل آمنة' : 'Secure messaging',
-          language === 'ar' ? 'تقارير أساسية' : 'Basic reports',
-          language === 'ar' ? 'دعم قياسي' : 'Standard support',
-        ],
-        cta: language === 'ar' ? 'ابدأ الأساسي' : 'Start Basic',
-        popular: false,
-      },
-      {
-        name: language === 'ar' ? 'بريميوم' : 'Premium',
-        price: '$250',
-        period: language === 'ar' ? '/شهر' : '/month',
-        features: [
-          language === 'ar' ? 'مرضى غير محدودين' : 'Unlimited patients',
-          language === 'ar' ? 'جميع ميزات الأساسي' : 'All Basic features',
-          language === 'ar' ? 'تحليلات متقدمة' : 'Advanced analytics',
-          language === 'ar' ? 'تكامل API' : 'API integration',
-          language === 'ar' ? 'دعم مخصص 24/7' : 'Dedicated 24/7 support',
-        ],
-        cta: language === 'ar' ? 'ترقية إلى بريميوم' : 'Upgrade to Premium',
-        popular: true,
-      },
-    ],
-  };
-
-  const testimonials = [
+  // Featured doctors data
+  const featuredDoctors = [
     {
       name: language === 'ar' ? 'د. أحمد الحسيني' : 'Dr. Ahmed Al-Husseini',
-      role: language === 'ar' ? 'استشاري طب الطوارئ، بغداد' : 'Emergency Medicine Consultant, Baghdad',
-      quote: language === 'ar' ? 'MediTriage AI Pro غير طريقة عملنا في قسم الطوارئ. التشخيصات الفورية والتوصيات المدعومة بالذكاء الاصطناعي توفر وقتاً ثميناً في الحالات الحرجة.' : 'MediTriage AI Pro has transformed how we work in the emergency department. The instant diagnoses and AI-powered recommendations save precious time in critical cases.',
-      rating: 5,
-      image: '/images/doctor-tablet.jpg',
+      specialty: language === 'ar' ? 'طب الطوارئ' : 'Emergency Medicine',
+      rating: 4.9,
+      patients: 250,
+      available: true,
+      image: '/images/doctor-1.jpg',
     },
     {
       name: language === 'ar' ? 'د. سارة محمود' : 'Dr. Sarah Mahmoud',
-      role: language === 'ar' ? 'طبيبة عائلة، البصرة' : 'Family Physician, Basra',
-      quote: language === 'ar' ? 'قاعدة البيانات الطبية الشاملة والسياق العراقي المحلي يجعلان هذا النظام لا يقدر بثمن. إنه مثل وجود فريق من المتخصصين في متناول يدي.' : 'The extensive medical database and Iraqi local context make this system invaluable. It\'s like having a team of specialists at my fingertips.',
-      rating: 5,
-      image: '/images/doctor-ai-hologram.webp',
+      specialty: language === 'ar' ? 'طب العائلة' : 'Family Medicine',
+      rating: 4.8,
+      patients: 180,
+      available: true,
+      image: '/images/doctor-2.jpg',
     },
     {
       name: language === 'ar' ? 'د. عمر الجبوري' : 'Dr. Omar Al-Jubouri',
-      role: language === 'ar' ? 'أخصائي أشعة، أربيل' : 'Radiologist, Erbil',
-      quote: language === 'ar' ? 'تحليل الأشعة السينية بالذكاء الاصطناعي دقيق بشكل مذهل. لقد ساعدني في اكتشاف شذوذات دقيقة كنت سأفوتها.' : 'The AI-powered X-ray analysis is remarkably accurate. It has helped me detect subtle abnormalities I might have missed.',
-      rating: 5,
-      image: '/images/ai-brain-analysis.webp',
+      specialty: language === 'ar' ? 'الأشعة' : 'Radiology',
+      rating: 5.0,
+      patients: 320,
+      available: false,
+      image: '/images/doctor-3.jpg',
+    },
+  ];
+
+  // AI Tools
+  const aiTools = [
+    {
+      icon: Brain,
+      title: language === 'ar' ? 'محرك التشخيص الذكي' : 'Smart Diagnosis Engine',
+      desc: language === 'ar' ? 'تحليل الأعراض بالذكاء الاصطناعي' : 'AI-powered symptom analysis',
+      color: 'from-purple-500 to-indigo-500',
+    },
+    {
+      icon: Microscope,
+      title: language === 'ar' ? 'تحليل الأشعة' : 'X-Ray Analysis',
+      desc: language === 'ar' ? 'تفسير الصور الطبية' : 'Medical imaging interpretation',
+      color: 'from-pink-500 to-rose-500',
+    },
+    {
+      icon: Activity,
+      title: language === 'ar' ? 'الماسح الحيوي 3D' : '3D Bio-Scanner',
+      desc: language === 'ar' ? 'تصور تشريحي تفاعلي' : 'Interactive anatomy visualization',
+      color: 'from-blue-500 to-cyan-500',
+    },
+    {
+      icon: FileText,
+      title: language === 'ar' ? 'التوثيق الصوتي' : 'Voice Documentation',
+      desc: language === 'ar' ? 'تحويل الصوت إلى نص طبي' : 'Voice to medical text',
+      color: 'from-green-500 to-emerald-500',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Activity className="w-8 h-8 text-teal-600" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+      <nav className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2">
+                <Heart className="w-8 h-8 text-rose-500" />
+                <span className="text-xl font-bold text-slate-900">MediTriage AI Pro</span>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
-                  MediTriage AI Pro
-                </h1>
-                <Badge variant="secondary" className="text-xs">
-                  {language === 'ar' ? '🇮🇶 مدعوم بالذكاء الاصطناعي المتقدم' : '🇮🇶 Powered by Advanced AI'}
-                </Badge>
+              <div className="hidden md:flex items-center gap-6 text-sm">
+                <a href="#features" className="text-slate-600 hover:text-slate-900">{language === 'ar' ? 'المميزات' : 'Features'}</a>
+                <a href="#doctors" className="text-slate-600 hover:text-slate-900">{language === 'ar' ? 'الأطباء' : 'Doctors'}</a>
+                <a href="#pricing" className="text-slate-600 hover:text-slate-900">{language === 'ar' ? 'الأسعار' : 'Pricing'}</a>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <LanguageSwitcher />
-              <Button
-                variant="ghost"
-                onClick={() => setLocation("/patient-login")}
-                className="hidden md:inline-flex"
-              >
-                {language === 'ar' ? 'دخول المريض' : 'Patient Login'}
+              <Button variant="ghost" onClick={() => setLocation("/patient-login")}>
+                {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
               </Button>
-              <Button
-                onClick={() => setLocation("/clinician-login")}
-                className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
-              >
-                {language === 'ar' ? 'دخول الطبيب' : 'Clinician Login'}
+              <Button onClick={() => setLocation("/patient-login")} className="bg-rose-500 hover:bg-rose-600">
+                {language === 'ar' ? 'ابدأ الآن' : 'Get Started'}
               </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section with Parallax */}
-      <section className="relative overflow-hidden py-20 md:py-32">
-        {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-600/10 via-blue-600/10 to-purple-600/10" />
-        <div 
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(20, 184, 166, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
-            transform: `translateY(${scrollY * 0.5}px)`,
-          }}
-        />
-        
-        <div className="container mx-auto px-4 relative z-10">
+      {/* Hero Section */}
+      <section className="py-20 bg-gradient-to-br from-rose-50 via-white to-blue-50">
+        <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text Content */}
-            <div className={`space-y-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 border border-teal-200 rounded-full">
-                <Users className="w-4 h-4 text-teal-600" />
-                <span className="text-sm font-medium text-teal-900">
-                  {language === 'ar' ? 'منصة تربط المرضى بالأطباء' : 'Connecting Patients with Doctors'}
-                </span>
-              </div>
+            <div className="space-y-8">
+              <Badge className="bg-rose-100 text-rose-700 border-rose-200">
+                <Heart className="w-4 h-4 mr-2" />
+                {language === 'ar' ? 'منصة الرعاية الصحية الذكية' : 'Smart Healthcare Platform'}
+              </Badge>
               
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                <span className="bg-gradient-to-r from-teal-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {language === 'ar' ? 'استشارات طبية ذكية' : 'Smart Medical Consultations'}
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+                <span className="text-slate-900">
+                  {language === 'ar' ? 'رعاية صحية متكاملة' : 'Complete Healthcare'}
                 </span>
                 <br />
-                <span className="text-slate-900">
-                  {language === 'ar' ? 'تجمع بين الذكاء الاصطناعي والأطباء الحقيقيين' : 'Combining AI with Real Doctors'}
+                <span className="bg-gradient-to-r from-rose-500 to-purple-500 bg-clip-text text-transparent">
+                  {language === 'ar' ? 'بالذكاء الاصطناعي والأطباء' : 'with AI & Real Doctors'}
                 </span>
               </h1>
               
               <p className="text-xl text-slate-600 leading-relaxed">
-                {language === 'ar' 
-                  ? 'منصة طبية متكاملة تربط المرضى بالأطباء المختصين. احصل على تقييم أولي بالذكاء الاصطناعي، ثم تواصل مع طبيب معتمد لاستشارة شاملة وخطة علاجية مخصصة.'
-                  : 'Integrated medical platform connecting patients with specialist doctors. Get an initial AI assessment, then connect with a certified doctor for comprehensive consultation and personalized treatment plan.'}
+                {language === 'ar'
+                  ? 'احصل على تقييم فوري بالذكاء الاصطناعي، ثم تواصل مع أطباء مختصين معتمدين للحصول على استشارة شاملة وخطة علاجية مخصصة.'
+                  : 'Get instant AI assessment, then connect with certified specialist doctors for comprehensive consultation and personalized treatment plan.'}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  onClick={() => setLocation("/patient-login")}
-                  className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+              {/* Tab Switcher */}
+              <div className="flex gap-2 p-1 bg-slate-100 rounded-lg w-fit">
+                <button
+                  onClick={() => setActiveTab('patient')}
+                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                    activeTab === 'patient'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
                 >
-                  <Activity className="w-5 h-5 mr-2" />
-                  {language === 'ar' ? 'للمرضى: ابدأ الاستشارة' : 'For Patients: Start Consultation'}
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={() => setLocation("/clinician-login")}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+                  <Users className="w-4 h-4 inline mr-2" />
+                  {language === 'ar' ? 'للمرضى' : 'For Patients'}
+                </button>
+                <button
+                  onClick={() => setActiveTab('doctor')}
+                  className={`px-6 py-3 rounded-md font-medium transition-all ${
+                    activeTab === 'doctor'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
                 >
-                  <Stethoscope className="w-5 h-5 mr-2" />
-                  {language === 'ar' ? 'للأطباء: إدارة المرضى' : 'For Doctors: Manage Patients'}
-                  <Users className="w-5 h-5 ml-2" />
-                </Button>
+                  <Stethoscope className="w-4 h-4 inline mr-2" />
+                  {language === 'ar' ? 'للأطباء' : 'For Doctors'}
+                </button>
               </div>
-              
-              {/* Value Propositions */}
-              <div className="grid sm:grid-cols-2 gap-4 pt-4">
-                <div className="flex items-start gap-3 p-4 bg-teal-50 rounded-lg border border-teal-100">
-                  <CheckCircle className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-900">
-                      {language === 'ar' ? 'للمرضى' : 'For Patients'}
-                    </p>
-                    <p className="text-sm text-slate-600">
-                      {language === 'ar' ? 'تقييم فوري + اتصال بطبيب مختص' : 'Instant assessment + Connect with specialist'}
-                    </p>
-                  </div>
+
+              {/* CTAs based on tab */}
+              {activeTab === 'patient' ? (
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    size="lg"
+                    onClick={() => setLocation("/patient-login")}
+                    className="bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600 text-white px-8 py-6 text-lg"
+                  >
+                    <Activity className="w-5 h-5 mr-2" />
+                    {language === 'ar' ? 'ابدأ التقييم المجاني' : 'Start Free Assessment'}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => setLocation("/patient-login")}
+                    className="border-2 px-8 py-6 text-lg"
+                  >
+                    <Search className="w-5 h-5 mr-2" />
+                    {language === 'ar' ? 'ابحث عن طبيب' : 'Find a Doctor'}
+                  </Button>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-purple-50 rounded-lg border border-purple-100">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-900">
-                      {language === 'ar' ? 'للأطباء' : 'For Doctors'}
-                    </p>
-                    <p className="text-sm text-slate-600">
-                      {language === 'ar' ? 'إدارة مرضى + أدوات ذكية' : 'Manage patients + Smart tools'}
-                    </p>
-                  </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    size="lg"
+                    onClick={() => setLocation("/clinician-login")}
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-8 py-6 text-lg"
+                  >
+                    <UserPlus className="w-5 h-5 mr-2" />
+                    {language === 'ar' ? 'انضم كطبيب' : 'Join as Doctor'}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => setLocation("/clinician-login")}
+                    className="border-2 px-8 py-6 text-lg"
+                  >
+                    <TrendingUp className="w-5 h-5 mr-2" />
+                    {language === 'ar' ? 'وسّع ممارستك' : 'Grow Your Practice'}
+                  </Button>
                 </div>
-              </div>
+              )}
 
               {/* Trust Badges */}
-              <div className="flex flex-wrap items-center gap-6 pt-4">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap gap-6 pt-4">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Shield className="w-5 h-5 text-green-600" />
-                  <span className="text-sm text-slate-600">
-                    {language === 'ar' ? 'معتمد طبياً' : 'Medically Certified'}
-                  </span>
+                  <span>{language === 'ar' ? 'معتمد طبياً' : 'Medically Certified'}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm text-slate-600">
-                    {language === 'ar' ? 'مشفر بالكامل' : 'Fully Encrypted'}
-                  </span>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Users className="w-5 h-5 text-blue-600" />
+                  <span>{language === 'ar' ? '500+ طبيب' : '500+ Doctors'}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-purple-600" />
-                  <span className="text-sm text-slate-600">
-                    {language === 'ar' ? 'متوافق مع HIPAA' : 'HIPAA Compliant'}
-                  </span>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Star className="w-5 h-5 text-yellow-500" />
+                  <span>{language === 'ar' ? 'تقييم 4.9/5' : '4.9/5 Rating'}</span>
                 </div>
               </div>
             </div>
 
-            {/* Right: Hero Image */}
-            <div className={`relative transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src="/images/doctor-ai-hologram.webp"
-                  alt="AI Medical Technology"
-                  className="w-full h-auto object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-teal-900/50 to-transparent" />
-                
-                {/* Floating Stats Cards */}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg animate-float">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-slate-900">99.2%</div>
-                      <div className="text-xs text-slate-600">
-                        {language === 'ar' ? 'دقة' : 'Accuracy'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg animate-float" style={{ animationDelay: '1s' }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Zap className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-slate-900">&lt;3s</div>
-                      <div className="text-xs text-slate-600">
-                        {language === 'ar' ? 'استجابة' : 'Response'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-white border-y border-slate-200">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="text-center group hover:scale-105 transition-transform duration-300"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-50 to-blue-50 rounded-2xl mb-4 group-hover:shadow-lg transition-shadow">
-                  <stat.icon className={`w-8 h-8 ${stat.color}`} />
-                </div>
-                <div className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                <div className="text-sm font-medium text-slate-600 mb-1">{stat.label}</div>
-                <div className="text-xs text-slate-500">{stat.description}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* AI Capabilities Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
-        {/* Animated Grid Background */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'linear-gradient(rgba(20, 184, 166, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 184, 166, 0.5) 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
-          }} />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4 bg-teal-500/20 text-teal-300 border-teal-500/50">
-              <Cpu className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'مدعوم بالذكاء الاصطناعي المتقدم' : 'Powered by Advanced AI'}
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              {language === 'ar' ? 'قدرات الذكاء الاصطناعي والبيانات الطبية' : 'AI Capabilities & Medical Data'}
-            </h2>
-            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-              {language === 'ar' 
-                ? 'نماذج لغوية كبيرة متطورة وقاعدة بيانات طبية شاملة تدعم كل قرار'
-                : 'Sophisticated Large Language Models and extensive medical database powering every decision'}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {aiCapabilities.map((capability, index) => (
-              <Card
-                key={index}
-                className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-2xl group"
-              >
-                <CardContent className="p-8">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${capability.gradient} rounded-2xl mb-6 group-hover:scale-110 transition-transform`}>
-                    <capability.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white">{capability.title}</h3>
-                  <p className="text-slate-300 mb-6 leading-relaxed">{capability.description}</p>
-                  <div className="space-y-2">
-                    {capability.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-teal-400" />
-                        <span className="text-sm text-slate-200">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Medical Data Showcase */}
-          <div className="mt-16 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
-              <div>
-                <Database className="w-12 h-12 text-teal-400 mx-auto mb-4" />
-                <div className="text-4xl font-bold mb-2">10,000+</div>
-                <div className="text-slate-300">{language === 'ar' ? 'حالات طبية مع بروتوكولات العلاج' : 'Medical conditions with treatment protocols'}</div>
-              </div>
-              <div>
-                <Pill className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <div className="text-4xl font-bold mb-2">50,000+</div>
-                <div className="text-slate-300">{language === 'ar' ? 'أدوية مع تفاعلات وآثار جانبية' : 'Medications with interactions & side effects'}</div>
-              </div>
-              <div>
-                <Layers className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                <div className="text-4xl font-bold mb-2">1M+</div>
-                <div className="text-slate-300">{language === 'ar' ? 'سجلات طبية للتدريب والتحقق' : 'Medical records for training & validation'}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Platform Functions Grid */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'ميزات المنصة' : 'Platform Features'}
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
-              {language === 'ar' ? 'أدوات متكاملة للمرضى والأطباء' : 'Integrated Tools for Patients & Doctors'}
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              {language === 'ar' 
-                ? 'منصة شاملة تجمع بين التقييم الذكي للأعراض، والاتصال بالأطباء، وأدوات إدارة المرضى الاحترافية'
-                : 'Comprehensive platform combining smart symptom assessment, doctor connections, and professional patient management tools'}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {platformFunctions.map((func, index) => {
-              const functionImages: Record<string, string> = {
-                'Clinical Reasoning Engine': '/images/ai-brain-analysis.webp',
-                'X-Ray Analysis': '/images/xray-chest.jpg',
-                '3D Bio-Scanner': '/images/3d-body-scan.jpg',
-                'Live Scribe': '/images/doctor-recording.jpg',
-                'PharmaGuard': '/images/medication-bottles.jpg',
-                'Care Locator': '/images/hospital-map.webp',
-                'مولد ملاحظات SOAP': '/images/soap-notes.jpg',
-                'الجدول الزمني للحالة': '/images/vital-signs-timeline.jpg',
-                'الرسائل الآمنة': '/images/telemedicine-video.png',
-              };
-              const imageUrl = functionImages[func.title];
-              
-              return (
-              <Card
-                key={index}
-                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-teal-200 overflow-hidden"
-              >
-                {imageUrl && (
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={imageUrl}
-                      alt={func.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className={`absolute top-4 right-4 inline-flex items-center justify-center w-12 h-12 ${func.bgColor} rounded-xl shadow-lg`}>
-                      <func.icon className={`w-6 h-6 ${func.color}`} />
-                    </div>
-                  </div>
-                )}
-                <CardContent className="p-6">
-                  {!imageUrl && (
-                    <div className={`inline-flex items-center justify-center w-14 h-14 ${func.bgColor} rounded-xl mb-4 group-hover:scale-110 transition-transform`}>
-                      <func.icon className={`w-7 h-7 ${func.color}`} />
-                    </div>
-                  )}
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">{func.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{func.description}</p>
-                  <div className="mt-4 flex items-center text-teal-600 font-medium group-hover:gap-2 transition-all">
-                    <span className="text-sm">{language === 'ar' ? 'اعرف المزيد' : 'Learn more'}</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </CardContent>
-              </Card>
-            )})}
-          </div>
-        </div>
-      </section>
-
-      {/* Medical Imaging Showcase */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Badge variant="secondary" className="mb-4">
-                <Microscope className="w-4 h-4 mr-2" />
-                {language === 'ar' ? 'تحليل الصور الطبية' : 'Medical Imaging Analysis'}
-              </Badge>
-              <h2 className="text-4xl font-bold mb-6 text-slate-900">
-                {language === 'ar' ? 'رؤية حاسوبية متقدمة للتشخيص الدقيق' : 'Advanced Computer Vision for Accurate Diagnosis'}
-              </h2>
-              <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                {language === 'ar' 
-                  ? 'نماذج الذكاء الاصطناعي لدينا تحلل الأشعة السينية، التصوير بالرنين المغناطيسي، والأشعة المقطعية لاكتشاف الشذوذات مع تسجيل الثقة وتصنيف الخطورة.'
-                  : 'Our AI models analyze X-rays, MRIs, and CT scans to detect abnormalities with confidence scoring and severity classification.'}
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-1">
-                      {language === 'ar' ? 'اكتشاف الشذوذات' : 'Abnormality Detection'}
-                    </h4>
-                    <p className="text-slate-600">
-                      {language === 'ar' ? 'تحديد الشذوذات الدقيقة التي قد يفوتها العين البشرية' : 'Identify subtle abnormalities that might be missed by the human eye'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                    <Target className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-1">
-                      {language === 'ar' ? 'تسجيل الثقة' : 'Confidence Scoring'}
-                    </h4>
-                    <p className="text-slate-600">
-                      {language === 'ar' ? 'احصل على درجات ثقة لكل اكتشاف لاتخاذ قرارات مستنيرة' : 'Get confidence scores for each detection to make informed decisions'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                    <FileText className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-1">
-                      {language === 'ar' ? 'توليد التقارير' : 'Report Generation'}
-                    </h4>
-                    <p className="text-slate-600">
-                      {language === 'ar' ? 'تقارير أشعة منظمة تلقائياً مع النتائج والتوصيات' : 'Automatically generated structured radiology reports with findings and recommendations'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Hero Image/Stats */}
             <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src="/images/ai-brain-analysis.webp"
-                  alt="AI Brain Analysis"
-                  className="w-full h-auto object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent" />
-              </div>
-              {/* Dashboard Preview Overlay */}
-              <div className="absolute -bottom-6 -right-6 w-64 h-48 bg-white rounded-xl shadow-2xl p-4 hidden lg:block">
-                <img
-                  src="/images/healthcare-dashboard.png"
-                  alt="Healthcare Dashboard"
-                  className="w-full h-full object-cover rounded-lg"
-                />
+              <div className="bg-gradient-to-br from-rose-100 to-purple-100 rounded-3xl p-8 relative overflow-hidden">
+                <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] bg-[size:20px_20px]" />
+                <div className="relative space-y-6">
+                  {/* Stats Cards */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="border-none shadow-lg">
+                      <CardContent className="p-6">
+                        <div className="text-3xl font-bold text-rose-500">99.2%</div>
+                        <div className="text-sm text-slate-600">{language === 'ar' ? 'دقة التشخيص' : 'Diagnosis Accuracy'}</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-none shadow-lg">
+                      <CardContent className="p-6">
+                        <div className="text-3xl font-bold text-blue-500">&lt;3s</div>
+                        <div className="text-sm text-slate-600">{language === 'ar' ? 'وقت الاستجابة' : 'Response Time'}</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-none shadow-lg">
+                      <CardContent className="p-6">
+                        <div className="text-3xl font-bold text-purple-500">500+</div>
+                        <div className="text-sm text-slate-600">{language === 'ar' ? 'أطباء معتمدون' : 'Certified Doctors'}</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-none shadow-lg">
+                      <CardContent className="p-6">
+                        <div className="text-3xl font-bold text-green-500">24/7</div>
+                        <div className="text-sm text-slate-600">{language === 'ar' ? 'متاح دائماً' : 'Always Available'}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-gradient-to-br from-teal-50 to-blue-50">
+      {/* How It Works */}
+      <section className="py-20 bg-white" id="features">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">
-              <Star className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'آراء الأطباء' : 'Clinician Testimonials'}
+            <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200">
+              <Zap className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'كيف يعمل' : 'How It Works'}
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
-              {language === 'ar' ? 'موثوق به من قبل المهنيين الطبيين' : 'Trusted by Medical Professionals'}
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'رحلة رعاية صحية متكاملة' : 'Complete Healthcare Journey'}
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              {language === 'ar' 
-                ? 'اكتشف كيف يحول MediTriage AI Pro الرعاية الصحية في العراق'
-                : 'Discover how MediTriage AI Pro is transforming healthcare across Iraq'}
+              {language === 'ar'
+                ? 'من التقييم الأولي إلى الاستشارة الطبية الشاملة في ثلاث خطوات بسيطة'
+                : 'From initial assessment to comprehensive medical consultation in three simple steps'}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-white hover:shadow-xl transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                    ))}
+            {[
+              {
+                step: '1',
+                icon: Brain,
+                title: language === 'ar' ? 'تقييم ذكي فوري' : 'Instant AI Assessment',
+                desc: language === 'ar' ? 'احصل على تحليل فوري لأعراضك باستخدام الذكاء الاصطناعي المتقدم' : 'Get instant analysis of your symptoms using advanced AI',
+                color: 'from-purple-500 to-indigo-500',
+              },
+              {
+                step: '2',
+                icon: Search,
+                title: language === 'ar' ? 'اتصل بطبيب مختص' : 'Connect with Specialist',
+                desc: language === 'ar' ? 'اختر من بين مئات الأطباء المعتمدين حسب التخصص والتقييم' : 'Choose from hundreds of certified doctors by specialty and rating',
+                color: 'from-rose-500 to-pink-500',
+              },
+              {
+                step: '3',
+                icon: FileText,
+                title: language === 'ar' ? 'خطة علاجية مخصصة' : 'Personalized Treatment',
+                desc: language === 'ar' ? 'احصل على استشارة شاملة وخطة علاجية مصممة خصيصاً لحالتك' : 'Get comprehensive consultation and treatment plan tailored to your condition',
+                color: 'from-blue-500 to-cyan-500',
+              },
+            ].map((item, idx) => (
+              <Card key={idx} className="relative border-2 hover:shadow-xl transition-all">
+                <CardContent className="p-8">
+                  <div className={`absolute top-6 right-6 w-12 h-12 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-xl`}>
+                    {item.step}
                   </div>
-                  <p className="text-slate-700 mb-6 leading-relaxed italic">"{testimonial.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                      {testimonial.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-900">{testimonial.name}</div>
-                      <div className="text-sm text-slate-600">{testimonial.role}</div>
-                    </div>
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-6`}>
+                    <item.icon className="w-8 h-8 text-white" />
                   </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                  <p className="text-slate-600 leading-relaxed">{item.desc}</p>
                 </CardContent>
               </Card>
             ))}
@@ -795,180 +330,122 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 bg-white">
+      {/* Featured Doctors */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-white" id="doctors">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-gradient-to-r from-teal-500 to-blue-500 text-white px-4 py-2">
-              <Crown className="w-4 h-4 mr-2 inline" />
-              {language === 'ar' ? 'خطط الاشتراك' : 'Subscription Plans'}
+            <Badge className="mb-4 bg-rose-100 text-rose-700 border-rose-200">
+              <Stethoscope className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'أطباؤنا' : 'Our Doctors'}
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              {language === 'ar' ? 'استثمر في صحتك أو ممارستك الطبية' : 'Invest in Your Health or Medical Practice'}
+              {language === 'ar' ? 'أطباء معتمدون ومتخصصون' : 'Certified Specialist Doctors'}
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
               {language === 'ar'
-                ? 'خطط اشتراك مصممة لتلبية احتياجات المرضى الباحثين عن رعاية طبية متميزة، والأطباء الراغبين في توسيع ممارساتهم'
-                : 'Subscription plans designed for patients seeking premium care and doctors looking to grow their practice'}
+                ? 'تواصل مع أفضل الأطباء المعتمدين في مختلف التخصصات الطبية'
+                : 'Connect with top certified doctors across various medical specialties'}
             </p>
           </div>
 
-          {/* Patient Plans */}
-          <div className="mb-16">
-            <h3 className="text-3xl font-bold text-center mb-4 text-teal-600">
-              {language === 'ar' ? 'للمرضى' : 'For Patients'}
-            </h3>
-            <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
-              {language === 'ar' ? 'احصل على تقييم فوري بالذكاء الاصطناعي وتواصل مع أطباء مختصين معتمدين' : 'Get instant AI assessment and connect with certified specialist doctors'}
-            </p>
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {pricingPlans.patient.map((plan: any, idx: number) => (
-                <Card
-                  key={idx}
-                  className={`relative border-2 transition-all hover:shadow-2xl ${
-                    plan.popular
-                      ? 'border-teal-400 shadow-xl scale-105'
-                      : 'border-slate-200 hover:border-teal-200'
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-gradient-to-r from-teal-500 to-blue-500 text-white px-4 py-1">
-                        {language === 'ar' ? '⭐ الأكثر شعبية' : '⭐ Most Popular'}
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {featuredDoctors.map((doctor, idx) => (
+              <Card key={idx} className="border-2 hover:shadow-2xl transition-all hover:-translate-y-2">
+                <CardContent className="p-6">
+                  <div className="relative mb-4">
+                    <div className="w-full h-48 bg-gradient-to-br from-slate-200 to-slate-300 rounded-xl flex items-center justify-center">
+                      <Users className="w-20 h-20 text-slate-400" />
+                    </div>
+                    {doctor.available && (
+                      <Badge className="absolute top-3 right-3 bg-green-500 text-white">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />
+                        {language === 'ar' ? 'متاح الآن' : 'Available Now'}
                       </Badge>
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-1">{doctor.name}</h3>
+                  <p className="text-slate-600 mb-4">{doctor.specialty}</p>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-semibold text-slate-900">{doctor.rating}</span>
                     </div>
-                  )}
-                  <CardContent className="p-8">
-                    <div className="text-center mb-6">
-                      <h4 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h4>
-                      <div className="text-4xl font-bold text-teal-600 mb-1">
-                        {plan.price}
-                      </div>
-                      <p className="text-sm text-slate-600">{plan.period}</p>
+                    <div className="text-sm text-slate-600">
+                      {doctor.patients} {language === 'ar' ? 'مريض' : 'patients'}
                     </div>
-                    <ul className="space-y-3 mb-8">
-                      {plan.features.map((feature: string, fidx: number) => (
-                        <li key={fidx} className="flex items-start gap-2">
-                          <CheckCircle className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-slate-700">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => setLocation("/patient-login")}
-                      className={`w-full ${
-                        plan.popular
-                          ? 'bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600'
-                          : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
-                      }`}
-                      size="lg"
-                    >
-                      {plan.cta}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    {language === 'ar' ? 'تواصل الآن' : 'Connect Now'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
-          {/* Doctor Plans */}
-          <div>
-            <h3 className="text-3xl font-bold text-center mb-4 text-purple-600">
-              {language === 'ar' ? 'للأطباء' : 'For Doctors'}
-            </h3>
-            <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
-              {language === 'ar' ? 'وسّع قاعدة مرضاك وأدر ممارستك بكفاءة باستخدام أدوات ذكية' : 'Expand your patient base and manage your practice efficiently with smart tools'}
+          <div className="text-center">
+            <Button size="lg" variant="outline" onClick={() => setLocation("/patient-login")} className="border-2">
+              {language === 'ar' ? 'عرض جميع الأطباء' : 'View All Doctors'}
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Tools Grid */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-purple-100 text-purple-700 border-purple-200">
+              <Brain className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'أدوات الذكاء الاصطناعي' : 'AI-Powered Tools'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'تقنيات طبية متقدمة' : 'Advanced Medical Technology'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'استفد من أحدث تقنيات الذكاء الاصطناعي في التشخيص والتحليل الطبي'
+                : 'Leverage cutting-edge AI technology for medical diagnosis and analysis'}
             </p>
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {pricingPlans.doctor.map((plan: any, idx: number) => (
-                <Card
-                  key={idx}
-                  className={`relative border-2 transition-all hover:shadow-2xl ${
-                    plan.popular
-                      ? 'border-purple-400 shadow-xl scale-105'
-                      : 'border-slate-200 hover:border-purple-200'
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1">
-                        {language === 'ar' ? '⭐ الأكثر شعبية' : '⭐ Most Popular'}
-                      </Badge>
-                    </div>
-                  )}
-                  <CardContent className="p-8">
-                    <div className="text-center mb-6">
-                      <h4 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h4>
-                      <div className="text-4xl font-bold text-purple-600 mb-1">
-                        {plan.price}
-                      </div>
-                      <p className="text-sm text-slate-600">{plan.period}</p>
-                    </div>
-                    <ul className="space-y-3 mb-8">
-                      {plan.features.map((feature: string, fidx: number) => (
-                        <li key={fidx} className="flex items-start gap-2">
-                          <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-slate-700">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => setLocation("/clinician-login")}
-                      className={`w-full ${
-                        plan.popular
-                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-                          : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
-                      }`}
-                      size="lg"
-                    >
-                      {plan.cta}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {aiTools.map((tool, idx) => (
+              <Card key={idx} className="border-2 hover:shadow-xl transition-all hover:-translate-y-1 group">
+                <CardContent className="p-6">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <tool.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{tool.title}</h3>
+                  <p className="text-slate-600 text-sm">{tool.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-teal-600 via-blue-600 to-purple-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%)',
-          }} />
-        </div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              {language === 'ar' ? 'جاهز لتحويل ممارستك الطبية؟' : 'Ready to Transform Your Medical Practice?'}
-            </h2>
-            <p className="text-xl mb-8 text-white/90">
-              {language === 'ar' 
-                ? 'انضم إلى آلاف المهنيين الطبيين الذين يستخدمون MediTriage AI Pro لتقديم رعاية أفضل'
-                : 'Join thousands of medical professionals using MediTriage AI Pro to deliver better care'}
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button
-                size="lg"
-                onClick={() => setLocation("/clinician-login")}
-                className="bg-white text-teal-600 hover:bg-slate-100 px-8 py-6 text-lg shadow-xl"
-              >
-                <Users className="w-5 h-5 mr-2" />
-                {language === 'ar' ? 'ابدأ الآن' : 'Get Started Now'}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => setLocation("/symptom-checker")}
-                className="border-2 border-white text-white hover:bg-white/10 px-8 py-6 text-lg"
-              >
-                <Activity className="w-5 h-5 mr-2" />
-                {language === 'ar' ? 'جرب التقييم' : 'Try Assessment'}
-              </Button>
-            </div>
+      <section className="py-20 bg-gradient-to-br from-rose-500 via-purple-500 to-blue-500 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            {language === 'ar' ? 'ابدأ رحلتك الصحية اليوم' : 'Start Your Health Journey Today'}
+          </h2>
+          <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
+            {language === 'ar'
+              ? 'انضم إلى آلاف المرضى والأطباء الذين يثقون في MediTriage AI Pro'
+              : 'Join thousands of patients and doctors who trust MediTriage AI Pro'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" onClick={() => setLocation("/patient-login")} className="bg-white text-rose-600 hover:bg-slate-100 px-8 py-6 text-lg">
+              <Activity className="w-5 h-5 mr-2" />
+              {language === 'ar' ? 'للمرضى - ابدأ الآن' : 'For Patients - Get Started'}
+            </Button>
+            <Button size="lg" onClick={() => setLocation("/clinician-login")} className="bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg">
+              <Stethoscope className="w-5 h-5 mr-2" />
+              {language === 'ar' ? 'للأطباء - انضم الآن' : 'For Doctors - Join Now'}
+            </Button>
           </div>
         </div>
       </section>
@@ -979,21 +456,21 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Activity className="w-6 h-6 text-teal-400" />
+                <Heart className="w-6 h-6 text-rose-500" />
                 <span className="text-xl font-bold">MediTriage AI Pro</span>
               </div>
               <p className="text-slate-400 text-sm">
-                {language === 'ar' 
-                  ? 'مساعد الرعاية الصحية الذكي المدعوم بالتعاطف للعراق'
-                  : 'Empathy-powered intelligent healthcare assistant for Iraq'}
+                {language === 'ar'
+                  ? 'منصة الرعاية الصحية الذكية للعراق'
+                  : 'Smart Healthcare Platform for Iraq'}
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{language === 'ar' ? 'المنتج' : 'Product'}</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الميزات' : 'Features'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'التسعير' : 'Pricing'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الأمان' : 'Security'}</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">{language === 'ar' ? 'المميزات' : 'Features'}</a></li>
+                <li><a href="#doctors" className="hover:text-white transition-colors">{language === 'ar' ? 'الأطباء' : 'Doctors'}</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">{language === 'ar' ? 'الأسعار' : 'Pricing'}</a></li>
               </ul>
             </div>
             <div>
@@ -1001,7 +478,6 @@ export default function Home() {
               <ul className="space-y-2 text-sm text-slate-400">
                 <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'من نحن' : 'About'}</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'اتصل بنا' : 'Contact'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الوظائف' : 'Careers'}</a></li>
               </ul>
             </div>
             <div>
@@ -1009,7 +485,6 @@ export default function Home() {
               <ul className="space-y-2 text-sm text-slate-400">
                 <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الخصوصية' : 'Privacy'}</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الشروط' : 'Terms'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الامتثال' : 'Compliance'}</a></li>
               </ul>
             </div>
           </div>
@@ -1018,17 +493,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-
-      {/* Custom Animations */}
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

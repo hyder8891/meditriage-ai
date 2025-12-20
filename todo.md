@@ -1,120 +1,175 @@
-# MediTriage AI Pro - TODO
+# MediTriage AI Pro - Complete Redesign TODO
 
-## B2B2C Platform Implementation (Patient-Initiated Model)
+## Phase 9: Complete Visual Redesign - Modern Healthcare Marketplace + AI Tools
 
-### Phase 1: Backend API (Doctor Availability & Patient Connections)
-- [x] Add doctor availability status to users table
-- [x] Create b2b2c-router.ts with all procedures
-- [x] Doctor availability procedures (setStatus, getStatus)
-- [x] Patient connection procedures (connectWithDoctor, getMyDoctors)
-- [x] Doctor patient management (getMyPatients, getPatientProfile)
-- [x] Messaging procedures (sendMessage, getConversation, markAsRead)
-- [x] Subscription procedures (create, getCurrent, upgrade, cancel)
-- [x] Usage tracking procedures (trackUsage, checkLimit, resetUsage)
-- [ ] Shared records procedures (shareRecord, getSharedRecords)
+### 1. Brand New Homepage (Home.tsx)
+- [x] New color scheme (rose/purple/blue gradient palette)
+- [x] Modern hero section
+  - [x] Dual value proposition: AI Tools + Doctor Marketplace
+  - [x] Tab switcher for Patient/Doctor views
+  - [x] Trust badges and certifications
+- [x] Featured Doctors Section
+  - [x] Doctor cards with photos, specialties, ratings
+  - [x] "View All Doctors" CTA
+- [x] AI Tools Showcase
+  - [x] Grid of AI features (Symptom Checker, X-Ray Analysis, BRAIN, etc.)
+  - [x] Visual cards with gradient icons
+- [x] How It Works (3 steps)
+  - [x] Step 1: AI Assessment
+  - [x] Step 2: Connect with Doctor
+  - [x] Step 3: Get Treatment Plan
+- [ ] Pricing Section (keep existing but redesign visually)
+- [ ] Testimonials from patients AND doctors
+- [x] Modern footer
 
-### Phase 2: Doctor Practice Management
-- [x] Doctor Dashboard - Availability toggle and patient queue
-- [x] My Patients page - List of all connected patients
-- [ ] Patient Profile page - Complete patient information and history
-- [ ] Messages page - Inbox with conversations
-- [ ] Appointments page - Calendar and scheduling
-- [ ] Prescriptions page - Manage prescriptions
+### 2. New Patient Dashboard (PatientPortal.tsx)
+- [x] Complete redesign with modern card-based layout
+- [x] Top Navigation Bar
+  - [x] Dashboard | Find Doctors | My Doctors | Messages | Subscription
+- [ ] Dashboard Overview (main page)
+  - [ ] Welcome card with quick actions
+  - [ ] Usage stats widget (consultations remaining)
+  - [ ] Recent activity feed
+  - [ ] Connected doctors widget
+  - [ ] Upcoming appointments
+- [ ] AI Tools Section
+  - [ ] Symptom Checker
+  - [ ] X-Ray Analysis
+  - [ ] BRAIN Analysis
+  - [ ] Bio-Scanner
+  - [ ] All existing AI tools accessible
+- [ ] Find Doctors Tab
+  - [ ] Search and filter interface
+  - [ ] Doctor cards grid
+  - [ ] Connect button
+- [ ] My Doctors Tab
+  - [ ] List of connected doctors
+  - [ ] Quick message button
+  - [ ] View profile
+- [ ] Messages Tab
+  - [ ] Conversation list
+  - [ ] Chat interface
+  - [ ] Real-time messaging
+- [ ] Subscription Tab
+  - [ ] Current plan display
+  - [ ] Usage tracking
+  - [ ] Upgrade options
 
-### Phase 3: Patient Doctor Discovery
-- [x] Find Doctor page - Search with real-time availability
-- [ ] Doctor Profile page - View doctor details and status
-- [x] Instant connection - Connect with available doctors
-- [x] My Doctor page - View connected doctors
-- [ ] My Medical Records page - View shared records from doctors
+### 3. New Doctor Dashboard (ClinicianDashboard.tsx)
+- [ ] Complete redesign with professional layout
+- [ ] Top Navigation
+  - [ ] Dashboard | My Patients | Requests | Messages | Tools | Subscription
+- [ ] Dashboard Overview
+  - [ ] Stats cards (total patients, pending requests, revenue)
+  - [ ] Availability toggle (Online/Offline)
+  - [ ] Recent patient activity
+  - [ ] Upcoming consultations
+- [ ] My Patients Tab
+  - [ ] Patient list with search/filter
+  - [ ] Patient cards with status
+  - [ ] Quick actions (message, view history)
+- [ ] Connection Requests Tab
+  - [ ] Pending patient requests
+  - [ ] Accept/Reject buttons
+  - [ ] Patient preview info
+- [ ] Messages Tab
+  - [ ] Patient conversation list
+  - [ ] Chat interface
+- [ ] AI Tools Section
+  - [ ] Access to all diagnostic tools
+  - [ ] BRAIN, X-Ray Analysis, etc.
+  - [ ] For use with patients
+- [ ] Subscription Tab
+  - [ ] Current plan (Basic/Premium)
+  - [ ] Patient count vs limit
+  - [ ] Revenue metrics
+  - [ ] Upgrade options
 
-### Phase 4: Real-Time Messaging
-- [x] Message thread component with real-time updates
-- [x] Unread count badges
-- [ ] Notification system for new messages
-- [ ] Message attachments support
-- [ ] Typing indicators
+### 4. B2B2C Feature Pages
 
-### Phase 5: Subscription & Monetization (COMPLETED)
-- [x] Patient subscription page (/patient/subscription)
-  - [x] Display current plan (Free/Lite/Pro)
-  - [x] Show usage stats (consultations used/remaining)
-  - [x] Plan comparison cards with features
-  - [x] Upgrade/downgrade buttons
-  - [x] Billing history table
-- [x] Doctor subscription page (/clinician/subscription)
-  - [x] Display current plan (Basic/Premium)
-  - [x] Show patient count (current/max)
-  - [x] Plan comparison cards
-  - [x] Upgrade button
-  - [x] Billing history
-- [ ] Payment integration (Stripe)
-  - [ ] Add Stripe feature using webdev_add_feature
-  - [ ] Create checkout sessions
-  - [ ] Handle webhook events
-  - [ ] Update subscription status in database
-- [x] Usage limit enforcement in frontend
-  - [x] Check consultation limits before symptom checker
-  - [ ] Check patient limits before doctor accepts connections
-  - [x] Show upgrade prompts when limits reached
-  - [x] Display usage stats in dashboards
+#### FindDoctor.tsx (Redesign)
+- [ ] Modern search interface
+- [ ] Filters: Specialty, Availability, Rating, Price
+- [ ] Doctor cards with:
+  - [ ] Profile photo
+  - [ ] Name and specialty
+  - [ ] Rating and reviews
+  - [ ] Availability status (online/offline)
+  - [ ] Price per consultation
+  - [ ] "Connect" button
+- [ ] Doctor profile modal/page
+- [ ] Connection request flow
 
-### Phase 6: Testing & Deployment
-- [ ] Test doctor availability status changes
-- [ ] Test patient connection flow
-- [ ] Test messaging system
-- [ ] Test subscription and payment
-- [ ] Test usage limits
-- [ ] Create checkpoint for B2B2C platform
+#### MyDoctors.tsx (Redesign)
+- [ ] Grid/list of connected doctors
+- [ ] Doctor cards with:
+  - [ ] Profile info
+  - [ ] Last consultation date
+  - [ ] Quick message button
+  - [ ] View full profile
+- [ ] Empty state if no doctors
 
+#### MyPatients.tsx (Redesign)
+- [ ] Professional patient management interface
+- [ ] Patient cards/table with:
+  - [ ] Patient name and photo
+  - [ ] Connection date
+  - [ ] Last consultation
+  - [ ] Status (active/inactive)
+  - [ ] Quick actions
+- [ ] Search and filter
+- [ ] Patient detail view
 
-### Phase 7: Complete Website Redesign for B2B2C (IN PROGRESS)
-- [x] Homepage redesign
-  - [x] Clear patient/doctor portal selection
-  - [x] Subscription pricing preview
-  - [x] Feature comparison table
-  - [x] Trust signals and testimonials
-  - [x] Clear CTAs for both user types
-- [ ] Patient dashboard redesign
-  - [ ] Prominent subscription status card
-  - [ ] Usage stats with progress bars
-  - [ ] Quick access to upgrade
-  - [ ] Doctor connection status
-  - [ ] Recent consultation history
-- [ ] Doctor dashboard redesign
-  - [ ] Patient count and capacity display
-  - [ ] Revenue metrics and ROI calculator
-  - [ ] Subscription tier badge
-  - [ ] Quick stats for active patients
-  - [ ] Upgrade to Premium CTA
-- [ ] Onboarding flow
-  - [ ] Welcome screen for new users
-  - [ ] User type selection (patient/doctor)
-  - [ ] Plan selection wizard
-  - [ ] Feature tour
-- [ ] Monetization touchpoints
-  - [ ] Upgrade prompts when limits reached
-  - [ ] Feature comparison modals
-  - [ ] Success stories from premium users
-  - [ ] Limited-time offers
+#### Messages.tsx (Redesign)
+- [ ] Modern chat interface
+- [ ] Left sidebar: Conversation list
+- [ ] Right panel: Active chat
+- [ ] Message input with attachments
+- [ ] Real-time updates
+- [ ] Unread indicators
+- [ ] Empty state
 
+#### PatientSubscription.tsx (Keep but redesign)
+- [ ] Modern card layout
+- [ ] Current plan highlight
+- [ ] Usage progress bars
+- [ ] Plan comparison table
+- [ ] Upgrade CTAs
+- [ ] Billing history
 
-### Phase 8: Complete Website Redesign - Professional Arabic + B2B2C Messaging
-- [x] Homepage redesign with professional Arabic tone
-  - [x] Hero section: Emphasize patient-doctor marketplace connection
-  - [x] Subheadings: Natural Arabic medical terminology
-  - [x] Feature sections: Highlight doctor availability, matching, messaging
-  - [x] Trust signals: Professional certifications and security badges
-  - [x] Clear CTAs for both patient and doctor journeys
-- [ ] Feature descriptions update
-  - [ ] Rewrite all features to show B2B2C value
-  - [ ] Add doctor-patient connection examples
-  - [ ] Show subscription benefits in context
-- [ ] Pricing section enhancement
-  - [ ] Clearer value propositions for each tier
-  - [ ] Show ROI for doctors (patient revenue potential)
-  - [ ] Emphasize connection features in higher tiers
-- [ ] Dashboard messaging updates
-  - [ ] Patient dashboard: Show doctor discovery prominently
-  - [ ] Doctor dashboard: Emphasize patient management value
-  - [ ] Add upgrade prompts with specific benefits
+#### DoctorSubscription.tsx (Keep but redesign)
+- [ ] Professional dashboard style
+- [ ] Revenue metrics
+- [ ] Patient count tracking
+- [ ] ROI calculator
+- [ ] Plan comparison
+- [ ] Upgrade options
+
+### 5. Visual Design System
+- [ ] New color palette (move from teal/blue to professional medical colors)
+- [ ] Consistent card shadows and borders
+- [ ] Modern typography scale
+- [ ] Spacing system (4px base)
+- [ ] Button styles (primary, secondary, outline)
+- [ ] Icon system consistency
+- [ ] Loading states
+- [ ] Empty states
+- [ ] Error states
+
+### 6. Navigation & Routing
+- [ ] Update App.tsx routes
+- [ ] Patient routes properly connected
+- [ ] Doctor routes properly connected
+- [ ] All B2B2C features accessible
+- [ ] All AI tools accessible
+- [ ] Clean URL structure
+
+### 7. Integration & Polish
+- [ ] All pages responsive
+- [ ] Arabic translations updated
+- [ ] Professional tone throughout
+- [ ] Consistent navigation
+- [ ] All features accessible from dashboards
+- [ ] Test complete user flows:
+  - [ ] Patient: Sign up → AI assessment → Find doctor → Connect → Message
+  - [ ] Doctor: Sign up → Set availability → Accept patient → Message → Manage

@@ -1,416 +1,379 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Calendar,
-  FileText,
-  Pill,
+  Brain,
+  Microscope,
   Activity,
+  FileText,
+  Search,
+  Users,
   MessageSquare,
-  User,
+  Crown,
+  TrendingUp,
+  Calendar,
+  Heart,
+  Stethoscope,
+  ArrowRight,
+  Zap,
   Clock,
   CheckCircle,
   AlertCircle,
-  Heart,
-  Thermometer,
-  Droplet,
-  Stethoscope,
-  Crown,
-  Zap
+  Star,
+  Plus,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useLocation, Link } from "wouter";
-import { PatientVitalsInput } from "@/components/PatientVitalsInput";
-import { PatientReminders } from "@/components/PatientReminders";
+import { useLocation } from "wouter";
+import { Progress } from "@/components/ui/progress";
 
 export default function PatientPortal() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("overview");
   const { data: usage } = trpc.b2b2c.subscription.getUsageStats.useQuery();
+  const { data: myDoctors } = trpc.b2b2c.patientDoctorConnection.getMyDoctors.useQuery();
 
-  // Mock patient ID - in real app, get from auth context
-  const patientId = 1;
+  // AI Tools
+  const aiTools = [
+    {
+      icon: Brain,
+      title: language === 'ar' ? 'محرك التشخيص' : 'Diagnosis Engine',
+      desc: language === 'ar' ? 'تحليل الأعراض بالذكاء الاصطناعي' : 'AI symptom analysis',
+      color: 'from-purple-500 to-indigo-500',
+      path: '/brain',
+    },
+    {
+      icon: Microscope,
+      title: language === 'ar' ? 'تحليل الأشعة' : 'X-Ray Analysis',
+      desc: language === 'ar' ? 'تفسير الصور الطبية' : 'Medical imaging',
+      color: 'from-pink-500 to-rose-500',
+      path: '/xray-analysis',
+    },
+    {
+      icon: Activity,
+      title: language === 'ar' ? 'الماسح الحيوي' : 'Bio-Scanner',
+      desc: language === 'ar' ? 'تصور تشريحي 3D' : '3D anatomy',
+      color: 'from-blue-500 to-cyan-500',
+      path: '/bio-scanner',
+    },
+    {
+      icon: FileText,
+      title: language === 'ar' ? 'التوثيق الصوتي' : 'Voice Notes',
+      desc: language === 'ar' ? 'تحويل الصوت لنص' : 'Voice to text',
+      color: 'from-green-500 to-emerald-500',
+      path: '/live-scribe',
+    },
+  ];
 
-  const { data: appointments } = trpc.clinical.getAppointmentsByPatient.useQuery({ patientId });
-  const { data: prescriptions } = trpc.clinical.getPrescriptionsByPatient.useQuery({ patientId });
-  // Messages feature to be implemented
-  const messages: any[] = [];
-
-  const t = {
-    title: language === "ar" ? "بوابة المريض" : "Patient Portal",
-    subtitle: language === "ar" ? "الوصول إلى سجلاتك الطبية والتواصل مع طبيبك" : "Access your medical records and communicate with your doctor",
-    overview: language === "ar" ? "نظرة عامة" : "Overview",
-    appointments: language === "ar" ? "المواعيد" : "Appointments",
-    medications: language === "ar" ? "الأدوية" : "Medications",
-    vitalSigns: language === "ar" ? "العلامات الحيوية" : "Vital Signs",
-    messages: language === "ar" ? "الرسائل" : "Messages",
-    upcomingAppointments: language === "ar" ? "المواعيد القادمة" : "Upcoming Appointments",
-    activeMedications: language === "ar" ? "الأدوية النشطة" : "Active Medications",
-    recentVitals: language === "ar" ? "العلامات الحيوية الأخيرة" : "Recent Vitals",
-    unreadMessages: language === "ar" ? "رسائل غير مقروءة" : "Unread Messages",
-    symptomChecker: language === "ar" ? "فاحص الأعراض" : "Symptom Checker",
-    checkSymptoms: language === "ar" ? "فحص الأعراض" : "Check Symptoms",
-    viewAll: language === "ar" ? "عرض الكل" : "View All",
-    noAppointments: language === "ar" ? "لا توجد مواعيد قادمة" : "No upcoming appointments",
-    noMedications: language === "ar" ? "لا توجد أدوية نشطة" : "No active medications",
-    noMessages: language === "ar" ? "لا توجد رسائل جديدة" : "No new messages",
-    bookAppointment: language === "ar" ? "حجز موعد" : "Book Appointment",
-    viewMedications: language === "ar" ? "عرض الأدوية" : "View Medications",
-    sendMessage: language === "ar" ? "إرسال رسالة" : "Send Message",
-    date: language === "ar" ? "التاريخ" : "Date",
-    time: language === "ar" ? "الوقت" : "Time",
-    doctor: language === "ar" ? "الطبيب" : "Doctor",
-    status: language === "ar" ? "الحالة" : "Status",
-    pending: language === "ar" ? "قيد الانتظار" : "Pending",
-    confirmed: language === "ar" ? "مؤكد" : "Confirmed",
-    completed: language === "ar" ? "مكتمل" : "Completed",
-    cancelled: language === "ar" ? "ملغى" : "Cancelled",
-    medication: language === "ar" ? "الدواء" : "Medication",
-    dosage: language === "ar" ? "الجرعة" : "Dosage",
-    frequency: language === "ar" ? "التكرار" : "Frequency",
-    from: language === "ar" ? "من" : "From",
-    subject: language === "ar" ? "الموضوع" : "Subject",
-    bloodPressure: language === "ar" ? "ضغط الدم" : "Blood Pressure",
-    heartRate: language === "ar" ? "معدل القلب" : "Heart Rate",
-    temperature: language === "ar" ? "درجة الحرارة" : "Temperature",
-    oxygenSaturation: language === "ar" ? "تشبع الأكسجين" : "Oxygen Saturation",
-    bpm: language === "ar" ? "نبضة/دقيقة" : "bpm",
-    celsius: language === "ar" ? "°س" : "°C",
-    mmHg: language === "ar" ? "ملم زئبق" : "mmHg",
-  };
-
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { label: string; className: string }> = {
-      pending: { label: t.pending, className: "bg-yellow-100 text-yellow-800" },
-      confirmed: { label: t.confirmed, className: "bg-green-100 text-green-800" },
-      completed: { label: t.completed, className: "bg-blue-100 text-blue-800" },
-      cancelled: { label: t.cancelled, className: "bg-red-100 text-red-800" },
-    };
-    const statusInfo = statusMap[status] || statusMap.pending;
-    return <Badge className={statusInfo.className}>{statusInfo.label}</Badge>;
-  };
-
-  const upcomingAppointments = appointments?.filter(a => 
-    a.status === "pending" || a.status === "confirmed"
-  ).slice(0, 3) || [];
-
-  const activePrescriptions = prescriptions?.filter(p => p.status === "active").slice(0, 3) || [];
-  
-  const unreadMessages = messages?.filter((m: any) => !m.isRead).slice(0, 3) || [];
-
-  // Mock vital signs data
-  const recentVitals = {
-    bloodPressure: "120/80",
-    heartRate: 72,
-    temperature: 36.6,
-    oxygenSaturation: 98,
-    recordedAt: new Date().toLocaleDateString(),
-  };
+  // Calculate usage percentage
+  const usagePercentage = usage 
+    ? (usage.consultationsUsed / usage.consultationsLimit) * 100 
+    : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+      {/* Top Navigation */}
+      <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2">
+                <Heart className="w-6 h-6 text-rose-500" />
+                <span className="text-lg font-bold text-slate-900">MediTriage AI Pro</span>
+              </div>
+              <div className="hidden md:flex items-center gap-1">
+                <Button variant="ghost" className="text-rose-600 bg-rose-50">
+                  <Activity className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
+                </Button>
+                <Button variant="ghost" onClick={() => setLocation('/patient/find-doctors')}>
+                  <Search className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'ابحث عن طبيب' : 'Find Doctors'}
+                </Button>
+                <Button variant="ghost" onClick={() => setLocation('/patient/my-doctors')}>
+                  <Users className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'أطبائي' : 'My Doctors'}
+                </Button>
+                <Button variant="ghost" onClick={() => setLocation('/patient/messages')}>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'الرسائل' : 'Messages'}
+                </Button>
+                <Button variant="ghost" onClick={() => setLocation('/patient/subscription')}>
+                  <Crown className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'الاشتراك' : 'Subscription'}
+                </Button>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge className="bg-gradient-to-r from-rose-500 to-purple-500 text-white">
+                {usage?.planName || 'Free'}
+              </Badge>
+              <Button variant="ghost" size="icon">
+                <Users className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.title}</h1>
-          <p className="text-gray-600">{t.subtitle}</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+            {language === 'ar' ? 'مرحباً بك' : 'Welcome Back'}
+          </h1>
+          <p className="text-slate-600">
+            {language === 'ar' 
+              ? 'احصل على تقييم فوري أو تواصل مع أطبائك المختصين'
+              : 'Get instant assessment or connect with your specialist doctors'}
+          </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.overview}</span>
-            </TabsTrigger>
-            <TabsTrigger value="appointments" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.appointments}</span>
-            </TabsTrigger>
-            <TabsTrigger value="medications" className="flex items-center gap-2">
-              <Pill className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.medications}</span>
-            </TabsTrigger>
-            <TabsTrigger value="vitals" className="flex items-center gap-2">
-              <Heart className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.vitalSigns}</span>
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.messages}</span>
-              {unreadMessages.length > 0 && (
-                <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500">
-                  {unreadMessages.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="subscription" className="flex items-center gap-2">
-              <Crown className="w-4 h-4" />
-              <span className="hidden sm:inline">{language === "ar" ? "الاشتراك" : "Subscription"}</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            {/* Symptom Checker Banner */}
-            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/20">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Stethoscope className="h-8 w-8 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold mb-1">{t.symptomChecker}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {language === "ar" 
-                          ? "احصل على تقييم فوري لأعراضك بواسطة الذكاء الاصطناعي"
-                          : "Get instant AI-powered assessment of your symptoms"}
-                      </p>
-                    </div>
-                  </div>
-                  <Button 
-                    size="lg"
-                    onClick={() => setLocation("/symptom-checker")}
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    <Activity className="mr-2 h-5 w-5" />
-                    {t.checkSymptoms}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Upcoming Appointments Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    {t.upcomingAppointments}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {upcomingAppointments.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">{t.noAppointments}</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {upcomingAppointments.map((apt) => (
-                        <div key={apt.id} className="p-3 bg-blue-50 rounded-lg">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium">
-                              {new Date(apt.appointmentDate).toLocaleDateString()}
-                            </span>
-                            {getStatusBadge(apt.status)}
-                          </div>
-                          <p className="text-xs text-gray-600">{apt.notes || 'Appointment'}</p>
-                        </div>
-                      ))}
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => setActiveTab("appointments")}
-                      >
-                        {t.viewAll}
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Active Medications Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Pill className="w-5 h-5 text-green-600" />
-                    {t.activeMedications}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {activePrescriptions.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">{t.noMedications}</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {activePrescriptions.map((rx) => (
-                        <div key={rx.id} className="p-3 bg-green-50 rounded-lg">
-                          <p className="text-sm font-medium">{rx.medicationName}</p>
-                          <p className="text-xs text-gray-600">{rx.dosage} - {rx.frequency}</p>
-                        </div>
-                      ))}
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => setLocation("/patient/medications")}
-                      >
-                        {t.viewMedications}
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Recent Vitals Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-red-600" />
-                    {t.recentVitals}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-2 bg-red-50 rounded">
-                      <div className="flex items-center gap-2">
-                        <Droplet className="w-4 h-4 text-red-600" />
-                        <span className="text-sm">{t.bloodPressure}</span>
-                      </div>
-                      <span className="text-sm font-medium">{recentVitals.bloodPressure} {t.mmHg}</span>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-pink-50 rounded">
-                      <div className="flex items-center gap-2">
-                        <Heart className="w-4 h-4 text-pink-600" />
-                        <span className="text-sm">{t.heartRate}</span>
-                      </div>
-                      <span className="text-sm font-medium">{recentVitals.heartRate} {t.bpm}</span>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
-                      <div className="flex items-center gap-2">
-                        <Thermometer className="w-4 h-4 text-orange-600" />
-                        <span className="text-sm">{t.temperature}</span>
-                      </div>
-                      <span className="text-sm font-medium">{recentVitals.temperature}{t.celsius}</span>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => setActiveTab("vitals")}
-                    >
-                      {t.viewAll}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Messages Card */}
-            {unreadMessages.length > 0 && (
-              <Card className="border-2 border-blue-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-blue-600" />
-                    {t.unreadMessages}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {unreadMessages.map((msg: any) => (
-                      <div key={msg.id} className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm font-medium">Dr. {msg.senderName}</span>
-                          </div>
-                          <span className="text-xs text-gray-500">
-                            {new Date(msg.sentAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-700">{msg.content.substring(0, 100)}...</p>
-                      </div>
-                    ))}
-                    <Button 
-                      className="w-full"
-                      onClick={() => setActiveTab("messages")}
-                    >
-                      {t.viewAll}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          {/* Other tabs would be implemented similarly */}
-          <TabsContent value="medications">
-            <div className="space-y-6">
-              <PatientReminders patientId={patientId} />
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t.medications}</CardTitle>
-                  <CardDescription>
-                    {language === 'ar' ? 'عرض أدويتك الحالية' : 'View your current medications'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={() => setLocation("/patient/medications")}>
-                    {t.viewMedications}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="vitals">
-            <div className="space-y-6">
-              <PatientVitalsInput patientId={patientId} />
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t.vitalSigns} {language === 'ar' ? 'السابقة' : 'History'}</CardTitle>
-                  <CardDescription>
-                    {language === 'ar' ? 'عرض سجل العلامات الحيوية' : 'View your vital signs history'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-500">
-                    {language === 'ar' ? 'سيتم عرض سجل العلامات الحيوية هنا' : 'Vital signs history will be displayed here'}
+        {/* Usage Stats Banner */}
+        {usage && (
+          <Card className="mb-8 border-2 border-rose-100 bg-gradient-to-r from-rose-50 to-purple-50">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-1">
+                    {language === 'ar' ? 'استخدام الاستشارات' : 'Consultation Usage'}
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar' 
+                      ? `${usage.consultationsUsed} من ${usage.consultationsLimit} استشارة مستخدمة`
+                      : `${usage.consultationsUsed} of ${usage.consultationsLimit} consultations used`}
                   </p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="messages">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t.messages}</CardTitle>
-                <CardDescription>Communicate with your healthcare provider</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500">Secure messaging interface will be displayed here</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="subscription">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Crown className="w-6 h-6 text-yellow-500" />
-                  {language === "ar" ? "إدارة الاشتراك" : "Subscription Management"}
-                </CardTitle>
-                <CardDescription>
-                  {language === "ar" 
-                    ? "عرض وإدارة خطة اشتراكك"
-                    : "View and manage your subscription plan"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </div>
+                {usagePercentage >= 80 && (
+                  <Badge className="bg-orange-100 text-orange-700">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    {language === 'ar' ? 'قريب من الحد' : 'Near Limit'}
+                  </Badge>
+                )}
+              </div>
+              <Progress value={usagePercentage} className="h-3 mb-4" />
+              {usagePercentage >= 80 && (
                 <Button 
-                  onClick={() => setLocation("/patient/subscription")}
-                  className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600"
-                  size="lg"
+                  size="sm" 
+                  onClick={() => setLocation('/patient/subscription')}
+                  className="bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600"
                 >
-                  <Crown className="w-5 h-5 mr-2" />
-                  {language === "ar" ? "عرض خطط الاشتراك" : "View Subscription Plans"}
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'ترقية الخطة' : 'Upgrade Plan'}
                 </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Quick Actions */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {/* Start AI Assessment */}
+          <Card className="border-2 hover:shadow-xl transition-all cursor-pointer group" onClick={() => setLocation('/symptom-checker')}>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Brain className="w-7 h-7 text-white" />
+                </div>
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                {language === 'ar' ? 'ابدأ التقييم الذكي' : 'Start AI Assessment'}
+              </h3>
+              <p className="text-slate-600 mb-4">
+                {language === 'ar' 
+                  ? 'احصل على تحليل فوري لأعراضك باستخدام الذكاء الاصطناعي'
+                  : 'Get instant analysis of your symptoms using AI'}
+              </p>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Clock className="w-4 h-4" />
+                <span>{language === 'ar' ? 'أقل من 3 دقائق' : 'Less than 3 minutes'}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Find Doctor */}
+          <Card className="border-2 hover:shadow-xl transition-all cursor-pointer group" onClick={() => setLocation('/patient/find-doctors')}>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Search className="w-7 h-7 text-white" />
+                </div>
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                {language === 'ar' ? 'ابحث عن طبيب' : 'Find a Doctor'}
+              </h3>
+              <p className="text-slate-600 mb-4">
+                {language === 'ar' 
+                  ? 'تصفح واختر من بين مئات الأطباء المعتمدين'
+                  : 'Browse and choose from hundreds of certified doctors'}
+              </p>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Users className="w-4 h-4" />
+                <span>{language === 'ar' ? '500+ طبيب متاح' : '500+ doctors available'}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* My Doctors */}
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl">
+                  {language === 'ar' ? 'أطبائي' : 'My Doctors'}
+                </CardTitle>
+                <p className="text-slate-600 text-sm mt-1">
+                  {language === 'ar' ? 'الأطباء المتصلون بك' : 'Your connected doctors'}
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => setLocation('/patient/my-doctors')}>
+                {language === 'ar' ? 'عرض الكل' : 'View All'}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {myDoctors && myDoctors.length > 0 ? (
+              <div className="grid md:grid-cols-3 gap-4">
+                {myDoctors.slice(0, 3).map((connection: any) => (
+                  <Card key={connection.id} className="border hover:shadow-lg transition-all">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                          <Stethoscope className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-slate-900 truncate">
+                            {connection.doctor?.name || language === 'ar' ? 'د. أحمد' : 'Dr. Ahmed'}
+                          </h4>
+                          <p className="text-sm text-slate-600 truncate">
+                            {connection.doctor?.specialty || language === 'ar' ? 'طب عام' : 'General Medicine'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm font-medium">4.9</span>
+                        <Badge className="bg-green-100 text-green-700 text-xs">
+                          {language === 'ar' ? 'متاح' : 'Available'}
+                        </Badge>
+                      </div>
+                      <Button size="sm" className="w-full" onClick={() => setLocation('/patient/messages')}>
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        {language === 'ar' ? 'إرسال رسالة' : 'Send Message'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">
+                  {language === 'ar' ? 'لا يوجد أطباء متصلون' : 'No Connected Doctors'}
+                </h3>
+                <p className="text-slate-600 mb-4">
+                  {language === 'ar' 
+                    ? 'ابحث عن طبيب وتواصل معه للحصول على استشارة'
+                    : 'Find and connect with a doctor to get consultation'}
+                </p>
+                <Button onClick={() => setLocation('/patient/find-doctors')}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'ابحث عن طبيب' : 'Find Doctor'}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* AI Tools Grid */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl">
+                  {language === 'ar' ? 'أدوات الذكاء الاصطناعي' : 'AI-Powered Tools'}
+                </CardTitle>
+                <p className="text-slate-600 text-sm mt-1">
+                  {language === 'ar' ? 'أدوات تشخيصية متقدمة' : 'Advanced diagnostic tools'}
+                </p>
+              </div>
+              <Zap className="w-6 h-6 text-purple-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {aiTools.map((tool, idx) => (
+                <Card 
+                  key={idx} 
+                  className="border-2 hover:shadow-lg transition-all cursor-pointer group"
+                  onClick={() => setLocation(tool.path)}
+                >
+                  <CardContent className="p-6">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                      <tool.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="font-bold text-slate-900 mb-1">{tool.title}</h3>
+                    <p className="text-sm text-slate-600">{tool.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="text-2xl">
+              {language === 'ar' ? 'النشاط الأخير' : 'Recent Activity'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                {
+                  icon: CheckCircle,
+                  title: language === 'ar' ? 'تم إكمال التقييم' : 'Assessment Completed',
+                  desc: language === 'ar' ? 'تقييم الأعراض - صداع وحمى' : 'Symptom assessment - Headache and fever',
+                  time: language === 'ar' ? 'منذ ساعتين' : '2 hours ago',
+                  color: 'text-green-600 bg-green-100',
+                },
+                {
+                  icon: MessageSquare,
+                  title: language === 'ar' ? 'رسالة جديدة' : 'New Message',
+                  desc: language === 'ar' ? 'من د. أحمد الحسيني' : 'From Dr. Ahmed Al-Husseini',
+                  time: language === 'ar' ? 'منذ 5 ساعات' : '5 hours ago',
+                  color: 'text-blue-600 bg-blue-100',
+                },
+                {
+                  icon: Calendar,
+                  title: language === 'ar' ? 'موعد قادم' : 'Upcoming Appointment',
+                  desc: language === 'ar' ? 'غداً الساعة 10:00 صباحاً' : 'Tomorrow at 10:00 AM',
+                  time: language === 'ar' ? 'غداً' : 'Tomorrow',
+                  color: 'text-purple-600 bg-purple-100',
+                },
+              ].map((activity, idx) => (
+                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg hover:bg-slate-50 transition-colors">
+                  <div className={`w-10 h-10 rounded-full ${activity.color} flex items-center justify-center flex-shrink-0`}>
+                    <activity.icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-slate-900">{activity.title}</h4>
+                    <p className="text-sm text-slate-600">{activity.desc}</p>
+                  </div>
+                  <span className="text-xs text-slate-500">{activity.time}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
