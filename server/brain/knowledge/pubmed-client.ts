@@ -6,6 +6,7 @@
 import { getDb } from "../../db";
 import { brainMedicalLiterature } from "../../../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
+import crypto from "crypto";
 
 // PubMed E-utilities base URL
 const PUBMED_BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
@@ -142,7 +143,6 @@ export async function searchAndCachePubMed(
   if (!db) return [];
 
   // Check cache first - use hash of query to avoid title length issues
-  const crypto = require('crypto');
   const queryHash = crypto.createHash('md5').update(`${query}:${maxResults}`).digest('hex');
   const cacheKey = `pubmed:${queryHash}`;
   

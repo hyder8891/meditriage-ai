@@ -1434,3 +1434,11 @@
 - [x] Added Iraqi healthcare context (common diseases, available medications)
 - [x] Improved Plan section with: Immediate Management, Investigations, Follow-up, Patient Education
 - [ ] User needs to test: generate SOAP note and verify improved structure
+
+## CRITICAL: "require is not defined" Error in Clinical Reasoning
+- [x] Error occurs when generating differential diagnosis
+- [x] Found: server/brain/knowledge/pubmed-client.ts line 145 using require('crypto')
+- [x] Fixed: Added `import crypto from "crypto"` at top of file
+- [x] Fixed: Removed inline `const crypto = require('crypto')`
+- [x] Now using ES6 import instead of CommonJS require
+- [ ] User needs to test: generate diagnosis and verify no "require is not defined" error
