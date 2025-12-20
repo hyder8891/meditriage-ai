@@ -511,7 +511,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-6 text-center">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
               <div className="text-4xl font-bold text-rose-400 mb-2">10M+</div>
-              <div className="text-slate-300">{language === 'ar' ? 'حالة طبية' : 'Medical Cases'}</div>
+              <div className="text-slate-300">{language === 'ar' ? 'تقارير طبية' : 'Medical Reports'}</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
               <div className="text-4xl font-bold text-blue-400 mb-2">500+</div>
@@ -522,7 +522,7 @@ export default function Home() {
               <div className="text-slate-300">{language === 'ar' ? 'وقت التشغيل' : 'Uptime'}</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-4xl font-bold text-green-400 mb-2">&lt;3s</div>
+              <div className="text-4xl font-bold text-green-400 mb-2">{language === 'ar' ? '<3ثواني' : '<3s'}</div>
               <div className="text-slate-300">{language === 'ar' ? 'وقت الاستجابة' : 'Response Time'}</div>
             </div>
           </div>
@@ -1100,7 +1100,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                    {language === 'ar' ? 'لماذا My Doctor طبيبي؟' : 'Why My Doctor طبيبي?'}
+                    {language === 'ar' ? 'لماذا تطبيق طبيبي؟' : 'Why My Doctor طبيبي?'}
                   </h3>
                   <ul className="space-y-3">
                     {[

@@ -320,3 +320,8 @@
 ## UI Spacing Improvements
 - [x] Improve spacing on tab switcher buttons
 - [x] Fix spacing between icons and text in tab buttons
+
+## Content Updates
+- [x] Change "حالة طبية" to "تقارير طبية" (Medical Cases to Medical Reports)
+- [x] Change "<3s" to show "<3ثواني" in Arabic version
+- [x] Change "لماذا My Doctor طبيبي؟" to "لماذا تطبيق طبيبي؟"
