@@ -46,6 +46,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Patients from "./pages/Patients";
 import AddPatient from "./pages/AddPatient";
 import Reports from "./pages/Reports";
+import MyPatients from "./pages/MyPatients";
+import FindDoctor from "./pages/FindDoctor";
+import MyDoctors from "./pages/MyDoctors";
+import Messages from "./pages/Messages";
 
 function Router() {
   return (
@@ -74,6 +78,10 @@ function Router() {
       <Route path={"/clinician/patients"} component={Patients} />
       <Route path={"/clinician/patients/add"} component={AddPatient} />
       <Route path={"/clinician/reports"} component={Reports} />
+      <Route path={"/clinician/my-patients"} component={MyPatients} />
+      <Route path={"/patient/find-doctor"} component={FindDoctor} />
+      <Route path={"/patient/my-doctors"} component={MyDoctors} />
+      <Route path={"/messages"} component={Messages} />
       <Route path={"/patient/medications"} component={PatientMedications} />
       <Route path={"/patient/portal"}>
         {() => <ProtectedRoute requiredRole="patient"><PatientPortal /></ProtectedRoute>}

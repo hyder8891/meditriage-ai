@@ -20,6 +20,13 @@ export const users = mysqlTable("users", {
   specialty: varchar("specialty", { length: 100 }),
   verified: boolean("verified").default(false).notNull(),
   
+  // Doctor availability status (for B2B2C platform)
+  availabilityStatus: mysqlEnum("availability_status", ["available", "busy", "offline"]).default("offline"),
+  currentPatientCount: int("current_patient_count").default(0), // Number of patients in queue
+  maxPatientsPerDay: int("max_patients_per_day").default(50), // Daily limit
+  lastStatusChange: timestamp("last_status_change"),
+  autoOfflineMinutes: int("auto_offline_minutes").default(15), // Auto-offline after inactivity
+  
   // Email verification
   emailVerified: boolean("email_verified").default(false).notNull(),
   verificationToken: varchar("verification_token", { length: 255 }),
@@ -1256,3 +1263,262 @@ export const brainMedicalLiterature = mysqlTable("brain_medical_literature", {
 
 export type BrainMedicalLiterature = typeof brainMedicalLiterature.$inferSelect;
 export type InsertBrainMedicalLiterature = typeof brainMedicalLiterature.$inferInsert;
+
+/**
+ * Doctor-Patient Relationships - links doctors to their patients
+ */
+export const doctorPatientRelationships = mysqlTable("doctor_patient_relationships", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Relationship participants
+  doctorId: int("doctor_id").notNull(), // user ID with role='doctor' or 'clinician'
+  patientId: int("patient_id").notNull(), // user ID with role='patient'
+  
+  // Relationship type
+  relationshipType: mysqlEnum("relationship_type", [
+    "primary",      // Primary care physician
+    "specialist",   // Specialist consultant
+    "consultant",   // One-time consultation
+    "referral"      // Referred by another doctor
+  ]).default("primary").notNull(),
+  
+  // Status
+  status: mysqlEnum("status", [
+    "active",       // Currently active relationship
+    "inactive",     // Temporarily inactive
+    "pending",      // Invitation sent, not yet accepted
+    "terminated"    // Relationship ended
+  ]).default("pending").notNull(),
+  
+  // Permissions - what doctor can see/do
+  canViewRecords: boolean("can_view_records").default(true),
+  canPrescribe: boolean("can_prescribe").default(true),
+  canMessage: boolean("can_message").default(true),
+  canScheduleAppointments: boolean("can_schedule_appointments").default(true),
+  
+  // Metadata
+  notes: text("notes"), // Internal notes about relationship
+  referredBy: int("referred_by"), // Doctor ID who made referral
+  
+  // Timestamps
+  establishedAt: timestamp("established_at").defaultNow().notNull(),
+  terminatedAt: timestamp("terminated_at"),
+  terminationReason: text("termination_reason"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorPatientRelationship = typeof doctorPatientRelationships.$inferSelect;
+export type InsertDoctorPatientRelationship = typeof doctorPatientRelationships.$inferInsert;
+
+/**
+ * Patient Invitations - tracks invitation codes for patients to join doctor's practice
+ */
+export const patientInvitations = mysqlTable("patient_invitations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Invitation details
+  doctorId: int("doctor_id").notNull(),
+  invitationCode: varchar("invitation_code", { length: 32 }).unique().notNull(), // Unique code
+  
+  // Patient contact info (before they register)
+  patientEmail: varchar("patient_email", { length: 320 }),
+  patientPhone: varchar("patient_phone", { length: 50 }),
+  patientName: varchar("patient_name", { length: 255 }),
+  
+  // Status
+  status: mysqlEnum("status", [
+    "pending",      // Sent, not yet accepted
+    "accepted",     // Patient accepted and registered
+    "expired",      // Invitation expired
+    "cancelled"     // Doctor cancelled invitation
+  ]).default("pending").notNull(),
+  
+  // Acceptance
+  acceptedBy: int("accepted_by"), // user ID of patient who accepted
+  acceptedAt: timestamp("accepted_at"),
+  
+  // Expiration
+  expiresAt: timestamp("expires_at").notNull(), // Default 7 days from creation
+  
+  // Invitation message
+  personalMessage: text("personal_message"), // Optional message from doctor
+  
+  // Metadata
+  sentVia: mysqlEnum("sent_via", ["email", "sms", "link", "qr_code"]),
+  timesViewed: int("times_viewed").default(0),
+  lastViewedAt: timestamp("last_viewed_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PatientInvitation = typeof patientInvitations.$inferSelect;
+export type InsertPatientInvitation = typeof patientInvitations.$inferInsert;
+
+/**
+ * Subscriptions - manages user subscription plans and billing
+ */
+export const subscriptions = mysqlTable("subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // User and plan
+  userId: int("user_id").notNull().unique(), // One subscription per user
+  
+  // Plan details
+  planType: mysqlEnum("plan_type", [
+    // Patient plans
+    "patient_free",
+    "patient_lite",
+    "patient_pro",
+    // Doctor plans
+    "doctor_basic",
+    "doctor_premium",
+    // Enterprise
+    "enterprise"
+  ]).notNull(),
+  
+  // Pricing
+  pricePerMonth: decimal("price_per_month", { precision: 10, scale: 2 }).notNull(), // In USD
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  
+  // Status
+  status: mysqlEnum("status", [
+    "active",       // Currently active and paid
+    "trialing",     // In trial period
+    "past_due",     // Payment failed, grace period
+    "cancelled",    // Cancelled, active until period end
+    "expired"       // Subscription ended
+  ]).default("active").notNull(),
+  
+  // Billing cycle
+  billingCycle: mysqlEnum("billing_cycle", ["monthly", "yearly"]).default("monthly").notNull(),
+  currentPeriodStart: timestamp("current_period_start").notNull(),
+  currentPeriodEnd: timestamp("current_period_end").notNull(),
+  
+  // Trial
+  trialStart: timestamp("trial_start"),
+  trialEnd: timestamp("trial_end"),
+  
+  // Cancellation
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+  cancelledAt: timestamp("cancelled_at"),
+  cancellationReason: text("cancellation_reason"),
+  
+  // Payment integration
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
+  paymentMethod: mysqlEnum("payment_method", [
+    "stripe",
+    "zain_cash",
+    "asia_hawala",
+    "bank_transfer",
+    "cash",
+    "manual"
+  ]),
+  
+  // Last payment
+  lastPaymentDate: timestamp("last_payment_date"),
+  lastPaymentAmount: decimal("last_payment_amount", { precision: 10, scale: 2 }),
+  lastPaymentStatus: mysqlEnum("last_payment_status", ["succeeded", "failed", "pending"]),
+  
+  // Next payment
+  nextPaymentDate: timestamp("next_payment_date"),
+  nextPaymentAmount: decimal("next_payment_amount", { precision: 10, scale: 2 }),
+  
+  // Metadata
+  metadata: text("metadata"), // JSON for additional data
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+/**
+ * Usage Tracking - tracks feature usage for enforcing plan limits
+ */
+export const usageTracking = mysqlTable("usage_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // User and feature
+  userId: int("user_id").notNull(),
+  feature: varchar("feature", { length: 100 }).notNull(), // 'symptom_check', 'message', 'patient_invite', etc.
+  
+  // Usage count
+  count: int("count").default(0).notNull(),
+  
+  // Period (resets monthly)
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  
+  // Limit for this period
+  limit: int("limit"), // null = unlimited
+  
+  // Metadata
+  lastUsedAt: timestamp("last_used_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UsageTracking = typeof usageTracking.$inferSelect;
+export type InsertUsageTracking = typeof usageTracking.$inferInsert;
+
+/**
+ * Shared Records - controls what medical records patients can see
+ */
+export const sharedRecords = mysqlTable("shared_records", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Participants
+  doctorId: int("doctor_id").notNull(), // Doctor who shared
+  patientId: int("patient_id").notNull(), // Patient who can view
+  
+  // Record reference
+  recordType: mysqlEnum("record_type", [
+    "case",
+    "vital",
+    "diagnosis",
+    "prescription",
+    "clinical_note",
+    "transcription",
+    "timeline_event",
+    "appointment",
+    "consultation",
+    "lab_result",
+    "imaging"
+  ]).notNull(),
+  recordId: int("record_id").notNull(), // ID of the actual record
+  
+  // Permissions
+  patientCanView: boolean("patient_can_view").default(true),
+  patientCanDownload: boolean("patient_can_download").default(false),
+  patientCanComment: boolean("patient_can_comment").default(false),
+  
+  // Visibility settings
+  hideFromPatient: boolean("hide_from_patient").default(false), // Temporarily hide
+  showAfter: timestamp("show_after"), // Delay visibility
+  
+  // Sharing metadata
+  shareReason: text("share_reason"), // Why this was shared
+  sharedAt: timestamp("shared_at").defaultNow().notNull(),
+  
+  // Patient interaction
+  viewedByPatient: boolean("viewed_by_patient").default(false),
+  firstViewedAt: timestamp("first_viewed_at"),
+  lastViewedAt: timestamp("last_viewed_at"),
+  viewCount: int("view_count").default(0),
+  
+  // Revocation
+  revokedAt: timestamp("revoked_at"),
+  revocationReason: text("revocation_reason"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SharedRecord = typeof sharedRecords.$inferSelect;
+export type InsertSharedRecord = typeof sharedRecords.$inferInsert;
