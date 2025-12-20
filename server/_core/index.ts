@@ -8,6 +8,15 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeBatchScheduler } from "./batch-scheduler";
+import { 
+  securityHeaders, 
+  sanitizeInput, 
+  requestSizeLimiter,
+  apiLimiter,
+  detectSuspiciousActivity,
+  logAudit,
+  getClientIp
+} from "./security";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,14 +40,39 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Security middleware - MUST be first
+  app.use(securityHeaders);
+  app.use(requestSizeLimiter);
+  
+  // Suspicious activity detection
+  app.use((req, res, next) => {
+    const { suspicious, reasons } = detectSuspiciousActivity(req);
+    if (suspicious) {
+      logAudit({
+        action: 'security.suspicious_activity',
+        ipAddress: getClientIp(req),
+        userAgent: req.headers['user-agent'],
+        details: { reasons, path: req.path },
+        success: false,
+      });
+      console.warn('[SECURITY] Suspicious activity detected:', reasons);
+    }
+    next();
+  });
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Input sanitization
+  app.use(sanitizeInput);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
-  // tRPC API
+  // tRPC API with rate limiting
   app.use(
     "/api/trpc",
+    apiLimiter,
     createExpressMiddleware({
       router: appRouter,
       createContext,

@@ -1522,3 +1522,35 @@ export const sharedRecords = mysqlTable("shared_records", {
 
 export type SharedRecord = typeof sharedRecords.$inferSelect;
 export type InsertSharedRecord = typeof sharedRecords.$inferInsert;
+
+/**
+ * Audit Logs - Security and compliance tracking
+ * Logs all sensitive operations for security monitoring and compliance
+ */
+export const auditLogs = mysqlTable("audit_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // User who performed the action
+  userId: int("user_id"),
+  
+  // Action details
+  action: varchar("action", { length: 100 }).notNull(), // e.g., 'user.login', 'doctor.patient_access'
+  resourceType: varchar("resource_type", { length: 50 }), // e.g., 'user', 'patient', 'triage'
+  resourceId: varchar("resource_id", { length: 100 }), // ID of the affected resource
+  
+  // Request metadata
+  ipAddress: varchar("ip_address", { length: 45 }), // IPv4 or IPv6
+  userAgent: text("user_agent"),
+  
+  // Additional context
+  details: text("details"), // JSON stringified additional information
+  
+  // Result
+  success: boolean("success").notNull(),
+  errorMessage: text("error_message"),
+  
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
