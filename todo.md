@@ -1324,3 +1324,14 @@
 - [x] Add Arabic language support to LiveScribe
 - [x] Fix audio input not showing in symptom checker (already exists, verified)
 - [x] Test all audio inputs with Arabic priority
+
+
+## Audio Recording Debug & Fixes
+- [x] Test audio recording in Clinical Reasoning page (UI working, needs real mic hardware)
+- [x] Test audio recording in Patient Symptom Checker (UI working, needs real mic hardware)
+- [ ] Test audio recording in LiveScribe
+- [x] Check browser console for errors (no errors found)
+- [x] Fix Arabic language default in all audio components
+- [x] Fix language toggle text updates
+- [ ] Verify backend audio endpoints are working
+- [ ] Test complete audio-to-transcription flow with real microphone

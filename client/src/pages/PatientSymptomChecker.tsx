@@ -178,6 +178,7 @@ export default function PatientSymptomChecker() {
               {/* Audio Input */}
               {useAudioInput && (
                 <AudioInput
+                  initialLanguage="ar"
                   onAudioCapture={(blob, url) => {
                     setAudioBlob(blob);
                     toast.success("Audio recorded successfully");
@@ -186,7 +187,6 @@ export default function PatientSymptomChecker() {
                     setAudioBlob(null);
                     setSymptoms("");
                   }}
-                  initialLanguage="ar"
                   maxDuration={180}
                   disabled={analyzeMutation.isPending}
                 />

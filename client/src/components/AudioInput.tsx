@@ -35,6 +35,11 @@ export function AudioInput({
   showLanguageToggle = true,
 }: AudioInputProps) {
   const [language, setLanguage] = useState<'ar' | 'en'>(initialLanguage);
+  
+  // Update language when initialLanguage prop changes
+  useEffect(() => {
+    setLanguage(initialLanguage);
+  }, [initialLanguage]);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);

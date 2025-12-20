@@ -206,6 +206,7 @@ function ClinicalReasoningContent() {
                   />
                 ) : (
                   <AudioInput
+                    initialLanguage="ar"
                     onAudioCapture={(blob, url) => {
                       setAudioBlob(blob);
                       toast.success("Audio recorded successfully");
@@ -214,7 +215,6 @@ function ClinicalReasoningContent() {
                       setAudioBlob(null);
                       setSymptoms("");
                     }}
-                    initialLanguage="ar"
                     maxDuration={180}
                     disabled={generateDiagnosisMutation.isPending}
                   />
