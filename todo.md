@@ -35,13 +35,29 @@
 - [ ] Message attachments support
 - [ ] Typing indicators
 
-### Phase 5: Subscription & Monetization
-- [ ] Subscription plans UI for patients
-- [ ] Subscription plans UI for doctors
+### Phase 5: Subscription & Monetization (COMPLETED)
+- [x] Patient subscription page (/patient/subscription)
+  - [x] Display current plan (Free/Lite/Pro)
+  - [x] Show usage stats (consultations used/remaining)
+  - [x] Plan comparison cards with features
+  - [x] Upgrade/downgrade buttons
+  - [x] Billing history table
+- [x] Doctor subscription page (/clinician/subscription)
+  - [x] Display current plan (Basic/Premium)
+  - [x] Show patient count (current/max)
+  - [x] Plan comparison cards
+  - [x] Upgrade button
+  - [x] Billing history
 - [ ] Payment integration (Stripe)
-- [ ] Usage limit enforcement
-- [ ] Upgrade prompts when limits reached
-- [ ] Billing history page
+  - [ ] Add Stripe feature using webdev_add_feature
+  - [ ] Create checkout sessions
+  - [ ] Handle webhook events
+  - [ ] Update subscription status in database
+- [x] Usage limit enforcement in frontend
+  - [x] Check consultation limits before symptom checker
+  - [ ] Check patient limits before doctor accepts connections
+  - [x] Show upgrade prompts when limits reached
+  - [x] Display usage stats in dashboards
 
 ### Phase 6: Testing & Deployment
 - [ ] Test doctor availability status changes

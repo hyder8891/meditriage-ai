@@ -18,18 +18,24 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 import { AudioInput } from "@/components/AudioInput";
+import { UsageLimitGuard } from "@/components/UsageLimitGuard";
 
-export default function PatientSymptomChecker() {
+function PatientSymptomCheckerContent() {
   const [, setLocation] = useLocation();
   const [symptoms, setSymptoms] = useState("");
   const [analysis, setAnalysis] = useState<any>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [useAudioInput, setUseAudioInput] = useState(false);
 
+  const trackUsageMutation = trpc.b2b2c.subscription.trackUsage.useMutation();
+
   const analyzeMutation = trpc.clinical.patientSymptomAnalysis.useMutation({
     onSuccess: (data) => {
       setAnalysis(data);
       toast.success("Analysis complete");
+      
+      // Track usage after successful consultation
+      trackUsageMutation.mutate({ featureType: "consultation" });
     },
     onError: (error) => {
       toast.error("Analysis failed: " + error.message);
@@ -336,5 +342,13 @@ export default function PatientSymptomChecker() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PatientSymptomChecker() {
+  return (
+    <UsageLimitGuard feature="consultation" userRole="patient" language="ar">
+      <PatientSymptomCheckerContent />
+    </UsageLimitGuard>
   );
 }

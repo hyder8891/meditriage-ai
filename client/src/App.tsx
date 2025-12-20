@@ -50,6 +50,8 @@ import MyPatients from "./pages/MyPatients";
 import FindDoctor from "./pages/FindDoctor";
 import MyDoctors from "./pages/MyDoctors";
 import Messages from "./pages/Messages";
+import PatientSubscription from "./pages/PatientSubscription";
+import DoctorSubscription from "./pages/DoctorSubscription";
 
 function Router() {
   return (
@@ -82,6 +84,8 @@ function Router() {
       <Route path={"/patient/find-doctor"} component={FindDoctor} />
       <Route path={"/patient/my-doctors"} component={MyDoctors} />
       <Route path={"/messages"} component={Messages} />
+      <Route path={"/patient/subscription"} component={PatientSubscription} />
+      <Route path={"/clinician/subscription"} component={DoctorSubscription} />
       <Route path={"/patient/medications"} component={PatientMedications} />
       <Route path={"/patient/portal"}>
         {() => <ProtectedRoute requiredRole="patient"><PatientPortal /></ProtectedRoute>}

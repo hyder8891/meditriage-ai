@@ -16,11 +16,13 @@ import {
   Heart,
   Thermometer,
   Droplet,
-  Stethoscope
+  Stethoscope,
+  Crown,
+  Zap
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { PatientVitalsInput } from "@/components/PatientVitalsInput";
 import { PatientReminders } from "@/components/PatientReminders";
 
@@ -28,6 +30,7 @@ export default function PatientPortal() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
+  const { data: usage } = trpc.b2b2c.subscription.getUsageStats.useQuery();
 
   // Mock patient ID - in real app, get from auth context
   const patientId = 1;
