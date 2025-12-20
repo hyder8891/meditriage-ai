@@ -1,0 +1,48 @@
+
+╔══════════════════════════════════════════════════════════════════╗
+║           BRAIN PERFORMANCE TEST REPORT                          ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📊 OVERALL METRICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total Cases Tested:        100
+  Top-1 Accuracy:            0/100 (0.00%)
+  Top-3 Accuracy:            0/100 (0.00%)
+  Urgency Accuracy:          0/100 (0.00%)
+  Average Execution Time:    0ms
+
+📁 CATEGORY BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  emergency: 0/20 (0.00%)
+  common: 0/30 (0.00%)
+  complex: 0/20 (0.00%)
+  pediatric: 0/10 (0.00%)
+  geriatric: 0/10 (0.00%)
+  iraqi-specific: 0/10 (0.00%)
+
+🎯 DIFFICULTY BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  easy: 0/23 (0.00%)
+  medium: 0/39 (0.00%)
+  hard: 0/38 (0.00%)
+
+❌ FAILED CASES (Top 10)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  EMG-001: Expected "Acute Myocardial Infarction", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-002: Expected "Acute Ischemic Stroke", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-003: Expected "Acute Severe Asthma Exacerbation", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-004: Expected "Acute Appendicitis", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-005: Expected "Diabetic Ketoacidosis", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-006: Expected "Subarachnoid Hemorrhage", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-007: Expected "Pulmonary Embolism", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-008: Expected "Bowel Obstruction", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-009: Expected "Severe Preeclampsia", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+  EMG-010: Expected "Septic Shock", Got "ERROR: __vite_ssr_import_1__.reason is not a function"
+
+✅ PERFORMANCE TARGETS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Target Top-1 Accuracy:     ≥85% ✗
+  Target Top-3 Accuracy:     ≥95% ✗
+  Target Urgency Accuracy:   ≥90% ✗
+  Target Execution Time:     <3000ms ✓
+
