@@ -58,7 +58,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
         <div className="p-4">
           <div className="flex items-center justify-between mb-8">
             {sidebarOpen && (
-              <img src="/logo.png" alt="My Doctor طبيبي" className="h-10 w-auto" />
+              <img 
+                src="/logo.png" 
+                alt="My Doctor طبيبي" 
+                className="h-12 w-auto" 
+                style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+              />
             )}
             <Button
               variant="ghost"

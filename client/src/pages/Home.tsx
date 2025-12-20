@@ -96,7 +96,12 @@ export default function Home() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
-                <img src="/logo.png" alt="My Doctor طبيبي" className="h-10 w-auto" />
+                <img 
+                  src="/logo.png" 
+                  alt="My Doctor طبيبي" 
+                  className="h-12 w-auto" 
+                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+                />
               </div>
               <div className="hidden md:flex items-center gap-6 text-sm">
                 <a href="#features" className="text-slate-600 hover:text-slate-900">{language === 'ar' ? 'المميزات' : 'Features'}</a>

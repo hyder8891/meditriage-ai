@@ -82,7 +82,12 @@ export default function ClinicianDashboard() {
         <div className="p-4">
           <div className="mb-8">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="My Doctor طبيبي" className="h-12 w-auto" />
+              <img 
+                src="/logo.png" 
+                alt="My Doctor طبيبي" 
+                className="h-14 w-auto" 
+                style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+              />
             </div>
           </div>
 
