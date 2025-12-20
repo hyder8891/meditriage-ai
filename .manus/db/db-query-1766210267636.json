@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, name, email, specialty, role, availability_status FROM users WHERE role = 'doctor' ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, name, email, specialty, role, availability_status FROM users WHERE role = 'doctor' ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "2100015",
+      "name": "Dr. Karim Al-Baghdadi",
+      "email": "karim.baghdadi@meditriage.iq",
+      "specialty": "Internal Medicine",
+      "role": "doctor",
+      "availability_status": "available"
+    },
+    {
+      "id": "2100014",
+      "name": "Dr. Layla Hassan",
+      "email": "layla.hassan@meditriage.iq",
+      "specialty": "Obstetrics & Gynecology",
+      "role": "doctor",
+      "availability_status": "offline"
+    },
+    {
+      "id": "2100013",
+      "name": "Dr. Omar Al-Jubouri",
+      "email": "omar.jubouri@meditriage.iq",
+      "specialty": "Cardiology",
+      "role": "doctor",
+      "availability_status": "available"
+    },
+    {
+      "id": "2100012",
+      "name": "Dr. Fatima Al-Najjar",
+      "email": "fatima.najjar@meditriage.iq",
+      "specialty": "Pediatrics",
+      "role": "doctor",
+      "availability_status": "busy"
+    },
+    {
+      "id": "2100011",
+      "name": "Dr. Ahmed Al-Husseini",
+      "email": "ahmed.husseini@meditriage.iq",
+      "specialty": "Emergency Medicine",
+      "role": "doctor",
+      "availability_status": "available"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tspecialty\trole\tavailability_status\n2100015\tDr. Karim Al-Baghdadi\tkarim.baghdadi@meditriage.iq\tInternal Medicine\tdoctor\tavailable\n2100014\tDr. Layla Hassan\tlayla.hassan@meditriage.iq\tObstetrics & Gynecology\tdoctor\toffline\n2100013\tDr. Omar Al-Jubouri\tomar.jubouri@meditriage.iq\tCardiology\tdoctor\tavailable\n2100012\tDr. Fatima Al-Najjar\tfatima.najjar@meditriage.iq\tPediatrics\tdoctor\tbusy\n2100011\tDr. Ahmed Al-Husseini\tahmed.husseini@meditriage.iq\tEmergency Medicine\tdoctor\tavailable\n",
+  "stderr": "",
+  "execution_time_ms": 1538
+}
