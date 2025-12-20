@@ -16,7 +16,7 @@ import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
 import { invokeDeepSeek, trainOnMedicalMaterial, deepMedicalReasoning } from "./_core/deepseek";
 import { analyzeXRayBackend } from "./_core/gemini";
-import { transcribeAudio } from "./_core/voiceTranscription";
+import { transcribeAudioWithGemini } from "./services/geminiTranscription";
 import { storagePut } from "./storage";
 import { 
   createTriageRecord, 
@@ -365,7 +365,7 @@ export const appRouter = router({
         language: z.enum(['en', 'ar']).default('en'),
       }))
       .mutation(async ({ input, ctx }) => {
-        const result = await transcribeAudio({
+        const result = await transcribeAudioWithGemini({
           audioUrl: input.audioUrl,
           language: input.language,
         });

@@ -738,10 +738,10 @@ Provide structured JSON output with this exact format:
       language: z.string().default("en"),
     }))
     .mutation(async ({ input }) => {
-      // Import transcribeAudio from voice transcription helper
-      const { transcribeAudio } = await import("./_core/voiceTranscription");
+      // Import Gemini transcription
+      const { transcribeAudioWithGemini } = await import("./services/geminiTranscription");
       
-      const result = await transcribeAudio({
+      const result = await transcribeAudioWithGemini({
         audioUrl: input.audioUrl,
         language: input.language,
       });

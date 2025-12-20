@@ -1356,3 +1356,12 @@
 - [ ] Ensure audio blob has data before sending to backend
 - [ ] Add validation for audio blob size and format
 - [ ] Test real Arabic speech transcription end-to-end
+
+## Audio Transcription Fix - Switched to Gemini Flash
+- [x] Created geminiTranscription.ts service using Gemini Flash native audio
+- [x] Updated routers.ts to use transcribeAudioWithGemini
+- [x] Updated clinical-routers.ts to use transcribeAudioWithGemini
+- [ ] Test audio recording in LiveScribe with real microphone
+- [ ] Test audio recording in Clinical Reasoning with real microphone
+- [ ] Test audio recording in Patient Symptom Checker with real microphone
+- [ ] Verify transcription returns actual spoken words, not placeholder text
