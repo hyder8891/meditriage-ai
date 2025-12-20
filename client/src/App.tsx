@@ -83,7 +83,8 @@ function Router() {
       <Route path={"/clinician/patient/:id"} component={PatientDetail} />
       <Route path={"/clinician/reports"} component={Reports} />
       <Route path={"/clinician/my-patients"} component={MyPatients} />
-      <Route path={"/patient/find-doctor"} component={FindDoctor} />
+      <Route path="/patient/find-doctor" component={FindDoctor} />
+      <Route path="/patient/find-doctors" component={FindDoctor} />
       <Route path={"/patient/my-doctors"} component={MyDoctors} />
       <Route path={"/messages"} component={Messages} />
       <Route path={"/patient/subscription"} component={PatientSubscription} />
