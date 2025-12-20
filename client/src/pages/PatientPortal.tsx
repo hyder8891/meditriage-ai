@@ -32,7 +32,7 @@ export default function PatientPortal() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const { data: usage } = trpc.b2b2c.subscription.getUsageStats.useQuery();
-  const { data: myDoctors } = trpc.b2b2c.patientDoctorConnection.getMyDoctors.useQuery();
+  const { data: myDoctors } = trpc.b2b2c.patient.getMyDoctors.useQuery();
 
   // AI Tools
   const aiTools = [
