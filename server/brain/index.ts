@@ -94,20 +94,26 @@ export class BRAIN {
       const normalizedSymptoms = await this.normalizeSymptoms(input.symptoms);
       console.log(`✓ Symptoms normalized: ${normalizedSymptoms.length} concepts identified`);
 
-      // Step 2: Find possible diagnoses from knowledge base
-      const knowledgeBaseDiagnoses = await this.findDiagnosesFromKnowledge(normalizedSymptoms);
+      // Steps 2-4: Run knowledge base, historical cases, and literature search in parallel
+      const [knowledgeBaseDiagnoses, similarCases, literature] = await Promise.all([
+        // Step 2: Find possible diagnoses from knowledge base
+        this.findDiagnosesFromKnowledge(normalizedSymptoms),
+        
+        // Step 3: Find similar historical cases
+        this.findSimilarCases(normalizedSymptoms, input.patientInfo),
+        
+        // Step 4: Search medical literature for evidence
+        (async () => {
+          const literatureQuery = generatePubMedQuery(
+            normalizedSymptoms[0]?.standardTerm || input.symptoms[0],
+            input.symptoms
+          );
+          return await searchAndCachePubMed(literatureQuery, 5);
+        })()
+      ]);
+      
       console.log(`✓ Found ${knowledgeBaseDiagnoses.length} candidate diagnoses from knowledge base`);
-
-      // Step 3: Find similar historical cases
-      const similarCases = await this.findSimilarCases(normalizedSymptoms, input.patientInfo);
       console.log(`✓ Found ${similarCases.length} similar historical cases`);
-
-      // Step 4: Search medical literature for evidence
-      const literatureQuery = generatePubMedQuery(
-        normalizedSymptoms[0]?.standardTerm || input.symptoms[0],
-        input.symptoms
-      );
-      const literature = await searchAndCachePubMed(literatureQuery, 5);
       console.log(`✓ Found ${literature.length} relevant medical articles`);
 
       // Step 5: Generate differential diagnosis using LLM with all context

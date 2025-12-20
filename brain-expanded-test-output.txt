@@ -1,0 +1,426 @@
+🧠 BRAIN Expanded Performance Test (24 cases)
+
+Testing 4 cases from each category...
+
+[1/24] Testing EMG-001: Severe crushing chest pain...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6169 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264126059-lun550zoi
+🧠 BRAIN: Reasoning complete in 18340ms
+  ✓ Completed in 18340ms
+  Expected: Acute Myocardial Infarction
+  Got: ST-Elevation Myocardial Infarction (STEMI) / Acute Coronary Syndrome (ACS) (60%)
+  Match: ✗ FAIL
+
+[2/24] Testing EMG-004: Severe abdominal pain...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5830 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264140840-br0m1791b
+🧠 BRAIN: Reasoning complete in 14347ms
+  ✓ Completed in 14347ms
+  Expected: Acute Appendicitis
+  Got: Acute Appendicitis (45%)
+  Match: ✓ PASS
+
+[3/24] Testing EMG-006: Sudden severe headache...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6347 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264154141-esehcqoii
+🧠 BRAIN: Reasoning complete in 13300ms
+  ✓ Completed in 13300ms
+  Expected: Subarachnoid Hemorrhage
+  Got: Subarachnoid Hemorrhage (SAH) (45%)
+  Match: ✓ PASS
+
+[4/24] Testing EMG-009: Severe headache and blurred vision...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6344 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264168279-lpep4rnog
+🧠 BRAIN: Reasoning complete in 14138ms
+  ✓ Completed in 14138ms
+  Expected: Severe Preeclampsia
+  Got: Severe Preeclampsia (60%)
+  Match: ✓ PASS
+
+[5/24] Testing COM-001: Fever and cough...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6021 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264181303-5wofg4vom
+🧠 BRAIN: Reasoning complete in 13024ms
+  ✓ Completed in 13024ms
+  Expected: Community-Acquired Pneumonia
+  Got: Community-Acquired Pneumonia (CAP) (60%)
+  Match: ✓ PASS
+
+[6/24] Testing COM-003: Heartburn and chest discomfort...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5278 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264192049-xr4wula15
+🧠 BRAIN: Reasoning complete in 10744ms
+  ✓ Completed in 10744ms
+  Expected: Gastroesophageal Reflux Disease
+  Got: Gastroesophageal Reflux Disease (GERD) (60%)
+  Match: ✓ PASS
+
+[7/24] Testing COM-006: Diarrhea and vomiting...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5927 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264204298-07jtlwirt
+🧠 BRAIN: Reasoning complete in 12255ms
+  ✓ Completed in 12255ms
+  Expected: Acute Gastroenteritis
+  Got: Acute Bacterial Gastroenteritis (e.g., E. coli, Salmonella, Shigella) (40%)
+  Match: ✗ FAIL
+
+[8/24] Testing COM-009: High blood pressure...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5612 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264217634-ol135chc8
+🧠 BRAIN: Reasoning complete in 13330ms
+  ✓ Completed in 13330ms
+  Expected: Essential Hypertension
+  Got: Essential (Primary) Hypertension (Stage 2) (70%)
+  Match: ✗ FAIL
+
+[9/24] Testing CPX-001: Fatigue and weight loss...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5394 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264230987-rdksqct51
+🧠 BRAIN: Reasoning complete in 13352ms
+  ✓ Completed in 13352ms
+  Expected: Lymphoma
+  Got: Lymphoma (Non-Hodgkin or Hodgkin) (35%)
+  Match: ✓ PASS
+
+[10/24] Testing CPX-003: Confusion and tremor...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6461 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264245281-6gn2ibj4f
+🧠 BRAIN: Reasoning complete in 14296ms
+  ✓ Completed in 14296ms
+  Expected: Hepatic Encephalopathy
+  Got: Hepatic Encephalopathy (due to Alcoholic Liver Disease) (45%)
+  Match: ✓ PASS
+
+[11/24] Testing CPX-006: Numbness and vision problems...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6243 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264257259-3s2ypgs59
+🧠 BRAIN: Reasoning complete in 11977ms
+  ✓ Completed in 11977ms
+  Expected: Multiple Sclerosis
+  Got: Multiple Sclerosis (MS) (45%)
+  Match: ✓ PASS
+
+[12/24] Testing CPX-009: Severe headaches and vision changes...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6373 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264271220-x3euhrhw3
+🧠 BRAIN: Reasoning complete in 13961ms
+  ✓ Completed in 13961ms
+  Expected: Acromegaly
+  Got: Acromegaly (Pituitary Adenoma) (45%)
+  Match: ✓ PASS
+
+[13/24] Testing PED-001: Fever and difficulty breathing...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (7066 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264284208-tihzplx3f
+🧠 BRAIN: Reasoning complete in 12988ms
+  ✓ Completed in 12988ms
+  Expected: Bronchiolitis
+  Got: Severe Bronchiolitis (Viral, likely RSV) (40%)
+  Match: ✓ PASS
+
+[14/24] Testing PED-003: Barking cough...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6002 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264297264-hg2rj6mmk
+🧠 BRAIN: Reasoning complete in 13054ms
+  ✓ Completed in 13054ms
+  Expected: Croup
+  Got: Laryngotracheobronchitis (Croup) (70%)
+  Match: ✓ PASS
+
+[15/24] Testing PED-006: Sore throat and rash...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5516 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264308937-y9mxikmos
+🧠 BRAIN: Reasoning complete in 11681ms
+  ✓ Completed in 11681ms
+  Expected: Scarlet Fever
+  Got: Scarlet Fever (Scarlatina) (60%)
+  Match: ✓ PASS
+
+[16/24] Testing PED-008: Watery diarrhea and vomiting...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6278 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264321193-ie0f3awlp
+🧠 BRAIN: Reasoning complete in 12251ms
+  ✓ Completed in 12251ms
+  Expected: Severe Dehydration from Gastroenteritis
+  Got: Viral Gastroenteritis (e.g., Rotavirus, Adenovirus) (45%)
+  Match: ✗ FAIL
+
+[17/24] Testing GER-001: Fall and hip pain...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6095 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264333095-2w043qr69
+🧠 BRAIN: Reasoning complete in 11904ms
+  ✓ Completed in 11904ms
+  Expected: Hip Fracture
+  Got: Femoral Neck Fracture (Hip Fracture) (85%)
+  Match: ✓ PASS
+
+[18/24] Testing GER-003: Dizziness when standing...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5842 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264346816-0vrfjfr5d
+🧠 BRAIN: Reasoning complete in 13716ms
+  ✓ Completed in 13716ms
+  Expected: Orthostatic Hypotension
+  Got: Orthostatic Hypotension (Secondary to Medication) (45%)
+  Match: ✓ PASS
+
+[19/24] Testing GER-006: Sudden confusion...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5818 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264360646-wypn1mlbq
+🧠 BRAIN: Reasoning complete in 13836ms
+  ✓ Completed in 13836ms
+  Expected: Normal Pressure Hydrocephalus
+  Got: Normal Pressure Hydrocephalus (NPH) (35%)
+  Match: ✓ PASS
+
+[20/24] Testing GER-008: Chest pain atypical presentation...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5343 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264373652-hzep1tdnv
+🧠 BRAIN: Reasoning complete in 13002ms
+  ✓ Completed in 13004ms
+  Expected: Atypical Myocardial Infarction
+  Got: Non-ST Elevation Myocardial Infarction (NSTEMI) / Unstable Angina (UA) (45%)
+  Match: ✗ FAIL
+
+[21/24] Testing IRQ-001: Chronic fever and weight loss...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5609 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264387736-f1apmnvs5
+🧠 BRAIN: Reasoning complete in 14084ms
+  ✓ Completed in 14084ms
+  Expected: Brucellosis
+  Got: Brucellosis (Malta Fever) (40%)
+  Match: ✓ PASS
+
+[22/24] Testing IRQ-003: High fever and headache...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5277 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264400241-rlsz1awjw
+🧠 BRAIN: Reasoning complete in 12508ms
+  ✓ Completed in 12508ms
+  Expected: Typhoid Fever
+  Got: Typhoid Fever (Enteric Fever) (55%)
+  Match: ✓ PASS
+
+[23/24] Testing IRQ-006: Chronic cough and fever...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5024 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264412404-9jzy0mzl0
+🧠 BRAIN: Reasoning complete in 12160ms
+  ✓ Completed in 12160ms
+  Expected: Pulmonary Tuberculosis
+  Got: Pulmonary Tuberculosis (PTB) (60%)
+  Match: ✓ PASS
+
+[24/24] Testing IRQ-008: Liver enlargement and ascites...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5858 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766264426160-dx7j0dc7k
+🧠 BRAIN: Reasoning complete in 13756ms
+  ✓ Completed in 13756ms
+  Expected: Hepatic Schistosomiasis
+  Got: Hepatic Schistosomiasis (Schistosoma mansoni or haematobium leading to Symmers' Fibrosis) (45%)
+  Match: ✓ PASS
+
+======================================================================
+BRAIN EXPANDED TEST RESULTS (24 CASES)
+======================================================================
+Total Cases:           24
+Top-1 Accuracy:        19/24 (79.17%)
+Top-3 Accuracy:        19/24 (79.17%)
+Avg Execution Time:    13250ms
+Total Test Time:       5.3 minutes
+======================================================================
+
+Category Breakdown:
+  emergency: 3/4 top-1 (75%), 3/4 top-3 (75%)
+  common: 2/4 top-1 (50%), 2/4 top-3 (50%)
+  complex: 4/4 top-1 (100%), 4/4 top-3 (100%)
+  pediatric: 3/4 top-1 (75%), 3/4 top-3 (75%)
+  geriatric: 3/4 top-1 (75%), 3/4 top-3 (75%)
+  iraqi-specific: 4/4 top-1 (100%), 4/4 top-3 (100%)
+
+Difficulty Breakdown:
+  easy: 3/5 top-1 (60%), 3/5 top-3 (60%)
+  medium: 9/11 top-1 (82%), 9/11 top-3 (82%)
+  hard: 7/8 top-1 (88%), 7/8 top-3 (88%)
+
+Failed Cases:
+  EMG-001: Expected "Acute Myocardial Infarction", Got "ST-Elevation Myocardial Infarction (STEMI) / Acute Coronary Syndrome (ACS)"
+  COM-006: Expected "Acute Gastroenteritis", Got "Acute Bacterial Gastroenteritis (e.g., E. coli, Salmonella, Shigella)"
+  COM-009: Expected "Essential Hypertension", Got "Essential (Primary) Hypertension (Stage 2)"
+  PED-008: Expected "Severe Dehydration from Gastroenteritis", Got "Viral Gastroenteritis (e.g., Rotavirus, Adenovirus)"
+  GER-008: Expected "Atypical Myocardial Infarction", Got "Non-ST Elevation Myocardial Infarction (NSTEMI) / Unstable Angina (UA)"
+
+======================================================================
+✅ Expanded test complete! Top-1: 79.17%, Top-3: 79.17%
+======================================================================
+
+📊 All results saved to brain-expanded-test-results.json
+
+💡 To delete test data: rm /home/ubuntu/meditriage-ai/brain-expanded-test-results.json
+
