@@ -189,11 +189,11 @@ function ClinicalReasoningContent() {
       symptoms: symptomList,
       vitals: {
         bloodPressure,
-        heartRate: heartRate ? parseInt(heartRate) : undefined,
+        heartRate: heartRate && heartRate.trim() ? parseInt(heartRate) : undefined,
         temperature,
-        oxygenSaturation: oxygenSaturation ? parseInt(oxygenSaturation) : undefined,
+        oxygenSaturation: oxygenSaturation && oxygenSaturation.trim() ? parseInt(oxygenSaturation) : undefined,
       },
-      patientAge: patientAge ? parseInt(patientAge) : undefined,
+      patientAge: patientAge && patientAge.trim() ? parseInt(patientAge) : undefined,
       patientGender,
     });
   };

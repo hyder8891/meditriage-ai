@@ -1442,3 +1442,11 @@
 - [x] Fixed: Removed inline `const crypto = require('crypto')`
 - [x] Now using ES6 import instead of CommonJS require
 - [ ] User needs to test: generate diagnosis and verify no "require is not defined" error
+
+## NaN Validation Error for oxygenSaturation
+- [x] Error: "Invalid input: expected number, received NaN" for vitals.oxygenSaturation
+- [x] Root cause: Empty string "" is truthy, so `oxygenSaturation ? parseInt(oxygenSaturation)` tries to parse it
+- [x] Fixed: Changed to `oxygenSaturation && oxygenSaturation.trim() ? parseInt(oxygenSaturation) : undefined`
+- [x] Also fixed heartRate and patientAge with same logic
+- [x] Now checks for non-empty string before parseInt(), avoiding NaN
+- [ ] User needs to test: generate diagnosis with some fields empty
