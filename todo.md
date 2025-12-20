@@ -1399,3 +1399,12 @@
 - [ ] User needs to test again and check if onAudioCapture logs appear
 - [ ] If onAudioCapture is NOT called, AudioInput has a bug
 - [ ] If onAudioCapture IS called but audioBlob still null, state update issue
+
+## REBUILD: Clinical Reasoning Audio from Scratch
+- [x] Removed broken AudioInput component usage
+- [x] Implemented simple MediaRecorder-based audio recording UI
+- [x] Added recording timer and visual feedback
+- [x] Convert audio blob to base64 in handleGenerate
+- [x] Call audioAnalysisMutation with base64 audio (uses Gemini Flash)
+- [x] Simplified flow: record → convert → send to Gemini → extract symptoms → generate diagnosis
+- [ ] User needs to test: record audio → click Generate → check if diagnosis appears

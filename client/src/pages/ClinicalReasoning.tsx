@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,13 +20,14 @@ import {
   Calendar,
   Info,
   Mic,
-  MessageSquare
+  MessageSquare,
+  Square,
+  Trash2
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import ClinicianLayout from "@/components/ClinicianLayout";
-import { AudioInput } from "@/components/AudioInput";
 
 function ClinicalReasoningContent() {
   const [, setLocation] = useLocation();
@@ -41,6 +42,11 @@ function ClinicalReasoningContent() {
   const [reasoning, setReasoning] = useState<any>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [useAudioInput, setUseAudioInput] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const generateDiagnosisMutation = trpc.clinical.generateDifferentialDiagnosis.useMutation({
     onSuccess: (data) => {
@@ -82,43 +88,83 @@ function ClinicalReasoningContent() {
     },
   });
 
-  const handleGenerate = async () => {
-    console.log('[ClinicalReasoning] handleGenerate called');
-    console.log('[ClinicalReasoning] useAudioInput:', useAudioInput);
-    console.log('[ClinicalReasoning] audioBlob:', audioBlob);
-    
-    // Audio input mode - process audio first
-    if (useAudioInput && audioBlob) {
-      console.log('[ClinicalReasoning] Processing audio input...');
-      console.log('[ClinicalReasoning] Audio blob size:', audioBlob.size, 'bytes');
-      console.log('[ClinicalReasoning] Audio blob type:', audioBlob.type);
+  // Audio recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        setAudioBlob(blob);
+        stream.getTracks().forEach(track => track.stop());
+        toast.success("Audio recorded successfully");
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+      
+      // Start timer
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+      
+      toast.success("Recording started");
+    } catch (error) {
+      toast.error("Failed to access microphone: " + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
+  
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, []);
+
+  const handleGenerate = async () => {
+    // Audio input mode - process audio with Gemini
+    if (useAudioInput && audioBlob) {
       try {
         // Convert blob to base64
         const reader = new FileReader();
         
-        reader.onerror = (error) => {
-          console.error('[ClinicalReasoning] FileReader error:', error);
-          toast.error("Failed to read audio file");
-        };
-        
         reader.onloadend = () => {
-          console.log('[ClinicalReasoning] FileReader onloadend triggered');
-          
           if (!reader.result) {
-            console.error('[ClinicalReasoning] FileReader result is null');
             toast.error("Failed to read audio file");
             return;
           }
           
           const base64Audio = (reader.result as string).split(',')[1];
           const mimeType = audioBlob.type;
-          
-          console.log('[ClinicalReasoning] Base64 audio length:', base64Audio.length);
-          console.log('[ClinicalReasoning] MIME type:', mimeType);
-          console.log('[ClinicalReasoning] Calling audioAnalysisMutation...');
 
-          // Call audio analysis via tRPC
+          // Call audio analysis via tRPC (uses Gemini Flash)
           audioAnalysisMutation.mutate({
             audioBase64: base64Audio,
             mimeType,
@@ -126,11 +172,9 @@ function ClinicalReasoningContent() {
           });
         };
         
-        console.log('[ClinicalReasoning] Starting FileReader.readAsDataURL...');
         reader.readAsDataURL(audioBlob);
         
       } catch (error) {
-        console.error('[ClinicalReasoning] Error processing audio:', error);
         toast.error("Audio processing failed: " + (error instanceof Error ? error.message : 'Unknown error'));
       }
       return;
@@ -237,25 +281,69 @@ function ClinicalReasoningContent() {
                     rows={3}
                   />
                 ) : (
-                  <AudioInput
-                    initialLanguage="ar"
-                    onAudioCapture={(blob, url) => {
-                      console.log('[ClinicalReasoning] onAudioCapture called!');
-                      console.log('[ClinicalReasoning] Blob received:', blob);
-                      console.log('[ClinicalReasoning] Blob size:', blob?.size, 'bytes');
-                      console.log('[ClinicalReasoning] Blob type:', blob?.type);
-                      console.log('[ClinicalReasoning] URL:', url);
-                      setAudioBlob(blob);
-                      console.log('[ClinicalReasoning] audioBlob state updated');
-                      toast.success("Audio recorded successfully");
-                    }}
-                    onClear={() => {
-                      setAudioBlob(null);
-                      setSymptoms("");
-                    }}
-                    maxDuration={180}
-                    disabled={generateDiagnosisMutation.isPending}
-                  />
+                  <div className="space-y-3">
+                    {!isRecording && !audioBlob && (
+                      <Button
+                        onClick={startRecording}
+                        disabled={audioAnalysisMutation.isPending}
+                        className="w-full"
+                        size="lg"
+                        type="button"
+                      >
+                        <Mic className="w-5 h-5 mr-2" />
+                        Start Recording (Arabic)
+                      </Button>
+                    )}
+                    
+                    {isRecording && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-center gap-3 p-4 bg-red-50 rounded-lg">
+                          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                          <span className="text-lg font-medium">Recording... {recordingTime}s</span>
+                        </div>
+                        <Button
+                          onClick={stopRecording}
+                          className="w-full bg-red-600 hover:bg-red-700"
+                          size="lg"
+                          type="button"
+                        >
+                          <Square className="w-5 h-5 mr-2" />
+                          Stop Recording
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {audioBlob && !isRecording && (
+                      <div className="space-y-3">
+                        <div className="p-4 bg-green-50 rounded-lg">
+                          <p className="text-sm text-green-800">✓ Audio recorded ({Math.round(audioBlob.size / 1024)}KB)</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              setAudioBlob(null);
+                              setRecordingTime(0);
+                            }}
+                            variant="outline"
+                            className="flex-1"
+                            type="button"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                          <Button
+                            onClick={startRecording}
+                            variant="outline"
+                            className="flex-1"
+                            type="button"
+                          >
+                            <Mic className="w-4 h-4 mr-2" />
+                            Re-record
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 
