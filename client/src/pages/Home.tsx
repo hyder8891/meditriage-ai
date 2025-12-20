@@ -100,7 +100,7 @@ export default function Home() {
                   src="/logo.png" 
                   alt="My Doctor طبيبي" 
                   className="h-12 w-auto" 
-                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain', width: '79px', height: '58px' }}
                 />
               </div>
               <div className="hidden md:flex items-center gap-6 text-sm">
