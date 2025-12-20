@@ -1,6 +1,7 @@
 import { getDb } from "./db";
 import { messages } from "../drizzle/schema";
 import { eq, and, or, desc } from "drizzle-orm";
+import { emitNotificationToUser } from "./_core/socket-server";
 
 export async function sendMessage(data: {
   senderId: number;
@@ -17,6 +18,20 @@ export async function sendMessage(data: {
     content: data.content,
     read: false,
   });
+  
+  // Emit real-time notification to recipient
+  try {
+    emitNotificationToUser(data.recipientId, 'new-message', {
+      messageId: message.insertId,
+      senderId: data.senderId,
+      content: data.content,
+      subject: data.subject,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Failed to emit message notification:', error);
+  }
+  
   return message;
 }
 

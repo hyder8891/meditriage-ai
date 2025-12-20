@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { TourProvider } from "./contexts/TourContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import { GuidedTour } from "./components/GuidedTour";
 import Home from "./pages/Home";
 import NewHome from "./pages/NewHome";
@@ -121,12 +122,14 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <LanguageProvider>
-          <TourProvider>
-            <TooltipProvider>
-              <Router />
-              <GuidedTour />
-            </TooltipProvider>
-          </TourProvider>
+          <NotificationProvider>
+            <TourProvider>
+              <TooltipProvider>
+                <Router />
+                <GuidedTour />
+              </TooltipProvider>
+            </TourProvider>
+          </NotificationProvider>
         </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>

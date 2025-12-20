@@ -13,9 +13,21 @@ export function initializeSocketServer(httpServer: HttpServer) {
 
   // Store active rooms and participants
   const rooms = new Map<string, Set<string>>();
+  
+  // Store user socket mappings for notifications
+  const userSockets = new Map<number, Set<string>>();
 
   io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
+    
+    // Register user for notifications
+    socket.on('register-user', ({ userId }) => {
+      if (!userSockets.has(userId)) {
+        userSockets.set(userId, new Set());
+      }
+      userSockets.get(userId)?.add(socket.id);
+      console.log(`User ${userId} registered for notifications`);
+    });
 
     // Join consultation room
     socket.on('join-room', ({ roomId, userId, role }) => {
@@ -86,9 +98,27 @@ export function initializeSocketServer(httpServer: HttpServer) {
       console.log(`User ${userId} left room ${roomId}`);
     });
 
+    // Unregister user from notifications
+    socket.on('unregister-user', ({ userId }) => {
+      userSockets.get(userId)?.delete(socket.id);
+      if (userSockets.get(userId)?.size === 0) {
+        userSockets.delete(userId);
+      }
+    });
+    
     // Disconnect
     socket.on('disconnect', () => {
       console.log('User disconnected:', socket.id);
+      
+      // Remove from user sockets
+      userSockets.forEach((sockets, userId) => {
+        if (sockets.has(socket.id)) {
+          sockets.delete(socket.id);
+          if (sockets.size === 0) {
+            userSockets.delete(userId);
+          }
+        }
+      });
       
       // Remove from all rooms
       rooms.forEach((participants, roomId) => {
@@ -112,4 +142,16 @@ export function getSocketServer() {
     throw new Error('Socket.IO server not initialized');
   }
   return io;
+}
+
+// Helper function to emit notification to a specific user
+export function emitNotificationToUser(userId: number, event: string, data: any) {
+  if (!io) {
+    console.warn('Socket.IO server not initialized, cannot send notification');
+    return;
+  }
+  
+  // Emit to all sockets connected for this user
+  io.emit(`user:${userId}:${event}`, data);
+  console.log(`Notification sent to user ${userId}: ${event}`);
 }

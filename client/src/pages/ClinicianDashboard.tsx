@@ -26,12 +26,22 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { NotificationBadge } from "@/components/NotificationBadge";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 export default function ClinicianDashboard() {
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
+  const { requestPermission, hasPermission } = useNotifications();
   const [searchQuery, setSearchQuery] = useState("");
   const sidebarOpen = true; // Always keep sidebar open
+  
+  // Request notification permission on mount
+  useEffect(() => {
+    if (!hasPermission) {
+      requestPermission();
+    }
+  }, [hasPermission, requestPermission]);
 
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
@@ -191,19 +201,7 @@ export default function ClinicianDashboard() {
               <p className="text-sm text-gray-500 mt-1">Welcome back, Dr. {user?.name || "Clinician"}</p>
             </div>
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-                onClick={() => setLocation("/clinician/messages")}
-              >
-                <Bell className="w-5 h-5" />
-                {unreadCount && unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </Button>
+              <NotificationBadge />
               <Button onClick={handleNewCase} className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="w-4 h-4 mr-2" />
                 New Case

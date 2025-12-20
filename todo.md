@@ -291,3 +291,13 @@
 - [x] Create hypothetical doctor profile for admin testing
 - [x] Add patient-doctor message conversations
 - [x] Verify admin can view messages in secure messaging page
+
+## Real-Time Notifications
+- [x] Implement WebSocket notification system for new messages
+- [x] Create server-side notification events for message sending
+- [x] Build client-side notification hook and context
+- [x] Add browser notification permission handling
+- [x] Create in-app toast notifications for new messages
+- [x] Add notification badge counter in navigation
+- [x] Integrate notifications into Messages page
+- [ ] Test real-time notification delivery
