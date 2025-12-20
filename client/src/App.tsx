@@ -16,6 +16,7 @@ import SymptomCheckerStructured from "./pages/SymptomCheckerStructured";
 import BRAINAnalysis from "./pages/BRAINAnalysis";
 import BRAINDashboard from "./pages/BRAINDashboard";
 import TrainingDashboard from "./pages/TrainingDashboard";
+import BrainPerformance from "./pages/BrainPerformance";
 import PatientLogin from "./pages/PatientLogin";
 import ClinicianLoginNew from "./pages/ClinicianLoginNew";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -110,6 +111,7 @@ function Router() {
       <Route path={"/brain"} component={BRAINAnalysis} />
       <Route path={"/brain/dashboard"} component={BRAINDashboard} />
       <Route path={"/brain/training"} component={TrainingDashboard} />
+      <Route path={"/brain/performance"} component={BrainPerformance} />
       <Route path={"/symptom-checker-old"} component={SymptomChecker} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
