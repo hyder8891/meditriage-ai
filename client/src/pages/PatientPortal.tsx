@@ -121,7 +121,7 @@ export default function PatientPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-6 lg:w-auto">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <Activity className="w-4 h-4" />
               <span className="hidden sm:inline">{t.overview}</span>
@@ -146,6 +146,10 @@ export default function PatientPortal() {
                   {unreadMessages.length}
                 </Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="flex items-center gap-2">
+              <Crown className="w-4 h-4" />
+              <span className="hidden sm:inline">{language === "ar" ? "الاشتراك" : "Subscription"}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -377,6 +381,32 @@ export default function PatientPortal() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-500">Secure messaging interface will be displayed here</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subscription">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="w-6 h-6 text-yellow-500" />
+                  {language === "ar" ? "إدارة الاشتراك" : "Subscription Management"}
+                </CardTitle>
+                <CardDescription>
+                  {language === "ar" 
+                    ? "عرض وإدارة خطة اشتراكك"
+                    : "View and manage your subscription plan"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={() => setLocation("/patient/subscription")}
+                  className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600"
+                  size="lg"
+                >
+                  <Crown className="w-5 h-5 mr-2" />
+                  {language === "ar" ? "عرض خطط الاشتراك" : "View Subscription Plans"}
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
