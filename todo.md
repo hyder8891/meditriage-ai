@@ -325,3 +325,6 @@
 - [x] Change "حالة طبية" to "تقارير طبية" (Medical Cases to Medical Reports)
 - [x] Change "<3s" to show "<3ثواني" in Arabic version
 - [x] Change "لماذا My Doctor طبيبي؟" to "لماذا تطبيق طبيبي؟"
+
+## Bug Fixes
+- [x] Fix useEffect import error in ClinicianDashboard
