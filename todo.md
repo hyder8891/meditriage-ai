@@ -69,12 +69,12 @@
 
 
 ### Phase 7: Complete Website Redesign for B2B2C (IN PROGRESS)
-- [ ] Homepage redesign
-  - [ ] Clear patient/doctor portal selection
-  - [ ] Subscription pricing preview
-  - [ ] Feature comparison table
-  - [ ] Trust signals and testimonials
-  - [ ] Clear CTAs for both user types
+- [x] Homepage redesign
+  - [x] Clear patient/doctor portal selection
+  - [x] Subscription pricing preview
+  - [x] Feature comparison table
+  - [x] Trust signals and testimonials
+  - [x] Clear CTAs for both user types
 - [ ] Patient dashboard redesign
   - [ ] Prominent subscription status card
   - [ ] Usage stats with progress bars

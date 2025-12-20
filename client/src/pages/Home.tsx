@@ -34,6 +34,7 @@ import {
   Lightbulb,
   Rocket,
   BarChart,
+  Crown,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -773,6 +774,136 @@ export default function Home() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-gradient-to-r from-teal-500 to-blue-500 text-white px-4 py-2">
+              <Crown className="w-4 h-4 mr-2 inline" />
+              {language === 'ar' ? 'خطط الاشتراك' : 'Subscription Plans'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'اختر الخطة المناسبة لك' : 'Choose Your Perfect Plan'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'خطط مرنة للمرضى والأطباء مع إمكانية الترقية في أي وقت'
+                : 'Flexible plans for patients and doctors with upgrade anytime'}
+            </p>
+          </div>
+
+          {/* Patient Plans */}
+          <div className="mb-16">
+            <h3 className="text-3xl font-bold text-center mb-8 text-teal-600">
+              {language === 'ar' ? 'للمرضى' : 'For Patients'}
+            </h3>
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {pricingPlans.patient.map((plan: any, idx: number) => (
+                <Card
+                  key={idx}
+                  className={`relative border-2 transition-all hover:shadow-2xl ${
+                    plan.popular
+                      ? 'border-teal-400 shadow-xl scale-105'
+                      : 'border-slate-200 hover:border-teal-200'
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-gradient-to-r from-teal-500 to-blue-500 text-white px-4 py-1">
+                        {language === 'ar' ? '⭐ الأكثر شعبية' : '⭐ Most Popular'}
+                      </Badge>
+                    </div>
+                  )}
+                  <CardContent className="p-8">
+                    <div className="text-center mb-6">
+                      <h4 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h4>
+                      <div className="text-4xl font-bold text-teal-600 mb-1">
+                        {plan.price}
+                      </div>
+                      <p className="text-sm text-slate-600">{plan.period}</p>
+                    </div>
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feature: string, fidx: number) => (
+                        <li key={fidx} className="flex items-start gap-2">
+                          <CheckCircle className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                          <span className="text-slate-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      onClick={() => setLocation("/patient-login")}
+                      className={`w-full ${
+                        plan.popular
+                          ? 'bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600'
+                          : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
+                      }`}
+                      size="lg"
+                    >
+                      {plan.cta}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Doctor Plans */}
+          <div>
+            <h3 className="text-3xl font-bold text-center mb-8 text-purple-600">
+              {language === 'ar' ? 'للأطباء' : 'For Doctors'}
+            </h3>
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {pricingPlans.doctor.map((plan: any, idx: number) => (
+                <Card
+                  key={idx}
+                  className={`relative border-2 transition-all hover:shadow-2xl ${
+                    plan.popular
+                      ? 'border-purple-400 shadow-xl scale-105'
+                      : 'border-slate-200 hover:border-purple-200'
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1">
+                        {language === 'ar' ? '⭐ الأكثر شعبية' : '⭐ Most Popular'}
+                      </Badge>
+                    </div>
+                  )}
+                  <CardContent className="p-8">
+                    <div className="text-center mb-6">
+                      <h4 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h4>
+                      <div className="text-4xl font-bold text-purple-600 mb-1">
+                        {plan.price}
+                      </div>
+                      <p className="text-sm text-slate-600">{plan.period}</p>
+                    </div>
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feature: string, fidx: number) => (
+                        <li key={fidx} className="flex items-start gap-2">
+                          <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                          <span className="text-slate-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      onClick={() => setLocation("/clinician-login")}
+                      className={`w-full ${
+                        plan.popular
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                          : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
+                      }`}
+                      size="lg"
+                    >
+                      {plan.cta}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </section>
