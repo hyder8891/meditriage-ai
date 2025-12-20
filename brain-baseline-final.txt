@@ -1,0 +1,223 @@
+🧠 BRAIN Sample Performance Test
+
+Testing representative cases from each category...
+
+Testing EMG-001: Severe crushing chest pain...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5688 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228297225-amq7zo6nb
+🧠 BRAIN: Reasoning complete in 15750ms
+  ✓ Completed in 15750ms
+  Expected: Acute Myocardial Infarction
+  Got: ST-Elevation Myocardial Infarction (STEMI) / Acute Coronary Syndrome (ACS) (65%)
+  Match: ✗
+
+Testing EMG-006: Sudden severe headache...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5735 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228309206-71s8597vc
+🧠 BRAIN: Reasoning complete in 11544ms
+  ✓ Completed in 11544ms
+  Expected: Subarachnoid Hemorrhage
+  Got: Subarachnoid Hemorrhage (SAH) (45%)
+  Match: ✓
+
+Testing COM-001: Fever and cough...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5643 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228321376-9le0ihc28
+🧠 BRAIN: Reasoning complete in 12168ms
+  ✓ Completed in 12168ms
+  Expected: Community-Acquired Pneumonia
+  Got: Community-Acquired Pneumonia (CAP) (50%)
+  Match: ✓
+
+Testing COM-006: Diarrhea and vomiting...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5369 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228332701-1qlxevb9t
+🧠 BRAIN: Reasoning complete in 11322ms
+  ✓ Completed in 11323ms
+  Expected: Acute Gastroenteritis
+  Got: Acute Bacterial Gastroenteritis (e.g., Campylobacter, Salmonella) (35%)
+  Match: ✗
+
+Testing CPX-001: Fatigue and weight loss...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5682 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228343743-ynvsm4shv
+🧠 BRAIN: Reasoning complete in 11042ms
+  ✓ Completed in 11042ms
+  Expected: Lymphoma
+  Got: Lymphoma (Non-Hodgkin or Hodgkin) (35%)
+  Match: ✓
+
+Testing CPX-006: Numbness and vision problems...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5855 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228354901-kdgjegsz0
+🧠 BRAIN: Reasoning complete in 11158ms
+  ✓ Completed in 11158ms
+  Expected: Multiple Sclerosis
+  Got: Multiple Sclerosis (MS) (45%)
+  Match: ✓
+
+Testing PED-001: Fever and difficulty breathing...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5657 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228365986-kvdt3wmo4
+🧠 BRAIN: Reasoning complete in 11084ms
+  ✓ Completed in 11084ms
+  Expected: Bronchiolitis
+  Got: Acute Bronchiolitis (Viral, likely RSV) (45%)
+  Match: ✓
+
+Testing PED-006: Sore throat and rash...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5520 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228378857-6xgwhyc16
+🧠 BRAIN: Reasoning complete in 12872ms
+  ✓ Completed in 12872ms
+  Expected: Scarlet Fever
+  Got: Scarlet Fever (Scarlatina) (60%)
+  Match: ✓
+
+Testing GER-001: Fall and hip pain...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5573 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228391915-shqrugdad
+🧠 BRAIN: Reasoning complete in 13063ms
+  ✓ Completed in 13063ms
+  Expected: Hip Fracture
+  Got: Femoral Neck Fracture (Intertrochanteric or Subcapital) (85%)
+  Match: ✗
+
+Testing GER-006: Sudden confusion...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5204 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228403584-4c1n9wxsq
+🧠 BRAIN: Reasoning complete in 11669ms
+  ✓ Completed in 11669ms
+  Expected: Normal Pressure Hydrocephalus
+  Got: Normal Pressure Hydrocephalus (NPH) (35%)
+  Match: ✓
+
+Testing IRQ-001: Chronic fever and weight loss...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5479 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228417056-675fdo958
+🧠 BRAIN: Reasoning complete in 13468ms
+  ✓ Completed in 13468ms
+  Expected: Brucellosis
+  Got: Brucellosis (Malta Fever) (35%)
+  Match: ✓
+
+Testing IRQ-006: Chronic cough and fever...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Caching disabled, fetching fresh results
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5622 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228430087-sbttib87s
+🧠 BRAIN: Reasoning complete in 13030ms
+  ✓ Completed in 13030ms
+  Expected: Pulmonary Tuberculosis
+  Got: Pulmonary Tuberculosis (PTB) (60%)
+  Match: ✓
+
+
+======================================================================
+BRAIN SAMPLE TEST RESULTS
+======================================================================
+Total Cases:           12
+Top-1 Accuracy:        9/12 (75.00%)
+Top-3 Accuracy:        9/12 (75.00%)
+Avg Execution Time:    12348ms
+======================================================================
+
+Category Breakdown:
+  emergency: 1/2 (50%)
+  common: 1/2 (50%)
+  complex: 2/2 (100%)
+  pediatric: 2/2 (100%)
+  geriatric: 1/2 (50%)
+  iraqi-specific: 2/2 (100%)
+
+Failed Cases:
+  EMG-001: Expected "Acute Myocardial Infarction", Got "ST-Elevation Myocardial Infarction (STEMI) / Acute Coronary Syndrome (ACS)"
+  COM-006: Expected "Acute Gastroenteritis", Got "Acute Bacterial Gastroenteritis (e.g., Campylobacter, Salmonella)"
+  GER-001: Expected "Hip Fracture", Got "Femoral Neck Fracture (Intertrochanteric or Subcapital)"
+
+======================================================================
+Test complete! Full 100-case test suite available in brain-performance.test.ts
+======================================================================
+

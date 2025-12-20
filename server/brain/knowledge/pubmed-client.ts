@@ -139,50 +139,12 @@ export async function searchAndCachePubMed(
   query: string,
   maxResults: number = 5
 ): Promise<PubMedArticle[]> {
-  const db = await getDb();
-  if (!db) return [];
-
-  // Check cache first - use hash of query to avoid title length issues
-  const queryHash = crypto.createHash('md5').update(`${query}:${maxResults}`).digest('hex');
-  const cacheKey = `pubmed:${queryHash}`;
+  // Temporarily disable caching due to schema mismatch
+  // TODO: Fix schema or migrate database to match expected structure
+  console.log('[PubMed] Caching disabled, fetching fresh results');
   
-  const cached = await db.select({
-    literatureData: brainMedicalLiterature.literatureData
-  })
-  .from(brainMedicalLiterature)
-  .where(
-    and(
-      eq(brainMedicalLiterature.source, 'pubmed'),
-      eq(brainMedicalLiterature.title, cacheKey)
-    )
-  )
-  .orderBy(desc(brainMedicalLiterature.createdAt))
-  .limit(1);
-
-  if (cached && cached.length > 0 && cached[0].literatureData) {
-    try {
-      return JSON.parse(cached[0].literatureData);
-    } catch {
-      // Cache corrupted, continue to fetch
-    }
-  }
-
   // Fetch from PubMed
   const result = await searchPubMed(query, maxResults);
-
-  // Cache in database using Drizzle ORM
-  if (result.articles.length > 0) {
-    await db.insert(brainMedicalLiterature).values({
-      source: 'pubmed',
-      title: cacheKey,
-      authors: result.articles[0].authors.join(", "),
-      publicationDate: result.articles[0].pubDate,
-      abstract: result.articles[0].abstract,
-      url: result.articles[0].url,
-      literatureData: JSON.stringify(result.articles),
-    });
-  }
-
   return result.articles;
 }
 

@@ -1,0 +1,315 @@
+🧠 BRAIN Sample Performance Test
+
+Testing representative cases from each category...
+
+Testing EMG-001: Severe crushing chest pain...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:17406ef86ab09e7c7511cc95962ea414,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:17406ef86ab09e7c7511cc95962ea414', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:17406ef86ab09e7c7511cc95962ea414') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5890 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228170721-srsxjpg2o
+🧠 BRAIN: Reasoning complete in 17538ms
+  ✓ Completed in 17538ms
+  Expected: Acute Myocardial Infarction
+  Got: Acute Myocardial Infarction (STEMI/NSTEMI) (65%)
+  Match: ✓
+
+Testing EMG-006: Sudden severe headache...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:e17f734f73bbe1b112a75d6c65385638,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:e17f734f73bbe1b112a75d6c65385638', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:e17f734f73bbe1b112a75d6c65385638') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5361 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228182661-1aijgy83y
+🧠 BRAIN: Reasoning complete in 11501ms
+  ✓ Completed in 11501ms
+  Expected: Subarachnoid Hemorrhage
+  Got: Subarachnoid Hemorrhage (SAH) (50%)
+  Match: ✓
+
+Testing COM-001: Fever and cough...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:cd3ed2bca270613b23e487d3225267d9,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:cd3ed2bca270613b23e487d3225267d9', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:cd3ed2bca270613b23e487d3225267d9') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5692 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228194144-yxukvrtsk
+🧠 BRAIN: Reasoning complete in 11481ms
+  ✓ Completed in 11481ms
+  Expected: Community-Acquired Pneumonia
+  Got: Community-Acquired Bacterial Pneumonia (CAP) (45%)
+  Match: ✗
+
+Testing COM-006: Diarrhea and vomiting...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:d07b85b807f8efe8dc0c2bb0f21fd67a,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:d07b85b807f8efe8dc0c2bb0f21fd67a', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:d07b85b807f8efe8dc0c2bb0f21fd67a') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5673 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228206964-0qyfskz7k
+🧠 BRAIN: Reasoning complete in 12821ms
+  ✓ Completed in 12821ms
+  Expected: Acute Gastroenteritis
+  Got: Acute Bacterial Gastroenteritis (e.g., E. coli, Salmonella, Shigella) (40%)
+  Match: ✗
+
+Testing CPX-001: Fatigue and weight loss...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:7fd7d58796ff66d7ef703dd7422f91fb,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:7fd7d58796ff66d7ef703dd7422f91fb', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:7fd7d58796ff66d7ef703dd7422f91fb') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5475 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228219210-yxqd9mkkv
+🧠 BRAIN: Reasoning complete in 12246ms
+  ✓ Completed in 12246ms
+  Expected: Lymphoma
+  Got: Lymphoma (Non-Hodgkin or Hodgkin) (35%)
+  Match: ✓
+
+Testing CPX-006: Numbness and vision problems...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:6eee993488fcd01619aa18d5c61c7da9,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:6eee993488fcd01619aa18d5c61c7da9', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:6eee993488fcd01619aa18d5c61c7da9') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (5944 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228230896-u1yld4p8n
+🧠 BRAIN: Reasoning complete in 11684ms
+  ✓ Completed in 11684ms
+  Expected: Multiple Sclerosis
+  Got: Multiple Sclerosis (MS) (45%)
+  Match: ✓
+
+Testing PED-001: Fever and difficulty breathing...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:a2167e95eab545f6eab7d25a55553bc8,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:a2167e95eab545f6eab7d25a55553bc8', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:a2167e95eab545f6eab7d25a55553bc8') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
+[Gemini Pro] Response generated (6014 chars, thinking: high, grounding: true)
+✓ Differential diagnosis generated
+✓ Case stored: BRAIN-1766228244009-taktpe5vw
+🧠 BRAIN: Reasoning complete in 13116ms
+  ✓ Completed in 13116ms
+  Expected: Bronchiolitis
+  Got: Bronchiolitis (Viral, likely RSV or Human Metapneumovirus) (40%)
+  Match: ✓
+
+Testing PED-006: Sore throat and rash...
+🧠 BRAIN: Starting clinical reasoning...
+✓ Symptoms normalized: 2 concepts identified
+✓ Found 0 candidate diagnoses from knowledge base
+✓ Found 10 similar historical cases
+[PubMed] Cache lookup failed, fetching fresh: DrizzleQueryError: Failed query: select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?
+params: pubmed,pubmed:2ec260eaabfd55d61521a74d6a88a72b,1
+    at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:79:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:18)
+    at async searchAndCachePubMed (/home/ubuntu/meditriage-ai/server/brain/knowledge/pubmed-client.ts:150:20)
+    at async BRAIN.reason (/home/ubuntu/meditriage-ai/server/brain/index.ts:110:26)
+    at async runSampleTests (/home/ubuntu/meditriage-ai/server/brain/brain-sample-test.ts:76:22) {
+  query: 'select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = ? and `brain_medical_literature`.`title` = ?) order by `brain_medical_literature`.`created_at` desc limit ?',
+  params: [ 'pubmed', 'pubmed:2ec260eaabfd55d61521a74d6a88a72b', 1 ],
+  cause: Error: Unknown column 'brain_medical_literature.created_at' in 'order clause'
+      at PromisePool.query (/home/ubuntu/meditriage-ai/node_modules/.pnpm/mysql2@3.15.1/node_modules/mysql2/lib/promise/pool.js:36:22)
+      at <anonymous> (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:133:24)
+      at MySql2PreparedQuery.queryWithCache (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/session.ts:77:18)
+      at MySql2PreparedQuery.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql2/session.ts:132:29)
+      at MySqlSelectBase.execute (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/mysql-core/query-builders/select.ts:1145:25)
+      at MySqlSelectBase.then (/home/ubuntu/meditriage-ai/node_modules/.pnpm/drizzle-orm@0.44.6_mysql2@3.15.1/node_modules/src/query-promise.ts:31:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sql: "select `literature_data` from `brain_medical_literature` where (`brain_medical_literature`.`source` = 'pubmed' and `brain_medical_literature`.`title` = 'pubmed:2ec260eaabfd55d61521a74d6a88a72b') order by `brain_medical_literature`.`created_at` desc limit 1",
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'brain_medical_literature.created_at' in 'order clause'"
+  }
+}
+✓ Found 0 relevant medical articles
