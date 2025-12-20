@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Calendar, TrendingUp, Users, Activity, BarChart3 } from "lucide-react";
 import { useLocation } from "wouter";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 
 function ReportsContent() {
   const [, setLocation] = useLocation();

@@ -13,7 +13,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 
 interface Annotation {
   id: string;

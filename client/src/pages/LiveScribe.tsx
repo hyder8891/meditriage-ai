@@ -24,7 +24,7 @@ import {
   Languages,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";

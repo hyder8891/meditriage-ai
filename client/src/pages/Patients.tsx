@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Users, Search, Plus, Phone, Mail, Calendar, FileText } from "lucide-react";
 import { useLocation } from "wouter";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { trpc } from "@/lib/trpc";
 
 function PatientsContent() {

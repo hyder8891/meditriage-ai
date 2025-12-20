@@ -24,7 +24,7 @@ interface ClinicianLayoutProps {
   children: ReactNode;
 }
 
-export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
+export function ClinicianLayout({ children }: ClinicianLayoutProps) {
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);

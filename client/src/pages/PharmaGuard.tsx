@@ -14,7 +14,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useLocation } from "wouter";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 

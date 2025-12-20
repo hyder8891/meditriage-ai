@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Activity, Brain, AlertTriangle } from "lucide-react";
 import { useLocation } from "wouter";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 import BioScanner3D from "@/components/BioScanner3D";
 
 function BioScannerContent() {

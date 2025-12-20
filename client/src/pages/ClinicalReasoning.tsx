@@ -27,7 +27,7 @@ import {
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 
 function ClinicalReasoningContent() {
   const [, setLocation] = useLocation();

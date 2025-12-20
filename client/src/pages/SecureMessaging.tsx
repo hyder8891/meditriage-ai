@@ -16,7 +16,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 
 function SecureMessagingContent() {
   const { language } = useLanguage();

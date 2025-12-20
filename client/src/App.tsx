@@ -46,6 +46,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Patients from "./pages/Patients";
 import AddPatient from "./pages/AddPatient";
 import Reports from "./pages/Reports";
+import PatientDetail from "./pages/PatientDetail";
 import MyPatients from "./pages/MyPatients";
 import FindDoctor from "./pages/FindDoctor";
 import MyDoctors from "./pages/MyDoctors";
@@ -79,6 +80,7 @@ function Router() {
       <Route path={"/clinician/messages"} component={SecureMessaging} />
       <Route path={"/clinician/patients"} component={Patients} />
       <Route path={"/clinician/patients/add"} component={AddPatient} />
+      <Route path={"/clinician/patient/:id"} component={PatientDetail} />
       <Route path={"/clinician/reports"} component={Reports} />
       <Route path={"/clinician/my-patients"} component={MyPatients} />
       <Route path={"/patient/find-doctor"} component={FindDoctor} />

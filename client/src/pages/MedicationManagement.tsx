@@ -11,7 +11,7 @@ import { Pill, Plus, Clock, AlertCircle, CheckCircle2, Search } from "lucide-rea
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import ClinicianLayout from "@/components/ClinicianLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 
 function MedicationManagementContent() {
   const { language } = useLanguage();
