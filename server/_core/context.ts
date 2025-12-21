@@ -20,27 +20,42 @@ export async function createContext(
   try {
     // First try JWT token from Authorization header (custom auth)
     const authHeader = opts.req.headers.authorization;
+    console.log('[Context] Authorization header:', authHeader ? authHeader.substring(0, 30) + '...' : 'null');
+    
     if (authHeader) {
       const token = extractTokenFromHeader(authHeader);
+      console.log('[Context] Extracted token:', token ? token.substring(0, 20) + '...' : 'null');
+      
       if (token) {
         const decoded = verifyToken(token);
+        console.log('[Context] Decoded token:', decoded);
+        
         if (decoded) {
           // Get user from database
           const db = await getDb();
           if (db) {
+            console.log('[Context] Looking up user with ID:', decoded.userId);
             const [dbUser] = await db
               .select()
               .from(users)
               .where(eq(users.id, decoded.userId))
               .limit(1);
             
+            console.log('[Context] DB user found:', dbUser ? `${dbUser.id} - ${dbUser.email}` : 'null');
+            
             if (dbUser) {
               user = dbUser;
-              console.log('[Context] Authenticated via JWT:', user.id, user.email, user.role);
+              console.log('[Context] ✅ Authenticated via JWT:', user.id, user.email, user.role);
             }
+          } else {
+            console.log('[Context] ❌ Failed to get database connection');
           }
+        } else {
+          console.log('[Context] ❌ Token verification failed');
         }
       }
+    } else {
+      console.log('[Context] No Authorization header found');
     }
     
     // Fallback to Manus OAuth if JWT auth failed

@@ -7,8 +7,23 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
+import { useAuthStore } from "@/hooks/useAuth";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (
+          error instanceof TRPCClientError &&
+          error.data?.code === "UNAUTHORIZED"
+        ) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+    },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -42,34 +57,18 @@ const trpcClient = trpc.createClient({
     httpBatchLink({
       url: "/api/trpc",
       transformer: superjson,
-      fetch(input, init) {
-        // Get JWT token from localStorage (Zustand persist)
-        let token: string | null = null;
-        try {
-          const authState = localStorage.getItem('auth-storage');
-          if (authState) {
-            const parsed = JSON.parse(authState);
-            token = parsed.state?.token || null;
-          }
-        } catch (e) {
-          console.error('[tRPC] Failed to get token from localStorage:', e);
-        }
-
-        // Add Authorization header if token exists
-        const headers = {
-          ...(init?.headers || {}),
+      async headers() {
+        // Access the token directly from the Zustand store
+        const token = useAuthStore.getState().token;
+        console.log('[tRPC] Sending request with token:', token ? token.substring(0, 20) + '...' : 'null');
+        return {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         };
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-          console.log('[tRPC] Sending request with JWT token:', token.substring(0, 20) + '...');
-        } else {
-          console.log('[tRPC] No JWT token found in localStorage');
-        }
-
+      },
+      fetch(input, init) {
         return globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
-          headers,
         });
       },
     }),
@@ -77,9 +76,9 @@ const trpcClient = trpc.createClient({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <trpc.Provider client={trpcClient} queryClient={queryClient}>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <App />
-    </QueryClientProvider>
-  </trpc.Provider>
+    </trpc.Provider>
+  </QueryClientProvider>,
 );
