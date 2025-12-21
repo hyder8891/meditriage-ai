@@ -328,4 +328,4 @@ medical_events (
 - [ ] Verify real-time messaging works between test patient and test doctor accounts
 - [x] Fix text visibility on doctor login page (labels barely visible - low contrast) - CRITICAL: Users cannot see password input
 - [ ] Fix routing: logged-in doctor redirected to homepage when accessing /clinician/dashboard
-- [x] Fix dashboard tabs redirecting to login page after successful login (JWT token not being sent/recognized on navigation)
+- [x] Fix dashboard tabs redirecting to login page after successful login (JWT token not being sent/recognized on navigation) - CRITICAL: Clinician login works but clicking tabs redirects to blue login page

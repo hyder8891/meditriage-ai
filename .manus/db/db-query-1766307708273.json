@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, email, role, name FROM users WHERE email LIKE '%patient%test%' OR email LIKE '%test%patient%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, role, name FROM users WHERE email LIKE '%patient%test%' OR email LIKE '%test%patient%'",
+  "rows": [
+    {
+      "id": "3150028",
+      "email": "patient.test@meditriage.com",
+      "role": "patient",
+      "name": "Test Patient"
+    },
+    {
+      "id": "3420027",
+      "email": "patient@test.com",
+      "role": "patient",
+      "name": "Test Patient"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\tname\n3150028\tpatient.test@meditriage.com\tpatient\tTest Patient\n3420027\tpatient@test.com\tpatient\tTest Patient\n",
+  "stderr": "",
+  "execution_time_ms": 1490
+}

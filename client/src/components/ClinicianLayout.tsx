@@ -16,7 +16,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -26,15 +26,8 @@ interface ClinicianLayoutProps {
 
 export function ClinicianLayout({ children }: ClinicianLayoutProps) {
   const [, setLocation] = useLocation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, clearAuth } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const logoutMutation = trpc.auth.logout.useMutation({
-    onSuccess: () => {
-      toast.success("Logged out successfully");
-      setLocation("/clinician/login");
-    },
-  });
 
   const { data: unreadCount } = trpc.clinical.getUnreadMessageCount.useQuery(
     { recipientId: user?.id || 0 },
@@ -42,11 +35,13 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
   );
 
   const handleLogout = () => {
-    logoutMutation.mutate();
+    clearAuth();
+    toast.success("Logged out successfully");
+    setLocation("/clinician/login");
   };
 
-  // Redirect if not authenticated or not admin
-  if (!authLoading && (!user || user.role !== 'admin')) {
+  // Redirect if not authenticated or not clinician/admin
+  if (!isAuthenticated || !user || (user.role !== 'admin' && user.role !== 'clinician')) {
     setLocation("/clinician/login");
     return null;
   }

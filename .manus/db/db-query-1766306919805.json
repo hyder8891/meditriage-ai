@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, email, role, verified FROM users WHERE role IN ('clinician', 'admin', 'doctor') LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, role, verified FROM users WHERE role IN ('clinician', 'admin', 'doctor') LIMIT 10",
+  "rows": [
+    {
+      "id": "1",
+      "email": "haljanabi88@gmail.com",
+      "role": "admin",
+      "verified": "0"
+    },
+    {
+      "id": "900079",
+      "email": "Haidar_goold_oo@yahoo.com",
+      "role": "clinician",
+      "verified": "0"
+    },
+    {
+      "id": "900086",
+      "email": "admin@admin.com",
+      "role": "admin",
+      "verified": "1"
+    },
+    {
+      "id": "1440001",
+      "email": "admin@meditriage.ai",
+      "role": "admin",
+      "verified": "0"
+    },
+    {
+      "id": "1500003",
+      "email": "test-admin@meditriage.test",
+      "role": "admin",
+      "verified": "0"
+    },
+    {
+      "id": "2100011",
+      "email": "ahmed.husseini@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100012",
+      "email": "fatima.najjar@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100013",
+      "email": "omar.jubouri@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100014",
+      "email": "layla.hassan@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100015",
+      "email": "karim.baghdadi@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\tverified\n1\thaljanabi88@gmail.com\tadmin\t0\n900079\tHaidar_goold_oo@yahoo.com\tclinician\t0\n900086\tadmin@admin.com\tadmin\t1\n1440001\tadmin@meditriage.ai\tadmin\t0\n1500003\ttest-admin@meditriage.test\tadmin\t0\n2100011\tahmed.husseini@meditriage.iq\tdoctor\t1\n2100012\tfatima.najjar@meditriage.iq\tdoctor\t1\n2100013\tomar.jubouri@meditriage.iq\tdoctor\t1\n2100014\tlayla.hassan@meditriage.iq\tdoctor\t1\n2100015\tkarim.baghdadi@meditriage.iq\tdoctor\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1563
+}

@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, email, role, name FROM users WHERE role = 'patient' LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, role, name FROM users WHERE role = 'patient' LIMIT 5",
+  "rows": [
+    {
+      "id": "900067",
+      "email": "Hhwaljanabi@yahoo.com",
+      "role": "patient",
+      "name": "hyd"
+    },
+    {
+      "id": "2100016",
+      "email": "sara.mohammed@example.iq",
+      "role": "patient",
+      "name": "Sara Mohammed"
+    },
+    {
+      "id": "2100017",
+      "email": "ali.khalil@example.iq",
+      "role": "patient",
+      "name": "Ali Khalil"
+    },
+    {
+      "id": "2100018",
+      "email": "mariam.youssef@example.iq",
+      "role": "patient",
+      "name": "Mariam Youssef"
+    },
+    {
+      "id": "2100019",
+      "email": "hassan.amiri@example.iq",
+      "role": "patient",
+      "name": "Hassan Al-Amiri"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\tname\n900067\tHhwaljanabi@yahoo.com\tpatient\thyd\n2100016\tsara.mohammed@example.iq\tpatient\tSara Mohammed\n2100017\tali.khalil@example.iq\tpatient\tAli Khalil\n2100018\tmariam.youssef@example.iq\tpatient\tMariam Youssef\n2100019\thassan.amiri@example.iq\tpatient\tHassan Al-Amiri\n",
+  "stderr": "",
+  "execution_time_ms": 1520
+}

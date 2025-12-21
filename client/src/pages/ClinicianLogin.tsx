@@ -61,9 +61,9 @@ export default function ClinicianLogin() {
     });
   };
 
-  // If already authenticated with Manus OAuth and is admin, redirect to dashboard
+  // If already authenticated, redirect to dashboard
   useEffect(() => {
-    if (user && user.role === 'admin' && !authLoading) {
+    if (user && (user.role === 'admin' || user.role === 'clinician') && !authLoading) {
       setLocation("/clinician/dashboard");
     }
   }, [user, authLoading, setLocation]);

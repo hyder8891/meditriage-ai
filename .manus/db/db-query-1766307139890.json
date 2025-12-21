@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, email, role, verified, name FROM users WHERE email = 'doctor.test@meditriage.com'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, role, verified, name FROM users WHERE email = 'doctor.test@meditriage.com'",
+  "rows": [
+    {
+      "id": "3150029",
+      "email": "doctor.test@meditriage.com",
+      "role": "clinician",
+      "verified": "1",
+      "name": "Dr. Test Doctor"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\tverified\tname\n3150029\tdoctor.test@meditriage.com\tclinician\t1\tDr. Test Doctor\n",
+  "stderr": "",
+  "execution_time_ms": 1598
+}
