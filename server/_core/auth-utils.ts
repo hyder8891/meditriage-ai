@@ -21,19 +21,21 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 
 /**
  * Generate a JWT token for a user
+ * Now includes tokenVersion for immediate revocation capability
  */
-export function generateToken(payload: { userId: number; email: string; role: string }): string {
+export function generateToken(payload: { userId: number; email: string; role: string; tokenVersion: number }): string {
   return jwt.sign(payload, ENV.cookieSecret, {
-    expiresIn: '7d', // Token expires in 7 days
+    expiresIn: '15m', // Reduced from 7d to 15 minutes for better security
   });
 }
 
 /**
  * Verify and decode a JWT token
+ * Returns decoded payload including tokenVersion
  */
-export function verifyToken(token: string): { userId: number; email: string; role: string } | null {
+export function verifyToken(token: string): { userId: number; email: string; role: string; tokenVersion: number } | null {
   try {
-    const decoded = jwt.verify(token, ENV.cookieSecret) as { userId: number; email: string; role: string };
+    const decoded = jwt.verify(token, ENV.cookieSecret) as { userId: number; email: string; role: string; tokenVersion: number };
     return decoded;
   } catch (error) {
     return null;

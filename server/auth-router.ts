@@ -13,6 +13,7 @@ import {
   generateRandomToken,
   generateTokenExpiry,
 } from "./_core/auth-utils";
+import { rateLimit } from "./_core/rate-limit";
 
 export const authRouter = router({
   /**
@@ -27,6 +28,9 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      // Rate limit: 3 registration attempts per 10 minutes per email
+      await rateLimit(input.email, "register", 3, 600);
+
       const db = await getDb();
 
       // Validate email format
@@ -113,6 +117,9 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      // Rate limit: 3 registration attempts per 10 minutes per email
+      await rateLimit(input.email, "register", 3, 600);
+
       const db = await getDb();
 
       // Validate email format
@@ -192,6 +199,9 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      // Rate limit: 5 login attempts per 10 minutes per email
+      await rateLimit(input.email, "login", 5, 600);
+
       const db = await getDb();
 
       // Find user by email
@@ -232,11 +242,12 @@ export const authRouter = router({
         .set({ lastSignedIn: new Date() })
         .where(eq(users.id, user.id));
 
-      // Generate JWT token
+      // Generate JWT token with tokenVersion
       const token = generateToken({
         userId: user.id,
         email: user.email!,
         role: user.role,
+        tokenVersion: user.tokenVersion || 0,
       });
 
       return {
@@ -310,4 +321,46 @@ export const authRouter = router({
       message: "Logged out successfully",
     };
   }),
+  
+  /**
+   * Revoke all tokens for a user (logout from all devices)
+   * Increments tokenVersion to invalidate all existing JWTs
+   */
+  revokeAllTokens: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        token: z.string(), // Current valid token required for authorization
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      
+      // Verify the current token
+      const decoded = verifyToken(input.token);
+      
+      if (!decoded || decoded.userId !== input.userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid token or unauthorized",
+        });
+      }
+      
+      // Increment tokenVersion to revoke all tokens
+      await db!
+        .update(users)
+        .set({ 
+          tokenVersion: (decoded.tokenVersion || 0) + 1 
+        })
+        .where(eq(users.id, input.userId));
+      
+      console.log(
+        `[Auth] Revoked all tokens for user ${input.userId} (version: ${decoded.tokenVersion} -> ${decoded.tokenVersion + 1})`
+      );
+      
+      return {
+        success: true,
+        message: "All tokens revoked successfully. Please log in again.",
+      };
+    }),
 });

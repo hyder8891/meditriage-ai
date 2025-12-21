@@ -44,8 +44,20 @@ export async function createContext(
             console.log('[Context] DB user found:', dbUser ? `${dbUser.id} - ${dbUser.email}` : 'null');
             
             if (dbUser) {
-              user = dbUser;
-              console.log('[Context] ✅ Authenticated via JWT:', user.id, user.email, user.role);
+              // Validate tokenVersion to allow immediate revocation
+              const currentTokenVersion = dbUser.tokenVersion || 0;
+              const tokenVersionInJWT = decoded.tokenVersion || 0;
+              
+              if (tokenVersionInJWT !== currentTokenVersion) {
+                console.log(
+                  `[Context] ❌ Token revoked: JWT version ${tokenVersionInJWT} != DB version ${currentTokenVersion}`
+                );
+                // Token is stale (password changed or logout-all triggered)
+                user = null;
+              } else {
+                user = dbUser;
+                console.log('[Context] ✅ Authenticated via JWT:', user.id, user.email, user.role);
+              }
             }
           } else {
             console.log('[Context] ❌ Failed to get database connection');

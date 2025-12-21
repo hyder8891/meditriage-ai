@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import Stripe from "stripe";
 import { getDb } from "../db";
-import { subscriptions, users } from "../../drizzle/schema";
+import { subscriptions, users, processedWebhooks } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -42,6 +42,53 @@ export async function handleStripeWebhook(req: Request, res: Response) {
   if (event.id.startsWith("evt_test_")) {
     console.log("[Webhook] Test event detected, returning verification response");
     return res.json({ verified: true });
+  }
+  
+  // IDEMPOTENCY CHECK: Prevent duplicate webhook processing
+  const db = await getDb();
+  if (!db) {
+    console.error("[Webhook] Database unavailable for idempotency check");
+    return res.status(500).json({ error: "Database unavailable" });
+  }
+  
+  try {
+    // Check if we've already processed this event
+    const [existingEvent] = await db
+      .select()
+      .from(processedWebhooks)
+      .where(eq(processedWebhooks.eventId, event.id))
+      .limit(1);
+    
+    if (existingEvent) {
+      console.log(
+        `[Webhook] ⚠️  Duplicate event ${event.id} detected (already processed at ${existingEvent.processedAt}). Skipping.`
+      );
+      // Return success to prevent Stripe from retrying
+      return res.json({ 
+        received: true, 
+        status: "duplicate",
+        originalProcessedAt: existingEvent.processedAt 
+      });
+    }
+    
+    // Record that we're processing this event
+    await db.insert(processedWebhooks).values({
+      eventId: event.id,
+      eventType: event.type,
+      processingStatus: "success", // Will update if fails
+      webhookData: JSON.stringify(event),
+    });
+    
+    console.log(`[Webhook] ✅ Idempotency check passed for ${event.id}`);
+  } catch (idempotencyError: any) {
+    // If this is a duplicate key error, another request is processing this event
+    if (idempotencyError.code === 'ER_DUP_ENTRY') {
+      console.log(`[Webhook] ⚠️  Race condition detected for ${event.id}. Another instance is processing.`);
+      return res.json({ received: true, status: "duplicate" });
+    }
+    
+    console.error(`[Webhook] Idempotency check failed:`, idempotencyError);
+    // Continue processing despite idempotency check failure (fail-open)
   }
 
   // Handle different event types

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS processed_webhooks (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  event_id VARCHAR(255) NOT NULL UNIQUE,\n  event_type VARCHAR(100) NOT NULL,\n  processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  processing_status ENUM('success', 'failed', 'skipped') NOT NULL DEFAULT 'success',\n  error_message TEXT,\n  webhook_data TEXT,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_event_id (event_id),\n  INDEX idx_event_type (event_type),\n  INDEX idx_processed_at (processed_at)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS processed_webhooks (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  event_id VARCHAR(255) NOT NULL UNIQUE,\n  event_type VARCHAR(100) NOT NULL,\n  processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  processing_status ENUM('success', 'failed', 'skipped') NOT NULL DEFAULT 'success',\n  error_message TEXT,\n  webhook_data TEXT,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_event_id (event_id),\n  INDEX idx_event_type (event_type),\n  INDEX idx_processed_at (processed_at)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1731
+}

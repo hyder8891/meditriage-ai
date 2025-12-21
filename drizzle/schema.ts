@@ -41,6 +41,10 @@ export const users = mysqlTable("users", {
   resetToken: varchar("reset_token", { length: 255 }),
   resetTokenExpiry: timestamp("reset_token_expiry"),
   
+  // Token version for immediate JWT revocation
+  // Increment this when password changes or logout-all-devices is triggered
+  tokenVersion: int("token_version").default(0).notNull(),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -1930,3 +1934,28 @@ export const labTrends = mysqlTable("lab_trends", {
 
 export type LabTrend = typeof labTrends.$inferSelect;
 export type InsertLabTrend = typeof labTrends.$inferInsert;
+
+/**
+ * Processed Webhooks - Prevent duplicate webhook processing (idempotency)
+ * Critical for payment systems like Stripe that may send duplicate webhooks
+ */
+export const processedWebhooks = mysqlTable("processed_webhooks", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Webhook identification
+  eventId: varchar("event_id", { length: 255 }).notNull().unique(), // Stripe event.id
+  eventType: varchar("event_type", { length: 100 }).notNull(), // e.g., "checkout.session.completed"
+  
+  // Processing metadata
+  processedAt: timestamp("processed_at").defaultNow().notNull(),
+  processingStatus: mysqlEnum("processing_status", ["success", "failed", "skipped"]).default("success").notNull(),
+  errorMessage: text("error_message"), // If processing failed
+  
+  // Webhook data (for debugging)
+  webhookData: text("webhook_data"), // JSON stringified event data
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ProcessedWebhook = typeof processedWebhooks.$inferSelect;
+export type InsertProcessedWebhook = typeof processedWebhooks.$inferInsert;

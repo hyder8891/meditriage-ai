@@ -14,6 +14,7 @@ import { getDb } from "../db";
 import { aecDetectedErrors } from "../../drizzle/schema";
 import { sendCriticalErrorAlert } from "./alerts/notification-service";
 import { eq } from "drizzle-orm";
+import { sanitizeForLog } from "../_core/log-sanitizer";
 
 /**
  * Detect and log an error to the AEC system
@@ -34,6 +35,9 @@ export async function detectError(errorData: {
       return null;
     }
 
+    // Sanitize user context before logging to prevent sensitive data leaks
+    const sanitizedContext = errorData.userContext ? sanitizeForLog(errorData.userContext) : undefined;
+    
     console.log(`[AEC Sentinel] Detecting error: ${errorData.errorType} (${errorData.severity})`);
 
     // Check if this error already exists
@@ -70,7 +74,8 @@ export async function detectError(errorData: {
         stackTrace: errorData.stackTrace,
         source: errorData.source,
         endpoint: errorData.endpoint,
-        userContext: errorData.userContext ? JSON.stringify(errorData.userContext) : undefined,
+        // Store sanitized context to prevent PHI/PII leaks
+        userContext: sanitizedContext ? JSON.stringify(sanitizedContext) : undefined,
         firstOccurrence: new Date(),
         lastOccurrence: new Date(),
         occurrenceCount: 1,

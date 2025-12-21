@@ -9,6 +9,10 @@ import { runAllTests, runSmokeTests } from "./test-runner";
 import { deployPatch, rollbackDeployment, performHealthCheck, shouldAutoDeployPatch } from "./deployment-manager";
 import { updatePatchValidation, updatePatchDeployment } from "../surgical/engine";
 import { sendDeploymentSuccessAlert, sendDeploymentFailedAlert, sendRollbackAlert, sendHealthCheckFailedAlert } from "../alerts/notification-service";
+import Redis from "ioredis";
+
+// Redis client for circuit breaker
+const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
 
 export interface RecoveryResult {
   success: boolean;
@@ -17,6 +21,110 @@ export interface RecoveryResult {
   healthCheckPassed: boolean;
   errors: string[];
   warnings: string[];
+  killedByCircuitBreaker?: boolean;
+}
+
+// ============================================================================
+// AEC Kill Switch (Circuit Breaker)
+// ============================================================================
+
+/**
+ * Check if AEC should be blocked from patching a file
+ * 
+ * Prevents infinite loop where:
+ * 1. AEC patches a file
+ * 2. Patch causes new error
+ * 3. AEC patches again
+ * 4. Loop continues, burning credits and potentially breaking code
+ * 
+ * @param filePath - File being patched
+ * @param errorId - Error ID being fixed
+ * @returns true if safe to proceed, false if kill switch engaged
+ */
+async function checkSafetyLock(filePath: string, errorId: number): Promise<boolean> {
+  const key = `aec:panic:${filePath}:${errorId}`;
+  
+  try {
+    // Increment attempt counter
+    const attempts = await redis.incr(key);
+    
+    // Set 30-minute expiry on first attempt
+    if (attempts === 1) {
+      await redis.expire(key, 1800); // 30 minutes
+    }
+
+    // Kill switch: max 3 attempts per file per error in 30 minutes
+    if (attempts > 3) {
+      console.error(
+        `🚨 AEC KILL SWITCH ENGAGED: Too many patch attempts for ${filePath} (error ${errorId}). ` +
+        `Manual intervention required. Attempts: ${attempts}/3`
+      );
+      
+      // Send critical alert to admin
+      try {
+        const { sendManualReviewAlert } = await import("../alerts/notification-service");
+        await sendManualReviewAlert(errorId, "AEC Kill Switch Engaged", [
+          `File: ${filePath}`,
+          `Error ID: ${errorId}`,
+          `Attempts: ${attempts}`,
+          "Reason: Too many failed patch attempts",
+          "Action Required: Manual code review and fix",
+        ]);
+      } catch (alertError) {
+        console.error("[AEC Kill Switch] Failed to send alert:", alertError);
+      }
+      
+      return false; // STOP THE AI
+    }
+
+    console.log(
+      `[AEC Safety Lock] ${filePath} - Attempt ${attempts}/3 (window: 30 minutes)`
+    );
+    
+    return true; // Safe to proceed
+  } catch (error) {
+    console.error("[AEC Safety Lock] Redis error:", error);
+    // If Redis fails, allow the operation (fail-open for availability)
+    return true;
+  }
+}
+
+/**
+ * Reset safety lock for a file (admin override)
+ */
+export async function resetSafetyLock(filePath: string, errorId: number): Promise<void> {
+  const key = `aec:panic:${filePath}:${errorId}`;
+  
+  try {
+    await redis.del(key);
+    console.log(`[AEC Safety Lock] Reset for ${filePath} (error ${errorId})`);
+  } catch (error) {
+    console.error("[AEC Safety Lock] Error resetting:", error);
+  }
+}
+
+/**
+ * Get safety lock status for a file
+ */
+export async function getSafetyLockStatus(
+  filePath: string,
+  errorId: number
+): Promise<{ attempts: number; ttl: number; locked: boolean }> {
+  const key = `aec:panic:${filePath}:${errorId}`;
+  
+  try {
+    const attempts = await redis.get(key);
+    const ttl = await redis.ttl(key);
+    
+    return {
+      attempts: attempts ? parseInt(attempts) : 0,
+      ttl: ttl > 0 ? ttl : 0,
+      locked: attempts ? parseInt(attempts) > 3 : false,
+    };
+  } catch (error) {
+    console.error("[AEC Safety Lock] Error getting status:", error);
+    return { attempts: 0, ttl: 0, locked: false };
+  }
 }
 
 // ============================================================================
@@ -65,6 +173,26 @@ export async function runRecoveryProcedure(
     }
 
     const branchName = patch.branchName || `aec/${patch.patchVersion}`;
+    
+    // Step 1.5: Check AEC Kill Switch (Circuit Breaker)
+    const filePath = patch.filePath || "unknown";
+    const safeToProceed = await checkSafetyLock(filePath, patch.errorId);
+    
+    if (!safeToProceed) {
+      console.error(`[AEC Recovery Engine] 🚨 Kill switch engaged for ${filePath}`);
+      result.errors.push("AEC kill switch engaged - too many patch attempts");
+      result.warnings.push("Manual intervention required");
+      result.killedByCircuitBreaker = true;
+      
+      // Update patch status
+      await updatePatchDeployment(
+        patchId,
+        "rejected",
+        "Kill switch engaged - too many attempts"
+      );
+      
+      return result;
+    }
 
     // Step 2: Run tests
     if (!options.skipTests) {

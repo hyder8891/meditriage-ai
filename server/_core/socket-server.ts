@@ -14,7 +14,18 @@ export function initializeSocketServer(httpServer: HttpServer) {
     // Reliability settings for Iraq's mobile networks
     pingTimeout: 20000,
     pingInterval: 25000,
-    transports: ['websocket', 'polling']
+    transports: ['websocket', 'polling'],
+    
+    // Connection state recovery for flaky networks
+    connectionStateRecovery: {
+      // Max duration to keep connection state (2 minutes)
+      maxDisconnectionDuration: 2 * 60 * 1000,
+      // Skip middleware on recovery (faster reconnection)
+      skipMiddlewares: true,
+    },
+    
+    // Clean up stale connections aggressively
+    cleanupEmptyChildNamespaces: true,
   });
 
   // ---------------------------------------------------------
@@ -123,9 +134,25 @@ export function initializeSocketServer(httpServer: HttpServer) {
       socket.to(roomId).emit('consultation-status-update', { status });
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
       // Redis Adapter automatically handles removing socket from rooms
-      console.log('User disconnected:', socket.id);
+      console.log(`User disconnected: ${socket.id} (reason: ${reason})`);
+      
+      // Additional cleanup for flaky connections
+      // The adapter handles room cleanup, but we log for monitoring
+      if (reason === 'transport error' || reason === 'ping timeout') {
+        console.log(`[Socket] Flaky connection detected for ${socket.id}`);
+      }
+    });
+    
+    // Handle connection errors explicitly
+    socket.on('error', (error) => {
+      console.error(`[Socket] Connection error for ${socket.id}:`, error.message);
+    });
+    
+    // Heartbeat to detect zombie connections
+    socket.on('ping', () => {
+      socket.emit('pong');
     });
   });
 
