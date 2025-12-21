@@ -351,8 +351,8 @@ export default function PatientPortal() {
                   time: language === 'ar' ? 'غداً' : 'Tomorrow',
                   color: 'text-purple-600 bg-purple-100',
                 },
-              ].map((activity, idx) => (
-                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg hover:bg-slate-50 transition-colors">
+              ].map((activity) => (
+                <div key={activity.title} className="flex items-start gap-4 p-4 rounded-lg hover:bg-slate-50 transition-colors">
                   <div className={`w-10 h-10 rounded-full ${activity.color} flex items-center justify-center flex-shrink-0`}>
                     <activity.icon className="w-5 h-5" />
                   </div>

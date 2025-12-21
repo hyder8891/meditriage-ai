@@ -386,8 +386,12 @@ medical_events (
 - [ ] Test email/password authentication continues to work
 
 ## Authentication Error Fixes - December 22, 2024 (CRITICAL)
-- [ ] Fix JWT expiresIn error in auth-utils.ts (invalid expiresIn option for number payload)
+- [x] Fix JWT expiresIn error in auth-utils.ts (invalid expiresIn option for number payload)
 - [ ] Add current domain (3000-ifhz2snq11y44i4wphv4f-33e916fa.manus-asia.computer) to Firebase
-- [ ] Improve email-already-in-use error handling in registration flow
+- [x] Improve email-already-in-use error handling in registration flow
 - [ ] Test Google OAuth after domain fix
 - [ ] Test email/password registration after fixes
+
+## React Key Prop Warning Fix - December 21, 2024
+- [x] Fix missing key prop in PatientPortal component list rendering
+- [x] Verify no React warnings after fix
