@@ -1,5 +1,9 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
+import { sendAppointmentConfirmation } from "./services/email";
+import { getDb } from "./db";
+import { users } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 import {
   createConsultation,
   getConsultationById,
@@ -25,7 +29,50 @@ export const consultationRouter = router({
       appointmentId: z.number().optional(),
     }))
     .mutation(async ({ input }) => {
-      return await createConsultation(input);
+      const result = await createConsultation(input);
+      
+      // Send appointment confirmation email
+      try {
+        const db = await getDb();
+        
+        // Get patient and clinician details
+        const [patient] = await db!
+          .select()
+          .from(users)
+          .where(eq(users.id, input.patientId))
+          .limit(1);
+        
+        const [clinician] = await db!
+          .select()
+          .from(users)
+          .where(eq(users.id, input.clinicianId))
+          .limit(1);
+        
+        if (patient && clinician && patient.email) {
+          const appointmentDate = new Date(input.scheduledTime);
+          
+          sendAppointmentConfirmation({
+            patientName: patient.name || "Patient",
+            patientEmail: patient.email,
+            doctorName: clinician.name || "Doctor",
+            appointmentDate: appointmentDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }),
+            appointmentTime: appointmentDate.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            appointmentType: input.chiefComplaint || "General Consultation",
+            language: "ar",
+          }).catch(err => console.error("[Consultation] Failed to send appointment confirmation:", err));
+        }
+      } catch (err) {
+        console.error("[Consultation] Error sending appointment confirmation:", err);
+      }
+      
+      return result;
     }),
 
   // Get consultation by ID

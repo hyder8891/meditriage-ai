@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { getDb } from "../db";
 import { subscriptions, users, processedWebhooks } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
+import { sendSubscriptionConfirmation, sendPaymentReceipt } from "../services/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-12-18.acacia",
@@ -176,6 +177,33 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
 
     console.log(`[Webhook] Created subscription for user ${userId}, plan ${planId}`);
+    
+    // Send subscription confirmation email
+    try {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      
+      if (user && user.email) {
+        const amount = session.amount_total ? session.amount_total / 100 : 0;
+        const billingPeriod = subscription.items.data[0]?.price?.recurring?.interval === "year" ? "yearly" : "monthly";
+        const nextBillingDate = new Date((subscription as any).current_period_end * 1000);
+        
+        sendSubscriptionConfirmation({
+          userName: user.name || "User",
+          userEmail: user.email,
+          planName: planId,
+          amount,
+          billingPeriod,
+          nextBillingDate: nextBillingDate.toLocaleDateString('en-US'),
+          language: "ar",
+        }).catch(err => console.error("[Webhook] Failed to send subscription confirmation:", err));
+      }
+    } catch (err) {
+      console.error("[Webhook] Error sending subscription confirmation:", err);
+    }
   }
 }
 
@@ -238,7 +266,48 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
  */
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
   console.log(`[Webhook] Invoice paid: ${invoice.id}`);
-  // Could log payment history here if needed
+  
+  // Send payment receipt email
+  try {
+    const db = await getDb();
+    if (!db) return;
+    
+    // Get user from subscription
+    const subscriptionId = (invoice as any).subscription;
+    if (subscriptionId) {
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.stripeSubscriptionId, subscriptionId as string))
+        .limit(1);
+      
+      if (subscription) {
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, subscription.userId))
+          .limit(1);
+        
+        if (user && user.email) {
+          const amount = invoice.amount_paid ? invoice.amount_paid / 100 : 0;
+          const paymentDate = new Date((invoice as any).status_transitions?.paid_at * 1000 || Date.now());
+          
+          sendPaymentReceipt({
+            userName: user.name || "User",
+            userEmail: user.email,
+            amount,
+            paymentDate: paymentDate.toLocaleDateString('en-US'),
+            paymentMethod: "Card",
+            invoiceNumber: invoice.number || invoice.id,
+            description: invoice.description || `Subscription payment for ${subscription.planType}`,
+            language: "ar",
+          }).catch(err => console.error("[Webhook] Failed to send payment receipt:", err));
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[Webhook] Error sending payment receipt:", err);
+  }
 }
 
 /**

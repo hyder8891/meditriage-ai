@@ -1,7 +1,8 @@
 import { getDb } from "./db";
-import { messages } from "../drizzle/schema";
+import { messages, users } from "../drizzle/schema";
 import { eq, and, or, desc } from "drizzle-orm";
 import { emitNotificationToUser } from "./_core/socket-server";
+import { sendMessageNotification } from "./services/email";
 
 export async function sendMessage(data: {
   senderId: number;
@@ -30,6 +31,42 @@ export async function sendMessage(data: {
     });
   } catch (error) {
     console.error('Failed to emit message notification:', error);
+  }
+  
+  // Send email notification to recipient
+  try {
+    // Get sender and recipient details
+    const [sender] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, data.senderId))
+      .limit(1);
+    
+    const [recipient] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, data.recipientId))
+      .limit(1);
+    
+    if (sender && recipient && recipient.email) {
+      // Truncate message preview to 100 characters
+      const messagePreview = data.content.length > 100 
+        ? data.content.substring(0, 100) + "..."
+        : data.content;
+      
+      const conversationUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || "https://app.manus.space"}/messages/${data.senderId}`;
+      
+      sendMessageNotification({
+        recipientName: recipient.name || "User",
+        recipientEmail: recipient.email,
+        senderName: sender.name || "User",
+        messagePreview,
+        conversationUrl,
+        language: "ar",
+      }).catch(err => console.error("[Messaging] Failed to send email notification:", err));
+    }
+  } catch (error) {
+    console.error('[Messaging] Error sending email notification:', error);
   }
   
   return message;

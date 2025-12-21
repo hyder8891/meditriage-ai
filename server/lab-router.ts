@@ -5,6 +5,10 @@
 
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
+import { sendLabResultNotification, sendCriticalLabResultAlert } from "./services/email";
+import { getDb } from "./db";
+import { users } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 import { storagePut } from "./storage";
 import {
   createLabReport,
@@ -166,6 +170,52 @@ export const labRouter = router({
           riskLevel: overall.riskLevel,
           recommendedActions: JSON.stringify(overall.recommendedActions),
         });
+
+        // Step 7: Send email notifications
+        try {
+          const db = await getDb();
+          const [user] = await db!
+            .select()
+            .from(users)
+            .where(eq(users.id, ctx.user.id))
+            .limit(1);
+          
+          if (user && user.email) {
+            const abnormalTests = interpretedResults
+              .filter(r => r.abnormalFlag)
+              .map(r => r.testName);
+            
+            const criticalTests = interpretedResults
+              .filter(r => r.criticalFlag)
+              .map(r => r.testName);
+            
+            const viewUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || "https://app.manus.space"}/lab-results/${input.reportId}`;
+            
+            // Send critical alert if there are critical results
+            if (criticalTests.length > 0) {
+              sendCriticalLabResultAlert({
+                patientName: user.name || "Patient",
+                patientEmail: user.email,
+                reportDate: report.reportDate.toLocaleDateString('en-US'),
+                criticalTests,
+                viewUrl,
+                language: "ar",
+              }).catch(err => console.error("[Lab] Failed to send critical alert:", err));
+            } else {
+              // Send normal notification
+              sendLabResultNotification({
+                patientName: user.name || "Patient",
+                patientEmail: user.email,
+                reportDate: report.reportDate.toLocaleDateString('en-US'),
+                abnormalTests: abnormalTests.length > 0 ? abnormalTests : undefined,
+                viewUrl,
+                language: "ar",
+              }).catch(err => console.error("[Lab] Failed to send notification:", err));
+            }
+          }
+        } catch (err) {
+          console.error("[Lab] Error sending email notification:", err);
+        }
 
         return {
           success: true,

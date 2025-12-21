@@ -48,6 +48,12 @@ import {
   getTrainingSessionById
 } from "./training-db";
 import { nanoid } from "nanoid";
+import { sendPasswordResetEmail } from "./services/email";
+import {
+  hashPassword,
+  generateRandomToken,
+  generateTokenExpiry,
+} from "./_core/auth-utils";
 
 export const appRouter = router({
   system: systemRouter,
@@ -64,6 +70,182 @@ export const appRouter = router({
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
+    
+    // Request password reset
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email("Invalid email address"),
+      }))
+      .mutation(async ({ input }) => {
+        const { getDb } = await import('./db');
+        const { users } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        
+        const db = await getDb();
+        
+        // Find user by email
+        const [user] = await db!
+          .select()
+          .from(users)
+          .where(eq(users.email, input.email))
+          .limit(1);
+        
+        // Always return success to prevent email enumeration
+        if (!user) {
+          return {
+            success: true,
+            message: "If an account exists with this email, a password reset link has been sent.",
+          };
+        }
+        
+        // Generate reset token
+        const resetToken = generateRandomToken();
+        const resetTokenExpiry = generateTokenExpiry(1); // 1 hour
+        
+        // Save reset token to database
+        await db!
+          .update(users)
+          .set({
+            verificationToken: resetToken,
+            verificationTokenExpiry: resetTokenExpiry,
+          })
+          .where(eq(users.id, user.id));
+        
+        // Send password reset email (async, don't wait)
+        const resetUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || "https://app.manus.space"}/reset-password?token=${resetToken}`;
+        sendPasswordResetEmail({
+          userName: user.name || "User",
+          userEmail: user.email!,
+          resetToken,
+          resetUrl,
+          language: "ar", // Default to Arabic for Iraqi users
+        }).catch((err) =>
+          console.error("[Auth] Failed to send password reset email:", err)
+        );
+        
+        return {
+          success: true,
+          message: "If an account exists with this email, a password reset link has been sent.",
+        };
+      }),
+    
+    // Reset password with token
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string().min(8, "Password must be at least 8 characters"),
+      }))
+      .mutation(async ({ input }) => {
+        const { getDb } = await import('./db');
+        const { users } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        const { TRPCError } = await import('@trpc/server');
+        
+        const db = await getDb();
+        
+        // Find user by reset token
+        const [user] = await db!
+          .select()
+          .from(users)
+          .where(eq(users.verificationToken, input.token))
+          .limit(1);
+        
+        if (!user) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid or expired reset token",
+          });
+        }
+        
+        // Check if token is expired
+        if (
+          !user.verificationTokenExpiry ||
+          user.verificationTokenExpiry < new Date()
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Reset token has expired. Please request a new one.",
+          });
+        }
+        
+        // Hash new password
+        const passwordHash = await hashPassword(input.newPassword);
+        
+        // Update password and clear reset token
+        await db!
+          .update(users)
+          .set({
+            passwordHash,
+            verificationToken: null,
+            verificationTokenExpiry: null,
+            // Increment tokenVersion to revoke all existing tokens
+            tokenVersion: (user.tokenVersion || 0) + 1,
+          })
+          .where(eq(users.id, user.id));
+        
+        console.log(
+          `[Auth] Password reset successful for user ${user.id}, tokenVersion incremented to ${(user.tokenVersion || 0) + 1}`
+        );
+        
+        return {
+          success: true,
+          message: "Password reset successful. Please log in with your new password.",
+        };
+      }),
+    
+    // Verify email with token
+    verifyEmail: publicProcedure
+      .input(z.object({
+        token: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { getDb } = await import('./db');
+        const { users } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        const { TRPCError } = await import('@trpc/server');
+        
+        const db = await getDb();
+        
+        // Find user by verification token
+        const [user] = await db!
+          .select()
+          .from(users)
+          .where(eq(users.verificationToken, input.token))
+          .limit(1);
+        
+        if (!user) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid or expired verification token",
+          });
+        }
+        
+        // Check if token is expired
+        if (
+          !user.verificationTokenExpiry ||
+          user.verificationTokenExpiry < new Date()
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Verification token has expired. Please request a new one.",
+          });
+        }
+        
+        // Update email verification status
+        await db!
+          .update(users)
+          .set({
+            emailVerified: true,
+            verificationToken: null,
+            verificationTokenExpiry: null,
+          })
+          .where(eq(users.id, user.id));
+        
+        return {
+          success: true,
+          message: "Email verified successfully!",
+        };
+      }),
     
     // Debug endpoint to show current user with full details
     debugMe: publicProcedure.query(async ({ ctx }) => {

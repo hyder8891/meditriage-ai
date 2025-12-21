@@ -16,6 +16,7 @@ import {
   generateTokenExpiry,
 } from "./_core/auth-utils";
 import { rateLimit } from "./_core/rate-limit";
+import { sendWelcomeEmail, sendEmailVerification } from "./services/email";
 
 export const authRouter = router({
   /**
@@ -93,6 +94,24 @@ export const authRouter = router({
         role: "patient",
         tokenVersion: 0, // New user starts with version 0
       });
+
+      // Send welcome email (async, don't wait)
+      sendWelcomeEmail({
+        userName: input.name,
+        userEmail: input.email,
+        userRole: "patient",
+        language: "ar", // Default to Arabic for Iraqi users
+      }).catch(err => console.error("[Auth] Failed to send welcome email:", err));
+
+      // Send email verification (async, don't wait)
+      const verificationUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || "https://app.manus.space"}/verify-email?token=${verificationToken}`;
+      sendEmailVerification({
+        userName: input.name,
+        userEmail: input.email,
+        verificationToken,
+        verificationUrl,
+        language: "ar",
+      }).catch(err => console.error("[Auth] Failed to send verification email:", err));
 
       return {
         success: true,
@@ -177,6 +196,24 @@ export const authRouter = router({
         verificationTokenExpiry,
         verified: false, // Clinicians require admin verification
       });
+
+      // Send welcome email (async, don't wait)
+      sendWelcomeEmail({
+        userName: input.name,
+        userEmail: input.email,
+        userRole: "clinician",
+        language: "ar", // Default to Arabic for Iraqi users
+      }).catch(err => console.error("[Auth] Failed to send welcome email:", err));
+
+      // Send email verification (async, don't wait)
+      const verificationUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || "https://app.manus.space"}/verify-email?token=${verificationToken}`;
+      sendEmailVerification({
+        userName: input.name,
+        userEmail: input.email,
+        verificationToken,
+        verificationUrl,
+        language: "ar",
+      }).catch(err => console.error("[Auth] Failed to send verification email:", err));
 
       return {
         success: true,

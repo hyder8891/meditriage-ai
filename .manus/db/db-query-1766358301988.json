@@ -1,0 +1,185 @@
+{
+  "query": "SELECT id, name, email, role, verified FROM users ORDER BY role, id LIMIT 100",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, name, email, role, verified FROM users ORDER BY role, id LIMIT 100",
+  "rows": [
+    {
+      "id": "900067",
+      "name": "Hhwaljanabi",
+      "email": "Hhwaljanabi@yahoo.com",
+      "role": "patient",
+      "verified": "1"
+    },
+    {
+      "id": "2100016",
+      "name": "Sara Mohammed",
+      "email": "sara.mohammed@example.iq",
+      "role": "patient",
+      "verified": "0"
+    },
+    {
+      "id": "2100017",
+      "name": "Ali Khalil",
+      "email": "ali.khalil@example.iq",
+      "role": "patient",
+      "verified": "0"
+    },
+    {
+      "id": "2100018",
+      "name": "Mariam Youssef",
+      "email": "mariam.youssef@example.iq",
+      "role": "patient",
+      "verified": "0"
+    },
+    {
+      "id": "2100019",
+      "name": "Hassan Al-Amiri",
+      "email": "hassan.amiri@example.iq",
+      "role": "patient",
+      "verified": "0"
+    },
+    {
+      "id": "2100020",
+      "name": "Noor Abdullah",
+      "email": "noor.abdullah@example.iq",
+      "role": "patient",
+      "verified": "0"
+    },
+    {
+      "id": "3150028",
+      "name": "Test Patient",
+      "email": "patient.test@meditriage.com",
+      "role": "patient",
+      "verified": "0"
+    },
+    {
+      "id": "3420027",
+      "name": "Test Patient",
+      "email": "patient@test.com",
+      "role": "patient",
+      "verified": "1"
+    },
+    {
+      "id": "3480015",
+      "name": "Test Patient SMS",
+      "email": "NULL",
+      "role": "patient",
+      "verified": "1"
+    },
+    {
+      "id": "3630002",
+      "name": "Wen Li",
+      "email": "nanjingunitedgroup@gmail.com",
+      "role": "patient",
+      "verified": "0"
+    },
+    {
+      "id": "3630036",
+      "name": "Hyder Janabi",
+      "email": "NULL",
+      "role": "patient",
+      "verified": "1"
+    },
+    {
+      "id": "3750014",
+      "name": "Test Refresh User",
+      "email": "test-refresh-1766354137584@example.com",
+      "role": "patient",
+      "verified": "1"
+    },
+    {
+      "id": "3750016",
+      "name": "Test Refresh User",
+      "email": "test-refresh-1766354161689@example.com",
+      "role": "patient",
+      "verified": "1"
+    },
+    {
+      "id": "3750018",
+      "name": "Test Refresh User",
+      "email": "test-refresh-1766354187075@example.com",
+      "role": "patient",
+      "verified": "1"
+    },
+    {
+      "id": "2100011",
+      "name": "Dr. Ahmed Al-Husseini",
+      "email": "ahmed.husseini@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100012",
+      "name": "Dr. Fatima Al-Najjar",
+      "email": "fatima.najjar@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100013",
+      "name": "Dr. Omar Al-Jubouri",
+      "email": "omar.jubouri@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100014",
+      "name": "Dr. Layla Hassan",
+      "email": "layla.hassan@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "2100015",
+      "name": "Dr. Karim Al-Baghdadi",
+      "email": "karim.baghdadi@meditriage.iq",
+      "role": "doctor",
+      "verified": "1"
+    },
+    {
+      "id": "1",
+      "name": "Hyder Janabi",
+      "email": "haljanabi88@gmail.com",
+      "role": "admin",
+      "verified": "0"
+    },
+    {
+      "id": "900086",
+      "name": "admin",
+      "email": "admin@admin.com",
+      "role": "admin",
+      "verified": "1"
+    },
+    {
+      "id": "1440001",
+      "name": "Admin User",
+      "email": "admin@meditriage.ai",
+      "role": "admin",
+      "verified": "0"
+    },
+    {
+      "id": "1500003",
+      "name": "Test Admin",
+      "email": "test-admin@meditriage.test",
+      "role": "admin",
+      "verified": "0"
+    },
+    {
+      "id": "900079",
+      "name": "hyder",
+      "email": "Haidar_goold_oo@yahoo.com",
+      "role": "clinician",
+      "verified": "0"
+    },
+    {
+      "id": "3150029",
+      "name": "Dr. Test Doctor",
+      "email": "doctor.test@meditriage.com",
+      "role": "clinician",
+      "verified": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tverified\n900067\tHhwaljanabi\tHhwaljanabi@yahoo.com\tpatient\t1\n2100016\tSara Mohammed\tsara.mohammed@example.iq\tpatient\t0\n2100017\tAli Khalil\tali.khalil@example.iq\tpatient\t0\n2100018\tMariam Youssef\tmariam.youssef@example.iq\tpatient\t0\n2100019\tHassan Al-Amiri\thassan.amiri@example.iq\tpatient\t0\n2100020\tNoor Abdullah\tnoor.abdullah@example.iq\tpatient\t0\n3150028\tTest Patient\tpatient.test@meditriage.com\tpatient\t0\n3420027\tTest Patient\tpatient@test.com\tpatient\t1\n3480015\tTest Patient SMS\tNULL\tpatient\t1\n3630002\tWen Li\tnanjingunitedgroup@gmail.com\tpatient\t0\n3630036\tHyder Janabi\tNULL\tpatient\t1\n3750014\tTest Refresh User\ttest-refresh-1766354137584@example.com\tpatient\t1\n3750016\tTest Refresh User\ttest-refresh-1766354161689@example.com\tpatient\t1\n3750018\tTest Refresh User\ttest-refresh-1766354187075@example.com\tpatient\t1\n2100011\tDr. Ahmed Al-Husseini\tahmed.husseini@meditriage.iq\tdoctor\t1\n2100012\tDr. Fatima Al-Najjar\tfatima.najjar@meditriage.iq\tdoctor\t1\n2100013\tDr. Omar Al-Jubouri\tomar.jubouri@meditriage.iq\tdoctor\t1\n2100014\tDr. Layla Hassan\tlayla.hassan@meditriage.iq\tdoctor\t1\n2100015\tDr. Karim Al-Baghdadi\tkarim.baghdadi@meditriage.iq\tdoctor\t1\n1\tHyder Janabi\thaljanabi88@gmail.com\tadmin\t0\n900086\tadmin\tadmin@admin.com\tadmin\t1\n1440001\tAdmin User\tadmin@meditriage.ai\tadmin\t0\n1500003\tTest Admin\ttest-admin@meditriage.test\tadmin\t0\n900079\thyder\tHaidar_goold_oo@yahoo.com\tclinician\t0\n3150029\tDr. Test Doctor\tdoctor.test@meditriage.com\tclinician\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1543
+}
