@@ -431,3 +431,14 @@ medical_events (
 - [ ] Fix remaining client-side type issues (AdminTraining, DebugAuth, etc.)
 - [ ] Fix Stripe API version warnings
 - [ ] Verify all fixes with tsc --noEmit
+
+## Refresh Token System Implementation (December 22, 2024) - CRITICAL UX FIX
+- [x] Update auth-utils.ts with generateRefreshToken and verifyRefreshToken functions
+- [x] Modify auth-router.ts to set refresh token cookie on login
+- [x] Add refreshToken endpoint to auth-router.ts
+- [x] Update logout to clear refresh token cookie
+- [x] Implement frontend auto-refresh in App.tsx (14-minute interval)
+- [x] Update Zustand auth store to handle token refresh
+- [x] Test complete authentication flow (login, auto-refresh, logout)
+- [x] Verify no session expiry during long consultations
+- [x] Write comprehensive vitest tests (16 tests, all passing)

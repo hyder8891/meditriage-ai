@@ -9,6 +9,9 @@ import { TourProvider } from "./contexts/TourContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { GuidedTour } from "./components/GuidedTour";
 import { useErrorReporting } from "./hooks/useErrorReporting";
+import { useAuth } from "./hooks/useAuth";
+import { trpc } from "./lib/trpc";
+import { useEffect } from "react";
 import Home from "./pages/Home";
 import NewHome from "./pages/NewHome";
 import MedHome from "./pages/MedHome";
@@ -165,6 +168,45 @@ function Router() {
 function App() {
   // Initialize AEC error reporting
   useErrorReporting();
+  
+  // Auto-refresh token mechanism
+  const { refreshToken, setToken, isAuthenticated } = useAuth();
+  const refreshMutation = trpc.auth.refreshToken.useMutation();
+
+  useEffect(() => {
+    // Only set up auto-refresh if user is authenticated and has refresh token
+    if (!isAuthenticated || !refreshToken) {
+      return;
+    }
+
+    // Refresh token every 14 minutes (before 15-minute expiry)
+    const interval = setInterval(async () => {
+      try {
+        console.log('[Auto-Refresh] Refreshing access token...');
+        const result = await refreshMutation.mutateAsync({ refreshToken });
+        setToken(result.token);
+        console.log('[Auto-Refresh] Token refreshed successfully');
+      } catch (error) {
+        console.error('[Auto-Refresh] Failed to refresh token:', error);
+        // Token refresh failed - user needs to log in again
+        // The error will be caught by the auth system
+      }
+    }, 14 * 60 * 1000); // 14 minutes
+
+    // Also refresh immediately if we're close to expiry
+    const refreshNow = async () => {
+      try {
+        const result = await refreshMutation.mutateAsync({ refreshToken });
+        setToken(result.token);
+        console.log('[Auto-Refresh] Initial token refresh successful');
+      } catch (error) {
+        console.error('[Auto-Refresh] Initial refresh failed:', error);
+      }
+    };
+    refreshNow();
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, refreshToken, setToken]);
   
   return (
     <ErrorBoundary>

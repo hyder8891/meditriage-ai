@@ -8,6 +8,8 @@ import {
   hashPassword,
   verifyPassword,
   generateToken,
+  generateRefreshToken,
+  verifyRefreshToken,
   isValidEmail,
   isValidPassword,
   generateRandomToken,
@@ -243,8 +245,15 @@ export const authRouter = router({
         .set({ lastSignedIn: new Date() })
         .where(eq(users.id, user.id));
 
-      // Generate JWT token with tokenVersion
+      // Generate JWT tokens (access + refresh)
       const token = generateToken({
+        userId: user.id,
+        email: user.email!,
+        role: user.role,
+        tokenVersion: user.tokenVersion || 0,
+      });
+
+      const refreshToken = generateRefreshToken({
         userId: user.id,
         email: user.email!,
         role: user.role,
@@ -254,6 +263,7 @@ export const authRouter = router({
       return {
         success: true,
         token,
+        refreshToken, // Return refresh token to frontend
         user: {
           id: user.id,
           name: user.name,
@@ -314,7 +324,66 @@ export const authRouter = router({
     }),
 
   /**
-   * Logout (client-side token removal, but we can track it server-side if needed)
+   * Refresh access token using refresh token
+   * Called automatically by frontend when access token expires
+   */
+  refreshToken: publicProcedure
+    .input(
+      z.object({
+        refreshToken: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+
+      // Verify refresh token
+      const payload = verifyRefreshToken(input.refreshToken);
+
+      if (!payload) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid or expired refresh token",
+        });
+      }
+
+      // Check if user exists and tokenVersion matches
+      const [user] = await db!
+        .select()
+        .from(users)
+        .where(eq(users.id, payload.userId))
+        .limit(1);
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      // Check if tokenVersion matches (for revocation)
+      if (user.tokenVersion !== payload.tokenVersion) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Token has been revoked",
+        });
+      }
+
+      // Generate new access token
+      const newToken = generateToken({
+        userId: user.id,
+        email: user.email!,
+        role: user.role,
+        tokenVersion: user.tokenVersion || 0,
+      });
+
+      return {
+        success: true,
+        token: newToken,
+      };
+    }),
+
+  /**
+   * Logout (client-side token removal)
    */
   logout: publicProcedure.mutation(async () => {
     return {

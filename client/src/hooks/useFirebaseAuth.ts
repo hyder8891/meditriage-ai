@@ -11,7 +11,7 @@ export function useFirebaseAuth(role: 'patient' | 'clinician', language: 'en' | 
   
   const verifyTokenMutation = trpc.oauth.verifyFirebaseToken.useMutation({
     onSuccess: (data) => {
-      setAuth(data.token, data.user as any);
+      setAuth(data.token, data.user as any, data.refreshToken);
       toast.success(language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
     },
     onError: (error) => {

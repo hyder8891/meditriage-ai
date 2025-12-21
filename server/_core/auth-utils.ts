@@ -20,13 +20,40 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 /**
- * Generate a JWT token for a user
+ * Generate a Short-Lived Access Token (15 Minutes)
+ * Used for API calls. If stolen, it expires quickly.
  * Now includes tokenVersion for immediate revocation capability
  */
 export function generateToken(payload: { userId: number; email: string; role: string; tokenVersion: number }): string {
   return jwt.sign(payload, ENV.cookieSecret, {
     expiresIn: '15m', // Reduced from 7d to 15 minutes for better security
   });
+}
+
+/**
+ * Generate a Long-Lived Refresh Token (30 Days)
+ * Stored in an HTTP-Only cookie. Used to get new Access Tokens.
+ */
+export function generateRefreshToken(payload: { userId: number; email: string; role: string; tokenVersion: number }): string {
+  // Use a separate secret if available, otherwise fallback to standard secret
+  const secret = process.env.JWT_REFRESH_SECRET || ENV.cookieSecret;
+  return jwt.sign(payload, secret, {
+    expiresIn: '30d',
+  });
+}
+
+/**
+ * Verify a Refresh Token
+ * Returns decoded payload or null if invalid
+ */
+export function verifyRefreshToken(token: string): { userId: number; email: string; role: string; tokenVersion: number } | null {
+  const secret = process.env.JWT_REFRESH_SECRET || ENV.cookieSecret;
+  try {
+    const decoded = jwt.verify(token, secret) as { userId: number; email: string; role: string; tokenVersion: number };
+    return decoded;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**

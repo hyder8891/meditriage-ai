@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
-import { generateToken } from "./_core/auth-utils";
+import { generateToken, generateRefreshToken } from "./_core/auth-utils";
 
 /**
  * OAuth Router for Firebase Authentication
@@ -77,8 +77,15 @@ export const oauthRouter = router({
         user = createdUsers[0];
       }
 
-      // Generate JWT token
+      // Generate JWT tokens (access + refresh)
       const token = generateToken({
+        userId: user.id,
+        email: user.email!,
+        role: user.role,
+        tokenVersion: user.tokenVersion || 0,
+      });
+
+      const refreshToken = generateRefreshToken({
         userId: user.id,
         email: user.email!,
         role: user.role,
@@ -87,6 +94,7 @@ export const oauthRouter = router({
 
       return {
         token,
+        refreshToken,
         user: {
           id: user.id,
           email: user.email,
