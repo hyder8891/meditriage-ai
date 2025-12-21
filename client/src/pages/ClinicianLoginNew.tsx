@@ -75,15 +75,14 @@ export default function ClinicianLoginNew() {
       // We'll need to add licenseNumber and specialty to the database after Firebase auth
       await registerWithEmail(email, password, name);
       toast.info(language === 'ar' ? 'يرجى إكمال ملفك الشخصي' : 'Please complete your profile');
-      setLocation("/clinician/dashboard");
+      // Redirect will happen automatically via useEffect after auth state updates
     } else {
       if (!email || !password) {
         toast.error(language === 'ar' ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور' : 'Please enter email and password');
         return;
       }
       await signInWithEmail(email, password);
-      // On success, user will be redirected by useEffect
-      setLocation("/clinician/dashboard");
+      // Redirect will happen automatically via useEffect after auth state updates
     }
   };
 

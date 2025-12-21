@@ -161,7 +161,7 @@ export function SMSLogin({ role = "patient", onSuccess }: SMSLoginProps) {
             <Button
               type="submit"
               className="w-full"
-              disabled={sendOTPMutation.isPending}
+              disabled={sendOTPMutation.isPending || phoneNumber.length < 10}
             >
               {sendOTPMutation.isPending ? (
                 <>

@@ -66,16 +66,14 @@ export default function PatientLogin() {
         return;
       }
       await registerWithEmail(email, password, name);
-      // On success, user will be redirected by useEffect
-      setLocation("/patient/portal");
+      // Redirect will happen automatically via useEffect after auth state updates
     } else {
       if (!email || !password) {
         toast.error(language === 'ar' ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور' : 'Please enter email and password');
         return;
       }
       await signInWithEmail(email, password);
-      // On success, user will be redirected by useEffect
-      setLocation("/patient/portal");
+      // Redirect will happen automatically via useEffect after auth state updates
     }
   };
 

@@ -35,7 +35,8 @@ export default function FindDoctor() {
   });
 
   const connectMutation = trpc.b2b2c.patient.connectWithDoctor.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('[FindDoctor] Connection successful:', data);
       toast({
         title: "Connected Successfully!",
         description: "You can now message the doctor",
@@ -43,11 +44,13 @@ export default function FindDoctor() {
       setShowConnectDialog(false);
       setConnectionReason("");
       utils.b2b2c.patient.getMyDoctors.invalidate();
+      utils.b2b2c.messaging.getConversations.invalidate();
     },
     onError: (error) => {
+      console.error('[FindDoctor] Connection failed:', error);
       toast({
         title: "Connection Failed",
-        description: error.message,
+        description: error.message || "Unable to connect with doctor. Please try again.",
         variant: "destructive",
       });
     },
@@ -59,10 +62,18 @@ export default function FindDoctor() {
   };
 
   const confirmConnect = () => {
+    console.log('[FindDoctor] Attempting to connect with doctor:', selectedDoctor);
     if (selectedDoctor) {
       connectMutation.mutate({
         doctorId: selectedDoctor,
         reason: connectionReason || undefined,
+      });
+    } else {
+      console.error('[FindDoctor] No doctor selected');
+      toast({
+        title: "Error",
+        description: "No doctor selected. Please try again.",
+        variant: "destructive",
       });
     }
   };
