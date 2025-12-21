@@ -112,14 +112,14 @@ Return ONLY a JSON array of test results, no other text.`
                   type: "object",
                   properties: {
                     testName: { type: "string" },
-                    testCode: { type: ["string", "null"] },
-                    testCategory: { type: ["string", "null"] },
+                    testCode: { type: "string" },
+                    testCategory: { type: "string" },
                     value: { type: "string" },
-                    numericValue: { type: ["number", "null"] },
-                    unit: { type: ["string", "null"] },
-                    referenceRangeMin: { type: ["number", "null"] },
-                    referenceRangeMax: { type: ["number", "null"] },
-                    referenceRangeText: { type: ["string", "null"] },
+                    numericValue: { type: "number" },
+                    unit: { type: "string" },
+                    referenceRangeMin: { type: "number" },
+                    referenceRangeMax: { type: "number" },
+                    referenceRangeText: { type: "string" },
                     status: { type: "string", enum: ["normal", "high", "low", "critical_high", "critical_low", "unknown"] },
                     abnormalFlag: { type: "boolean" },
                     criticalFlag: { type: "boolean" }
@@ -136,7 +136,7 @@ Return ONLY a JSON array of test results, no other text.`
       }
     });
 
-    const content = response.choices[0]?.message?.content;
+    const content = response.choices?.[0]?.message?.content;
     if (!content) {
       throw new Error("No response from AI parser");
     }
