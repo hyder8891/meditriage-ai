@@ -329,3 +329,9 @@ medical_events (
 - [x] Fix text visibility on doctor login page (labels barely visible - low contrast) - CRITICAL: Users cannot see password input
 - [ ] Fix routing: logged-in doctor redirected to homepage when accessing /clinician/dashboard
 - [x] Fix dashboard tabs redirecting to login page after successful login (JWT token not being sent/recognized on navigation) - CRITICAL: Clinician login works but clicking tabs redirects to blue login page
+
+## Current Sprint: Messaging System Fixes
+- [x] Fix "Connect Now" button to create patient-doctor connections
+- [x] Verify doctor dashboard shows all connected patients in messages list
+- [x] Test complete messaging flow between patient and doctor accounts
+- [x] Add availability toggle to clinician dashboard for easy status management

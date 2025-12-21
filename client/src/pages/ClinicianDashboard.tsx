@@ -23,16 +23,18 @@ import {
   Crown
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
+import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle";
 
 export default function ClinicianDashboard() {
   const [, setLocation] = useLocation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const authLoading = false; // Zustand auth is synchronous
   const { requestPermission, hasPermission } = useNotifications();
   const [searchQuery, setSearchQuery] = useState("");
   const sidebarOpen = true; // Always keep sidebar open
@@ -209,9 +211,14 @@ export default function ClinicianDashboard() {
           </div>
         </header>
 
-        {/* Stats Cards */}
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          {/* Availability Toggle */}
+          <div className="p-6 pb-0">
+            <DoctorAvailabilityToggle />
+          </div>
+
+          {/* Stats Cards */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card className="card-modern">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-gray-600">Active Cases</CardTitle>

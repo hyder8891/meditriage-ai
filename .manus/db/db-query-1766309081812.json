@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, email, role, availability_status FROM users WHERE role IN ('clinician', 'doctor') LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, role, availability_status FROM users WHERE role IN ('clinician', 'doctor') LIMIT 5",
+  "rows": [
+    {
+      "id": "900079",
+      "email": "Haidar_goold_oo@yahoo.com",
+      "role": "clinician",
+      "availability_status": "available"
+    },
+    {
+      "id": "2100011",
+      "email": "ahmed.husseini@meditriage.iq",
+      "role": "doctor",
+      "availability_status": "available"
+    },
+    {
+      "id": "2100012",
+      "email": "fatima.najjar@meditriage.iq",
+      "role": "doctor",
+      "availability_status": "busy"
+    },
+    {
+      "id": "2100013",
+      "email": "omar.jubouri@meditriage.iq",
+      "role": "doctor",
+      "availability_status": "available"
+    },
+    {
+      "id": "2100014",
+      "email": "layla.hassan@meditriage.iq",
+      "role": "doctor",
+      "availability_status": "offline"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\tavailability_status\n900079\tHaidar_goold_oo@yahoo.com\tclinician\tavailable\n2100011\tahmed.husseini@meditriage.iq\tdoctor\tavailable\n2100012\tfatima.najjar@meditriage.iq\tdoctor\tbusy\n2100013\tomar.jubouri@meditriage.iq\tdoctor\tavailable\n2100014\tlayla.hassan@meditriage.iq\tdoctor\toffline\n",
+  "stderr": "",
+  "execution_time_ms": 1512
+}
