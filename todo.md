@@ -345,3 +345,20 @@ medical_events (
 - [x] Create phone number input and OTP verification UI
 - [x] Test complete SMS authentication flow
 - [x] Handle account linking (existing email accounts with phone numbers)
+
+## OAuth Authentication (Google & Apple) - December 22, 2024
+- [x] Research OAuth 2.0 implementation requirements
+- [x] Set up Firebase project with Google and Apple providers
+- [x] Configure Firebase credentials (API Key, Auth Domain, Project ID, etc.)
+- [x] Create backend OAuth router with Firebase token verification
+- [x] Implement OAuth callback handlers for Google and Apple
+- [x] Add OAuth user profile mapping to database
+- [x] Update PatientLogin component with Google OAuth button
+- [x] Update PatientLogin component with Apple Sign In button
+- [x] Update ClinicianLogin component with Google OAuth button
+- [x] Update ClinicianLogin component with Apple Sign In button
+- [x] Create useFirebaseAuth hook for both providers
+- [x] Write comprehensive OAuth integration tests (11 tests, all passing)
+- [x] Test Firebase credentials validation
+- [x] Verify Google and Apple provider configuration
+- [x] Handle account linking for existing email users
