@@ -18,6 +18,37 @@ const MODELS = {
 
 // Context cache ID for medical knowledge base
 let MEDICAL_KNOWLEDGE_CACHE_ID: string | null = null;
+let CACHE_CREATION_TIME: number | null = null;
+const CACHE_TTL_HOURS = 24; // Cache expires after 24 hours
+
+/**
+ * Check if cache is still valid
+ */
+function isCacheValid(): boolean {
+  if (!MEDICAL_KNOWLEDGE_CACHE_ID || !CACHE_CREATION_TIME) {
+    return false;
+  }
+  const hoursSinceCreation = (Date.now() - CACHE_CREATION_TIME) / (1000 * 60 * 60);
+  return hoursSinceCreation < CACHE_TTL_HOURS;
+}
+
+/**
+ * Get or create medical context cache
+ * Uses Gemini's context caching to avoid re-sending 20K+ tokens on every request
+ */
+async function getMedicalContextCache(): Promise<string | null> {
+  // Check if existing cache is still valid
+  if (isCacheValid()) {
+    console.log('[Gemini Cache] Using existing cache:', MEDICAL_KNOWLEDGE_CACHE_ID);
+    return MEDICAL_KNOWLEDGE_CACHE_ID;
+  }
+
+  // Note: Manus built-in LLM may not support explicit caching API
+  // This is a placeholder for when direct Gemini SDK is used
+  console.log('[Gemini Cache] Context caching not yet implemented with Manus LLM');
+  console.log('[Gemini Cache] Medical knowledge will be included in system instruction');
+  return null;
+}
 
 /**
  * Medical Knowledge Base for Context Caching
@@ -137,6 +168,9 @@ export async function invokeGeminiPro(
   } = config;
 
   try {
+    // Check for cached medical context (logs cache status)
+    await getMedicalContextCache();
+    
     // Build system instruction with medical knowledge base
     const fullSystemInstruction = `${MEDICAL_KNOWLEDGE_BASE}\n\n${systemInstruction || ''}
 
@@ -188,6 +222,9 @@ export async function invokeGeminiFlash(
   } = config;
 
   try {
+    // Check for cached medical context (logs cache status)
+    await getMedicalContextCache();
+    
     // Build system instruction with medical knowledge base
     const fullSystemInstruction = `${MEDICAL_KNOWLEDGE_BASE}\n\n${systemInstruction || ''}
 

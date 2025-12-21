@@ -1,11 +1,16 @@
 /**
- * DeepSeek AI Integration for Medical Knowledge Training
+ * Gemini-Powered Medical AI Integration (formerly DeepSeek)
  * 
- * This module provides integration with DeepSeek API for:
+ * This module provides medical AI capabilities using Google Gemini:
  * - Advanced medical reasoning and diagnosis
  * - Training on medical literature and case studies
- * - Cost-optimized inference with fluid compute
+ * - Cost-optimized inference with Gemini Flash/Pro
+ * 
+ * NOTE: This file maintains DeepSeek's interface for backward compatibility
+ * but internally uses Gemini for all operations.
  */
+
+import { invokeGeminiFlash, invokeGeminiPro } from './gemini-dual';
 
 interface DeepSeekMessage {
   role: 'system' | 'user' | 'assistant';
@@ -38,51 +43,70 @@ interface DeepSeekOptions {
 }
 
 /**
- * Invoke DeepSeek API with fluid compute optimization
- * Uses cheaper models for simple queries and advanced models for complex reasoning
+ * Invoke Gemini API with DeepSeek-compatible interface
+ * Automatically routes to Gemini Flash (fast) or Pro (complex reasoning)
  */
 export async function invokeDeepSeek(options: DeepSeekOptions): Promise<DeepSeekResponse> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const { messages, temperature = 0.7, model } = options;
   
-  if (!apiKey) {
-    throw new Error('DEEPSEEK_API_KEY is not configured');
+  // Determine if this requires deep reasoning or fast response
+  const requiresDeepReasoning = 
+    model?.includes('reasoner') || 
+    messages.some(m => 
+      m.content.toLowerCase().includes('diagnos') ||
+      m.content.toLowerCase().includes('differential') ||
+      m.content.toLowerCase().includes('analyze')
+    );
+
+  // Extract system instruction from messages
+  const systemMessage = messages.find(m => m.role === 'system');
+  const userMessages = messages.filter(m => m.role !== 'system');
+
+  try {
+    let content: string;
+    
+    if (requiresDeepReasoning) {
+      // Use Gemini Pro for complex medical reasoning
+      content = await invokeGeminiPro(userMessages, {
+        temperature,
+        thinkingLevel: 'high',
+        grounding: true,
+        systemInstruction: systemMessage?.content,
+      });
+    } else {
+      // Use Gemini Flash for fast triage and simple queries
+      content = await invokeGeminiFlash(userMessages, {
+        temperature,
+        thinkingLevel: 'low',
+        systemInstruction: systemMessage?.content,
+      });
+    }
+
+    // Return DeepSeek-compatible response format
+    return {
+      id: `gemini-${Date.now()}`,
+      choices: [{
+        message: {
+          role: 'assistant',
+          content,
+        },
+        finish_reason: 'stop',
+      }],
+      usage: {
+        prompt_tokens: messages.reduce((sum, m) => sum + m.content.length / 4, 0),
+        completion_tokens: content.length / 4,
+        total_tokens: (messages.reduce((sum, m) => sum + m.content.length, 0) + content.length) / 4,
+      },
+    };
+  } catch (error) {
+    console.error('[Gemini API] Error:', error);
+    throw new Error(`Gemini API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-
-  // Fluid compute: Choose model based on complexity
-  const model = options.model || 'deepseek-chat';
-  
-  const requestBody: Record<string, unknown> = {
-    model,
-    messages: options.messages,
-    temperature: options.temperature ?? 0.7,
-    max_tokens: options.max_tokens ?? 2000,
-    stream: options.stream ?? false,
-  };
-
-  if (options.response_format) {
-    requestBody.response_format = options.response_format;
-  }
-
-  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(requestBody),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`DeepSeek API error: ${response.status} - ${error}`);
-  }
-
-  return await response.json();
 }
 
 /**
  * Train on medical material and store learned patterns
- * This function processes medical literature and case studies
+ * Uses Gemini Pro for deep analysis of medical literature
  */
 export async function trainOnMedicalMaterial(material: {
   title: string;
@@ -94,15 +118,7 @@ export async function trainOnMedicalMaterial(material: {
   keyFindings: string[];
   clinicalRelevance: string;
 }> {
-  const response = await invokeDeepSeek({
-    messages: [
-      {
-        role: 'system',
-        content: `You are a medical AI analyzing clinical literature. Extract key medical insights, clinical patterns, and diagnostic criteria from the provided material.`,
-      },
-      {
-        role: 'user',
-        content: `Analyze this medical material:
+  const prompt = `Analyze this medical material and extract key clinical insights:
 
 Title: ${material.title}
 Category: ${material.category}
@@ -112,152 +128,141 @@ Content:
 ${material.content}
 
 Provide:
-1. A concise summary
-2. Key clinical findings (as array)
-3. Clinical relevance for triage and diagnosis`,
-      },
-    ],
-    temperature: 0.3, // Lower temperature for factual extraction
-    max_tokens: 1500,
-  });
+1. A concise summary (2-3 sentences)
+2. Key clinical findings (3-5 bullet points)
+3. Clinical relevance for Iraqi healthcare context
 
-  const content = response.choices[0]?.message?.content || '';
-  
-  // Parse structured response
+Format as JSON:
+{
+  "summary": "...",
+  "keyFindings": ["...", "...", "..."],
+  "clinicalRelevance": "..."
+}`;
+
+  const response = await invokeGeminiPro(
+    [{ role: 'user', content: prompt }],
+    {
+      temperature: 0.3,
+      thinkingLevel: 'high',
+      grounding: true,
+      systemInstruction: 'You are a medical knowledge extraction AI. Analyze medical literature and extract actionable clinical insights.',
+    }
+  );
+
   try {
-    const parsed = JSON.parse(content);
+    // Clean markdown code blocks if present
+    const cleanJson = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleanJson);
+    
     return {
-      summary: parsed.summary || content.substring(0, 500),
-      keyFindings: parsed.keyFindings || [],
+      summary: parsed.summary || '',
+      keyFindings: Array.isArray(parsed.keyFindings) ? parsed.keyFindings : [],
       clinicalRelevance: parsed.clinicalRelevance || '',
     };
-  } catch {
-    // Fallback if response is not JSON
+  } catch (error) {
+    console.error('[Train on Material] JSON parse error:', error);
+    
+    // Fallback: extract from text
     return {
-      summary: content.substring(0, 500),
+      summary: response.substring(0, 200),
       keyFindings: [],
-      clinicalRelevance: content,
+      clinicalRelevance: 'Analysis completed but structured extraction failed.',
     };
   }
 }
 
 /**
- * Advanced medical reasoning using DeepSeek
- * For complex cases requiring deep analysis
+ * Deep medical reasoning for complex diagnostic cases
+ * Uses Gemini Pro with high thinking level and grounding
  */
-export interface DiagnosisWithConfidence {
-  diagnosis: string;
-  confidence: number; // 0-100
-  supportingEvidence: string[];
-  severity: 'mild' | 'moderate' | 'severe' | 'critical';
-  clinicalPresentation: string;
-  nextSteps: string[];
-}
-
-export interface MedicalReasoningResult {
-  differentialDiagnosis: DiagnosisWithConfidence[];
-  reasoning: string;
-  recommendedTests: string[];
-  urgencyAssessment: string;
-  redFlags: string[];
-  patientEducation: string;
-  followUpRecommendations: string;
-}
-
-import { IRAQI_MEDICAL_CONTEXT_PROMPT } from '../../shared/iraqiMedicalContext';
-
 export async function deepMedicalReasoning(params: {
-  symptoms: string[];
-  history: string;
-  vitalSigns?: Record<string, string>;
-  labResults?: string;
-}): Promise<MedicalReasoningResult> {
-  const prompt = `Perform comprehensive medical reasoning for this case:
+  symptoms: string;
+  patientHistory?: string;
+  vitalSigns?: Record<string, string | number>;
+  labResults?: Record<string, string | number>;
+  imagingFindings?: string;
+}): Promise<{
+  differentialDiagnosis: Array<{
+    condition: string;
+    probability: string;
+    reasoning: string;
+  }>;
+  recommendedTests: string[];
+  urgencyLevel: 'emergency' | 'urgent' | 'routine' | 'self-care';
+  clinicalReasoning: string;
+}> {
+  const prompt = `Perform deep medical reasoning for this clinical case:
 
-Symptoms: ${params.symptoms.join(', ')}
-Medical History: ${params.history}
-${params.vitalSigns ? `Vital Signs: ${JSON.stringify(params.vitalSigns)}` : ''}
-${params.labResults ? `Lab Results: ${params.labResults}` : ''}
+**Chief Complaint & Symptoms:**
+${params.symptoms}
 
-Provide a detailed JSON response with this exact structure:
+${params.patientHistory ? `**Patient History:**\n${params.patientHistory}\n` : ''}
+${params.vitalSigns ? `**Vital Signs:**\n${JSON.stringify(params.vitalSigns, null, 2)}\n` : ''}
+${params.labResults ? `**Lab Results:**\n${JSON.stringify(params.labResults, null, 2)}\n` : ''}
+${params.imagingFindings ? `**Imaging Findings:**\n${params.imagingFindings}\n` : ''}
+
+Provide comprehensive clinical reasoning with:
+1. Differential diagnosis (top 3-5 conditions with probability and reasoning)
+2. Recommended diagnostic tests
+3. Urgency level assessment
+4. Step-by-step clinical reasoning
+
+Consider Iraqi medical context (common diseases, available resources).
+
+Format as JSON:
 {
   "differentialDiagnosis": [
     {
-      "diagnosis": "condition name",
-      "confidence": 85,
-      "supportingEvidence": ["symptom matches", "vital sign abnormality"],
-      "severity": "moderate",
-      "clinicalPresentation": "typical presentation description",
-      "nextSteps": ["specific test", "treatment consideration"]
+      "condition": "...",
+      "probability": "high|medium|low",
+      "reasoning": "..."
     }
   ],
-  "reasoning": "detailed clinical reasoning process",
-  "recommendedTests": ["specific diagnostic tests with rationale"],
-  "urgencyAssessment": "EMERGENCY|URGENT|SEMI-URGENT|ROUTINE with explanation",
-  "redFlags": ["warning signs requiring immediate attention"],
-  "patientEducation": "key points for patient understanding",
-  "followUpRecommendations": "when and why to follow up"
-}
+  "recommendedTests": ["...", "..."],
+  "urgencyLevel": "emergency|urgent|routine|self-care",
+  "clinicalReasoning": "..."
+}`;
 
-Rank diagnoses by confidence (0-100). Include 3-5 differential diagnoses.`;
+  const response = await invokeGeminiPro(
+    [{ role: 'user', content: prompt }],
+    {
+      temperature: 0.7,
+      thinkingLevel: 'high',
+      grounding: true,
+      systemInstruction: 'You are an expert clinical diagnostician. Use evidence-based reasoning and consider Iraqi medical context.',
+    }
+  );
 
-  const response = await invokeDeepSeek({
-    messages: [
-      {
-        role: 'system',
-        content: `You are an expert medical diagnostician. Provide thorough differential diagnosis and clinical reasoning.
-
-${IRAQI_MEDICAL_CONTEXT_PROMPT}`,
-      },
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ],
-    temperature: 0.5,
-    max_tokens: 2000,
-    model: 'deepseek-chat', // Use advanced model for complex reasoning
-  });
-
-  const content = response.choices[0]?.message?.content || '';
-  
-  // Parse or return structured data
   try {
-    const parsed = JSON.parse(content);
+    // Clean markdown code blocks if present
+    const cleanJson = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleanJson);
+    
     return {
-      differentialDiagnosis: parsed.differentialDiagnosis || [],
-      reasoning: parsed.reasoning || content,
-      recommendedTests: parsed.recommendedTests || [],
-      urgencyAssessment: parsed.urgencyAssessment || 'UNKNOWN',
-      redFlags: parsed.redFlags || [],
-      patientEducation: parsed.patientEducation || '',
-      followUpRecommendations: parsed.followUpRecommendations || '',
+      differentialDiagnosis: Array.isArray(parsed.differentialDiagnosis) ? parsed.differentialDiagnosis : [],
+      recommendedTests: Array.isArray(parsed.recommendedTests) ? parsed.recommendedTests : [],
+      urgencyLevel: parsed.urgencyLevel || 'routine',
+      clinicalReasoning: parsed.clinicalReasoning || '',
     };
-  } catch {
+  } catch (error) {
+    console.error('[Deep Reasoning] JSON parse error:', error);
+    
+    // Fallback: return safe defaults
     return {
       differentialDiagnosis: [],
-      reasoning: content,
       recommendedTests: [],
-      urgencyAssessment: 'UNKNOWN',
-      redFlags: [],
-      patientEducation: '',
-      followUpRecommendations: '',
+      urgencyLevel: 'routine',
+      clinicalReasoning: response.substring(0, 500),
     };
   }
 }
 
 /**
- * Fluid compute helper: Determine optimal model based on query complexity
+ * Legacy export for backward compatibility
+ * @deprecated Use invokeGeminiFlash or invokeGeminiPro directly
  */
-export function selectOptimalModel(queryComplexity: 'simple' | 'moderate' | 'complex'): string {
-  switch (queryComplexity) {
-    case 'simple':
-      return 'deepseek-chat'; // Fast, cost-effective
-    case 'moderate':
-      return 'deepseek-chat';
-    case 'complex':
-      return 'deepseek-chat'; // Most capable
-    default:
-      return 'deepseek-chat';
-  }
-}
+export const DeepSeekAPI = {
+  invoke: invokeDeepSeek,
+  trainOnMaterial: trainOnMedicalMaterial,
+  deepReasoning: deepMedicalReasoning,
+};

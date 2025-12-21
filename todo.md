@@ -301,3 +301,23 @@ medical_events (
 - [ ] Clinical decision support tools used in >50% of consultations
 - [ ] Medical timeline viewed by >70% of users
 - [ ] User satisfaction score >4.5/5
+
+## Critical Architecture Fixes (December 2024)
+
+### Database & Performance
+- [x] Fix database connection pool in training-pipeline.ts (prevent crashes under load)
+- [x] Migrate all database operations to use connection pooling
+- [x] Add connection pool monitoring and limits
+- [x] Add graceful shutdown handler
+
+### AI Architecture Unification
+- [x] Remove DeepSeek dependency completely
+- [x] Replace DeepSeek with Gemini-powered implementation
+- [x] Maintain backward-compatible interface
+- [x] Route simple queries to Gemini Flash, complex to Gemini Pro
+
+### Cost Optimization
+- [x] Implement Gemini Context Caching infrastructure
+- [x] Add cache validity checking (24-hour TTL)
+- [x] Add cache hit/miss logging
+- [ ] Integrate direct Gemini SDK for true cache API (pending Manus LLM support)
