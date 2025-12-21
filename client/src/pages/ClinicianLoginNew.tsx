@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Activity, Briefcase, Mail, Lock, ArrowLeft, Eye, EyeOff, Shield } from "lucide-react";
+import { Activity, Briefcase, Mail, Lock, ArrowLeft, Eye, EyeOff, Shield, Smartphone } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/hooks/useAuth";
+import { SMSLogin } from "@/components/SMSLogin";
 
 export default function ClinicianLoginNew() {
   const [, setLocation] = useLocation();
@@ -33,6 +34,7 @@ export default function ClinicianLoginNew() {
   const [name, setName] = useState("");
   const [licenseNumber, setLicenseNumber] = useState("");
   const [specialty, setSpecialty] = useState("");
+  const [showSMSLogin, setShowSMSLogin] = useState(false);
 
   const t = {
     title: language === 'ar' ? 'دخول الطبيب' : 'Clinician Login',
@@ -100,6 +102,38 @@ export default function ClinicianLoginNew() {
       loginMutation.mutate({ email, password });
     }
   };
+
+  // Show SMS login if toggled
+  if (showSMSLogin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Button
+            variant="ghost"
+            onClick={() => setShowSMSLogin(false)}
+            className="mb-6"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {language === 'ar' ? 'العودة لتسجيل الدخول بالبريد' : 'Back to Email Login'}
+          </Button>
+          
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
+              <Activity className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">MediTriage AI Pro</h1>
+              <p className="text-sm text-gray-500">
+                {language === 'ar' ? 'لوحة تحكم الطبيب' : 'Clinician Dashboard'}
+              </p>
+            </div>
+          </div>
+          
+          <SMSLogin role="clinician" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
@@ -257,6 +291,33 @@ export default function ClinicianLoginNew() {
                 </button>
               </p>
             </div>
+
+            {!isRegistering && (
+              <>
+                <div className="relative mt-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">
+                      {language === 'ar' ? 'أو تابع مع' : 'Or continue with'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowSMSLogin(true)}
+                    className="w-full"
+                  >
+                    <Smartphone className="w-5 h-5 mr-2" />
+                    {language === 'ar' ? 'رسالة نصية' : 'SMS Login'}
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

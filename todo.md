@@ -335,3 +335,13 @@ medical_events (
 - [x] Verify doctor dashboard shows all connected patients in messages list
 - [x] Test complete messaging flow between patient and doctor accounts
 - [x] Add availability toggle to clinician dashboard for easy status management
+
+## New Feature: SMS Login Authentication (December 21, 2024)
+- [x] Research authentication options - switched to SMS-only
+- [x] Design phone verification flow (OTP via SMS)
+- [x] Implement backend SMS OTP endpoints (simple service)
+- [x] Add SMS login button to patient login page
+- [x] Add SMS login button to clinician login page
+- [x] Create phone number input and OTP verification UI
+- [x] Test complete SMS authentication flow
+- [x] Handle account linking (existing email accounts with phone numbers)

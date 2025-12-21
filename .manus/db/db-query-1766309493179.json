@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users \nADD COLUMN phone_number VARCHAR(20),\nADD COLUMN phone_verified BOOLEAN NOT NULL DEFAULT FALSE,\nADD COLUMN country_code VARCHAR(5) DEFAULT '+964'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE users \nADD COLUMN phone_number VARCHAR(20),\nADD COLUMN phone_verified BOOLEAN NOT NULL DEFAULT FALSE,\nADD COLUMN country_code VARCHAR(5) DEFAULT '+964'",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2472
+}

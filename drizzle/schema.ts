@@ -10,6 +10,11 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }).unique(),
   passwordHash: varchar("password_hash", { length: 255 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
+  
+  // Phone authentication
+  phoneNumber: varchar("phone_number", { length: 20 }).unique(),
+  phoneVerified: boolean("phone_verified").default(false).notNull(),
+  countryCode: varchar("country_code", { length: 5 }).default("+964"), // Iraq default
   role: mysqlEnum("role", ["patient", "doctor", "nurse", "clinic_admin", "super_admin", "admin", "clinician"]).default("patient").notNull(),
   
   // Clinic association
