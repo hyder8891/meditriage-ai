@@ -11,10 +11,17 @@ export function useFirebaseAuth(role: 'patient' | 'clinician', language: 'en' | 
   
   const verifyTokenMutation = trpc.oauth.verifyFirebaseToken.useMutation({
     onSuccess: (data) => {
+      console.log('[useFirebaseAuth] Mutation success! Data received:', data);
+      console.log('[useFirebaseAuth] Token:', data.token ? data.token.substring(0, 20) + '...' : 'null');
+      console.log('[useFirebaseAuth] User:', data.user);
+      console.log('[useFirebaseAuth] Calling setAuth...');
       setAuth(data.token, data.user as any, data.refreshToken);
+      console.log('[useFirebaseAuth] setAuth called successfully');
+      setIsLoading(false);
       toast.success(language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
     },
     onError: (error) => {
+      console.error('[useFirebaseAuth] Mutation error:', error);
       toast.error(error.message);
       setIsLoading(false);
     },

@@ -16,7 +16,6 @@ interface AuthState {
   token: string | null;
   refreshToken: string | null;
   user: User | null;
-  isAuthenticated: boolean;
   setAuth: (token: string, user: User, refreshToken?: string) => void;
   setToken: (token: string) => void;
   clearAuth: () => void;
@@ -28,13 +27,11 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       refreshToken: null,
       user: null,
-      isAuthenticated: false,
       setAuth: (token: string, user: User, refreshToken?: string) =>
         set({
           token,
           refreshToken: refreshToken || null,
           user,
-          isAuthenticated: true,
         }),
       setToken: (token: string) =>
         set((state: AuthState) => ({
@@ -46,7 +43,6 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           refreshToken: null,
           user: null,
-          isAuthenticated: false,
         }),
     }),
     {
@@ -56,7 +52,10 @@ export const useAuthStore = create<AuthState>()(
 );
 
 export function useAuth() {
-  const { token, refreshToken, user, isAuthenticated, setAuth, setToken, clearAuth } = useAuthStore();
+  const { token, refreshToken, user, setAuth, setToken, clearAuth } = useAuthStore();
+
+  // Compute isAuthenticated based on token and user existence
+  const isAuthenticated = Boolean(token && user);
 
   console.log('[useAuth] Current state:', { token: token ? 'exists' : 'null', user, isAuthenticated });
 

@@ -100,6 +100,10 @@ export const oauthRouter = router({
           email: user.email,
           name: user.name,
           role: user.role,
+          verified: user.verified || false,
+          emailVerified: user.emailVerified || true, // OAuth users have verified emails
+          licenseNumber: user.licenseNumber,
+          specialty: user.specialty,
         },
       };
     }),

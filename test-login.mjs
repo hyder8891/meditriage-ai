@@ -1,59 +1,59 @@
-// Test login API endpoint with correct tRPC batch format
-const baseUrl = 'http://localhost:3000';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
-async function testLogin(email, password) {
-  console.log(`\n🔐 Testing login for: ${email}`);
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+console.log('Testing login with doctor.test@meditriage.com...');
+
+try {
+  const result = await signInWithEmailAndPassword(auth, 'doctor.test@meditriage.com', 'Doctor123!');
+  console.log('✅ Firebase login successful!');
+  console.log('User ID:', result.user.uid);
+  console.log('Email:', result.user.email);
   
-  try {
-    const response = await fetch(`${baseUrl}/api/trpc/auth.login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        0: {
-          json: {
-            email,
-            password,
-          },
-        },
-      }),
-    });
-
-    const data = await response.json();
-    console.log('Response status:', response.status);
-    console.log('Response data:', JSON.stringify(data, null, 2));
-
-    if (response.ok && data[0]?.result?.data) {
-      console.log('✅ Login successful!');
-      console.log('User:', data[0].result.data.user);
-      console.log('Token:', data[0].result.data.token ? 'Present' : 'Missing');
-      return true;
-    } else {
-      console.log('❌ Login failed');
-      if (data[0]?.error) {
-        console.log('Error:', data[0].error.json.message);
-      }
-      return false;
-    }
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-    return false;
+  const idToken = await result.user.getIdToken();
+  console.log('ID Token (first 50 chars):', idToken.substring(0, 50) + '...');
+  
+  // Now test backend verification
+  console.log('\nTesting backend verification...');
+  const response = await fetch('http://localhost:3000/api/trpc/oauth.verifyFirebaseToken', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      idToken,
+      provider: 'email',
+      role: 'clinician',
+      email: 'doctor.test@meditriage.com',
+      name: 'Test Doctor',
+    }),
+  });
+  
+  const data = await response.json();
+  console.log('Backend response:', JSON.stringify(data, null, 2));
+  
+  if (data.result?.data) {
+    console.log('\n✅ Backend verification successful!');
+    console.log('JWT Token received:', data.result.data.token ? 'YES' : 'NO');
+    console.log('Refresh Token received:', data.result.data.refreshToken ? 'YES' : 'NO');
+    console.log('User data:', data.result.data.user);
+  } else {
+    console.log('\n❌ Backend verification failed');
   }
+} catch (error) {
+  console.error('❌ Error:', error.message);
 }
 
-async function main() {
-  console.log('🧪 Testing login endpoints...\n');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  
-  await testLogin('patient.test@meditriage.com', 'test123');
-  
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  
-  await testLogin('doctor.test@meditriage.com', 'test123');
-  
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('\n✅ Test complete!');
-}
-
-main().catch(console.error);
+process.exit(0);

@@ -442,3 +442,12 @@ medical_events (
 - [x] Test complete authentication flow (login, auto-refresh, logout)
 - [x] Verify no session expiry during long consultations
 - [x] Write comprehensive vitest tests (16 tests, all passing)
+
+## Login Redirect Bug Fix - December 22, 2024 (COMPLETED)
+- [x] Fixed login redirect issue where successful authentication redirected back to login page
+- [x] Root cause: isAuthenticated was stored as boolean in Zustand but not recalculated on page reload
+- [x] Solution: Changed isAuthenticated to computed value based on token && user existence
+- [x] Updated useAuth hook to compute isAuthenticated dynamically
+- [x] Updated oauth-router to return complete user object with all required fields
+- [x] Added comprehensive logging to useFirebaseAuth for debugging
+- [x] Tested complete login flow: login → dashboard → navigation works perfectly

@@ -19,13 +19,19 @@ export default function ClinicianLoginNew() {
 
   // Redirect if already authenticated
   useEffect(() => {
+    console.log('[ClinicianLoginNew] useEffect triggered:', { isAuthenticated, user: user?.role });
     if (isAuthenticated && user) {
+      console.log('[ClinicianLoginNew] User is authenticated, checking role:', user.role);
       if (user.role === 'clinician' || user.role === 'admin') {
         // Both clinicians and admins go to clinician dashboard
+        console.log('[ClinicianLoginNew] Redirecting to /clinician/dashboard');
         setLocation('/clinician/dashboard');
       } else if (user.role === 'patient') {
+        console.log('[ClinicianLoginNew] Redirecting to /patient/portal');
         setLocation('/patient/portal');
       }
+    } else {
+      console.log('[ClinicianLoginNew] Not authenticated or no user');
     }
   }, [isAuthenticated, user, setLocation]);
   const [email, setEmail] = useState("");
