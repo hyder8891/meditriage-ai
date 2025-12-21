@@ -5,11 +5,18 @@
 
 import mysql from 'mysql2/promise';
 import { invokeLLM } from '../../_core/llm';
+import { getDatabaseConfig } from '../../_core/db-config';
 
-// Create connection pool (not single connection)
-// This prevents crashes under load by reusing connections
+// CRITICAL FIX: Parse DATABASE_URL into explicit connection parameters
+// This ensures mysql2 correctly initializes the pool with proper credentials
+const dbConfig = getDatabaseConfig();
 const pool = mysql.createPool({
-  uri: process.env.DATABASE_URL,
+  host: dbConfig.host,
+  user: dbConfig.user,
+  password: dbConfig.password,
+  database: dbConfig.database,
+  port: dbConfig.port,
+  ssl: dbConfig.ssl,
   waitForConnections: true,
   connectionLimit: 10, // Max 10 concurrent connections
   queueLimit: 0, // Unlimited queue
