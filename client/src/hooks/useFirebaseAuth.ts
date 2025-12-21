@@ -42,6 +42,8 @@ export function useFirebaseAuth(role: 'patient' | 'clinician', language: 'en' | 
       console.error('Google sign-in error:', error);
       if (error.code === 'auth/popup-closed-by-user') {
         toast.info(language === 'ar' ? 'تم إلغاء تسجيل الدخول' : 'Sign-in cancelled');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        toast.error(language === 'ar' ? 'النطاق غير مصرح به. يرجى إضافة النطاق في Firebase Console' : 'Unauthorized domain. Please add domain in Firebase Console');
       } else {
         toast.error(language === 'ar' ? 'فشل تسجيل الدخول بواسطة Google' : 'Google sign-in failed');
       }
@@ -73,6 +75,8 @@ export function useFirebaseAuth(role: 'patient' | 'clinician', language: 'en' | 
       console.error('Apple sign-in error:', error);
       if (error.code === 'auth/popup-closed-by-user') {
         toast.info(language === 'ar' ? 'تم إلغاء تسجيل الدخول' : 'Sign-in cancelled');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        toast.error(language === 'ar' ? 'النطاق غير مصرح به. يرجى إضافة النطاق في Firebase Console' : 'Unauthorized domain. Please add domain in Firebase Console');
       } else {
         toast.error(language === 'ar' ? 'فشل تسجيل الدخول بواسطة Apple' : 'Apple sign-in failed');
       }
@@ -134,9 +138,15 @@ export function useFirebaseAuth(role: 'patient' | 'clinician', language: 'en' | 
     } catch (error: any) {
       console.error('Email registration error:', error);
       if (error.code === 'auth/email-already-in-use') {
-        toast.error(language === 'ar' ? 'البريد الإلكتروني مستخدم بالفعل' : 'Email already in use');
+        // Email already exists - suggest login instead
+        toast.error(
+          language === 'ar' 
+            ? 'البريد الإلكتروني مستخدم بالفعل. جرب تسجيل الدخول بدلاً من ذلك' 
+            : 'Email already in use. Try logging in instead',
+          { duration: 5000 }
+        );
       } else if (error.code === 'auth/weak-password') {
-        toast.error(language === 'ar' ? 'كلمة المرور ضعيفة جداً' : 'Password is too weak');
+        toast.error(language === 'ar' ? 'كلمة المرور ضعيفة جداً (8 أحرف على الأقل)' : 'Password is too weak (min 8 characters)');
       } else if (error.code === 'auth/invalid-email') {
         toast.error(language === 'ar' ? 'البريد الإلكتروني غير صالح' : 'Invalid email');
       } else {

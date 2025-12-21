@@ -377,3 +377,17 @@ medical_events (
 - [x] Test clinician email/password login flow
 - [x] Verify all authentication methods work (Email, Google, Apple, SMS)
 - [x] All authentication unified under Firebase
+
+## Firebase Domain Authorization Fix - December 22, 2024
+- [ ] Add Manus development domain to Firebase authorized domains
+- [ ] Add production domain to Firebase authorized domains (when published)
+- [ ] Verify Google OAuth works after domain authorization
+- [ ] Verify Apple OAuth works after domain authorization
+- [ ] Test email/password authentication continues to work
+
+## Authentication Error Fixes - December 22, 2024 (CRITICAL)
+- [ ] Fix JWT expiresIn error in auth-utils.ts (invalid expiresIn option for number payload)
+- [ ] Add current domain (3000-ifhz2snq11y44i4wphv4f-33e916fa.manus-asia.computer) to Firebase
+- [ ] Improve email-already-in-use error handling in registration flow
+- [ ] Test Google OAuth after domain fix
+- [ ] Test email/password registration after fixes

@@ -78,7 +78,11 @@ export const oauthRouter = router({
       }
 
       // Generate JWT token
-      const token = generateToken(user.id, user.role);
+      const token = generateToken({
+        userId: user.id,
+        email: user.email!,
+        role: user.role,
+      });
 
       return {
         token,
