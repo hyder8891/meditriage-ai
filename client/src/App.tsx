@@ -75,29 +75,62 @@ function Router() {
       <Route path={"/clinician/dashboard"}>
         {() => <ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>}
       </Route>
-      <Route path={"/clinician/reasoning"} component={ClinicalReasoning} />
+      <Route path={"/clinician/reasoning"}>
+        {() => <ProtectedRoute requiredRole="clinician"><ClinicalReasoning /></ProtectedRoute>}
+      </Route>
       <Route path={"/patient/symptom-checker"} component={PatientSymptomChecker} />
-      <Route path={"/clinician/pharmaguard"} component={PharmaGuard} />
-      <Route path={"/clinician/care-locator"} component={CareLocator} />
+      <Route path={"/clinician/pharmaguard"}>
+        {() => <ProtectedRoute requiredRole="clinician"><PharmaGuard /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/care-locator"}>
+        {() => <ProtectedRoute requiredRole="clinician"><CareLocator /></ProtectedRoute>}
+      </Route>
 
-      <Route path={"/clinician/live-scribe"} component={LiveScribe} />
-      <Route path={"/clinician/lab-results"} component={LabResults} />
-      <Route path={"/clinician/case/:id/timeline"} component={CaseTimeline} />
-      <Route path={"/clinician/xray-analysis"} component={XRayAnalysis} />
-      <Route path={"/clinician/calendar"} component={ClinicianCalendar} />      <Route path={"/clinician/medications"} component={MedicationManagement} />
-      <Route path={"/clinician/messages"} component={SecureMessaging} />
-      <Route path={"/clinician/patients"} component={Patients} />
-      <Route path={"/clinician/patients/add"} component={AddPatient} />
-      <Route path={"/clinician/patient/:id"} component={PatientDetail} />
-      <Route path={"/clinician/reports"} component={Reports} />
-      <Route path={"/clinician/my-patients"} component={MyPatients} />
+      <Route path={"/clinician/live-scribe"}>
+        {() => <ProtectedRoute requiredRole="clinician"><LiveScribe /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/lab-results"}>
+        {() => <ProtectedRoute requiredRole="clinician"><LabResults /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/case/:id/timeline"}>
+        {() => <ProtectedRoute requiredRole="clinician"><CaseTimeline /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/xray-analysis"}>
+        {() => <ProtectedRoute requiredRole="clinician"><XRayAnalysis /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/calendar"}>
+        {() => <ProtectedRoute requiredRole="clinician"><ClinicianCalendar /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/medications"}>
+        {() => <ProtectedRoute requiredRole="clinician"><MedicationManagement /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/messages"}>
+        {() => <ProtectedRoute requiredRole="clinician"><SecureMessaging /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/patients"}>
+        {() => <ProtectedRoute requiredRole="clinician"><Patients /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/patients/add"}>
+        {() => <ProtectedRoute requiredRole="clinician"><AddPatient /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/patient/:id"}>
+        {() => <ProtectedRoute requiredRole="clinician"><PatientDetail /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/reports"}>
+        {() => <ProtectedRoute requiredRole="clinician"><Reports /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/my-patients"}>
+        {() => <ProtectedRoute requiredRole="clinician"><MyPatients /></ProtectedRoute>}
+      </Route>
       <Route path="/patient/find-doctor" component={FindDoctor} />
       <Route path="/patient/find-doctors" component={FindDoctor} />
       <Route path={"/patient/my-doctors"} component={MyDoctors} />
       <Route path={"/messages"} component={Messages} />
       <Route path={"/patient/messages"} component={Messages} />
       <Route path={"/patient/subscription"} component={PatientSubscription} />
-      <Route path={"/clinician/subscription"} component={DoctorSubscription} />
+      <Route path={"/clinician/subscription"}>
+        {() => <ProtectedRoute requiredRole="clinician"><DoctorSubscription /></ProtectedRoute>}
+      </Route>
       <Route path={"/patient/medications"} component={PatientMedications} />
       <Route path={"/patient/portal"}>
         {() => <ProtectedRoute requiredRole="patient"><PatientPortal /></ProtectedRoute>}

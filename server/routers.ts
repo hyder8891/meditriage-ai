@@ -144,6 +144,7 @@ export const appRouter = router({
           
           return {
             success: true,
+            token, // Return the JWT token
             user: {
               id: user.id,
               email: user.email,

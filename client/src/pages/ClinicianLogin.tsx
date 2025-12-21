@@ -20,14 +20,16 @@ import { getLoginUrl } from "@/const";
 
 export default function ClinicianLogin() {
   const [, setLocation] = useLocation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, setAuth } = useAuth();
   const [email, setEmail] = useState("demo@meditriage.ai");
   const [password, setPassword] = useState("demo123");
   const [isLoading, setIsLoading] = useState(false);
 
   const adminLoginMutation = trpc.auth.adminLogin.useMutation({
     onSuccess: (data) => {
-      if (data.success) {
+      if (data.success && data.token && data.user) {
+        // Store token and user in Zustand (persists to localStorage)
+        setAuth(data.token, data.user);
         toast.success("Login successful! Redirecting to dashboard...");
         setTimeout(() => {
           setLocation("/clinician/dashboard");
