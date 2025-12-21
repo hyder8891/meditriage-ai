@@ -48,6 +48,7 @@ import PatientPortal from "./pages/PatientPortal";
 import SecureMessaging from "./pages/SecureMessaging";
 import AdminDashboard from "./pages/AdminDashboard";
 import Patients from "./pages/Patients";
+import TestNotifications from "./pages/TestNotifications";
 import AddPatient from "./pages/AddPatient";
 import Reports from "./pages/Reports";
 import PatientDetail from "./pages/PatientDetail";
@@ -116,6 +117,7 @@ function Router() {
       <Route path={"/brain/training"} component={TrainingDashboard} />
       <Route path={"/brain/performance"} component={BrainPerformance} />
       <Route path={"/symptom-checker-old"} component={SymptomChecker} />
+      <Route path={"/test-notifications"} component={TestNotifications} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
