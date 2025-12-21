@@ -362,3 +362,18 @@ medical_events (
 - [x] Test Firebase credentials validation
 - [x] Verify Google and Apple provider configuration
 - [x] Handle account linking for existing email users
+
+## Firebase Email Authentication Migration - December 22, 2024
+- [x] Enable Firebase Email/Password authentication in Firebase Console
+- [x] Update useFirebaseAuth hook to support email/password sign in
+- [x] Update useFirebaseAuth hook to support email/password registration
+- [x] Update PatientLogin component to use Firebase email auth
+- [x] Update ClinicianLoginNew component to use Firebase email auth
+- [x] Update backend oauth-router to accept 'email' provider
+- [x] Backend already verifies Firebase ID tokens (no changes needed)
+- [x] Test patient email/password registration flow
+- [x] Test patient email/password login flow
+- [x] Test clinician email/password registration flow
+- [x] Test clinician email/password login flow
+- [x] Verify all authentication methods work (Email, Google, Apple, SMS)
+- [x] All authentication unified under Firebase

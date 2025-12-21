@@ -7,7 +7,7 @@ import { generateToken } from "./_core/auth-utils";
 
 /**
  * OAuth Router for Firebase Authentication
- * Handles Google and Facebook OAuth login via Firebase
+ * Handles Google, Apple, and Email/Password authentication via Firebase
  */
 
 export const oauthRouter = router({
@@ -18,7 +18,7 @@ export const oauthRouter = router({
     .input(
       z.object({
         idToken: z.string(),
-        provider: z.enum(["google", "apple"]),
+        provider: z.enum(["google", "apple", "email"]),
         role: z.enum(["patient", "clinician"]),
         email: z.string().email(),
         name: z.string(),

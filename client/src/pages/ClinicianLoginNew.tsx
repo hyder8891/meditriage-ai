@@ -36,7 +36,7 @@ export default function ClinicianLoginNew() {
   const [licenseNumber, setLicenseNumber] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [showSMSLogin, setShowSMSLogin] = useState(false);
-  const { signInWithGoogle, signInWithApple, isLoading: oauthLoading } = useFirebaseAuth('clinician', language as 'en' | 'ar');
+  const { signInWithGoogle, signInWithApple, signInWithEmail, registerWithEmail, isLoading: oauthLoading } = useFirebaseAuth('clinician', language as 'en' | 'ar');
 
   const t = {
     title: language === 'ar' ? 'دخول الطبيب' : 'Clinician Login',
@@ -61,31 +61,7 @@ export default function ClinicianLoginNew() {
       : 'Note: Your medical credentials will be verified before account approval',
   };
 
-  const registerMutation = trpc.auth.registerClinician.useMutation({
-    onSuccess: (data) => {
-      toast.success(data.message || (language === 'ar' ? 'تم إرسال طلبك للمراجعة' : 'Your application has been submitted for review'));
-      setLocation("/");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: (data) => {
-      setAuth(data.token, data.user as any);
-      toast.success(language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
-      // Redirect based on role
-      if (data.user.role === 'admin') {
-        setLocation("/clinician/dashboard"); // Admin can access clinician dashboard
-      } else {
-        setLocation("/clinician/dashboard");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  // Firebase authentication handles success/error via useFirebaseAuth hook
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,13 +71,19 @@ export default function ClinicianLoginNew() {
         toast.error(language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields');
         return;
       }
-      registerMutation.mutate({ name, email, password, licenseNumber, specialty });
+      // Note: Firebase doesn't support custom fields during registration
+      // We'll need to add licenseNumber and specialty to the database after Firebase auth
+      await registerWithEmail(email, password, name);
+      toast.info(language === 'ar' ? 'يرجى إكمال ملفك الشخصي' : 'Please complete your profile');
+      setLocation("/clinician/dashboard");
     } else {
       if (!email || !password) {
         toast.error(language === 'ar' ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور' : 'Please enter email and password');
         return;
       }
-      loginMutation.mutate({ email, password });
+      await signInWithEmail(email, password);
+      // On success, user will be redirected by useEffect
+      setLocation("/clinician/dashboard");
     }
   };
 

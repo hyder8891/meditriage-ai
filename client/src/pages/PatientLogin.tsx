@@ -34,7 +34,7 @@ export default function PatientLogin() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState("");
   const [showSMSLogin, setShowSMSLogin] = useState(false);
-  const { signInWithGoogle, signInWithApple, isLoading: oauthLoading } = useFirebaseAuth('patient', language as 'en' | 'ar');
+  const { signInWithGoogle, signInWithApple, signInWithEmail, registerWithEmail, isLoading: oauthLoading } = useFirebaseAuth('patient', language as 'en' | 'ar');
 
   const t = {
     title: language === 'ar' ? 'دخول المريض' : 'Patient Login',
@@ -55,32 +55,7 @@ export default function PatientLogin() {
     orContinue: language === 'ar' ? 'أو تابع مع' : 'Or continue with',
   };
 
-  const registerMutation = trpc.auth.registerPatient.useMutation({
-    onSuccess: (data) => {
-      setAuth(data.token, data.user as any);
-      toast.success(language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully');
-      setLocation("/patient/portal");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: (data) => {
-      setAuth(data.token, data.user as any);
-      toast.success(language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Logged in successfully');
-      // Redirect based on role
-      if (data.user.role === 'admin') {
-        setLocation("/patient/portal"); // Admin can access patient portal
-      } else {
-        setLocation("/patient/portal");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  // Firebase authentication handles success/error via useFirebaseAuth hook
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,13 +65,17 @@ export default function PatientLogin() {
         toast.error(language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields');
         return;
       }
-      registerMutation.mutate({ name, email, password });
+      await registerWithEmail(email, password, name);
+      // On success, user will be redirected by useEffect
+      setLocation("/patient/portal");
     } else {
       if (!email || !password) {
         toast.error(language === 'ar' ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور' : 'Please enter email and password');
         return;
       }
-      loginMutation.mutate({ email, password });
+      await signInWithEmail(email, password);
+      // On success, user will be redirected by useEffect
+      setLocation("/patient/portal");
     }
   };
 
