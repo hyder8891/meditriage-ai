@@ -1,54 +1,92 @@
 import { Server as HttpServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import Redis from 'ioredis';
 
 let io: SocketIOServer | null = null;
 
 export function initializeSocketServer(httpServer: HttpServer) {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: "*",
+      origin: "*", // Lock this down to your specific domain in production!
       methods: ["GET", "POST"]
-    }
+    },
+    // Reliability settings for Iraq's mobile networks
+    pingTimeout: 20000,
+    pingInterval: 25000,
+    transports: ['websocket', 'polling']
   });
 
-  // Store active rooms and participants
-  const rooms = new Map<string, Set<string>>();
-  
-  // Store user socket mappings for notifications
-  const userSockets = new Map<number, Set<string>>();
+  // ---------------------------------------------------------
+  // 🔴 SCALABILITY: Redis Adapter Configuration
+  // ---------------------------------------------------------
+  if (process.env.REDIS_URL) {
+    console.log("🚀 [Socket.IO] Connecting to Redis Adapter...");
+    
+    // Create separate clients for Pub/Sub (Required by socket.io)
+    // TLS configuration for secure Redis connections (Upstash)
+    const pubClient = new Redis(process.env.REDIS_URL, {
+      tls: { rejectUnauthorized: false }
+    });
+    const subClient = pubClient.duplicate();
+
+    // Error handling to prevent app crashes if Redis blips
+    const handleRedisError = (err: any) => console.error("🔴 [Redis Error]", err.message);
+    pubClient.on('error', handleRedisError);
+    subClient.on('error', handleRedisError);
+
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log("✅ [Socket.IO] Redis Adapter Configured - Multi-server messaging enabled");
+  } else {
+    console.warn("⚠️ [Socket.IO] No REDIS_URL found. Falling back to single-server memory mode.");
+  }
 
   io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
     
-    // Register user for notifications
+    // ---------------------------------------------------------
+    // 1. SCALABLE USER REGISTRATION (Using Rooms)
+    // ---------------------------------------------------------
     socket.on('register-user', ({ userId }) => {
-      if (!userSockets.has(userId)) {
-        userSockets.set(userId, new Set());
-      }
-      userSockets.get(userId)?.add(socket.id);
-      console.log(`User ${userId} registered for notifications`);
+      // Instead of a Map, we join a "personal room"
+      const userRoom = `user:${userId}`;
+      socket.join(userRoom);
+      console.log(`User ${userId} registered (Joined room: ${userRoom})`);
     });
 
-    // Join consultation room
-    socket.on('join-room', ({ roomId, userId, role }) => {
+    socket.on('unregister-user', ({ userId }) => {
+      const userRoom = `user:${userId}`;
+      socket.leave(userRoom);
+    });
+
+    // ---------------------------------------------------------
+    // 2. CONSULTATION ROOMS
+    // ---------------------------------------------------------
+    socket.on('join-room', async ({ roomId, userId, role }) => {
       socket.join(roomId);
       
-      if (!rooms.has(roomId)) {
-        rooms.set(roomId, new Set());
-      }
-      rooms.get(roomId)?.add(socket.id);
-
-      // Notify others in the room
+      // Notify others in the room (Redis handles broadcasting across servers)
       socket.to(roomId).emit('user-joined', { userId, socketId: socket.id, role });
       
-      // Send existing participants to the new user
-      const existingParticipants = Array.from(rooms.get(roomId) || []).filter(id => id !== socket.id);
-      socket.emit('existing-participants', existingParticipants);
+      // Fetch participants: With Redis, we ask the adapter who is in the room
+      const socketsInRoom = await io?.in(roomId).fetchSockets();
+      const existingParticipants = socketsInRoom
+        ?.filter(s => s.id !== socket.id)
+        .map(s => s.id) || [];
 
+      socket.emit('existing-participants', existingParticipants);
       console.log(`User ${userId} (${role}) joined room ${roomId}`);
     });
 
-    // WebRTC signaling
+    socket.on('leave-room', ({ roomId, userId }) => {
+      socket.leave(roomId);
+      socket.to(roomId).emit('user-left', { userId, socketId: socket.id });
+      console.log(`User ${userId} left room ${roomId}`);
+    });
+
+    // ---------------------------------------------------------
+    // 3. WebRTC SIGNALING (P2P Handshake)
+    // ---------------------------------------------------------
     socket.on('offer', ({ offer, to }) => {
       socket.to(to).emit('offer', { offer, from: socket.id });
     });
@@ -61,7 +99,9 @@ export function initializeSocketServer(httpServer: HttpServer) {
       socket.to(to).emit('ice-candidate', { candidate, from: socket.id });
     });
 
-    // Chat messages
+    // ---------------------------------------------------------
+    // 4. CHAT & UTILITIES
+    // ---------------------------------------------------------
     socket.on('chat-message', ({ roomId, message, sender, senderName }) => {
       io?.to(roomId).emit('chat-message', {
         message,
@@ -71,7 +111,6 @@ export function initializeSocketServer(httpServer: HttpServer) {
       });
     });
 
-    // Screen sharing
     socket.on('start-screen-share', ({ roomId, userId }) => {
       socket.to(roomId).emit('screen-share-started', { userId, socketId: socket.id });
     });
@@ -80,57 +119,13 @@ export function initializeSocketServer(httpServer: HttpServer) {
       socket.to(roomId).emit('screen-share-stopped', { userId });
     });
 
-    // Consultation status updates
     socket.on('consultation-status', ({ roomId, status }) => {
       socket.to(roomId).emit('consultation-status-update', { status });
     });
 
-    // Leave room
-    socket.on('leave-room', ({ roomId, userId }) => {
-      socket.leave(roomId);
-      rooms.get(roomId)?.delete(socket.id);
-      
-      if (rooms.get(roomId)?.size === 0) {
-        rooms.delete(roomId);
-      }
-
-      socket.to(roomId).emit('user-left', { userId, socketId: socket.id });
-      console.log(`User ${userId} left room ${roomId}`);
-    });
-
-    // Unregister user from notifications
-    socket.on('unregister-user', ({ userId }) => {
-      userSockets.get(userId)?.delete(socket.id);
-      if (userSockets.get(userId)?.size === 0) {
-        userSockets.delete(userId);
-      }
-    });
-    
-    // Disconnect
     socket.on('disconnect', () => {
+      // Redis Adapter automatically handles removing socket from rooms
       console.log('User disconnected:', socket.id);
-      
-      // Remove from user sockets
-      userSockets.forEach((sockets, userId) => {
-        if (sockets.has(socket.id)) {
-          sockets.delete(socket.id);
-          if (sockets.size === 0) {
-            userSockets.delete(userId);
-          }
-        }
-      });
-      
-      // Remove from all rooms
-      rooms.forEach((participants, roomId) => {
-        if (participants.has(socket.id)) {
-          participants.delete(socket.id);
-          socket.to(roomId).emit('user-left', { socketId: socket.id });
-          
-          if (participants.size === 0) {
-            rooms.delete(roomId);
-          }
-        }
-      });
     });
   });
 
@@ -144,14 +139,22 @@ export function getSocketServer() {
   return io;
 }
 
-// Helper function to emit notification to a specific user
+/**
+ * Emit a notification to a specific user securely and scalably.
+ * Uses the Redis Room pattern to find the user on ANY server.
+ */
 export function emitNotificationToUser(userId: number, event: string, data: any) {
   if (!io) {
     console.warn('Socket.IO server not initialized, cannot send notification');
     return;
   }
   
-  // Emit to all sockets connected for this user
-  io.emit(`user:${userId}:${event}`, data);
-  console.log(`Notification sent to user ${userId}: ${event}`);
+  // Backward compatibility: 
+  // We send to the "user:ID" room, but keep the event name structure 
+  // your frontend expects (`user:ID:event`).
+  const userRoom = `user:${userId}`;
+  const specificEventName = `user:${userId}:${event}`;
+  
+  io.to(userRoom).emit(specificEventName, data);
+  console.log(`Notification sent to ${userRoom} via Redis: ${event}`);
 }
