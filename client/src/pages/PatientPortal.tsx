@@ -27,6 +27,7 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 import { Progress } from "@/components/ui/progress";
+import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 export default function PatientPortal() {
   const { language } = useLanguage();
@@ -102,9 +103,7 @@ export default function PatientPortal() {
               <Badge className="bg-gradient-to-r from-rose-500 to-purple-500 text-white">
                 {usage?.planName || 'Free'}
               </Badge>
-              <Button variant="ghost" size="icon">
-                <Users className="w-5 h-5" />
-              </Button>
+              <UserProfileDropdown />
             </div>
           </div>
         </div>

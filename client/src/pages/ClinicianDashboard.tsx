@@ -28,6 +28,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 export default function ClinicianDashboard() {
   const [, setLocation] = useLocation();
@@ -184,14 +185,7 @@ export default function ClinicianDashboard() {
           </nav>
 
           <div className="absolute bottom-4 left-0 right-0 px-4">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={handleLogout}
-            >
-              <LogOut className="w-5 h-5 mr-3" />
-              Logout
-            </Button>
+            <UserProfileDropdown />
           </div>
         </div>
       </aside>

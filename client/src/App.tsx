@@ -58,6 +58,8 @@ import MyDoctors from "./pages/MyDoctors";
 import Messages from "./pages/Messages";
 import PatientSubscription from "./pages/PatientSubscription";
 import DoctorSubscription from "./pages/DoctorSubscription";
+import DebugUser from "./pages/DebugUser";
+import DebugAuth from "./pages/DebugAuth";
 
 function Router() {
   return (
@@ -93,6 +95,7 @@ function Router() {
       <Route path="/patient/find-doctors" component={FindDoctor} />
       <Route path={"/patient/my-doctors"} component={MyDoctors} />
       <Route path={"/messages"} component={Messages} />
+      <Route path={"/patient/messages"} component={Messages} />
       <Route path={"/patient/subscription"} component={PatientSubscription} />
       <Route path={"/clinician/subscription"} component={DoctorSubscription} />
       <Route path={"/patient/medications"} component={PatientMedications} />
@@ -118,6 +121,8 @@ function Router() {
       <Route path={"/brain/performance"} component={BrainPerformance} />
       <Route path={"/symptom-checker-old"} component={SymptomChecker} />
       <Route path={"/test-notifications"} component={TestNotifications} />
+      <Route path={"/debug-user"} component={DebugUser} />
+      <Route path={"/debug-auth"} component={DebugAuth} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

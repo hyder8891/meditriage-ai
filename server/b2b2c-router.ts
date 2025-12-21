@@ -562,6 +562,8 @@ export const b2b2cRouter = router({
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
 
+        console.log('[getConversations] User ID:', ctx.user.id, 'Role:', ctx.user.role);
+
         const db = await getDb();
         if (!db) {
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
@@ -589,6 +591,11 @@ export const b2b2cRouter = router({
           )
           .orderBy(desc(messages.createdAt))
           .limit(100);
+
+        console.log('[getConversations] Found', latestMessages.length, 'messages');
+        if (latestMessages.length > 0) {
+          console.log('[getConversations] First message:', JSON.stringify(latestMessages[0], null, 2));
+        }
 
         // Group by conversation and get latest message
         const conversationsMap = new Map();

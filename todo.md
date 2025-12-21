@@ -321,3 +321,8 @@ medical_events (
 - [x] Add cache validity checking (24-hour TTL)
 - [x] Add cache hit/miss logging
 - [ ] Integrate direct Gemini SDK for true cache API (pending Manus LLM support)
+
+## Messaging System Bug Fixes (December 21, 2024)
+- [ ] Fix "Connect Now" button not creating patient-doctor connections
+- [ ] Fix doctor dashboard not showing connected patients in messages list
+- [ ] Verify real-time messaging works between test patient and test doctor accounts

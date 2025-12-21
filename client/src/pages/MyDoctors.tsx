@@ -101,13 +101,15 @@ export default function MyDoctors() {
                   </div>
 
                   <div className="flex flex-col gap-2 ml-4">
-                    <Button
-                      disabled={!isAvailable}
-                      className={isAvailable ? "bg-green-600 hover:bg-green-700" : ""}
-                    >
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      {isAvailable ? "Message Now" : isBusy ? "Doctor Busy" : "Offline"}
-                    </Button>
+                    <Link href="/patient/messages">
+                      <Button
+                        disabled={!isAvailable}
+                        className={isAvailable ? "bg-green-600 hover:bg-green-700 w-full" : "w-full"}
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        {isAvailable ? "Message Now" : isBusy ? "Doctor Busy" : "Offline"}
+                      </Button>
+                    </Link>
                     
                     <Button variant="outline" size="sm">
                       <Calendar className="h-4 w-4 mr-2" />

@@ -61,6 +61,23 @@ export const appRouter = router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
     
+    // Debug endpoint to show current user with full details
+    debugMe: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) {
+        return { authenticated: false, message: 'Not logged in' };
+      }
+      return {
+        authenticated: true,
+        user: {
+          id: ctx.user.id,
+          email: ctx.user.email,
+          name: ctx.user.name,
+          role: ctx.user.role,
+        },
+        message: 'User is authenticated'
+      };
+    }),
+    
     // Traditional admin login with username/password
     adminLogin: publicProcedure
       .input(z.object({
