@@ -126,7 +126,7 @@ export default function ClinicianLogin() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="demo@meditriage.ai"
-                    className="pl-11 bg-white/5 border-purple-400/30 text-white placeholder:text-purple-300 focus:border-blue-400"
+                    className="pl-11 bg-white/90 border-purple-400/30 text-slate-900 placeholder:text-slate-500 focus:border-blue-400"
                     required
                   />
                 </div>
@@ -143,7 +143,7 @@ export default function ClinicianLogin() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="pl-11 bg-white/5 border-purple-400/30 text-white placeholder:text-purple-300 focus:border-blue-400"
+                    className="pl-11 bg-white/90 border-purple-400/30 text-slate-900 placeholder:text-slate-500 focus:border-blue-400"
                     required
                   />
                 </div>
