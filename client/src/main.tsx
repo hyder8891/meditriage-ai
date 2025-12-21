@@ -61,6 +61,9 @@ const trpcClient = trpc.createClient({
         };
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
+          console.log('[tRPC] Sending request with JWT token:', token.substring(0, 20) + '...');
+        } else {
+          console.log('[tRPC] No JWT token found in localStorage');
         }
 
         return globalThis.fetch(input, {

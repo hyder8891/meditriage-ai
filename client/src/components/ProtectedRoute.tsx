@@ -13,6 +13,8 @@ export function ProtectedRoute({ children, requiredRole, redirectTo }: Protected
   const [, setLocation] = useLocation();
   const { isAuthenticated, user } = useAuth();
 
+  console.log('[ProtectedRoute] Auth state:', { isAuthenticated, user, requiredRole });
+
   useEffect(() => {
     // If not authenticated, redirect to home
     if (!isAuthenticated) {

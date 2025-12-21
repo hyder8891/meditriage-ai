@@ -48,6 +48,8 @@ export const useAuthStore = create<AuthState>()(
 export function useAuth() {
   const { token, user, isAuthenticated, setAuth, clearAuth } = useAuthStore();
 
+  console.log('[useAuth] Current state:', { token: token ? 'exists' : 'null', user, isAuthenticated });
+
   return {
     token,
     user,
@@ -57,5 +59,6 @@ export function useAuth() {
     isAdmin: user?.role === "admin",
     setAuth,
     clearAuth,
+    logout: clearAuth,
   };
 }

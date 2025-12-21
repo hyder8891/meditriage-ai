@@ -66,8 +66,8 @@ export default function ClinicianDashboard() {
     setLocation("/clinician/reasoning");
   };
 
-  // Redirect if not authenticated or not admin
-  if (!authLoading && (!user || user.role !== 'admin')) {
+  // Redirect if not authenticated or not a clinician/admin
+  if (!authLoading && (!user || (user.role !== 'clinician' && user.role !== 'admin'))) {
     setLocation("/clinician/login");
     return null;
   }

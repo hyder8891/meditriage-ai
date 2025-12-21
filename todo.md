@@ -326,3 +326,5 @@ medical_events (
 - [ ] Fix "Connect Now" button not creating patient-doctor connections
 - [ ] Fix doctor dashboard not showing connected patients in messages list
 - [ ] Verify real-time messaging works between test patient and test doctor accounts
+- [ ] Fix text visibility on doctor login page (labels barely visible - low contrast)
+- [ ] Fix routing: logged-in doctor redirected to homepage when accessing /clinician/dashboard

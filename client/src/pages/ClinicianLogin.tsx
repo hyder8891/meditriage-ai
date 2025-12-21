@@ -107,7 +107,7 @@ export default function ClinicianLogin() {
 
             <div>
               <CardTitle className="text-3xl text-white">Clinician Login</CardTitle>
-              <CardDescription className="text-purple-200 text-base mt-2">
+              <CardDescription className="text-white/90 text-base mt-2">
                 Access your secure workspace.
               </CardDescription>
             </div>
@@ -117,7 +117,7 @@ export default function ClinicianLogin() {
             <form onSubmit={handleLogin} className="space-y-4">
               {/* Email Field */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-purple-100">Email</Label>
+                <Label htmlFor="email" className="text-white font-medium">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
                   <Input
@@ -134,7 +134,7 @@ export default function ClinicianLogin() {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-purple-100">Password</Label>
+                <Label htmlFor="password" className="text-white font-medium">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
                   <Input
