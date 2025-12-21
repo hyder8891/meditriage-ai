@@ -75,12 +75,6 @@ export default function Home() {
       color: 'from-pink-500 to-rose-500',
     },
     {
-      icon: Activity,
-      title: language === 'ar' ? 'الماسح الحيوي 3D' : '3D Bio-Scanner',
-      desc: language === 'ar' ? 'تصور تشريحي تفاعلي' : 'Interactive anatomy visualization',
-      color: 'from-blue-500 to-cyan-500',
-    },
-    {
       icon: FileText,
       title: language === 'ar' ? 'التوثيق الصوتي' : 'Voice Documentation',
       desc: language === 'ar' ? 'تحويل الصوت إلى نص طبي' : 'Voice to medical text',

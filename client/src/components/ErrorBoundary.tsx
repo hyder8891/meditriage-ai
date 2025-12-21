@@ -26,6 +26,26 @@ class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.setState({ error, errorInfo });
+
+    // Report error to AEC system
+    fetch('/api/aec/report-error', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        errorType: 'REACT_ERROR_BOUNDARY',
+        severity: 'high',
+        message: error.message,
+        stackTrace: error.stack,
+        source: 'client-error-boundary',
+        endpoint: window.location.pathname,
+        userContext: {
+          url: window.location.href,
+          componentStack: errorInfo.componentStack,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        },
+      }),
+    }).catch(err => console.error('Failed to report error to AEC:', err));
   }
 
   render() {

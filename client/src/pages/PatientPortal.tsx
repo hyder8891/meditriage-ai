@@ -51,13 +51,6 @@ export default function PatientPortal() {
       path: '/xray-analysis',
     },
     {
-      icon: Activity,
-      title: language === 'ar' ? 'الماسح الحيوي' : 'Bio-Scanner',
-      desc: language === 'ar' ? 'تصور تشريحي 3D' : '3D anatomy',
-      color: 'from-blue-500 to-cyan-500',
-      path: '/bio-scanner',
-    },
-    {
       icon: FileText,
       title: language === 'ar' ? 'التوثيق الصوتي' : 'Voice Notes',
       desc: language === 'ar' ? 'تحويل الصوت لنص' : 'Voice to text',

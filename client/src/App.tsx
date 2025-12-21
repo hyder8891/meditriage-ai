@@ -36,8 +36,9 @@ import ClinicalReasoning from "./pages/ClinicalReasoning";
 import PatientSymptomChecker from "./pages/PatientSymptomChecker";
 import PharmaGuard from "./pages/PharmaGuard";
 import CareLocator from "./pages/CareLocator";
-import BioScanner from "./pages/BioScanner";
+
 import LiveScribe from "./pages/LiveScribe";
+import LabResults from "./pages/LabResults";
 import CaseTimeline from "./pages/CaseTimeline";
 import XRayAnalysis from "./pages/XRayAnalysis";
 import ClinicianCalendar from "./pages/ClinicianCalendar";
@@ -75,8 +76,9 @@ function Router() {
       <Route path={"/patient/symptom-checker"} component={PatientSymptomChecker} />
       <Route path={"/clinician/pharmaguard"} component={PharmaGuard} />
       <Route path={"/clinician/care-locator"} component={CareLocator} />
-      <Route path={"/clinician/bio-scanner"} component={BioScanner} />
+
       <Route path={"/clinician/live-scribe"} component={LiveScribe} />
+      <Route path={"/clinician/lab-results"} component={LabResults} />
       <Route path={"/clinician/case/:id/timeline"} component={CaseTimeline} />
       <Route path={"/clinician/xray-analysis"} component={XRayAnalysis} />
       <Route path={"/clinician/calendar"} component={ClinicianCalendar} />      <Route path={"/clinician/medications"} component={MedicationManagement} />

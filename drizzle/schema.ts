@@ -1764,3 +1764,164 @@ export const aecConfig = mysqlTable("aec_config", {
 
 export type AecConfig = typeof aecConfig.$inferSelect;
 export type InsertAecConfig = typeof aecConfig.$inferInsert;
+
+
+/**
+ * Lab Result Interpretation System
+ * Comprehensive lab report management and AI-powered interpretation
+ */
+
+/**
+ * Lab Reports - Uploaded lab report documents
+ */
+export const labReports = mysqlTable("lab_reports", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  
+  // Report metadata
+  reportDate: timestamp("report_date").notNull(),
+  uploadDate: timestamp("upload_date").defaultNow().notNull(),
+  reportName: varchar("report_name", { length: 255 }),
+  labName: varchar("lab_name", { length: 255 }),
+  orderingPhysician: varchar("ordering_physician", { length: 255 }),
+  
+  // File storage
+  fileUrl: text("file_url").notNull(),
+  fileType: varchar("file_type", { length: 50 }),
+  fileSize: int("file_size"),
+  
+  // OCR and extraction
+  ocrText: text("ocr_text"),
+  extractionStatus: varchar("extraction_status", { length: 50 }).default("pending"),
+  extractionError: text("extraction_error"),
+  
+  // AI interpretation
+  overallInterpretation: text("overall_interpretation"),
+  riskLevel: varchar("risk_level", { length: 20 }),
+  recommendedActions: text("recommended_actions"),
+  
+  // Status
+  status: varchar("status", { length: 50 }).default("uploaded"),
+  reviewedBy: int("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LabReport = typeof labReports.$inferSelect;
+export type InsertLabReport = typeof labReports.$inferInsert;
+
+/**
+ * Lab Results - Individual test results extracted from reports
+ */
+export const labResults = mysqlTable("lab_results", {
+  id: int("id").autoincrement().primaryKey(),
+  reportId: int("report_id").notNull(),
+  userId: int("user_id").notNull(),
+  
+  // Test identification
+  testName: varchar("test_name", { length: 255 }).notNull(),
+  testCode: varchar("test_code", { length: 100 }),
+  testCategory: varchar("test_category", { length: 100 }),
+  
+  // Result value
+  value: varchar("value", { length: 100 }).notNull(),
+  numericValue: decimal("numeric_value", { precision: 10, scale: 3 }),
+  unit: varchar("unit", { length: 50 }),
+  
+  // Reference range
+  referenceRangeMin: decimal("reference_range_min", { precision: 10, scale: 3 }),
+  referenceRangeMax: decimal("reference_range_max", { precision: 10, scale: 3 }),
+  referenceRangeText: varchar("reference_range_text", { length: 255 }),
+  
+  // Status and flags
+  status: varchar("status", { length: 20 }).notNull(),
+  abnormalFlag: boolean("abnormal_flag").default(false),
+  criticalFlag: boolean("critical_flag").default(false),
+  
+  // AI interpretation
+  interpretation: text("interpretation"),
+  clinicalSignificance: text("clinical_significance"),
+  possibleCauses: text("possible_causes"),
+  recommendedFollowUp: text("recommended_follow_up"),
+  
+  // Metadata
+  testDate: timestamp("test_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LabResult = typeof labResults.$inferSelect;
+export type InsertLabResult = typeof labResults.$inferInsert;
+
+/**
+ * Lab Reference Ranges - Standard reference ranges for different demographics
+ */
+export const labReferenceRanges = mysqlTable("lab_reference_ranges", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Test identification
+  testName: varchar("test_name", { length: 255 }).notNull(),
+  testCode: varchar("test_code", { length: 100 }),
+  testCategory: varchar("test_category", { length: 100 }),
+  
+  // Demographics
+  ageMin: int("age_min"),
+  ageMax: int("age_max"),
+  gender: varchar("gender", { length: 20 }),
+  
+  // Reference range
+  referenceMin: decimal("reference_min", { precision: 10, scale: 3 }),
+  referenceMax: decimal("reference_max", { precision: 10, scale: 3 }),
+  unit: varchar("unit", { length: 50 }).notNull(),
+  
+  // Critical values
+  criticalLow: decimal("critical_low", { precision: 10, scale: 3 }),
+  criticalHigh: decimal("critical_high", { precision: 10, scale: 3 }),
+  
+  // Additional info
+  description: text("description"),
+  clinicalContext: text("clinical_context"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LabReferenceRange = typeof labReferenceRanges.$inferSelect;
+export type InsertLabReferenceRange = typeof labReferenceRanges.$inferInsert;
+
+/**
+ * Lab Trends - Track changes in lab values over time
+ */
+export const labTrends = mysqlTable("lab_trends", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  testName: varchar("test_name", { length: 255 }).notNull(),
+  
+  // Trend analysis
+  trendDirection: varchar("trend_direction", { length: 20 }),
+  percentChange: decimal("percent_change", { precision: 10, scale: 2 }),
+  timeSpan: int("time_span"),
+  measurementCount: int("measurement_count"),
+  
+  // Values
+  firstValue: decimal("first_value", { precision: 10, scale: 3 }),
+  lastValue: decimal("last_value", { precision: 10, scale: 3 }),
+  minValue: decimal("min_value", { precision: 10, scale: 3 }),
+  maxValue: decimal("max_value", { precision: 10, scale: 3 }),
+  avgValue: decimal("avg_value", { precision: 10, scale: 3 }),
+  
+  // Dates
+  firstDate: timestamp("first_date"),
+  lastDate: timestamp("last_date"),
+  
+  // AI insights
+  trendInterpretation: text("trend_interpretation"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LabTrend = typeof labTrends.$inferSelect;
+export type InsertLabTrend = typeof labTrends.$inferInsert;

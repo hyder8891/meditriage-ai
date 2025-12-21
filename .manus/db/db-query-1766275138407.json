@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS lab_reports (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  report_date TIMESTAMP NOT NULL,\n  upload_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  report_name VARCHAR(255),\n  lab_name VARCHAR(255),\n  ordering_physician VARCHAR(255),\n  file_url TEXT NOT NULL,\n  file_type VARCHAR(50),\n  file_size INT,\n  ocr_text TEXT,\n  extraction_status VARCHAR(50) DEFAULT 'pending',\n  extraction_error TEXT,\n  overall_interpretation TEXT,\n  risk_level VARCHAR(20),\n  recommended_actions TEXT,\n  status VARCHAR(50) DEFAULT 'uploaded',\n  reviewed_by INT,\n  reviewed_at TIMESTAMP NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS lab_reports (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  report_date TIMESTAMP NOT NULL,\n  upload_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  report_name VARCHAR(255),\n  lab_name VARCHAR(255),\n  ordering_physician VARCHAR(255),\n  file_url TEXT NOT NULL,\n  file_type VARCHAR(50),\n  file_size INT,\n  ocr_text TEXT,\n  extraction_status VARCHAR(50) DEFAULT 'pending',\n  extraction_error TEXT,\n  overall_interpretation TEXT,\n  risk_level VARCHAR(20),\n  recommended_actions TEXT,\n  status VARCHAR(50) DEFAULT 'uploaded',\n  reviewed_by INT,\n  reviewed_at TIMESTAMP NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1817
+}

@@ -1,0 +1,91 @@
+{
+  "query": "SELECT id, error_type, severity, message, occurrence_count, status, created_at FROM aec_detected_errors ORDER BY id DESC LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, error_type, severity, message, occurrence_count, status, created_at FROM aec_detected_errors ORDER BY id DESC LIMIT 10",
+  "rows": [
+    {
+      "id": "30008",
+      "error_type": "PAYMENT_ERROR",
+      "severity": "critical",
+      "message": "Stripe payment failed: Card declined",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 23:26:51"
+    },
+    {
+      "id": "30007",
+      "error_type": "AI_SERVICE_ERROR",
+      "severity": "high",
+      "message": "Gemini API rate limit exceeded",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 23:26:50"
+    },
+    {
+      "id": "30006",
+      "error_type": "FILE_UPLOAD_ERROR",
+      "severity": "medium",
+      "message": "File size exceeds 16MB limit",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 23:26:49"
+    },
+    {
+      "id": "30005",
+      "error_type": "AUTH_ERROR",
+      "severity": "medium",
+      "message": "Invalid JWT token: Token expired",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 23:26:49"
+    },
+    {
+      "id": "30004",
+      "error_type": "DATABASE_ERROR",
+      "severity": "critical",
+      "message": "Connection timeout: Unable to connect to database",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 23:26:48"
+    },
+    {
+      "id": "30003",
+      "error_type": "REACT_ERROR_BOUNDARY",
+      "severity": "high",
+      "message": "Cannot read property 'name' of undefined",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 23:26:47"
+    },
+    {
+      "id": "30002",
+      "error_type": "TRPC_ERROR",
+      "severity": "high",
+      "message": "Invalid input: expected string, received number",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 23:26:45"
+    },
+    {
+      "id": "30001",
+      "error_type": "PAGE_NOT_FOUND",
+      "severity": "medium",
+      "message": "404 Not Found: /test-missing-page",
+      "occurrence_count": "3",
+      "status": "detected",
+      "created_at": "2025-12-20 23:21:00"
+    },
+    {
+      "id": "67",
+      "error_type": "API_TIMEOUT",
+      "severity": "high",
+      "message": "Find Doctors health check failed",
+      "occurrence_count": "1",
+      "status": "detected",
+      "created_at": "2025-12-20 22:30:16"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\terror_type\tseverity\tmessage\toccurrence_count\tstatus\tcreated_at\n30008\tPAYMENT_ERROR\tcritical\tStripe payment failed: Card declined\t1\tdetected\t2025-12-20 23:26:51\n30007\tAI_SERVICE_ERROR\thigh\tGemini API rate limit exceeded\t1\tdetected\t2025-12-20 23:26:50\n30006\tFILE_UPLOAD_ERROR\tmedium\tFile size exceeds 16MB limit\t1\tdetected\t2025-12-20 23:26:49\n30005\tAUTH_ERROR\tmedium\tInvalid JWT token: Token expired\t1\tdetected\t2025-12-20 23:26:49\n30004\tDATABASE_ERROR\tcritical\tConnection timeout: Unable to connect to database\t1\tdetected\t2025-12-20 23:26:48\n30003\tREACT_ERROR_BOUNDARY\thigh\tCannot read property 'name' of undefined\t1\tdetected\t2025-12-20 23:26:47\n30002\tTRPC_ERROR\thigh\tInvalid input: expected string, received number\t1\tdetected\t2025-12-20 23:26:45\n30001\tPAGE_NOT_FOUND\tmedium\t404 Not Found: /test-missing-page\t3\tdetected\t2025-12-20 23:21:00\n67\tAPI_TIMEOUT\thigh\tFind Doctors health check failed\t1\tdetected\t2025-12-20 22:30:16\n",
+  "stderr": "",
+  "execution_time_ms": 1564
+}
