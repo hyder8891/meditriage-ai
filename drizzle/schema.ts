@@ -1959,3 +1959,122 @@ export const processedWebhooks = mysqlTable("processed_webhooks", {
 
 export type ProcessedWebhook = typeof processedWebhooks.$inferSelect;
 export type InsertProcessedWebhook = typeof processedWebhooks.$inferInsert;
+
+
+/**
+ * Email Preferences - User notification settings
+ */
+export const emailPreferences = mysqlTable("email_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(),
+  
+  // Authentication emails
+  welcomeEmails: boolean("welcome_emails").default(true).notNull(),
+  verificationEmails: boolean("verification_emails").default(true).notNull(),
+  passwordResetEmails: boolean("password_reset_emails").default(true).notNull(),
+  securityAlerts: boolean("security_alerts").default(true).notNull(),
+  
+  // Medical notification emails
+  appointmentConfirmations: boolean("appointment_confirmations").default(true).notNull(),
+  appointmentReminders: boolean("appointment_reminders").default(true).notNull(),
+  appointmentReminderFrequency: mysqlEnum("appointment_reminder_frequency", ["instant", "daily", "weekly", "off"]).default("instant").notNull(),
+  
+  medicationReminders: boolean("medication_reminders").default(true).notNull(),
+  medicationReminderFrequency: mysqlEnum("medication_reminder_frequency", ["instant", "daily", "weekly", "off"]).default("instant").notNull(),
+  
+  labResultNotifications: boolean("lab_result_notifications").default(true).notNull(),
+  criticalLabAlerts: boolean("critical_lab_alerts").default(true).notNull(), // Always instant
+  
+  // Messaging notification emails
+  newMessageNotifications: boolean("new_message_notifications").default(true).notNull(),
+  messageNotificationFrequency: mysqlEnum("message_notification_frequency", ["instant", "daily", "weekly", "off"]).default("instant").notNull(),
+  unreadMessageDigest: boolean("unread_message_digest").default(false).notNull(),
+  
+  // Transactional emails
+  subscriptionConfirmations: boolean("subscription_confirmations").default(true).notNull(),
+  paymentReceipts: boolean("payment_receipts").default(true).notNull(),
+  invoiceEmails: boolean("invoice_emails").default(true).notNull(),
+  subscriptionExpiryWarnings: boolean("subscription_expiry_warnings").default(true).notNull(),
+  paymentFailureAlerts: boolean("payment_failure_alerts").default(true).notNull(),
+  
+  // Quiet hours
+  quietHoursEnabled: boolean("quiet_hours_enabled").default(false).notNull(),
+  quietHoursStart: varchar("quiet_hours_start", { length: 5 }).default("22:00"), // HH:MM format
+  quietHoursEnd: varchar("quiet_hours_end", { length: 5 }).default("08:00"), // HH:MM format
+  
+  // Bulk controls
+  allEmailsEnabled: boolean("all_emails_enabled").default(true).notNull(),
+  marketingEmails: boolean("marketing_emails").default(false).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailPreferences = typeof emailPreferences.$inferSelect;
+export type InsertEmailPreferences = typeof emailPreferences.$inferInsert;
+
+/**
+ * User Settings - General application preferences
+ */
+export const userSettings = mysqlTable("user_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(),
+  
+  // Language and localization
+  language: mysqlEnum("language", ["en", "ar"]).default("ar").notNull(),
+  timezone: varchar("timezone", { length: 50 }).default("Asia/Baghdad").notNull(),
+  dateFormat: varchar("date_format", { length: 20 }).default("DD/MM/YYYY").notNull(),
+  timeFormat: mysqlEnum("time_format", ["12h", "24h"]).default("24h").notNull(),
+  
+  // Notification preferences (in-app)
+  desktopNotifications: boolean("desktop_notifications").default(true).notNull(),
+  soundNotifications: boolean("sound_notifications").default(true).notNull(),
+  
+  // Privacy settings
+  profileVisibility: mysqlEnum("profile_visibility", ["public", "private", "doctors_only"]).default("doctors_only").notNull(),
+  showOnlineStatus: boolean("show_online_status").default(true).notNull(),
+  
+  // Doctor-specific settings
+  autoAcceptPatients: boolean("auto_accept_patients").default(false).notNull(),
+  maxDailyConsultations: int("max_daily_consultations").default(20),
+  consultationDuration: int("consultation_duration").default(30), // minutes
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserSettings = typeof userSettings.$inferSelect;
+export type InsertUserSettings = typeof userSettings.$inferInsert;
+
+/**
+ * Account Activity - Login history and statistics
+ */
+export const accountActivity = mysqlTable("account_activity", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  
+  // Activity type
+  activityType: mysqlEnum("activity_type", [
+    "login", "logout", "password_change", "email_change", 
+    "profile_update", "settings_change", "failed_login"
+  ]).notNull(),
+  
+  // Activity details
+  ipAddress: varchar("ip_address", { length: 45 }), // IPv6 support
+  userAgent: text("user_agent"),
+  deviceType: varchar("device_type", { length: 50 }), // mobile, desktop, tablet
+  browser: varchar("browser", { length: 100 }),
+  location: varchar("location", { length: 255 }), // City, Country
+  
+  // Success/failure
+  success: boolean("success").default(true).notNull(),
+  failureReason: text("failure_reason"),
+  
+  // Metadata
+  metadata: text("metadata"), // JSON for additional data
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type AccountActivity = typeof accountActivity.$inferSelect;
+export type InsertAccountActivity = typeof accountActivity.$inferInsert;

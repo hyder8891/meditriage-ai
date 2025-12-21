@@ -484,3 +484,56 @@ medical_events (
 - [x] Invoice emails (via payment receipts)
 - [ ] Subscription expiry warnings - requires scheduled job system
 - [ ] Payment failure alerts - webhook handler exists but email not implemented
+
+
+## User Profile & Email Preferences System (December 22, 2024)
+
+### Database Schema
+- [x] Add email_preferences table with notification types and frequencies
+- [x] Add user_settings table for language, timezone, quiet hours
+- [ ] Add profile_photos table for avatar storage
+- [x] Add account_activity table for login history and statistics
+
+### Backend API
+- [x] Create preferences-router.ts with tRPC procedures
+- [x] Add getEmailPreferences procedure
+- [x] Add updateEmailPreferences procedure
+- [x] Add getUserSettings procedure
+- [x] Add updateUserSettings procedure
+- [x] Add updateProfile procedure (name, email, phone, photo)
+- [x] Add changePassword procedure
+- [x] Add getAccountActivity procedure
+- [x] Add uploadProfilePhoto procedure with S3 integration
+
+### Patient Profile Page
+- [x] Create PatientProfile.tsx component
+- [x] Add Profile tab (personal info, photo upload)
+- [x] Add Security tab (password change, login history)
+- [x] Add Email Preferences tab (notification controls)
+- [x] Add Settings tab (language, timezone, quiet hours)
+- [x] Add Account Activity section (login history, statistics)
+- [x] Add route to /patient/profile
+
+### Doctor Profile Page
+- [x] Create DoctorProfile.tsx component
+- [x] Add Profile tab (personal info, specialty, license, photo)
+- [x] Add Security tab (password change, 2FA, login history)
+- [x] Add Email Preferences tab (notification controls)
+- [x] Add Settings tab (language, timezone, quiet hours, availability)
+- [x] Add Account Activity section (patient count, consultation stats)
+- [x] Add route to /clinician/profile
+
+### Email Preferences Features
+- [x] Toggle for each notification type (12 types)
+- [x] Frequency options (instant, daily, weekly, off)
+- [x] Quiet hours settings (start/end time)
+- [x] Test email functionality
+- [ ] Bulk enable/disable options
+- [ ] Preview email templates
+
+### Integration
+- [ ] Update email service to check preferences before sending
+- [ ] Add preference checks to all email triggers
+- [ ] Respect quiet hours in email sending
+- [ ] Implement daily/weekly digest aggregation
+- [ ] Add unsubscribe links to all emails

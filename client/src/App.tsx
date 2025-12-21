@@ -61,6 +61,8 @@ import MyDoctors from "./pages/MyDoctors";
 import Messages from "./pages/Messages";
 import PatientSubscription from "./pages/PatientSubscription";
 import DoctorSubscription from "./pages/DoctorSubscription";
+import PatientProfile from "./pages/PatientProfile";
+import DoctorProfile from "./pages/DoctorProfile";
 import DebugUser from "./pages/DebugUser";
 import DebugAuth from "./pages/DebugAuth";
 
@@ -135,10 +137,15 @@ function Router() {
         {() => <ProtectedRoute requiredRole="clinician"><DoctorSubscription /></ProtectedRoute>}
       </Route>
       <Route path={"/patient/medications"} component={PatientMedications} />
-      <Route path={"/patient/portal"}>
+      <Route path="/patient/portal">
         {() => <ProtectedRoute requiredRole="patient"><PatientPortal /></ProtectedRoute>}
       </Route>
-      <Route path={"/triage"} component={Triage} />
+      <Route path="/patient/profile">
+        {() => <ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>}
+      </Route>
+      <Route path="/clinician/profile">
+        {() => <ProtectedRoute requiredRole="clinician"><DoctorProfile /></ProtectedRoute>}
+      </Route>      <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={Admin} />

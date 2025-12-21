@@ -15,6 +15,7 @@ import { b2b2cRouter } from "./b2b2c-router";
 import { labRouter } from "./lab-router";
 import { phoneAuthRouter } from "./phone-auth-router";
 import { oauthRouter } from "./oauth-router";
+import { preferencesRouter } from "./preferences-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -67,6 +68,7 @@ export const appRouter = router({
   lab: labRouter,
   phoneAuth: phoneAuthRouter,
   oauth: oauthRouter,
+  preferences: preferencesRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
