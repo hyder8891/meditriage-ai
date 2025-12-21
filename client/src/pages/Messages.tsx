@@ -16,10 +16,18 @@ export default function Messages() {
   const utils = trpc.useUtils();
 
   // Get all conversations
-  const { data: conversations, isLoading: conversationsLoading } = 
+  const { data: conversations, isLoading: conversationsLoading, error: conversationsError } = 
     trpc.b2b2c.messaging.getConversations.useQuery(undefined, {
       refetchInterval: 5000, // Poll every 5 seconds for new messages
+      retry: false,
     });
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('[Messages] Conversations:', conversations);
+    console.log('[Messages] Loading:', conversationsLoading);
+    console.log('[Messages] Error:', conversationsError);
+  }, [conversations, conversationsLoading, conversationsError]);
 
   // Get selected conversation messages
   const { data: messages, isLoading: messagesLoading } = 
@@ -99,6 +107,11 @@ export default function Messages() {
           {conversationsLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : conversationsError ? (
+            <div className="text-center py-8 text-red-600 text-sm">
+              <p className="font-semibold">Error loading conversations:</p>
+              <p className="text-xs mt-2">{conversationsError.message}</p>
             </div>
           ) : !conversations || conversations.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">

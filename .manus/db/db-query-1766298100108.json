@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as message_count FROM messages WHERE sender_id = 3150028 OR recipient_id = 3150028",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT COUNT(*) as message_count FROM messages WHERE sender_id = 3150028 OR recipient_id = 3150028",
+  "rows": [
+    {
+      "message_count": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "message_count\n3\n",
+  "stderr": "",
+  "execution_time_ms": 1606
+}

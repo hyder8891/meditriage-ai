@@ -569,20 +569,10 @@ export const b2b2cRouter = router({
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         }
 
-        // Get latest message for each conversation
-        const latestMessages = await db
-          .select({
-            message: messages,
-            otherUser: users,
-          })
+        // Get all messages for current user
+        const userMessages = await db
+          .select()
           .from(messages)
-          .leftJoin(
-            users,
-            or(
-              eq(messages.senderId, users.id),
-              eq(messages.recipientId, users.id)
-            )
-          )
           .where(
             or(
               eq(messages.senderId, ctx.user.id),
@@ -592,35 +582,43 @@ export const b2b2cRouter = router({
           .orderBy(desc(messages.createdAt))
           .limit(100);
 
-        console.log('[getConversations] Found', latestMessages.length, 'messages');
-        if (latestMessages.length > 0) {
-          console.log('[getConversations] First message:', JSON.stringify(latestMessages[0], null, 2));
-        }
+        console.log('[getConversations] Found', userMessages.length, 'messages for user', ctx.user.id);
 
         // Group by conversation and get latest message
         const conversationsMap = new Map();
         
-        for (const item of latestMessages) {
-          const otherUserId = item.message.senderId === ctx.user.id 
-            ? item.message.recipientId 
-            : item.message.senderId;
+        for (const msg of userMessages) {
+          const otherUserId = msg.senderId === ctx.user.id 
+            ? msg.recipientId 
+            : msg.senderId;
 
           if (!conversationsMap.has(otherUserId)) {
+            // Fetch the other user's details
+            const [otherUser] = await db
+              .select()
+              .from(users)
+              .where(eq(users.id, otherUserId))
+              .limit(1);
+
             conversationsMap.set(otherUserId, {
-              otherUser: item.otherUser,
-              latestMessage: item.message,
+              otherUser: otherUser || null,
+              latestMessage: msg,
               unreadCount: 0,
             });
           }
 
           // Count unread messages
-          if (item.message.recipientId === ctx.user.id && !item.message.read) {
+          if (msg.recipientId === ctx.user.id && !msg.read) {
             const conv = conversationsMap.get(otherUserId);
-            conv.unreadCount++;
+            if (conv) {
+              conv.unreadCount++;
+            }
           }
         }
 
-        return Array.from(conversationsMap.values());
+        const conversations = Array.from(conversationsMap.values());
+        console.log('[getConversations] Returning', conversations.length, 'conversations');
+        return conversations;
       }),
 
     /**

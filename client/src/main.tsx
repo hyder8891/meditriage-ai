@@ -43,9 +43,30 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       fetch(input, init) {
+        // Get JWT token from localStorage (Zustand persist)
+        let token: string | null = null;
+        try {
+          const authState = localStorage.getItem('auth-storage');
+          if (authState) {
+            const parsed = JSON.parse(authState);
+            token = parsed.state?.token || null;
+          }
+        } catch (e) {
+          console.error('[tRPC] Failed to get token from localStorage:', e);
+        }
+
+        // Add Authorization header if token exists
+        const headers = {
+          ...(init?.headers || {}),
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
         return globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
+          headers,
         });
       },
     }),
