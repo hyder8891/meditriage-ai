@@ -89,6 +89,7 @@ export const authRouter = router({
         userId: newUser.insertId,
         email: input.email,
         role: "patient",
+        tokenVersion: 0, // New user starts with version 0
       });
 
       return {

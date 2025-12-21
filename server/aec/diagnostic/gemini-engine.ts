@@ -110,7 +110,6 @@ export async function diagnoseWithGemini(
         { role: "system", content: DIAGNOSTIC_SYSTEM_PROMPT },
         { role: "user", content: userPrompt },
       ],
-      temperature: 0.1, // Low temperature for precise analysis
       response_format: {
         type: "json_schema",
         json_schema: DIAGNOSTIC_OUTPUT_SCHEMA,
@@ -118,7 +117,8 @@ export async function diagnoseWithGemini(
     });
 
     // Parse response
-    const diagnosticData = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content;
+    const diagnosticData = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
 
     // Calculate metrics
     const duration = Math.floor((Date.now() - startTime) / 1000);

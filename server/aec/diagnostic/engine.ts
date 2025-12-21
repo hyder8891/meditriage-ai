@@ -50,11 +50,11 @@ export async function runDiagnostic(errorId: number): Promise<DiagnosticResult |
       id: errorRecord.id,
       severity: errorRecord.severity,
       errorType: errorRecord.errorType,
-      source: errorRecord.source,
-      errorMessage: errorRecord.errorMessage,
+      source: errorRecord.source || undefined,
+      errorMessage: errorRecord.message,
       stackTrace: errorRecord.stackTrace || undefined,
-      context: errorRecord.context ? JSON.parse(errorRecord.context) : undefined,
-      detectedAt: errorRecord.detectedAt,
+      context: errorRecord.userContext ? JSON.parse(errorRecord.userContext) : undefined,
+      detectedAt: errorRecord.firstOccurrence,
     };
 
     // Build comprehensive context
@@ -128,25 +128,20 @@ async function saveDiagnostic(diagnostic: DiagnosticResult): Promise<void> {
 
   await db.insert(aecDiagnostics).values({
     errorId: diagnostic.errorId,
-    rootCauseFile: diagnostic.rootCause.file || null,
-    rootCauseLine: diagnostic.rootCause.line || null,
-    rootCauseFunction: diagnostic.rootCause.function || null,
-    rootCauseIssue: diagnostic.rootCause.issue,
-    explanation: diagnostic.explanation,
+    rootCause: JSON.stringify(diagnostic.rootCause),
     impact: diagnostic.impact,
     affectedFeatures: JSON.stringify(diagnostic.affectedFeatures),
-    fixSteps: JSON.stringify(diagnostic.fixSteps),
-    filesToModify: JSON.stringify(diagnostic.filesToModify),
-    refactoringNeeded: diagnostic.refactoringNeeded.length > 0 
-      ? JSON.stringify(diagnostic.refactoringNeeded) 
-      : null,
-    testsToAdd: diagnostic.testsToAdd.length > 0 
-      ? JSON.stringify(diagnostic.testsToAdd) 
-      : null,
-    diagnosticDuration: diagnostic.diagnosticDuration,
-    tokensUsed: diagnostic.tokensUsed,
-    modelVersion: diagnostic.modelVersion,
-    completedAt: new Date(),
+    proposedSolution: JSON.stringify({
+      fixSteps: diagnostic.fixSteps,
+      filesToModify: diagnostic.filesToModify,
+      refactoringNeeded: diagnostic.refactoringNeeded,
+      testsToAdd: diagnostic.testsToAdd,
+    }),
+    confidence: String(Math.round((diagnostic.tokensUsed > 0 ? 85 : 50))),
+    codeContext: diagnostic.explanation,
+    relatedFiles: JSON.stringify(diagnostic.filesToModify),
+    analysisModel: diagnostic.modelVersion,
+    analysisDuration: diagnostic.diagnosticDuration,
   });
 
   console.log(`[AEC Diagnostic Engine] Diagnostic saved to database`);
@@ -171,23 +166,21 @@ export async function getDiagnosticByErrorId(errorId: number): Promise<Diagnosti
     return null;
   }
 
+  const rootCause = JSON.parse(record.rootCause);
+  const proposedSolution = JSON.parse(record.proposedSolution);
+  
   return {
     errorId: record.errorId,
-    rootCause: {
-      file: record.rootCauseFile || undefined,
-      line: record.rootCauseLine || undefined,
-      function: record.rootCauseFunction || undefined,
-      issue: record.rootCauseIssue,
-    },
-    explanation: record.explanation,
+    rootCause: rootCause,
+    explanation: record.codeContext || '',
     impact: record.impact as "low" | "medium" | "high" | "critical",
     affectedFeatures: JSON.parse(record.affectedFeatures || "[]"),
-    fixSteps: JSON.parse(record.fixSteps),
-    filesToModify: JSON.parse(record.filesToModify),
-    refactoringNeeded: record.refactoringNeeded ? JSON.parse(record.refactoringNeeded) : [],
-    testsToAdd: record.testsToAdd ? JSON.parse(record.testsToAdd) : [],
-    diagnosticDuration: record.diagnosticDuration || 0,
-    tokensUsed: record.tokensUsed || 0,
-    modelVersion: record.modelVersion || "unknown",
+    fixSteps: proposedSolution.fixSteps || [],
+    filesToModify: proposedSolution.filesToModify || [],
+    refactoringNeeded: proposedSolution.refactoringNeeded || [],
+    testsToAdd: proposedSolution.testsToAdd || [],
+    diagnosticDuration: record.analysisDuration || 0,
+    tokensUsed: 0, // Not stored in database schema
+    modelVersion: record.analysisModel || "unknown",
   };
 }

@@ -59,9 +59,10 @@ export async function triggerDiagnostic(errorId: number): Promise<void> {
           
           // Check if manual review is required
           const [diagnostic] = await db!.select().from(aecDiagnostics).where(eq(aecDiagnostics.errorId, errorId)).limit(1);
+          const affectedFeatures = diagnostic?.affectedFeatures ? JSON.parse(diagnostic.affectedFeatures) : [];
           const requiresManualReview = 
             diagnostic?.impact === "high" ||
-            diagnostic?.affectedFeatures?.some(f => f.toLowerCase().includes("medical") || f.toLowerCase().includes("triage") || f.toLowerCase().includes("diagnosis"));
+            affectedFeatures.some((f: string) => f.toLowerCase().includes("medical") || f.toLowerCase().includes("triage") || f.toLowerCase().includes("diagnosis"));
           
           if (requiresManualReview) {
             console.log(`[AEC Alerts] Sending manual review alert for patch ${surgicalResult.patchId}`);

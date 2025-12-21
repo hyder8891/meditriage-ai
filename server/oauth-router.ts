@@ -82,6 +82,7 @@ export const oauthRouter = router({
         userId: user.id,
         email: user.email!,
         role: user.role,
+        tokenVersion: user.tokenVersion || 0,
       });
 
       return {

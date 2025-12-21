@@ -33,7 +33,7 @@ export interface ErrorContext {
   id: number;
   severity: string;
   errorType: string;
-  source: string;
+  source?: string;
   errorMessage: string;
   stackTrace?: string;
   context?: any;

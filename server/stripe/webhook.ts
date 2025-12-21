@@ -133,12 +133,18 @@ export async function handleStripeWebhook(req: Request, res: Response) {
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   console.log("[Webhook] Processing checkout.session.completed");
 
-  const userId = session.metadata?.user_id;
+  const userIdStr = session.metadata?.user_id;
   const planId = session.metadata?.plan_id;
   const userRole = session.metadata?.user_role;
 
-  if (!userId || !planId) {
+  if (!userIdStr || !planId) {
     console.error("[Webhook] Missing metadata in checkout session");
+    return;
+  }
+
+  const userId = parseInt(userIdStr, 10);
+  if (isNaN(userId)) {
+    console.error("[Webhook] Invalid user_id in metadata");
     return;
   }
 
@@ -155,24 +161,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     // Create subscription record
     await db.insert(subscriptions).values({
       userId: userId,
-      planType: planId,
+      planType: planId as any, // planId from metadata should match enum values
       status: "active",
+      pricePerMonth: "0.00", // Will be updated from Stripe price data
       stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscription.id,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
       cancelAtPeriodEnd: false,
       metadata: JSON.stringify({
         plan_id: planId,
         user_role: userRole,
       }),
     });
-
-    // Update user's Stripe customer ID
-    await db
-      .update(users)
-      .set({ stripeCustomerId: session.customer as string })
-      .where(eq(users.id, userId));
 
     console.log(`[Webhook] Created subscription for user ${userId}, plan ${planId}`);
   }
