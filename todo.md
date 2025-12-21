@@ -401,3 +401,4 @@ medical_events (
 
 ## Current Issues (December 22, 2024)
 - [x] Fix messaging system - users can enter phone numbers but cannot send messages (send button unclickable) - Added better error handling and logging
+- [x] Fix phone number validation error when logging in with Google OAuth (phone number is null)

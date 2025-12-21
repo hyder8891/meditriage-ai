@@ -17,15 +17,15 @@ export default function ClinicianLoginNew() {
   const { language } = useLanguage();
   const { setAuth, isAuthenticated, user } = useAuth();
 
-  // Redirect if already authenticated (but allow admin to stay)
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role === 'clinician') {
+      if (user.role === 'clinician' || user.role === 'admin') {
+        // Both clinicians and admins go to clinician dashboard
         setLocation('/clinician/dashboard');
       } else if (user.role === 'patient') {
         setLocation('/patient/portal');
       }
-      // Admin can stay on login page to login with different credentials
     }
   }, [isAuthenticated, user, setLocation]);
   const [email, setEmail] = useState("");

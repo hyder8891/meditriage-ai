@@ -82,10 +82,20 @@ export function SMSLogin({ role = "patient", onSuccess }: SMSLoginProps) {
   const handleSendOTP = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate phone number before sending
+    if (!phoneNumber || phoneNumber.trim().length === 0) {
+      toast({
+        title: "Error",
+        description: "Please enter your phone number",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (phoneNumber.length < 10) {
       toast({
-        title: "Invalid Phone Number",
-        description: "Please enter a valid phone number",
+        title: "Error",
+        description: "Phone number must be at least 10 digits",
         variant: "destructive",
       });
       return;

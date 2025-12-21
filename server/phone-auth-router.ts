@@ -28,12 +28,20 @@ export const phoneAuthRouter = router({
       const { phoneNumber, countryCode } = input;
 
       // Format and validate phone number
+      // Handle empty or null phone numbers gracefully
+      if (!phoneNumber || phoneNumber.trim().length === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Phone number is required",
+        });
+      }
+      
       const formattedPhone = formatPhoneNumber(phoneNumber, countryCode);
       
       if (!isValidPhoneNumber(formattedPhone)) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Invalid phone number format",
+          message: "Invalid phone number format. Please enter a valid phone number with at least 10 digits.",
         });
       }
 
