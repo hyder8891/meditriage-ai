@@ -167,19 +167,60 @@ async function fetchUserGeolocation(userId: number): Promise<{ city: string; lat
 
 async function fetchEnvironmentalFactors(userId: number): Promise<any> {
   try {
-    // TODO: Integrate with weather API for barometric pressure, temperature, humidity
-    // These can trigger migraines, asthma, joint pain, etc.
+    // Get user location first
+    const location = await fetchUserGeolocation(userId);
     
-    // For now, return empty
-    return {
-      barometricPressure: undefined,
-      temperature: undefined,
-      humidity: undefined,
+    // Check if OpenWeather API key is configured
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    if (!apiKey) {
+      console.warn("[Context Vector] OPENWEATHER_API_KEY not configured, using default values");
+      return getDefaultEnvironmentalFactors();
+    }
+
+    // Fetch weather data from OpenWeatherMap API
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lng}&appid=${apiKey}&units=metric`;
+    
+    const response = await fetch(weatherUrl, {
+      signal: AbortSignal.timeout(3000), // 3 second timeout
+    });
+
+    if (!response.ok) {
+      console.warn(`[Context Vector] Weather API returned ${response.status}, using defaults`);
+      return getDefaultEnvironmentalFactors();
+    }
+
+    const weatherData = await response.json();
+    
+    // Extract relevant environmental factors
+    const environmentalFactors = {
+      barometricPressure: weatherData.main?.pressure, // hPa
+      temperature: weatherData.main?.temp, // Celsius
+      humidity: weatherData.main?.humidity, // Percentage
+      airQualityIndex: undefined, // Would need separate AQI API
+      weatherCondition: weatherData.weather?.[0]?.main, // Clear, Clouds, Rain, etc.
+      windSpeed: weatherData.wind?.speed, // m/s
     };
+
+    console.log(`[Context Vector] Weather data fetched for ${location.city}: ${environmentalFactors.temperature}°C, ${environmentalFactors.humidity}% humidity`);
+    
+    return environmentalFactors;
   } catch (error) {
+    // Graceful fallback - don't crash the AI if weather API is down
     console.error("[Context Vector] Error fetching environmental factors:", error);
-    return {};
+    return getDefaultEnvironmentalFactors();
   }
+}
+
+// Default environmental factors for Baghdad (typical values)
+function getDefaultEnvironmentalFactors() {
+  return {
+    barometricPressure: 1013, // Standard atmospheric pressure (hPa)
+    temperature: 25, // Moderate temperature (Celsius)
+    humidity: 40, // Typical humidity for Baghdad (%)
+    airQualityIndex: undefined,
+    weatherCondition: "Clear",
+    windSpeed: 3, // Light breeze (m/s)
+  };
 }
 
 // ============================================================================

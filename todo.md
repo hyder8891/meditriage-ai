@@ -707,3 +707,36 @@ clinic_resources (
 
 ## Security & Reliability
 - [x] Implement fail-open pattern for Redis rate limiting (prevent Redis downtime from blocking logins)
+
+
+## Avicenna-X Integration Fixes (CRITICAL - December 22, 2024)
+
+### Router Mounting (404 Error Risk)
+- [x] Mount avicenna router in server/routers.ts main appRouter
+- [x] Verify trpc.avicenna.* endpoints are accessible
+
+### Epidemiology Database (Data Gap)
+- [x] Add epidemiology_events table to drizzle/schema.ts
+- [x] Run database migration for epidemiology_events table
+- [x] Verify getDiseaseHeatmap API can read/write data
+
+### Environment Sensing (External API Integration)
+- [ ] Get OpenWeather API key (free tier) - USER ACTION REQUIRED
+- [ ] Add OPENWEATHER_API_KEY to environment variables - USER ACTION REQUIRED
+- [x] Implement graceful fallback in context-vector.ts if weather API fails
+- [x] Test environment sensing with default fallback values
+
+### Deep Links Enhancement (Iraq Market)
+- [x] Add Careem deep link generation to generateDeepLinks()
+- [x] Add Google Maps and Uber deep links as fallbacks
+- [x] Verify all three ride-sharing link formats
+
+### Testing & Verification
+- [x] Create comprehensive integration test suite (11 tests)
+- [x] Test router mounting (trpc.avicenna.* endpoints accessible)
+- [x] Test epidemiology database schema (privacy-preserving design verified)
+- [x] Test environment sensing with graceful fallback
+- [x] Test deep link generation (Careem, Google Maps, Uber)
+- [x] Verify epidemiology tracking preserves privacy (no user_id in events)
+- [ ] Test full orchestration loop in production environment
+- [ ] Test network quality scoring with real socket connections

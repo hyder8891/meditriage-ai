@@ -2078,3 +2078,48 @@ export const accountActivity = mysqlTable("account_activity", {
 
 export type AccountActivity = typeof accountActivity.$inferSelect;
 export type InsertAccountActivity = typeof accountActivity.$inferInsert;
+
+/**
+ * Epidemiology Events - Privacy-preserving disease tracking
+ * Used by Avicenna-X for Bayesian epidemiology updates and disease heatmaps
+ * NO user_id to preserve privacy (HIPAA/GDPR compliance)
+ */
+export const epidemiologyEvents = mysqlTable("epidemiology_events", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Location data (city-level only for privacy)
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }).default("Iraq"),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  
+  // Symptom vector (normalized 0-1 for Bayesian analysis)
+  // Stored as JSON array: [fever_intensity, cough_intensity, fatigue_intensity, ...]
+  symptomVector: text("symptom_vector").notNull(),
+  
+  // Suspected condition (from BRAIN analysis)
+  suspectedCondition: varchar("condition", { length: 255 }),
+  conditionConfidence: decimal("condition_confidence", { precision: 5, scale: 2 }), // 0-100%
+  
+  // Urgency level for spike detection
+  urgencyLevel: mysqlEnum("urgency_level", ["low", "moderate", "high", "emergency"]),
+  
+  // Environmental context (for correlation analysis)
+  temperature: decimal("temperature", { precision: 5, scale: 2 }), // Celsius
+  humidity: decimal("humidity", { precision: 5, scale: 2 }), // Percentage
+  airQualityIndex: int("air_quality_index"),
+  
+  // Temporal data
+  timestamp: timestamp("created_at").defaultNow().notNull(),
+  
+  // Metadata for analysis
+  ageGroup: varchar("age_group", { length: 20 }), // "0-10", "11-20", etc. (not exact age)
+  gender: mysqlEnum("gender", ["male", "female", "other", "unknown"]),
+  
+  // Data quality flags
+  dataSource: varchar("data_source", { length: 50 }).default("avicenna_triage"), // triage, lab, imaging
+  verified: boolean("verified").default(false), // true if confirmed by doctor
+});
+
+export type EpidemiologyEvent = typeof epidemiologyEvents.$inferSelect;
+export type InsertEpidemiologyEvent = typeof epidemiologyEvents.$inferInsert;

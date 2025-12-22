@@ -496,12 +496,30 @@ export function generateDeepLinks(resource: ResourceMatch): {
   careemLink?: string;
   googleMapsLink?: string;
 } {
-  // TODO: Implement deep link generation for ride-sharing apps
-  // Example: uber://action=setPickup&pickup=my_location&dropoff[latitude]=33.3152&dropoff[longitude]=44.3661
+  const { location } = resource;
+  
+  if (!location?.lat || !location?.lng) {
+    console.warn("[Deep Links] No location coordinates available for resource");
+    return {};
+  }
+
+  // Careem deep link (popular in Iraq, especially Baghdad)
+  // Format: careem://ride?pickup=current&dropoff[lat]=X&dropoff[long]=Y&service=GO
+  const careemLink = `careem://ride?pickup=current&dropoff[lat]=${location.lat}&dropoff[long]=${location.lng}&service=GO`;
+  
+  // Google Maps deep link (universal fallback)
+  // Format: https://www.google.com/maps/dir/?api=1&destination=LAT,LNG&travelmode=driving
+  const googleMapsLink = `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}&travelmode=driving`;
+  
+  // Uber deep link (less common in Iraq but included for completeness)
+  // Format: uber://?action=setPickup&pickup=my_location&dropoff[latitude]=X&dropoff[longitude]=Y
+  const uberLink = `uber://?action=setPickup&pickup=my_location&dropoff[latitude]=${location.lat}&dropoff[longitude]=${location.lng}`;
+
+  console.log(`[Deep Links] Generated links for ${resource.name || 'clinic'} at (${location.lat}, ${location.lng})`);
   
   return {
-    uberLink: undefined,
-    careemLink: undefined,
-    googleMapsLink: undefined,
+    careemLink,
+    googleMapsLink,
+    uberLink,
   };
 }
