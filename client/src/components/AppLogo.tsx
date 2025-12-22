@@ -61,7 +61,7 @@ export function AppLogo({
         
         {showText && (
           <span className={`font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
-            MediTriage AI
+            My Doctor طبيبي
           </span>
         )}
       </a>

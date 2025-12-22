@@ -23,6 +23,7 @@
 - [ ] Investigate routing configuration
 
 ## NEW: Current Session Requirements
+- [x] Update all remaining "MediTriage AI" references to "My Doctor طبيبي"
 - [x] Fix lab results functionality - make it robust and fully working
   - [x] Test current upload functionality
   - [x] Fix OCR extraction if broken
