@@ -17,6 +17,11 @@
 - [x] Fix profile dropdown - only shows logout, missing other options
 - [x] Fix doctor availability status toggle - user reports cannot change status
 
+## NEW: Current Session Issues
+- [ ] Fix 404 error - identify which route is causing the error
+- [ ] Fix WebSocket connection failures
+- [ ] Investigate routing configuration
+
 ## NEW: Current Session Requirements
 - [x] Fix lab results functionality - make it robust and fully working
   - [x] Test current upload functionality

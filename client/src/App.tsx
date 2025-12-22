@@ -68,11 +68,21 @@ import DebugAuth from "./pages/DebugAuth";
 import AdminUsers from "./pages/AdminUsers";
 import Settings from "./pages/Settings";
 import PatientMedicalRecords from "./pages/PatientMedicalRecords";
+import { Redirect } from "wouter";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/dashboard"}>
+        {() => {
+          const { user } = useAuth();
+          if (!user) return <Redirect to="/patient-login" />;
+          if (user.role === 'admin') return <Redirect to="/admin/dashboard" />;
+          if (user.role === 'clinician' || user.role === 'doctor') return <Redirect to="/clinician/dashboard" />;
+          return <Redirect to="/patient/portal" />;
+        }}
+      </Route>
       <Route path={"/old-home3"} component={MedHome} />
       <Route path={"/old-home2"} component={NewHome} />
       <Route path={"/patient-login"} component={PatientLogin} />

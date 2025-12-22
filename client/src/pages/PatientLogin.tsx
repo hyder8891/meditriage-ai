@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Activity, UserCircle, Mail, Lock, ArrowLeft, Eye, EyeOff, Smartphone } from "lucide-react";
+import { UserCircle, Mail, Lock, ArrowLeft, Eye, EyeOff, Smartphone } from "lucide-react";
+import { AppLogo } from "@/components/AppLogo";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
@@ -91,17 +92,12 @@ export default function PatientLogin() {
             {language === 'ar' ? 'العودة لتسجيل الدخول بالبريد' : 'Back to Email Login'}
           </Button>
           
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <Activity className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">MediTriage AI Pro</h1>
-              <p className="text-sm text-gray-500">
-                {language === 'ar' ? 'بوابة المريض' : 'Patient Portal'}
-              </p>
-            </div>
+          <div className="flex items-center justify-center mb-8">
+            <AppLogo href="/" size="lg" showText={true} />
           </div>
+          <p className="text-center text-sm text-gray-500 mb-6">
+            {language === 'ar' ? 'بوابة المريض' : 'Patient Portal'}
+          </p>
           
           <SMSLogin role="patient" />
         </div>
@@ -123,17 +119,12 @@ export default function PatientLogin() {
         </Button>
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-            <Activity className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">MediTriage AI Pro</h1>
-            <p className="text-sm text-gray-500">
-              {language === 'ar' ? 'بوابة المريض' : 'Patient Portal'}
-            </p>
-          </div>
+        <div className="flex items-center justify-center mb-8">
+          <AppLogo href="/" size="lg" showText={true} />
         </div>
+        <p className="text-center text-sm text-gray-500 mb-6">
+          {language === 'ar' ? 'بوابة المريض' : 'Patient Portal'}
+        </p>
 
         {/* Login/Register Card */}
         <Card className="border-2 border-blue-200 shadow-xl">

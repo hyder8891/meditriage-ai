@@ -58,9 +58,9 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
         <div className="p-4">
           <div className="flex items-center justify-between mb-8">
             {sidebarOpen ? (
-              <AppLogo href="/dashboard" size="md" showText={true} />
+              <AppLogo size="md" showText={true} />
             ) : (
-              <AppLogo href="/dashboard" size="sm" showText={false} className="mx-auto" />
+              <AppLogo size="sm" showText={false} className="mx-auto" />
             )}
             {sidebarOpen && (
               <Button

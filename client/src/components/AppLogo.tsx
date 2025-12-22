@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Activity } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AppLogoProps {
   /** Where the logo should navigate to */
@@ -17,11 +18,22 @@ interface AppLogoProps {
  * Used across all pages for consistent navigation
  */
 export function AppLogo({ 
-  href = "/dashboard", 
+  href, 
   size = "md", 
   showText = true,
   className = "" 
 }: AppLogoProps) {
+  const { user } = useAuth();
+  
+  // Smart navigation: if href not provided, determine based on user role
+  const navigationHref = href || (() => {
+    if (!user) return "/";
+    // Admin users go to clinician dashboard (functional tools), not admin user management
+    if (user.role === 'admin' || user.role === 'clinician' || user.role === 'doctor') {
+      return "/clinician/dashboard";
+    }
+    return "/patient/portal";
+  })();
   const sizeClasses = {
     sm: "h-6 w-6",
     md: "h-8 w-8",
@@ -35,7 +47,7 @@ export function AppLogo({
   };
 
   return (
-    <Link href={href}>
+    <Link href={navigationHref}>
       <a className={`flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer ${className}`}>
         <div className="relative">
           {/* Gradient background */}
