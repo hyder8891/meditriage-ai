@@ -537,3 +537,41 @@ medical_events (
 - [ ] Respect quiet hours in email sending
 - [ ] Implement daily/weekly digest aggregation
 - [ ] Add unsubscribe links to all emails
+
+
+## Login Notification Emails (December 22, 2024)
+
+### Email Service Updates
+- [ ] Add "login_notification" email type to EmailType union
+- [ ] Create LoginNotificationData interface (userName, userEmail, loginTime, ipAddress, device, location, language)
+- [ ] Create bilingual email templates for login notifications (Arabic/English)
+- [ ] Add sendLoginNotificationEmail function
+
+### Backend Integration
+- [ ] Update auth-router.ts login mutation to send login emails
+- [ ] Update oauth-router.ts to send login emails for OAuth logins
+- [ ] Update phone-auth-router.ts to send login emails for SMS logins
+- [ ] Add device/IP detection using request headers
+- [ ] Add location detection (optional, using IP geolocation)
+
+### Email Preferences
+- [ ] Add "login_notification" to email_preferences table defaults
+- [ ] Update preferences-router.ts to include login notification toggle
+- [ ] Update PatientProfile.tsx Email Preferences tab to show login notification toggle
+- [ ] Update DoctorProfile.tsx Email Preferences tab to show login notification toggle
+
+### Testing
+- [ ] Test login email for email/password authentication
+- [ ] Test login email for Google OAuth
+- [ ] Test login email for Apple OAuth
+- [ ] Test login email for SMS authentication
+- [ ] Test email preference toggle (enable/disable)
+- [ ] Verify bilingual templates (Arabic/English)
+
+
+## Google Authentication Fix (December 22, 2024) - URGENT
+- [ ] Add current domain (3000-ifhz2snq11y44i4wphv4f-33e916fa.manus-asia.computer) to Firebase authorized domains
+- [ ] Add wildcard domain (*.manus-asia.computer) to prevent future domain issues
+- [ ] Test Google OAuth after domain authorization
+- [ ] Test Apple OAuth after domain authorization
+- [ ] Document doctor test credentials in README or setup guide
