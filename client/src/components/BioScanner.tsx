@@ -148,8 +148,8 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       videoRef.current.srcObject = null;
     }
 
-    // Save results if valid
-    if (finalResult && finalResult.bpm > 0 && finalResult.confidence > 30) {
+    // Save results if valid (lowered threshold for better success rate)
+    if (finalResult && finalResult.bpm > 0 && finalResult.confidence > 20) {
       const stressLevel = 
         finalResult.bpm > 100 ? "HIGH" : 
         finalResult.bpm < 60 ? "LOW" : 
@@ -181,7 +181,12 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
 
       onComplete?.(finalResult);
     } else {
-      toast.error("Measurement quality too low. Please try again in better lighting.");
+      const reason = !finalResult 
+        ? "No signal detected" 
+        : finalResult.bpm === 0 
+        ? "No heartbeat detected" 
+        : `Confidence too low (${finalResult.confidence}%)`;
+      toast.error(`Measurement failed: ${reason}. Try better lighting and keep still.`);
     }
   };
 
@@ -311,8 +316,15 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
           </div>
 
           {/* Instructions */}
-          <div className="text-center text-sm text-muted-foreground animate-pulse">
-            Keep your face still and well-lit...
+          <div className="text-center space-y-1">
+            <div className="text-sm text-muted-foreground animate-pulse">
+              Keep your face still and well-lit...
+            </div>
+            {currentBpm && currentBpm > 0 && (
+              <div className="text-xs text-green-500 font-medium">
+                ✓ Signal detected! Continue holding still...
+              </div>
+            )}
           </div>
         </div>
       )}

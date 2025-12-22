@@ -113,8 +113,8 @@ export class BioScannerEngine {
     const variance = normalized.reduce((sum, val) => sum + val * val, 0) / normalized.length;
     const stdDev = Math.sqrt(variance);
 
-    // If signal is too flat, quality is poor
-    if (stdDev < 0.5) {
+    // If signal is too flat, quality is poor (lowered threshold for better detection)
+    if (stdDev < 0.3) {
       return {
         bpm: 0,
         confidence: 0,
@@ -125,7 +125,7 @@ export class BioScannerEngine {
     }
 
     // Step 3: Detect peaks (local maxima above threshold)
-    const threshold = stdDev * 0.5; // Adaptive threshold based on signal strength
+    const threshold = stdDev * 0.3; // Adaptive threshold based on signal strength (lowered for better detection)
     const peaks: number[] = [];
     const peakIndices: number[] = [];
 

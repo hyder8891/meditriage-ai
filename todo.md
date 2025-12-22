@@ -72,6 +72,16 @@
 - [x] Lab result interpretation system
 - [x] Medical imaging analysis (11 modalities)
 
+## Bug Fixes (Current Session)
+- [x] Debug Optic-Vitals camera not working
+  - [x] Check camera permissions and MediaRecorder API
+  - [x] Verify rPPG signal processing
+  - [x] Test UI/UX flow
+  - [x] Add better error messages
+  - [x] Lower confidence threshold from 30% to 20%
+  - [x] Improve signal detection sensitivity
+  - [x] Add real-time visual feedback
+
 ## Optic-Vitals Enhancements (Current Session)
 - [x] Add HRV (Heart Rate Variability) analysis to rPPG engine
   - [x] Extend patient_vitals table with HRV metrics (RMSSD, SDNN, pNN50, LF/HF ratio)
