@@ -13,7 +13,11 @@ import {
   Bell,
   LogOut,
   FileText,
-  TrendingUp
+  TrendingUp,
+  FlaskConical,
+  Settings as SettingsIcon,
+  User,
+  ChevronDown
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -156,9 +160,33 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 </span>
               )}
             </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start hover:bg-blue-50"
+              onClick={() => setLocation("/clinician/lab-results")}
+            >
+              <FlaskConical className="w-5 h-5 mr-3" />
+              {sidebarOpen && "Lab Results"}
+            </Button>
           </nav>
 
-          <div className="absolute bottom-4 left-0 right-0 px-4">
+          <div className="absolute bottom-4 left-0 right-0 px-4 space-y-2">
+            <Button
+              variant="ghost"
+              className="w-full justify-start hover:bg-blue-50"
+              onClick={() => setLocation("/settings")}
+            >
+              <SettingsIcon className="w-5 h-5 mr-3" />
+              {sidebarOpen && "Settings"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start hover:bg-blue-50"
+              onClick={() => setLocation("/clinician/profile")}
+            >
+              <User className="w-5 h-5 mr-3" />
+              {sidebarOpen && "Profile"}
+            </Button>
             <Button
               variant="ghost"
               className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"

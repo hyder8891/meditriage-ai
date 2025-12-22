@@ -65,6 +65,8 @@ import PatientProfile from "./pages/PatientProfile";
 import DoctorProfile from "./pages/DoctorProfile";
 import DebugUser from "./pages/DebugUser";
 import DebugAuth from "./pages/DebugAuth";
+import AdminUsers from "./pages/AdminUsers";
+import Settings from "./pages/Settings";
 
 function Router() {
   return (
@@ -157,6 +159,12 @@ function Router() {
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/login/traditional"} component={AdminLoginTraditional} />
       <Route path={"/admin/training"} component={AdminTraining} />
+      <Route path={"/admin/users"}>
+        <ProtectedRoute requiredRole="admin">
+          <AdminUsers />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/settings"} component={Settings} />
       <Route path={"/symptom-checker"} component={SymptomCheckerStructured} />
       <Route path={"/brain"} component={BRAINAnalysis} />
       <Route path={"/brain/dashboard"} component={BRAINDashboard} />
