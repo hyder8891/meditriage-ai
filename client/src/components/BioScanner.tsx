@@ -25,6 +25,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   const [confidence, setConfidence] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
+  const [signalStrength, setSignalStrength] = useState(0);
 
   const saveVital = trpc.vitals.logVital.useMutation({
     onSuccess: () => {
@@ -91,21 +92,34 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       return;
     }
 
-    // Draw video frame to canvas (use center region for better face detection)
+    // Draw video frame to canvas
     const videoWidth = video.videoWidth;
     const videoHeight = video.videoHeight;
     
-    // Extract center 100x100 region (forehead/cheek area)
-    const centerX = (videoWidth - 100) / 2;
-    const centerY = (videoHeight - 100) / 2;
+    // Use larger region for better signal capture (forehead area)
+    // Forehead is ideal: less movement, good blood flow, minimal hair
+    const regionSize = 150;
+    canvas.width = regionSize;
+    canvas.height = regionSize;
     
-    ctx.drawImage(video, centerX, centerY, 100, 100, 0, 0, 100, 100);
+    // Extract center region (forehead/upper face area)
+    const centerX = (videoWidth - regionSize) / 2;
+    const centerY = (videoHeight - regionSize) / 2.5; // Slightly higher for forehead
+    
+    ctx.drawImage(video, centerX, centerY, regionSize, regionSize, 0, 0, regionSize, regionSize);
 
-    // Get pixel data from center region (where face should be)
-    const imageData = ctx.getImageData(40, 40, 20, 20);
+    // Get pixel data from larger center region (60x60 instead of 20x20)
+    const sampleSize = 60;
+    const sampleX = (regionSize - sampleSize) / 2;
+    const sampleY = (regionSize - sampleSize) / 2;
+    const imageData = ctx.getImageData(sampleX, sampleY, sampleSize, sampleSize);
 
     // Process frame through rPPG engine
     engineRef.current.processFrame(imageData);
+
+    // Get signal metrics for real-time feedback
+    const metrics = engineRef.current.getSignalMetrics();
+    setSignalStrength(metrics.signalStrength);
 
     // Calculate heart rate if enough data
     const result = engineRef.current.calculateHeartRate();
@@ -255,19 +269,24 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
           playsInline
         />
 
-        {/* Overlay Grid for Sci-Fi Effect */}
+        {/* Face Positioning Target Overlay */}
         {scanning && (
           <div className="absolute inset-0 pointer-events-none">
-            <div className="grid grid-cols-2 grid-rows-2 h-full">
-              <div className="border-r border-b border-emerald-500/30"></div>
-              <div className="border-b border-emerald-500/30"></div>
-              <div className="border-r border-emerald-500/30"></div>
-              <div></div>
+            {/* Target circle for forehead positioning */}
+            <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-24 h-24 border-2 border-dashed border-emerald-400 rounded-full flex items-center justify-center">
+              <div className="text-xs text-emerald-400 font-medium bg-black/50 px-2 py-1 rounded">Forehead</div>
             </div>
+            
             {/* Scanning line animation */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-500 to-transparent animate-pulse"></div>
             </div>
+            
+            {/* Corner brackets for framing */}
+            <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-emerald-500/50"></div>
+            <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-emerald-500/50"></div>
+            <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-emerald-500/50"></div>
+            <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-emerald-500/50"></div>
           </div>
         )}
 
@@ -280,7 +299,23 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       </div>
 
       {/* Hidden processing canvas */}
-      <canvas ref={canvasRef} width="100" height="100" className="hidden" />
+      <canvas ref={canvasRef} width="150" height="150" className="hidden" />
+
+      {/* Face Positioning Guide */}
+      {scanning && (
+        <div className="text-center space-y-2 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="flex items-center justify-center gap-2 text-sm font-medium text-blue-900 dark:text-blue-200">
+            <Activity className="w-4 h-4" />
+            Positioning Tips
+          </div>
+          <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+            <li>• Position your face in the center of the circle</li>
+            <li>• Ensure good lighting on your forehead</li>
+            <li>• Stay still and avoid talking</li>
+            <li>• Remove glasses if possible</li>
+          </ul>
+        </div>
+      )}
 
       {/* Results Display */}
       {scanning && (
@@ -294,10 +329,38 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
               <span className="text-xl text-muted-foreground">BPM</span>
             </div>
             
-            <div className="flex items-center justify-center gap-2 text-sm">
-              {getQualityIcon()}
-              <span className="capitalize">{quality} Quality</span>
-              <span className="text-muted-foreground">• {confidence}% Confidence</span>
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2 text-sm">
+                {getQualityIcon()}
+                <span className="capitalize">{quality} Quality</span>
+                <span className="text-muted-foreground">• {confidence}% Confidence</span>
+              </div>
+              
+              {/* Signal Strength Indicator */}
+              <div className="flex items-center justify-center gap-2 text-xs">
+                <span className="text-muted-foreground">Signal:</span>
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-2 h-3 rounded-sm ${
+                        i < Math.round(signalStrength * 5)
+                          ? 'bg-green-500'
+                          : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className={`font-medium ${
+                  signalStrength > 0.6 ? 'text-green-600' :
+                  signalStrength > 0.3 ? 'text-yellow-600' :
+                  'text-red-600'
+                }`}>
+                  {signalStrength > 0.6 ? 'Strong' :
+                   signalStrength > 0.3 ? 'Moderate' :
+                   'Weak'}
+                </span>
+              </div>
             </div>
           </div>
 

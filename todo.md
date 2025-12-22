@@ -73,14 +73,14 @@
 - [x] Medical imaging analysis (11 modalities)
 
 ## Bug Fixes (Current Session)
-- [x] Debug Optic-Vitals camera not working
-  - [x] Check camera permissions and MediaRecorder API
-  - [x] Verify rPPG signal processing
-  - [x] Test UI/UX flow
-  - [x] Add better error messages
-  - [x] Lower confidence threshold from 30% to 20%
-  - [x] Improve signal detection sensitivity
-  - [x] Add real-time visual feedback
+- [x] Fix Optic-Vitals rPPG signal detection (camera turns on but no measurement)
+  - [x] Enlarge detection region from 20x20 to 60x60 pixels
+  - [x] Increase canvas size from 100x100 to 150x150 for better capture
+  - [x] Focus on forehead area (optimal for rPPG)
+  - [x] Add face positioning guidance overlay with target circle
+  - [x] Add signal strength indicator (5-bar visual + text)
+  - [x] Add positioning tips panel during scan
+  - [x] Add corner brackets for better framing
 
 ## Optic-Vitals Enhancements (Current Session)
 - [x] Add HRV (Heart Rate Variability) analysis to rPPG engine
