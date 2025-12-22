@@ -11,7 +11,7 @@ class InternalBioEngine {
   times: number[] = [];
   lastFrameTime = 0;
 
-  process(imageData: ImageData): { bpm: number | null; confidence: number; debug: string } {
+  process(imageData: ImageData): { bpm: number | null; confidence: number; debug: string; peaks?: number } {
     const now = performance.now();
     
     // 1. Get Green Average from center region
@@ -46,8 +46,8 @@ class InternalBioEngine {
       this.buffer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / this.buffer.length
     );
     
-    // Check if signal has enough variation
-    if (stdDev < 0.5) {
+    // Check if signal has enough variation (LOWERED threshold for better detection)
+    if (stdDev < 0.3) {
       return { bpm: null, confidence: 0, debug: `Signal too flat (stdDev: ${stdDev.toFixed(2)})` };
     }
 
@@ -59,11 +59,12 @@ class InternalBioEngine {
     
     for (let i = 2; i < normalized.length - 1; i++) {
       // Peak detection: current value is higher than neighbors and crosses threshold
+      // LOWERED threshold from 0.3 to 0.2 for better sensitivity
       if (
-        normalized[i] > 0.3 && // Threshold
+        normalized[i] > 0.2 && // Threshold (lowered for better detection)
         normalized[i] > normalized[i - 1] &&
         normalized[i] > normalized[i + 1] &&
-        i - lastPeakIndex > 15 // Minimum distance between peaks (prevents double-counting)
+        i - lastPeakIndex > 12 // Minimum distance between peaks (reduced from 15 to 12)
       ) {
         peaks++;
         lastPeakIndex = i;
@@ -85,13 +86,17 @@ class InternalBioEngine {
       return { bpm: null, confidence: 0, debug: `Out of range: ${bpm.toFixed(0)} BPM` };
     }
 
-    // Calculate confidence based on signal quality
-    const confidence = Math.min(100, Math.floor((stdDev / 5) * 100));
+    // Calculate confidence based on signal quality and number of peaks detected
+    // More peaks = more confident measurement
+    const signalQuality = Math.min(100, Math.floor((stdDev / 3) * 100));
+    const peakConfidence = Math.min(100, Math.floor((peaks / (durationSec / 60)) * 10)); // Expect ~60-100 peaks per minute
+    const confidence = Math.floor((signalQuality + peakConfidence) / 2);
 
     return { 
       bpm: Math.round(bpm), 
       confidence,
-      debug: `✓ Valid (${peaks} peaks, ${durationSec.toFixed(1)}s, stdDev: ${stdDev.toFixed(2)})` 
+      peaks,
+      debug: `✓ ${peaks} peaks in ${durationSec.toFixed(1)}s | stdDev: ${stdDev.toFixed(2)} | BPM: ${Math.round(bpm)}` 
     };
   }
 
