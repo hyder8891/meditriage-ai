@@ -37,7 +37,7 @@ export interface HeartRateResult {
 }
 
 export class BioScannerEngine {
-  private buffer: number[] = [];
+  public buffer: number[] = [];
   private fps: number;
   private computedFps: number; // Dynamic FPS calculation
   private lastFrameTime: number = 0;
@@ -46,7 +46,7 @@ export class BioScannerEngine {
   private minHeartRate: number;
   private maxHeartRate: number;
   private samplingInterval: number;
-  private frameCount: number = 0;
+  public frameCount: number = 0;
   private lastPeakTime: number = 0;
   private peakHistory: number[] = [];
 
