@@ -68,6 +68,7 @@ import DebugAuth from "./pages/DebugAuth";
 import AdminUsers from "./pages/AdminUsers";
 import Settings from "./pages/Settings";
 import PatientMedicalRecords from "./pages/PatientMedicalRecords";
+import BioScannerPage from "./pages/patient/BioScannerPage";
 import { Redirect } from "wouter";
 
 function Router() {
@@ -155,6 +156,9 @@ function Router() {
       </Route>
       <Route path="/patient/medical-records">
         {() => <ProtectedRoute requiredRole="patient"><PatientMedicalRecords /></ProtectedRoute>}
+      </Route>
+      <Route path="/patient/bio-scanner">
+        {() => <ProtectedRoute requiredRole="patient"><BioScannerPage /></ProtectedRoute>}
       </Route>
       <Route path="/patient/profile">
         {() => <ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>}

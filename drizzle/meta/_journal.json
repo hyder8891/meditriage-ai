@@ -176,6 +176,13 @@
       "when": 1766372863813,
       "tag": "0024_chemical_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1766390608944,
+      "tag": "0025_broken_wallow",
+      "breakpoints": true
     }
   ]
 }

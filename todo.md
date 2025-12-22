@@ -48,6 +48,17 @@
 - [ ] Test email/password login with all three test accounts
 - [ ] Document working login credentials
 
+## Optic-Vitals Camera-Based Heart Rate Monitor (rPPG)
+- [x] Add patient_vitals database table to schema
+- [x] Create vitals-router.ts with logVital and getRecent endpoints
+- [x] Mount vitals router in main routers.ts
+- [x] Create rppg-engine.ts with BioScannerEngine class
+- [x] Create BioScanner.tsx component with camera integration
+- [x] Integrate BioScanner into PatientPortal
+- [x] Test camera permissions and video stream
+- [x] Test heart rate calculation accuracy
+- [x] Test vital signs storage and retrieval
+
 ## Completed Features
 - [x] Avicenna-X orchestration system (7 layers)
 - [x] OpenWeather API integration with Baghdad fallbacks

@@ -36,9 +36,16 @@ export default function PatientPortal() {
   const { data: usage } = trpc.b2b2c.subscription.getUsageStats.useQuery();
   const { data: myDoctors } = trpc.b2b2c.patient.getMyDoctors.useQuery();
 
-  // Patient Tools - Removed clinical tools (X-Ray, Bio-Scanner, Lab Interpretation)
-  // These are now doctor-only features
+  // Patient Tools - Removed clinical tools (X-Ray, Lab Interpretation)
+  // Bio-Scanner (Optic-Vitals) is now available for patients
   const patientTools = [
+    {
+      icon: Heart,
+      title: language === 'ar' ? 'قياس النبض' : 'Optic-Vitals',
+      desc: language === 'ar' ? 'قياس معدل ضربات القلب بالكاميرا' : 'Measure heart rate with camera',
+      color: 'from-red-500 to-rose-500',
+      path: '/patient/bio-scanner',
+    },
     {
       icon: Search,
       title: language === 'ar' ? 'ابحث عن عيادة' : 'Find Clinic',

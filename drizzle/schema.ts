@@ -2123,3 +2123,32 @@ export const epidemiologyEvents = mysqlTable("epidemiology_events", {
 
 export type EpidemiologyEvent = typeof epidemiologyEvents.$inferSelect;
 export type InsertEpidemiologyEvent = typeof epidemiologyEvents.$inferInsert;
+
+/**
+ * Patient Vitals - Camera-based vital signs monitoring (Optic-Vitals)
+ * Uses rPPG (remote photoplethysmography) to measure heart rate from camera
+ */
+export const patientVitals = mysqlTable("patient_vitals", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  
+  // Vital signs measurements
+  heartRate: int("heart_rate"), // BPM (beats per minute)
+  respirationRate: int("respiration_rate"), // Breaths per minute
+  oxygenSaturation: int("oxygen_saturation"), // SpO2 percentage (estimated)
+  stressLevel: varchar("stress_level", { length: 20 }), // "LOW", "NORMAL", "HIGH" based on HRV
+  
+  // Measurement quality
+  confidenceScore: int("confidence_score"), // 0-100% (how steady was the camera?)
+  measurementMethod: varchar("method", { length: 50 }).default("OPTIC_CAMERA"),
+  measurementDuration: int("measurement_duration"), // in seconds
+  
+  // Metadata
+  deviceInfo: text("device_info"), // JSON: browser, camera resolution, etc.
+  environmentalFactors: text("environmental_factors"), // JSON: lighting, movement, etc.
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PatientVital = typeof patientVitals.$inferSelect;
+export type InsertPatientVital = typeof patientVitals.$inferInsert;
