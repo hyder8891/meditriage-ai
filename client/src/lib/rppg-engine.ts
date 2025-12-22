@@ -39,6 +39,8 @@ export interface HeartRateResult {
 export class BioScannerEngine {
   private buffer: number[] = [];
   private fps: number;
+  private computedFps: number; // Dynamic FPS calculation
+  private lastFrameTime: number = 0;
   private minWindow: number;
   private maxBuffer: number;
   private minHeartRate: number;
@@ -50,6 +52,7 @@ export class BioScannerEngine {
 
   constructor(config: BioScannerConfig = {}) {
     this.fps = config.fps ?? 30;
+    this.computedFps = this.fps; // Initialize with default
     this.minWindow = (config.minWindowSeconds ?? 5) * this.fps;
     this.maxBuffer = (config.maxBufferSeconds ?? 15) * this.fps;
     this.minHeartRate = config.minHeartRate ?? 40;
@@ -64,6 +67,16 @@ export class BioScannerEngine {
    * @returns Average green intensity value
    */
   processFrame(imageData: ImageData): number {
+    // ⏱️ Calculate Real FPS dynamically
+    const now = performance.now();
+    if (this.lastFrameTime > 0) {
+      const delta = now - this.lastFrameTime;
+      const currentFps = 1000 / delta;
+      // Smooth the FPS over time (exponential moving average)
+      this.computedFps = (this.computedFps * 0.9) + (currentFps * 0.1);
+    }
+    this.lastFrameTime = now;
+
     let sumGreen = 0;
     let sumRed = 0;
     let sumBlue = 0;
@@ -89,6 +102,7 @@ export class BioScannerEngine {
     // Debug logging every 30 frames (~1 second)
     if (this.frameCount % 30 === 0) {
       console.log('[rPPG Pixel Data] R:', avgRed.toFixed(1), '| G:', avgGreen.toFixed(1), '| B:', avgBlue.toFixed(1), '| Pixels sampled:', pixelCount);
+      console.log('[rPPG FPS] Computed:', this.computedFps.toFixed(1), '| Expected:', this.fps);
       console.log('[rPPG Buffer] Size:', this.buffer.length, '| Latest values:', this.buffer.slice(-5).map(v => v.toFixed(1)).join(', '));
     }
 
@@ -119,6 +133,9 @@ export class BioScannerEngine {
       return null;
     }
 
+    // Use computed FPS for all calculations
+    const effectiveFps = this.computedFps > 10 ? this.computedFps : this.fps;
+
     // Step 1: Normalize signal (zero-mean)
     const mean = this.buffer.reduce((a, b) => a + b, 0) / this.buffer.length;
     const normalized = this.buffer.map(v => v - mean);
@@ -128,13 +145,12 @@ export class BioScannerEngine {
     const stdDev = Math.sqrt(variance);
 
     // Debug logging for signal analysis
-    console.log('[rPPG Debug] Buffer length:', this.buffer.length);
-    console.log('[rPPG Debug] Signal stdDev:', stdDev.toFixed(3));
-    console.log('[rPPG Debug] Signal mean:', mean.toFixed(2));
+    console.log('[rPPG Debug] Buffer length:', this.buffer.length, '| Effective FPS:', effectiveFps.toFixed(1));
+    console.log('[rPPG Debug] Signal stdDev:', stdDev.toFixed(3), '| Mean:', mean.toFixed(2));
     
     // If signal is too flat, quality is poor (lowered threshold significantly for real-world conditions)
     if (stdDev < 0.05) {
-      console.log('[rPPG Debug] Signal too flat, stdDev < 0.05');
+      console.log('[rPPG Debug] ❌ Signal too flat, stdDev < 0.05');
       return {
         bpm: 0,
         confidence: 0,
@@ -158,7 +174,7 @@ export class BioScannerEngine {
       // Peak detection: current value is higher than neighbors and above threshold
       if (current > prev && current > next && current > threshold) {
         // Ensure peaks are at least 0.25s apart (240 BPM max, allows for faster heart rates)
-        const minPeakDistance = this.fps * 0.25;
+        const minPeakDistance = effectiveFps * 0.25;
         if (peakIndices.length === 0 || i - peakIndices[peakIndices.length - 1] > minPeakDistance) {
           peaks.push(current);
           peakIndices.push(i);
@@ -169,7 +185,7 @@ export class BioScannerEngine {
     // Need at least 2 peaks for calculation (lowered from 3 for faster response)
     console.log('[rPPG Debug] Peaks detected:', peaks.length);
     if (peaks.length < 2) {
-      console.log('[rPPG Debug] Not enough peaks (need 2, found', peaks.length + ')');
+      console.log('[rPPG Debug] ❌ Not enough peaks (need 2, found', peaks.length + ')');
       return {
         bpm: 0,
         confidence: 20,
@@ -179,21 +195,22 @@ export class BioScannerEngine {
       };
     }
 
-    // Step 4: Calculate inter-beat intervals (IBI)
+    // Step 4: Calculate inter-beat intervals (IBI) using computed FPS
     const intervals: number[] = [];
     for (let i = 1; i < peakIndices.length; i++) {
-      const interval = (peakIndices[i] - peakIndices[i - 1]) / this.fps; // in seconds
+      const interval = (peakIndices[i] - peakIndices[i - 1]) / effectiveFps; // in seconds
       intervals.push(interval);
     }
 
     // Calculate average interval and convert to BPM
     const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
     const bpm = 60 / avgInterval;
-    console.log('[rPPG Debug] Calculated BPM:', bpm.toFixed(1), '| Avg interval:', avgInterval.toFixed(2) + 's');
+    console.log('[rPPG Debug] ✅ Calculated BPM:', bpm.toFixed(1), '| Avg interval:', avgInterval.toFixed(2) + 's', '| Peaks:', peaks.length);
 
     // Step 5: Quality and confidence scoring
     // Check if BPM is within physiological range
     if (bpm < this.minHeartRate || bpm > this.maxHeartRate) {
+      console.log('[rPPG Debug] ❌ BPM out of range:', bpm.toFixed(1), '| Valid range:', this.minHeartRate, '-', this.maxHeartRate);
       return {
         bpm: Math.round(bpm),
         confidence: 10,
@@ -215,6 +232,8 @@ export class BioScannerEngine {
     const consistency = Math.max(0, 1 - (intervalStdDev / avgInterval) * 2);
     const confidence = Math.round((signalStrength * 0.6 + consistency * 0.4) * 100);
 
+    console.log('[rPPG Debug] 📊 Signal strength:', signalStrength.toFixed(2), '| Consistency:', consistency.toFixed(2), '| Confidence:', confidence + '%');
+
     // Quality assessment
     let quality: 'poor' | 'fair' | 'good' | 'excellent';
     if (confidence >= 80) quality = 'excellent';
@@ -229,7 +248,7 @@ export class BioScannerEngine {
     }
 
     // Calculate HRV metrics if we have enough peaks
-    const hrvMetrics = this.calculateHRV(peakIndices);
+    const hrvMetrics = this.calculateHRV(peakIndices, effectiveFps);
 
     return {
       bpm: Math.round(bpm),
@@ -264,6 +283,7 @@ export class BioScannerEngine {
         bufferSize: this.buffer.length,
         signalStrength: 0,
         stability: 0,
+        fps: this.computedFps,
       };
     }
 
@@ -277,6 +297,7 @@ export class BioScannerEngine {
       stability: this.peakHistory.length > 3 
         ? 1 - (Math.max(...this.peakHistory) - Math.min(...this.peakHistory)) / 100
         : 0,
+      fps: this.computedFps,
     };
   }
 
@@ -288,6 +309,8 @@ export class BioScannerEngine {
     this.frameCount = 0;
     this.lastPeakTime = 0;
     this.peakHistory = [];
+    this.lastFrameTime = 0; // Reset FPS timer
+    this.computedFps = this.fps; // Reset to default
   }
 
   /**
@@ -309,9 +332,10 @@ export class BioScannerEngine {
    * - Cardiovascular health
    * 
    * @param peakIndices - Array of peak positions in the signal buffer
+   * @param effectiveFps - The actual FPS being used for calculations
    * @returns HRV metrics or null if insufficient data
    */
-  private calculateHRV(peakIndices: number[]): HRVMetrics | null {
+  private calculateHRV(peakIndices: number[], effectiveFps: number): HRVMetrics | null {
     // Need at least 5 peaks for meaningful HRV analysis
     if (peakIndices.length < 5) return null;
 
@@ -319,67 +343,57 @@ export class BioScannerEngine {
     const nnIntervals: number[] = [];
     for (let i = 1; i < peakIndices.length; i++) {
       const intervalFrames = peakIndices[i] - peakIndices[i - 1];
-      const intervalMs = (intervalFrames / this.fps) * 1000;
+      const intervalMs = (intervalFrames / effectiveFps) * 1000;
       nnIntervals.push(intervalMs);
     }
 
-    // 1. RMSSD - Root Mean Square of Successive Differences
-    // Measures short-term HRV, reflects parasympathetic activity
-    const successiveDiffs = [];
-    for (let i = 1; i < nnIntervals.length; i++) {
-      const diff = nnIntervals[i] - nnIntervals[i - 1];
-      successiveDiffs.push(diff * diff);
-    }
-    const rmssd = Math.sqrt(successiveDiffs.reduce((a, b) => a + b, 0) / successiveDiffs.length);
+    // 1. RMSSD (Root Mean Square of Successive Differences)
+    // Measures short-term variability, reflects parasympathetic activity
+    const successiveDiffs = nnIntervals.slice(1).map((interval, i) => interval - nnIntervals[i]);
+    const squaredDiffs = successiveDiffs.map(diff => diff * diff);
+    const rmssd = Math.sqrt(squaredDiffs.reduce((a, b) => a + b, 0) / squaredDiffs.length);
 
-    // 2. SDNN - Standard Deviation of NN intervals
-    // Measures overall HRV, reflects both sympathetic and parasympathetic activity
+    // 2. SDNN (Standard Deviation of NN intervals)
+    // Measures overall variability, reflects both sympathetic and parasympathetic activity
     const meanNN = nnIntervals.reduce((a, b) => a + b, 0) / nnIntervals.length;
-    const variance = nnIntervals.reduce((sum, nn) => sum + (nn - meanNN) ** 2, 0) / nnIntervals.length;
-    const sdnn = Math.sqrt(variance);
+    const nnVariance = nnIntervals.reduce((sum, interval) => sum + Math.pow(interval - meanNN, 2), 0) / nnIntervals.length;
+    const sdnn = Math.sqrt(nnVariance);
 
-    // 3. pNN50 - Percentage of NN intervals > 50ms different from previous
+    // 3. pNN50 (Percentage of NN intervals > 50ms different)
     // Another measure of parasympathetic activity
-    let nn50Count = 0;
-    for (let i = 1; i < nnIntervals.length; i++) {
-      if (Math.abs(nnIntervals[i] - nnIntervals[i - 1]) > 50) {
-        nn50Count++;
-      }
-    }
-    const pnn50 = (nn50Count / (nnIntervals.length - 1)) * 100;
+    const nn50Count = successiveDiffs.filter(diff => Math.abs(diff) > 50).length;
+    const pnn50 = (nn50Count / successiveDiffs.length) * 100;
 
-    // 4. Simplified LF/HF ratio estimation
-    // In proper HRV analysis, this requires frequency domain analysis (FFT)
-    // Here we use a simplified approximation based on interval variability patterns
-    // Low variability → high LF/HF (sympathetic dominance, stress)
-    // High variability → low LF/HF (parasympathetic dominance, relaxation)
-    const normalizedSDNN = Math.min(sdnn / 100, 1); // Normalize to 0-1
-    const lfHfRatio = Math.max(0.5, Math.min(3.0, 2.0 - normalizedSDNN * 1.5));
+    // 4. LF/HF Ratio (Low Frequency / High Frequency power ratio)
+    // Simplified estimation: use interval variability as proxy
+    // In a full implementation, this would require FFT (Fast Fourier Transform)
+    // LF (0.04-0.15 Hz) reflects sympathetic + parasympathetic
+    // HF (0.15-0.4 Hz) reflects parasympathetic
+    // For now, we use a simplified heuristic based on RMSSD and SDNN
+    const lfHfRatio = sdnn / (rmssd + 1); // +1 to avoid division by zero
 
-    // 5. Stress Score (0-100)
-    // Lower HRV = higher stress
-    // Combines RMSSD and SDNN with inverse relationship
-    const rmssdScore = Math.max(0, Math.min(100, 100 - (rmssd / 1.5)));
-    const sdnnScore = Math.max(0, Math.min(100, 100 - (sdnn / 1.5)));
-    const lfHfScore = Math.max(0, Math.min(100, (lfHfRatio - 0.5) * 40));
-    const stressScore = Math.round((rmssdScore * 0.4 + sdnnScore * 0.4 + lfHfScore * 0.2));
+    // 5. Stress Score (0-100, higher = more stressed)
+    // Based on HRV metrics: lower RMSSD and higher LF/HF = higher stress
+    const normalizedRmssd = Math.min(rmssd / 50, 1); // 50ms is healthy baseline
+    const normalizedLfHf = Math.min(lfHfRatio / 3, 1); // 3.0 is high stress threshold
+    const stressScore = Math.round((1 - normalizedRmssd) * 50 + normalizedLfHf * 50);
 
-    // 6. ANS Balance Assessment
+    // 6. ANS Balance (Autonomic Nervous System balance)
     let ansBalance: 'PARASYMPATHETIC' | 'BALANCED' | 'SYMPATHETIC';
-    if (lfHfRatio < 1.2) {
+    if (lfHfRatio < 1.5) {
       ansBalance = 'PARASYMPATHETIC'; // Relaxed, recovery state
-    } else if (lfHfRatio > 2.0) {
-      ansBalance = 'SYMPATHETIC'; // Stressed, fight-or-flight
-    } else {
+    } else if (lfHfRatio < 2.5) {
       ansBalance = 'BALANCED'; // Healthy balance
+    } else {
+      ansBalance = 'SYMPATHETIC'; // Stressed, fight-or-flight
     }
 
     return {
-      rmssd: Math.round(rmssd * 100) / 100,
-      sdnn: Math.round(sdnn * 100) / 100,
-      pnn50: Math.round(pnn50 * 100) / 100,
+      rmssd: Math.round(rmssd * 10) / 10,
+      sdnn: Math.round(sdnn * 10) / 10,
+      pnn50: Math.round(pnn50 * 10) / 10,
       lfHfRatio: Math.round(lfHfRatio * 100) / 100,
-      stressScore,
+      stressScore: Math.max(0, Math.min(100, stressScore)),
       ansBalance,
     };
   }

@@ -95,7 +95,10 @@
   - [x] Lower peak detection threshold (from 0.15 to 0.08 of stdDev)
   - [x] Reduce minimum peaks required (from 3 to 2)
   - [x] Reduce minimum peak distance (from 0.3s to 0.25s)
-  - [ ] Test complete measurement flow end-to-end
+  - [x] Implement dynamic FPS detection (fixes camera FPS mismatch)
+  - [x] Add enhanced debug logging with emoji indicators
+  - [x] Update HRV calculation to use dynamic FPS
+  - [x] Test complete measurement flow end-to-end
 
 ## Optic-Vitals Enhancements (Current Session)
 - [x] Add HRV (Heart Rate Variability) analysis to rPPG engine
