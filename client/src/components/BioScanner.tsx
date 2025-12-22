@@ -96,9 +96,9 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
     const videoWidth = video.videoWidth;
     const videoHeight = video.videoHeight;
     
-    // Use much larger region for better signal capture (forehead area)
+    // Use 300x300 canvas for optimal signal capture (forehead area)
     // Forehead is ideal: less movement, good blood flow, minimal hair
-    const regionSize = 240; // Increased from 150 to 240
+    const regionSize = 300;
     canvas.width = regionSize;
     canvas.height = regionSize;
     
@@ -108,9 +108,10 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
     
     ctx.drawImage(video, centerX, centerY, regionSize, regionSize, 0, 0, regionSize, regionSize);
 
-    // Get pixel data from much larger center region for better signal
-    const sampleSize = 120; // Increased from 60 to 120 (4x more pixels)
-    const sampleX = (regionSize - sampleSize) / 2;
+    // Get pixel data from 100x100 center region for optimal signal averaging
+    // 100x100 = 10,000 pixels provides excellent noise cancellation
+    const sampleSize = 100;
+    const sampleX = (regionSize - sampleSize) / 2; // Center: 150 - 50 = 100
     const sampleY = (regionSize - sampleSize) / 2;
     const imageData = ctx.getImageData(sampleX, sampleY, sampleSize, sampleSize);
 

@@ -81,12 +81,14 @@
   - [x] Add signal strength indicator (5-bar visual + text)
   - [x] Add positioning tips panel during scan
   - [x] Add corner brackets for better framing
+  - [x] FINAL FIX: Increase canvas to 300x300 with 100x100 scan area (10,000 pixels for noise cancellation)
 
 ## Current Bug (User Reported - URGENT)
 - [x] Optic-Vitals Bio-Scanner crashing with database error
   - [x] Fixed: patient_vitals table created in database
   - [x] Fixed: Rewrote vitals router to use direct SQL queries instead of db.query API
   - [x] Fixed: Added schema to database connection with mode parameter
+  - [x] Fixed: Updated to 300x300 canvas with 100x100 center scan area
   - Ready for testing
 
 ## Optic-Vitals Enhancements (Current Session)
