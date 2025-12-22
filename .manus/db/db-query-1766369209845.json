@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO users (email, name, password_hash, role, verified, email_verified, specialty, license_number, availability_status) VALUES ('test.doctor@meditriage.iq', 'Dr. Test Doctor', '$2a$10$rOjLnW8nqmFvxzKJ8K5zXuYvVqH6xH7qZGxH5xH6xH7qZGxH5xH6xH', 'clinician', 1, 1, 'Internal Medicine', 'TEST-DOC-2024', 'available') ON DUPLICATE KEY UPDATE email = email",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute INSERT INTO users (email, name, password_hash, role, verified, email_verified, specialty, license_number, availability_status) VALUES ('test.doctor@meditriage.iq', 'Dr. Test Doctor', '$2a$10$rOjLnW8nqmFvxzKJ8K5zXuYvVqH6xH7qZGxH5xH6xH7qZGxH5xH6xH', 'clinician', 1, 1, 'Internal Medicine', 'TEST-DOC-2024', 'available') ON DUPLICATE KEY UPDATE email = email",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1500
+}

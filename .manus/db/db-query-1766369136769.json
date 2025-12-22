@@ -1,0 +1,73 @@
+{
+  "query": "SELECT id, email, name, role, verified, specialty, license_number FROM users WHERE role IN ('clinician', 'doctor') LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, name, role, verified, specialty, license_number FROM users WHERE role IN ('clinician', 'doctor') LIMIT 10",
+  "rows": [
+    {
+      "id": "900079",
+      "email": "Haidar_goold_oo@yahoo.com",
+      "name": "hyder",
+      "role": "clinician",
+      "verified": "0",
+      "specialty": "gen",
+      "license_number": "4322348"
+    },
+    {
+      "id": "2100011",
+      "email": "ahmed.husseini@meditriage.iq",
+      "name": "Dr. Ahmed Al-Husseini",
+      "role": "doctor",
+      "verified": "1",
+      "specialty": "Emergency Medicine",
+      "license_number": "IQ-MED-2018-4521"
+    },
+    {
+      "id": "2100012",
+      "email": "fatima.najjar@meditriage.iq",
+      "name": "Dr. Fatima Al-Najjar",
+      "role": "doctor",
+      "verified": "1",
+      "specialty": "Pediatrics",
+      "license_number": "IQ-MED-2015-3892"
+    },
+    {
+      "id": "2100013",
+      "email": "omar.jubouri@meditriage.iq",
+      "name": "Dr. Omar Al-Jubouri",
+      "role": "doctor",
+      "verified": "1",
+      "specialty": "Cardiology",
+      "license_number": "IQ-MED-2012-2156"
+    },
+    {
+      "id": "2100014",
+      "email": "layla.hassan@meditriage.iq",
+      "name": "Dr. Layla Hassan",
+      "role": "doctor",
+      "verified": "1",
+      "specialty": "Obstetrics & Gynecology",
+      "license_number": "IQ-MED-2019-5634"
+    },
+    {
+      "id": "2100015",
+      "email": "karim.baghdadi@meditriage.iq",
+      "name": "Dr. Karim Al-Baghdadi",
+      "role": "doctor",
+      "verified": "1",
+      "specialty": "Internal Medicine",
+      "license_number": "IQ-MED-2016-4123"
+    },
+    {
+      "id": "3150029",
+      "email": "doctor.test@meditriage.com",
+      "name": "Dr. Test Doctor",
+      "role": "clinician",
+      "verified": "1",
+      "specialty": "General Medicine",
+      "license_number": "DOC-TEST-001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tverified\tspecialty\tlicense_number\n900079\tHaidar_goold_oo@yahoo.com\thyder\tclinician\t0\tgen\t4322348\n2100011\tahmed.husseini@meditriage.iq\tDr. Ahmed Al-Husseini\tdoctor\t1\tEmergency Medicine\tIQ-MED-2018-4521\n2100012\tfatima.najjar@meditriage.iq\tDr. Fatima Al-Najjar\tdoctor\t1\tPediatrics\tIQ-MED-2015-3892\n2100013\tomar.jubouri@meditriage.iq\tDr. Omar Al-Jubouri\tdoctor\t1\tCardiology\tIQ-MED-2012-2156\n2100014\tlayla.hassan@meditriage.iq\tDr. Layla Hassan\tdoctor\t1\tObstetrics & Gynecology\tIQ-MED-2019-5634\n2100015\tkarim.baghdadi@meditriage.iq\tDr. Karim Al-Baghdadi\tdoctor\t1\tInternal Medicine\tIQ-MED-2016-4123\n3150029\tdoctor.test@meditriage.com\tDr. Test Doctor\tclinician\t1\tGeneral Medicine\tDOC-TEST-001\n",
+  "stderr": "",
+  "execution_time_ms": 1679
+}

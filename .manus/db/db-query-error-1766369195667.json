@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO users (email, name, password_hash, role, verified, email_verified, specialty, license_number, availability_status, created_at, updated_at) VALUES ('test.doctor@meditriage.iq', 'Dr. Test Doctor', '$2a$10$YourHashedPasswordHere', 'clinician', 1, 1, 'Internal Medicine', 'TEST-DOC-2024', 'available', NOW(), NOW()) ON DUPLICATE KEY UPDATE password_hash = '$2a$10$YourHashedPasswordHere', verified = 1, email_verified = 1, specialty = 'Internal Medicine', license_number = 'TEST-DOC-2024', availability_status = 'available', updated_at = NOW()",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute INSERT INTO users (email, name, password_hash, role, verified, email_verified, specialty, license_number, availability_status, created_at, updated_at) VALUES ('test.doctor@meditriage.iq', 'Dr. Test Doctor', '$2a$10$YourHashedPasswordHere', 'clinician', 1, 1, 'Internal Medicine', 'TEST-DOC-2024', 'available', NOW(), NOW()) ON DUPLICATE KEY UPDATE password_hash = '$2a$10$YourHashedPasswordHere', verified = 1, email_verified = 1, specialty = 'Internal Medicine', license_number = 'TEST-DOC-2024', availability_status = 'available', updated_at = NOW()",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'created_at' in 'field list'"
+  ]
+}
