@@ -1,0 +1,40 @@
+{
+  "query": "SELECT * FROM users WHERE email = 'Haidar_goold_oo@yahoo.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT * FROM users WHERE email = 'Haidar_goold_oo@yahoo.com';",
+  "rows": [
+    {
+      "id": "900079",
+      "openId": "NULL",
+      "name": "Haidar_goold_oo",
+      "email": "Haidar_goold_oo@yahoo.com",
+      "loginMethod": "email",
+      "role": "clinician",
+      "clinic_id": "NULL",
+      "createdAt": "2025-12-19 00:21:12",
+      "updatedAt": "2025-12-22 05:07:57",
+      "lastSignedIn": "2025-12-19 00:21:12",
+      "password_hash": "$2b$10$GPPhIQmCsJjOQqOYRjMcwuOqD5y24Ht85leoY4Y9i5TI1XTy0TwxS",
+      "license_number": "4322348",
+      "specialty": "gen",
+      "verified": "1",
+      "email_verified": "1",
+      "verification_token": "e37e3b51c3519cc3afdd84e637fbf360d42349d892632d69cd834bd66578d64f",
+      "verification_token_expiry": "2025-12-20 00:21:12",
+      "reset_token": "NULL",
+      "reset_token_expiry": "NULL",
+      "availability_status": "offline",
+      "current_patient_count": "1",
+      "max_patients_per_day": "50",
+      "last_status_change": "2025-12-22 05:07:58",
+      "auto_offline_minutes": "15",
+      "phone_number": "NULL",
+      "phone_verified": "0",
+      "country_code": "+964",
+      "token_version": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tloginMethod\trole\tclinic_id\tcreatedAt\tupdatedAt\tlastSignedIn\tpassword_hash\tlicense_number\tspecialty\tverified\temail_verified\tverification_token\tverification_token_expiry\treset_token\treset_token_expiry\tavailability_status\tcurrent_patient_count\tmax_patients_per_day\tlast_status_change\tauto_offline_minutes\tphone_number\tphone_verified\tcountry_code\ttoken_version\n900079\tNULL\tHaidar_goold_oo\tHaidar_goold_oo@yahoo.com\temail\tclinician\tNULL\t2025-12-19 00:21:12\t2025-12-22 05:07:57\t2025-12-19 00:21:12\t$2b$10$GPPhIQmCsJjOQqOYRjMcwuOqD5y24Ht85leoY4Y9i5TI1XTy0TwxS\t4322348\tgen\t1\t1\te37e3b51c3519cc3afdd84e637fbf360d42349d892632d69cd834bd66578d64f\t2025-12-20 00:21:12\tNULL\tNULL\toffline\t1\t50\t2025-12-22 05:07:58\t15\tNULL\t0\t+964\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1615
+}

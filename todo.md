@@ -6,6 +6,7 @@
 - [ ] Fix lab results function not working (NEEDS ROBUST IMPLEMENTATION)
 - [x] Fix sidebar consistency - items disappear when navigating away from dashboard
 - [x] Fix profile dropdown - only shows logout, missing other options
+- [x] Fix doctor availability status toggle - user reports cannot change status
 
 ## NEW: Current Session Requirements
 - [x] Fix lab results functionality - make it robust and fully working

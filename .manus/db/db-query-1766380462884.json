@@ -1,0 +1,14 @@
+{
+  "query": "SELECT email, role FROM users WHERE email = 'Haidar_goold_oo@yahoo.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT email, role FROM users WHERE email = 'Haidar_goold_oo@yahoo.com';",
+  "rows": [
+    {
+      "email": "Haidar_goold_oo@yahoo.com",
+      "role": "clinician"
+    }
+  ],
+  "messages": [],
+  "stdout": "email\trole\nHaidar_goold_oo@yahoo.com\tclinician\n",
+  "stderr": "",
+  "execution_time_ms": 1576
+}

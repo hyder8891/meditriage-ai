@@ -26,8 +26,8 @@ export function DoctorAvailabilityToggle() {
     },
     onError: (error) => {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Cannot Change Status",
+        description: error.message || "You don't have permission to change availability status. Please contact support.",
         variant: "destructive",
       });
     },

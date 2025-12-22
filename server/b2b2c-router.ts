@@ -43,11 +43,11 @@ export const b2b2cRouter = router({
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
 
-        // Check if user is a doctor/clinician
-        if (!["doctor", "clinician"].includes(ctx.user.role)) {
+        // Check if user is a doctor/clinician/admin
+        if (!["doctor", "clinician", "admin"].includes(ctx.user.role)) {
           throw new TRPCError({ 
             code: "FORBIDDEN", 
-            message: "Only doctors can set availability status" 
+            message: `Only doctors and admins can set availability status. Your current role is: ${ctx.user.role}` 
           });
         }
 
