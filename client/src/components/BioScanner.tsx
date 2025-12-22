@@ -46,8 +46,8 @@ class InternalBioEngine {
       this.buffer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / this.buffer.length
     );
     
-    // Check if signal has enough variation (LOWERED threshold for better detection)
-    if (stdDev < 0.3) {
+    // Check if signal has enough variation (VERY LOW threshold for maximum sensitivity)
+    if (stdDev < 0.1) {
       return { bpm: null, confidence: 0, debug: `Signal too flat (stdDev: ${stdDev.toFixed(2)})` };
     }
 
@@ -59,12 +59,12 @@ class InternalBioEngine {
     
     for (let i = 2; i < normalized.length - 1; i++) {
       // Peak detection: current value is higher than neighbors and crosses threshold
-      // LOWERED threshold from 0.3 to 0.2 for better sensitivity
+      // VERY LOW threshold (0.1) for maximum sensitivity
       if (
-        normalized[i] > 0.2 && // Threshold (lowered for better detection)
+        normalized[i] > 0.1 && // Very low threshold for better detection
         normalized[i] > normalized[i - 1] &&
         normalized[i] > normalized[i + 1] &&
-        i - lastPeakIndex > 12 // Minimum distance between peaks (reduced from 15 to 12)
+        i - lastPeakIndex > 10 // Minimum distance between peaks (reduced to 10)
       ) {
         peaks++;
         lastPeakIndex = i;
@@ -216,13 +216,13 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       return;
     }
 
-    // 1. Draw video frame to canvas (scaled down for performance)
-    ctx.drawImage(video, 0, 0, 100, 100);
+    // 1. Draw video frame to canvas (LARGER for better signal capture)
+    ctx.drawImage(video, 0, 0, 300, 300);
     
-    // 2. Extract center region (50x50 pixels from center)
-    const centerX = 25;
-    const centerY = 25;
-    const regionSize = 50;
+    // 2. Extract center region (150x150 pixels from center - MUCH LARGER)
+    const centerX = 75;
+    const centerY = 75;
+    const regionSize = 150;
     const imageData = ctx.getImageData(centerX, centerY, regionSize, regionSize);
     
     // 3. Process frame with engine
@@ -348,7 +348,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         />
         
         {/* Hidden canvas for processing */}
-        <canvas ref={canvasRef} width={100} height={100} className="hidden" />
+        <canvas ref={canvasRef} width={300} height={300} className="hidden" />
         
         {/* Scan region indicator */}
         {scanning && (

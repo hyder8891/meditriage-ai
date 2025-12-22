@@ -84,7 +84,8 @@
   - [x] FINAL FIX: Increase canvas to 300x300 with 100x100 scan area (10,000 pixels for noise cancellation)
 
 ## Current Bug (User Reported - URGENT)
-- [x] Optic-Vitals Bio-Scanner showing 0% confidence despite perfect lighting and stillness (FIXED)
+- [x] Optic-Vitals Bio-Scanner showing 0% confidence despite perfect lighting and stillness (FIXED v1)
+- [ ] Bio-Scanner still showing 0% confidence - implement aggressive detection (v2)
   - [x] User logged in and demonstrated the issue
   - [x] Confirmed camera is working (user can see face clearly)
   - [x] Identified NO rPPG debug logs in console (processFrame not running)
@@ -107,6 +108,11 @@
   - [x] Add enhanced debug logging with emoji indicators
   - [x] Update HRV calculation to use dynamic FPS
   - [x] Test complete measurement flow end-to-end
+  - [x] AGGRESSIVE DETECTION v2: Increase canvas to 300x300, region to 150x150
+  - [x] Lower signal threshold from 0.3 to 0.1 (10x more sensitive)
+  - [x] Lower peak threshold from 0.2 to 0.1 (2x more sensitive)
+  - [x] Reduce minimum peak distance from 12 to 10 samples
+  - [ ] Test with user to verify confidence increases above 0%
 
 ## Optic-Vitals Enhancements (Current Session)
 - [x] Add HRV (Heart Rate Variability) analysis to rPPG engine
