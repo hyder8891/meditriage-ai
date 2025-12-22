@@ -54,7 +54,7 @@ export class BioScannerEngine {
     this.maxBuffer = (config.maxBufferSeconds ?? 15) * this.fps;
     this.minHeartRate = config.minHeartRate ?? 40;
     this.maxHeartRate = config.maxHeartRate ?? 200;
-    this.samplingInterval = config.samplingInterval ?? 16; // Sample every 16th pixel
+    this.samplingInterval = config.samplingInterval ?? 8; // Sample every 8th pixel (more samples = better signal)
   }
 
   /**
@@ -113,8 +113,14 @@ export class BioScannerEngine {
     const variance = normalized.reduce((sum, val) => sum + val * val, 0) / normalized.length;
     const stdDev = Math.sqrt(variance);
 
-    // If signal is too flat, quality is poor (lowered threshold for better detection)
-    if (stdDev < 0.3) {
+    // Debug logging for signal analysis
+    console.log('[rPPG Debug] Buffer length:', this.buffer.length);
+    console.log('[rPPG Debug] Signal stdDev:', stdDev.toFixed(3));
+    console.log('[rPPG Debug] Signal mean:', mean.toFixed(2));
+    
+    // If signal is too flat, quality is poor (lowered threshold significantly for real-world conditions)
+    if (stdDev < 0.1) {
+      console.log('[rPPG Debug] Signal too flat, stdDev < 0.1');
       return {
         bpm: 0,
         confidence: 0,
@@ -125,7 +131,8 @@ export class BioScannerEngine {
     }
 
     // Step 3: Detect peaks (local maxima above threshold)
-    const threshold = stdDev * 0.3; // Adaptive threshold based on signal strength (lowered for better detection)
+    const threshold = stdDev * 0.15; // Adaptive threshold based on signal strength (lowered significantly)
+    console.log('[rPPG Debug] Peak detection threshold:', threshold.toFixed(3));
     const peaks: number[] = [];
     const peakIndices: number[] = [];
 
@@ -146,7 +153,9 @@ export class BioScannerEngine {
     }
 
     // Need at least 3 peaks for reliable calculation
+    console.log('[rPPG Debug] Peaks detected:', peaks.length);
     if (peaks.length < 3) {
+      console.log('[rPPG Debug] Not enough peaks (need 3, found', peaks.length + ')');
       return {
         bpm: 0,
         confidence: 20,
@@ -166,6 +175,7 @@ export class BioScannerEngine {
     // Calculate average interval and convert to BPM
     const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
     const bpm = 60 / avgInterval;
+    console.log('[rPPG Debug] Calculated BPM:', bpm.toFixed(1), '| Avg interval:', avgInterval.toFixed(2) + 's');
 
     // Step 5: Quality and confidence scoring
     // Check if BPM is within physiological range

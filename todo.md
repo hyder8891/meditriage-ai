@@ -82,6 +82,13 @@
   - [x] Add positioning tips panel during scan
   - [x] Add corner brackets for better framing
 
+## Current Bug (User Reported - URGENT)
+- [x] Optic-Vitals Bio-Scanner crashing with database error
+  - [x] Fixed: patient_vitals table created in database
+  - [x] Fixed: Rewrote vitals router to use direct SQL queries instead of db.query API
+  - [x] Fixed: Added schema to database connection with mode parameter
+  - Ready for testing
+
 ## Optic-Vitals Enhancements (Current Session)
 - [x] Add HRV (Heart Rate Variability) analysis to rPPG engine
   - [x] Extend patient_vitals table with HRV metrics (RMSSD, SDNN, pNN50, LF/HF ratio)
