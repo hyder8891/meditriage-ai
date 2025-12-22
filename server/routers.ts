@@ -8,6 +8,7 @@ import { adminRouter } from "./admin-router";
 import { triageEnhancedRouter } from "./triage-enhanced";
 import { symptomCheckerStructuredRouter } from "./symptom-checker-structured";
 import { brainRouter } from "./brain/api/brain-router";
+import { avicennaRouter } from "./brain/avicenna-router";
 import { trainingRouter } from "./brain/training/training-router";
 import { audioSymptomRouter } from "./routers/audio-symptom-analysis";
 import { smartFormRouter } from "./routers/smart-form-router";
@@ -61,6 +62,7 @@ export const appRouter = router({
   consultation: consultationRouter,
   admin: adminRouter,
   brain: brainRouter,
+  avicenna: avicennaRouter,
   training: trainingRouter,
   audioSymptom: audioSymptomRouter,
   smartForm: smartFormRouter,

@@ -575,3 +575,135 @@ medical_events (
 - [ ] Test Google OAuth after domain authorization
 - [ ] Test Apple OAuth after domain authorization
 - [ ] Document doctor test credentials in README or setup guide
+
+## Avicenna-X Orchestration System (December 22, 2024) - STRATEGIC PRIORITY
+
+### Vision
+Transform MediTriage from passive tool into active health operating system with predictive capabilities that create competitive moats through:
+1. Data feedback loops (doctor performance + network quality)
+2. Infrastructure awareness (route based on connection stability)
+3. Self-correcting medical reasoning (AEC for medicine)
+
+### Layer 1: Context Vector System
+- [ ] Add pgvector or TiDB Vector support for symptom embeddings
+- [ ] Create context aggregation service (symptoms + history + vitals + environment + social determinants)
+- [ ] Implement weighted vector generation for patient state
+- [ ] Add Apple Watch / wearable integration for real-time vitals
+- [ ] Track financial constraints (budget filter clicks) in user preferences
+- [ ] Add barometric pressure API integration for environmental triggers
+- [ ] Create `patient_context_vectors` table for storing embeddings
+
+### Layer 2: Neuro-Symbolic Triage Engine
+- [ ] Implement hard medical guardrails (symbolic rules for emergencies)
+- [ ] Create emergency bypass logic (heart rate > 120 + chest pain → immediate action)
+- [ ] Build hybrid diagnosis engine (symbolic + neural)
+- [ ] Integrate Bayesian update system with epidemiology data
+- [ ] Add subtlety analysis for voice notes and text input
+- [ ] Create medical reasoning prompt templates in database
+- [ ] Implement confidence scoring for AI diagnoses
+
+### Layer 3: Resource Auction Algorithm
+- [ ] Design doctor scoring algorithm: `(Skill_Match * 0.4) + (Proximity * 0.3) + (Price * 0.2) + (Network * 0.1)`
+- [ ] Track doctor connection quality from socket-server metrics
+- [ ] Add `connection_quality_score` field to users table (clinicians)
+- [ ] Implement real-time network status tracking per clinic/doctor
+- [ ] Create clinic equipment tracking (X-Ray, MRI availability)
+- [ ] Add clinic operating hours and real-time status
+- [ ] Build resource ranking service with multi-factor optimization
+- [ ] Integrate Uber/Careem deep links for clinic navigation
+
+### Layer 4: Epidemiology Tracking System
+- [ ] Create Redis-based disease heatmap (`city:baghdad:risks`)
+- [ ] Implement background job for symptom aggregation (hourly)
+- [ ] Add anonymized symptom reporting pipeline
+- [ ] Build city-level disease spike detection
+- [ ] Create epidemiology dashboard for admin monitoring
+- [ ] Integrate local disease risk into triage algorithm
+- [ ] Add seasonal pattern detection (flu season, etc.)
+
+### Layer 5: Medical AEC (Self-Correcting AI)
+- [ ] Capture AI diagnosis vs doctor diagnosis deltas
+- [ ] Create `medical_corrections` table for RLHF data
+- [ ] Implement automatic system prompt patching
+- [ ] Build feedback loop for AI improvement
+- [ ] Add doctor correction interface in messaging system
+- [ ] Track diagnosis accuracy per condition type
+- [ ] Create medical reasoning version control
+- [ ] Implement A/B testing for prompt improvements
+
+### Layer 6: Doctor Performance Tracking
+- [ ] Add `diagnosis_accuracy` field to track AI vs doctor deltas
+- [ ] Implement specialty matching algorithm
+- [ ] Track successful treatment outcomes
+- [ ] Add patient satisfaction scoring
+- [ ] Create doctor performance dashboard
+- [ ] Implement time-based performance patterns (Dr. Ali better on weekdays)
+
+### Layer 7: Orchestrator Core
+- [ ] Create `server/brain/orchestrator.ts` with Avicenna-X loop
+- [ ] Implement `executeAvicennaLoop(userId, input)` function
+- [ ] Build context gathering phase (sense)
+- [ ] Add epidemiology check phase (local)
+- [ ] Implement hybrid diagnosis phase (think)
+- [ ] Create resource orchestration phase (act)
+- [ ] Add action routing (navigate to clinic vs connect socket)
+
+### Database Schema Updates
+```sql
+-- Context vectors
+patient_context_vectors (
+  id, user_id, vector_embedding,
+  symptom_severity, medical_history_summary,
+  environmental_factors, financial_constraints,
+  created_at
+)
+
+-- Medical corrections (RLHF)
+medical_corrections (
+  id, user_id, doctor_id,
+  ai_diagnosis, doctor_diagnosis,
+  correction_type, severity_delta,
+  prompt_patch_applied, created_at
+)
+
+-- Epidemiology tracking
+disease_heatmap (
+  id, city, disease_name,
+  case_count, severity_avg,
+  time_window, created_at
+)
+
+-- Doctor performance
+doctor_performance (
+  id, doctor_id, specialty,
+  diagnosis_accuracy_rate,
+  connection_quality_score,
+  avg_response_time,
+  patient_satisfaction,
+  updated_at
+)
+
+-- Clinic resources
+clinic_resources (
+  id, clinic_id, equipment_type,
+  is_available, network_quality,
+  operating_hours, last_checked
+)
+```
+
+### Success Metrics
+- [ ] Context vector generation time < 200ms
+- [ ] Emergency detection accuracy > 99%
+- [ ] Resource auction execution time < 500ms
+- [ ] AI diagnosis accuracy improvement rate > 5% per month
+- [ ] Doctor connection stability > 95%
+- [ ] Epidemiology spike detection within 2 hours
+
+### Competitive Moats Achieved
+- [ ] Data feedback loop: Track doctor performance + network quality (no competitor has this)
+- [ ] Infrastructure awareness: Route based on connection stability (critical for Iraq)
+- [ ] Self-correcting AI: Patch medical reasoning in seconds (competitors need app updates)
+- [ ] Predictive health graph: Anticipate disease spikes before patients finish typing
+
+## Security & Reliability
+- [x] Implement fail-open pattern for Redis rate limiting (prevent Redis downtime from blocking logins)
