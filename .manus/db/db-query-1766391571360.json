@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS patient_vitals (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  heart_rate INT,\n  respiration_rate INT,\n  oxygen_saturation INT,\n  stress_level VARCHAR(20),\n  hrv_rmssd DECIMAL(10,2),\n  hrv_sdnn DECIMAL(10,2),\n  hrv_pnn50 DECIMAL(10,2),\n  hrv_lf_hf_ratio DECIMAL(10,2),\n  hrv_stress_score INT,\n  hrv_ans_balance VARCHAR(30),\n  confidence_score INT,\n  method VARCHAR(50) DEFAULT 'OPTIC_CAMERA',\n  measurement_duration INT,\n  device_info TEXT,\n  environmental_factors TEXT,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS patient_vitals (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  heart_rate INT,\n  respiration_rate INT,\n  oxygen_saturation INT,\n  stress_level VARCHAR(20),\n  hrv_rmssd DECIMAL(10,2),\n  hrv_sdnn DECIMAL(10,2),\n  hrv_pnn50 DECIMAL(10,2),\n  hrv_lf_hf_ratio DECIMAL(10,2),\n  hrv_stress_score INT,\n  hrv_ans_balance VARCHAR(30),\n  confidence_score INT,\n  method VARCHAR(50) DEFAULT 'OPTIC_CAMERA',\n  measurement_duration INT,\n  device_info TEXT,\n  environmental_factors TEXT,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1688
+}

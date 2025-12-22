@@ -160,6 +160,13 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         confidence: finalResult.confidence,
         stress: stressLevel,
         measurementDuration,
+        // Include HRV metrics if available
+        hrvRmssd: finalResult.hrv?.rmssd,
+        hrvSdnn: finalResult.hrv?.sdnn,
+        hrvPnn50: finalResult.hrv?.pnn50,
+        hrvLfHfRatio: finalResult.hrv?.lfHfRatio,
+        hrvStressScore: finalResult.hrv?.stressScore,
+        hrvAnsBalance: finalResult.hrv?.ansBalance,
         deviceInfo: {
           browser: navigator.userAgent,
           cameraResolution: `${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`,

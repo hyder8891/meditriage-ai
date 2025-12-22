@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE patient_vitals \nADD COLUMN hrv_rmssd DECIMAL(10,2) AFTER stress_level,\nADD COLUMN hrv_sdnn DECIMAL(10,2) AFTER hrv_rmssd,\nADD COLUMN hrv_pnn50 DECIMAL(10,2) AFTER hrv_sdnn,\nADD COLUMN hrv_lf_hf_ratio DECIMAL(10,2) AFTER hrv_pnn50,\nADD COLUMN hrv_stress_score INT AFTER hrv_lf_hf_ratio,\nADD COLUMN hrv_ans_balance VARCHAR(30) AFTER hrv_stress_score;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE patient_vitals \nADD COLUMN hrv_rmssd DECIMAL(10,2) AFTER stress_level,\nADD COLUMN hrv_sdnn DECIMAL(10,2) AFTER hrv_rmssd,\nADD COLUMN hrv_pnn50 DECIMAL(10,2) AFTER hrv_sdnn,\nADD COLUMN hrv_lf_hf_ratio DECIMAL(10,2) AFTER hrv_pnn50,\nADD COLUMN hrv_stress_score INT AFTER hrv_lf_hf_ratio,\nADD COLUMN hrv_ans_balance VARCHAR(30) AFTER hrv_stress_score;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'hfh9iotezrzswfjesim83c.patient_vitals' doesn't exist"
+  ]
+}

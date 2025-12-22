@@ -183,6 +183,13 @@
       "when": 1766390608944,
       "tag": "0025_broken_wallow",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1766391520685,
+      "tag": "0026_grey_jackpot",
+      "breakpoints": true
     }
   ]
 }

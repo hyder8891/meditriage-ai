@@ -71,3 +71,21 @@
 - [x] User profile and preferences management
 - [x] Lab result interpretation system
 - [x] Medical imaging analysis (11 modalities)
+
+## Optic-Vitals Enhancements (Current Session)
+- [x] Add HRV (Heart Rate Variability) analysis to rPPG engine
+  - [x] Extend patient_vitals table with HRV metrics (RMSSD, SDNN, pNN50, LF/HF ratio)
+  - [x] Implement HRV calculation in BioScannerEngine
+  - [x] Add stress score and ANS balance assessment
+  - [x] Update vitals-router to store HRV data
+- [x] Add doctor dashboard integration for patient vitals
+  - [x] Create PatientVitalsViewer component for doctor dashboard
+  - [x] Add vitals filtering by patient, date range, and abnormal values
+  - [x] Add vitals alert system for critical readings
+  - [x] Add route at /clinician/patient-vitals
+- [x] Implement interactive trends charts
+  - [x] Add Recharts library for data visualization
+  - [x] Create VitalsTrendsChart component with line/area charts
+  - [x] Add time range selector (24h, 7d, 30d, all time)
+  - [x] Add metric selector (HR, HRV, stress level)
+  - [x] Integrate charts into both patient and doctor views

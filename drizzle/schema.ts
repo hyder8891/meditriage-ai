@@ -2138,6 +2138,14 @@ export const patientVitals = mysqlTable("patient_vitals", {
   oxygenSaturation: int("oxygen_saturation"), // SpO2 percentage (estimated)
   stressLevel: varchar("stress_level", { length: 20 }), // "LOW", "NORMAL", "HIGH" based on HRV
   
+  // HRV (Heart Rate Variability) metrics for stress and ANS assessment
+  hrvRmssd: decimal("hrv_rmssd", { precision: 10, scale: 2 }), // Root Mean Square of Successive Differences (ms)
+  hrvSdnn: decimal("hrv_sdnn", { precision: 10, scale: 2 }), // Standard Deviation of NN intervals (ms)
+  hrvPnn50: decimal("hrv_pnn50", { precision: 10, scale: 2 }), // Percentage of NN intervals > 50ms different (%)
+  hrvLfHfRatio: decimal("hrv_lf_hf_ratio", { precision: 10, scale: 2 }), // Low Frequency / High Frequency ratio
+  hrvStressScore: int("hrv_stress_score"), // 0-100 (0=relaxed, 100=highly stressed)
+  hrvAnsBalance: varchar("hrv_ans_balance", { length: 30 }), // "PARASYMPATHETIC", "BALANCED", "SYMPATHETIC"
+  
   // Measurement quality
   confidenceScore: int("confidence_score"), // 0-100% (how steady was the camera?)
   measurementMethod: varchar("method", { length: 50 }).default("OPTIC_CAMERA"),

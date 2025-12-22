@@ -1,0 +1,16 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE 'patient%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE 'patient%';",
+  "rows": [
+    {
+      "TABLE_NAME": "patient_clinic_links"
+    },
+    {
+      "TABLE_NAME": "patient_invitations"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\npatient_clinic_links\npatient_invitations\n",
+  "stderr": "",
+  "execution_time_ms": 1486
+}

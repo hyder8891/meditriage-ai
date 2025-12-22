@@ -19,6 +19,7 @@ import {
 import { AppLogo } from "@/components/AppLogo";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 import type { HeartRateResult } from "@/lib/rppg-engine";
+import { VitalsTrendsChart } from "@/components/VitalsTrendsChart";
 
 export default function BioScannerPage() {
   const { language } = useLanguage();
@@ -87,6 +88,7 @@ export default function BioScannerPage() {
           </p>
         </div>
 
+        <div className="space-y-6">
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Scanner Section */}
           <div className="lg:col-span-2">
@@ -285,6 +287,16 @@ export default function BioScannerPage() {
               </Card>
             )}
           </div>
+        </div>
+
+        {/* Trends Chart - Full Width Below */}
+        {stats && stats.totalMeasurements > 0 && recentVitals && recentVitals.length > 0 && (
+          <VitalsTrendsChart 
+            vitals={recentVitals}
+            title={language === 'ar' ? 'اتجاهات القياسات' : 'Vital Signs Trends'}
+            description={language === 'ar' ? 'تتبع معدل ضربات القلب ومقاييس HRV بمرور الوقت' : 'Track heart rate and HRV metrics over time'}
+          />
+        )}
         </div>
       </div>
     </div>

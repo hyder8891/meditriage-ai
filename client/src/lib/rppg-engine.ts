@@ -18,12 +18,22 @@ export interface BioScannerConfig {
   samplingInterval?: number; // Sample every Nth pixel for performance
 }
 
+export interface HRVMetrics {
+  rmssd: number; // Root Mean Square of Successive Differences (ms)
+  sdnn: number; // Standard Deviation of NN intervals (ms)
+  pnn50: number; // Percentage of NN intervals > 50ms different (%)
+  lfHfRatio: number; // Low Frequency / High Frequency ratio
+  stressScore: number; // 0-100 (0=relaxed, 100=highly stressed)
+  ansBalance: 'PARASYMPATHETIC' | 'BALANCED' | 'SYMPATHETIC';
+}
+
 export interface HeartRateResult {
   bpm: number;
   confidence: number; // 0-100
   quality: 'poor' | 'fair' | 'good' | 'excellent';
   signalStrength: number; // 0-1
   timestamp: number;
+  hrv?: HRVMetrics; // Optional HRV analysis
 }
 
 export class BioScannerEngine {
@@ -194,12 +204,16 @@ export class BioScannerEngine {
       this.peakHistory.shift();
     }
 
+    // Calculate HRV metrics if we have enough peaks
+    const hrvMetrics = this.calculateHRV(peakIndices);
+
     return {
       bpm: Math.round(bpm),
       confidence: Math.max(0, Math.min(100, confidence)),
       quality,
       signalStrength,
       timestamp: Date.now(),
+      hrv: hrvMetrics || undefined,
     };
   }
 
@@ -260,5 +274,89 @@ export class BioScannerEngine {
     
     const sum = this.peakHistory.reduce((a, b) => a + b, 0);
     return Math.round(sum / this.peakHistory.length);
+  }
+
+  /**
+   * Calculate HRV (Heart Rate Variability) metrics from inter-beat intervals
+   * 
+   * HRV measures the variation in time between heartbeats and is a key indicator of:
+   * - Autonomic nervous system (ANS) balance
+   * - Stress levels and recovery
+   * - Cardiovascular health
+   * 
+   * @param peakIndices - Array of peak positions in the signal buffer
+   * @returns HRV metrics or null if insufficient data
+   */
+  private calculateHRV(peakIndices: number[]): HRVMetrics | null {
+    // Need at least 5 peaks for meaningful HRV analysis
+    if (peakIndices.length < 5) return null;
+
+    // Calculate NN intervals (Normal-to-Normal intervals in milliseconds)
+    const nnIntervals: number[] = [];
+    for (let i = 1; i < peakIndices.length; i++) {
+      const intervalFrames = peakIndices[i] - peakIndices[i - 1];
+      const intervalMs = (intervalFrames / this.fps) * 1000;
+      nnIntervals.push(intervalMs);
+    }
+
+    // 1. RMSSD - Root Mean Square of Successive Differences
+    // Measures short-term HRV, reflects parasympathetic activity
+    const successiveDiffs = [];
+    for (let i = 1; i < nnIntervals.length; i++) {
+      const diff = nnIntervals[i] - nnIntervals[i - 1];
+      successiveDiffs.push(diff * diff);
+    }
+    const rmssd = Math.sqrt(successiveDiffs.reduce((a, b) => a + b, 0) / successiveDiffs.length);
+
+    // 2. SDNN - Standard Deviation of NN intervals
+    // Measures overall HRV, reflects both sympathetic and parasympathetic activity
+    const meanNN = nnIntervals.reduce((a, b) => a + b, 0) / nnIntervals.length;
+    const variance = nnIntervals.reduce((sum, nn) => sum + (nn - meanNN) ** 2, 0) / nnIntervals.length;
+    const sdnn = Math.sqrt(variance);
+
+    // 3. pNN50 - Percentage of NN intervals > 50ms different from previous
+    // Another measure of parasympathetic activity
+    let nn50Count = 0;
+    for (let i = 1; i < nnIntervals.length; i++) {
+      if (Math.abs(nnIntervals[i] - nnIntervals[i - 1]) > 50) {
+        nn50Count++;
+      }
+    }
+    const pnn50 = (nn50Count / (nnIntervals.length - 1)) * 100;
+
+    // 4. Simplified LF/HF ratio estimation
+    // In proper HRV analysis, this requires frequency domain analysis (FFT)
+    // Here we use a simplified approximation based on interval variability patterns
+    // Low variability → high LF/HF (sympathetic dominance, stress)
+    // High variability → low LF/HF (parasympathetic dominance, relaxation)
+    const normalizedSDNN = Math.min(sdnn / 100, 1); // Normalize to 0-1
+    const lfHfRatio = Math.max(0.5, Math.min(3.0, 2.0 - normalizedSDNN * 1.5));
+
+    // 5. Stress Score (0-100)
+    // Lower HRV = higher stress
+    // Combines RMSSD and SDNN with inverse relationship
+    const rmssdScore = Math.max(0, Math.min(100, 100 - (rmssd / 1.5)));
+    const sdnnScore = Math.max(0, Math.min(100, 100 - (sdnn / 1.5)));
+    const lfHfScore = Math.max(0, Math.min(100, (lfHfRatio - 0.5) * 40));
+    const stressScore = Math.round((rmssdScore * 0.4 + sdnnScore * 0.4 + lfHfScore * 0.2));
+
+    // 6. ANS Balance Assessment
+    let ansBalance: 'PARASYMPATHETIC' | 'BALANCED' | 'SYMPATHETIC';
+    if (lfHfRatio < 1.2) {
+      ansBalance = 'PARASYMPATHETIC'; // Relaxed, recovery state
+    } else if (lfHfRatio > 2.0) {
+      ansBalance = 'SYMPATHETIC'; // Stressed, fight-or-flight
+    } else {
+      ansBalance = 'BALANCED'; // Healthy balance
+    }
+
+    return {
+      rmssd: Math.round(rmssd * 100) / 100,
+      sdnn: Math.round(sdnn * 100) / 100,
+      pnn50: Math.round(pnn50 * 100) / 100,
+      lfHfRatio: Math.round(lfHfRatio * 100) / 100,
+      stressScore,
+      ansBalance,
+    };
   }
 }

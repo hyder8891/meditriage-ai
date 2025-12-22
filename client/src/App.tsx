@@ -69,6 +69,7 @@ import AdminUsers from "./pages/AdminUsers";
 import Settings from "./pages/Settings";
 import PatientMedicalRecords from "./pages/PatientMedicalRecords";
 import BioScannerPage from "./pages/patient/BioScannerPage";
+import { PatientVitalsViewer } from "./pages/clinician/PatientVitalsViewer";
 import { Redirect } from "wouter";
 
 function Router() {
@@ -165,7 +166,11 @@ function Router() {
       </Route>
       <Route path="/clinician/profile">
         {() => <ProtectedRoute requiredRole="clinician"><DoctorProfile /></ProtectedRoute>}
-      </Route>      <Route path={"/triage"} component={Triage} />
+      </Route>
+      <Route path="/clinician/patient-vitals">
+        {() => <ProtectedRoute requiredRole="clinician"><PatientVitalsViewer /></ProtectedRoute>}
+      </Route>
+      <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/admin"} component={Admin} />
