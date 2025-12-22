@@ -67,6 +67,7 @@ import DebugUser from "./pages/DebugUser";
 import DebugAuth from "./pages/DebugAuth";
 import AdminUsers from "./pages/AdminUsers";
 import Settings from "./pages/Settings";
+import PatientMedicalRecords from "./pages/PatientMedicalRecords";
 
 function Router() {
   return (
@@ -89,8 +90,8 @@ function Router() {
       <Route path={"/clinician/pharmaguard"}>
         {() => <ProtectedRoute requiredRole="clinician"><PharmaGuard /></ProtectedRoute>}
       </Route>
-      <Route path={"/clinician/care-locator"}>
-        {() => <ProtectedRoute requiredRole="clinician"><CareLocator /></ProtectedRoute>}
+      <Route path={"/patient/care-locator"}>
+        {() => <ProtectedRoute requiredRole="patient"><CareLocator /></ProtectedRoute>}
       </Route>
 
       <Route path={"/clinician/live-scribe"}>
@@ -141,6 +142,9 @@ function Router() {
       <Route path={"/patient/medications"} component={PatientMedications} />
       <Route path="/patient/portal">
         {() => <ProtectedRoute requiredRole="patient"><PatientPortal /></ProtectedRoute>}
+      </Route>
+      <Route path="/patient/medical-records">
+        {() => <ProtectedRoute requiredRole="patient"><PatientMedicalRecords /></ProtectedRoute>}
       </Route>
       <Route path="/patient/profile">
         {() => <ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>}

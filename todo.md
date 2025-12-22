@@ -1,5 +1,14 @@
 # MediTriage AI Pro - TODO
 
+## URGENT: UX Restructuring - Separate Patient and Doctor Features
+- [x] Remove X-Ray Analysis from patient portal (move to doctor-only)
+- [x] Remove Lab Result Interpretation from patient portal (move to doctor-only)
+- [x] Remove Bio-Scanner from patient portal (move to doctor-only)
+- [x] Move Care Locator from doctor dashboard to patient portal
+- [x] Add view-only "My Medical Records" section for patients
+- [x] Update patient portal navigation to focus on: symptoms → find doctor → communicate → track care
+- [x] Update doctor dashboard to focus on: diagnose → treat → monitor → communicate
+
 ## URGENT: User-Reported Issues (tabibi.clinic)
 - [x] Fix 404 error: /admin/users page missing
 - [x] Fix 404 error: /settings page missing

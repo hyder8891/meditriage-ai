@@ -36,28 +36,29 @@ export default function PatientPortal() {
   const { data: usage } = trpc.b2b2c.subscription.getUsageStats.useQuery();
   const { data: myDoctors } = trpc.b2b2c.patient.getMyDoctors.useQuery();
 
-  // AI Tools
-  const aiTools = [
+  // Patient Tools - Removed clinical tools (X-Ray, Bio-Scanner, Lab Interpretation)
+  // These are now doctor-only features
+  const patientTools = [
     {
-      icon: Brain,
-      title: language === 'ar' ? 'محرك التشخيص' : 'Diagnosis Engine',
-      desc: language === 'ar' ? 'تحليل الأعراض بالذكاء الاصطناعي' : 'AI symptom analysis',
-      color: 'from-purple-500 to-indigo-500',
-      path: '/brain',
-    },
-    {
-      icon: Microscope,
-      title: language === 'ar' ? 'تحليل الأشعة' : 'X-Ray Analysis',
-      desc: language === 'ar' ? 'تفسير الصور الطبية' : 'Medical imaging',
-      color: 'from-pink-500 to-rose-500',
-      path: '/xray-analysis',
+      icon: Search,
+      title: language === 'ar' ? 'ابحث عن عيادة' : 'Find Clinic',
+      desc: language === 'ar' ? 'اعثر على أقرب مستشفى أو عيادة' : 'Find nearest hospital or clinic',
+      color: 'from-blue-500 to-cyan-500',
+      path: '/patient/care-locator',
     },
     {
       icon: FileText,
-      title: language === 'ar' ? 'التوثيق الصوتي' : 'Voice Notes',
-      desc: language === 'ar' ? 'تحويل الصوت لنص' : 'Voice to text',
+      title: language === 'ar' ? 'سجلاتي الطبية' : 'My Medical Records',
+      desc: language === 'ar' ? 'عرض نتائج الفحوصات والتقارير' : 'View test results and reports',
       color: 'from-green-500 to-emerald-500',
-      path: '/live-scribe',
+      path: '/patient/medical-records',
+    },
+    {
+      icon: Calendar,
+      title: language === 'ar' ? 'مواعيدي' : 'My Appointments',
+      desc: language === 'ar' ? 'إدارة المواعيد الطبية' : 'Manage medical appointments',
+      color: 'from-purple-500 to-indigo-500',
+      path: '/patient/appointments',
     },
   ];
 
@@ -288,18 +289,18 @@ export default function PatientPortal() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-2xl">
-                  {language === 'ar' ? 'أدوات الذكاء الاصطناعي' : 'AI-Powered Tools'}
+                  {language === 'ar' ? 'أدواتي' : 'My Tools'}
                 </CardTitle>
                 <p className="text-slate-600 text-sm mt-1">
-                  {language === 'ar' ? 'أدوات تشخيصية متقدمة' : 'Advanced diagnostic tools'}
+                  {language === 'ar' ? 'إدارة رعايتك الصحية' : 'Manage your healthcare'}
                 </p>
               </div>
               <Zap className="w-6 h-6 text-purple-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {aiTools.map((tool, idx) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {patientTools.map((tool, idx) => (
                 <Card 
                   key={idx} 
                   className="border-2 hover:shadow-lg transition-all cursor-pointer group"
