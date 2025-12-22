@@ -14,6 +14,7 @@ interface BioScannerProps {
 export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const graphCanvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef(new BioScannerEngine({ fps: 30, minWindowSeconds: 5 }));
   const animationFrameRef = useRef<number>();
   const streamRef = useRef<MediaStream>();
@@ -26,6 +27,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   const [error, setError] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
   const [signalStrength, setSignalStrength] = useState(0);
+  const [waveformData, setWaveformData] = useState<number[]>([]);
 
   const saveVital = trpc.vitals.logVital.useMutation({
     onSuccess: () => {
@@ -35,6 +37,53 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       toast.error(`Failed to save: ${err.message}`);
     },
   });
+
+  const drawWaveform = (value: number) => {
+    const canvas = graphCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    setWaveformData(prev => {
+      const newData = [...prev, value].slice(-150); // Keep last 150 frames (5 seconds at 30fps)
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw grid lines
+      ctx.strokeStyle = "#e5e7eb";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = (i / 4) * canvas.height;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+      
+      if (newData.length < 2) return newData;
+      
+      // Auto-scale waveform
+      const min = Math.min(...newData);
+      const max = Math.max(...newData);
+      const range = max - min || 1;
+      
+      // Draw waveform
+      ctx.beginPath();
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 2;
+      
+      newData.forEach((pt, i) => {
+        const x = (i / 150) * canvas.width;
+        const y = canvas.height - ((pt - min) / range) * canvas.height;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      
+      return newData;
+    });
+  };
 
   const startCamera = async () => {
     try {
@@ -121,6 +170,14 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
     // Get signal metrics for real-time feedback
     const metrics = engineRef.current.getSignalMetrics();
     setSignalStrength(metrics.signalStrength);
+
+    // Update waveform visualization
+    // @ts-ignore - accessing private buffer for debugging
+    const buffer = engineRef.current.buffer;
+    if (buffer && buffer.length > 0) {
+      const latestValue = buffer[buffer.length - 1];
+      drawWaveform(latestValue);
+    }
 
     // Calculate heart rate if enough data
     const result = engineRef.current.calculateHeartRate();
@@ -301,6 +358,28 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
 
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} width="150" height="150" className="hidden" />
+
+      {/* Live Signal Waveform Graph */}
+      {scanning && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-emerald-600 font-semibold">📊 LIVE SIGNAL WAVEFORM</span>
+            <span className="text-xs text-muted-foreground">
+              {waveformData.length < 30 ? "Waiting for signal..." : 
+               waveformData.length < 90 ? "Signal detected" : 
+               "Analyzing..."}
+            </span>
+          </div>
+          <div className="w-full h-24 bg-white dark:bg-gray-900 rounded-lg border-2 border-emerald-200 dark:border-emerald-800 overflow-hidden shadow-inner">
+            <canvas ref={graphCanvasRef} width={600} height={96} className="w-full h-full" />
+          </div>
+          <p className="text-xs text-center text-muted-foreground">
+            {waveformData.length < 30 ? "🔍 Initializing camera sensor..." : 
+             waveformData.length < 90 ? "✓ Blood flow signal detected! Keep still..." : 
+             "⚡ Processing heart rate from signal peaks..."}
+          </p>
+        </div>
+      )}
 
       {/* Face Positioning Guide */}
       {scanning && (

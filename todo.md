@@ -84,12 +84,18 @@
   - [x] FINAL FIX: Increase canvas to 300x300 with 100x100 scan area (10,000 pixels for noise cancellation)
 
 ## Current Bug (User Reported - URGENT)
-- [x] Optic-Vitals Bio-Scanner crashing with database error
+- [ ] Optic-Vitals Bio-Scanner showing 0% confidence despite perfect lighting and stillness
   - [x] Fixed: patient_vitals table created in database
   - [x] Fixed: Rewrote vitals router to use direct SQL queries instead of db.query API
   - [x] Fixed: Added schema to database connection with mode parameter
   - [x] Fixed: Updated to 300x300 canvas with 100x100 center scan area
-  - Ready for testing
+  - [x] Added debug logging to see raw pixel data and signal processing
+  - [x] Add live waveform graph to visualize signal in real-time
+  - [x] Lower signal detection thresholds (stdDev from 0.1 to 0.05)
+  - [x] Lower peak detection threshold (from 0.15 to 0.08 of stdDev)
+  - [x] Reduce minimum peaks required (from 3 to 2)
+  - [x] Reduce minimum peak distance (from 0.3s to 0.25s)
+  - [ ] Test complete measurement flow end-to-end
 
 ## Optic-Vitals Enhancements (Current Session)
 - [x] Add HRV (Heart Rate Variability) analysis to rPPG engine

@@ -65,18 +65,32 @@ export class BioScannerEngine {
    */
   processFrame(imageData: ImageData): number {
     let sumGreen = 0;
+    let sumRed = 0;
+    let sumBlue = 0;
     let pixelCount = 0;
     const data = imageData.data;
 
     // Sample pixels at intervals to reduce CPU load
     // Each pixel is [R, G, B, A], so we jump by 4 * samplingInterval
     for (let i = 0; i < data.length; i += 4 * this.samplingInterval) {
+      const red = data[i];
       const green = data[i + 1]; // Green channel is at index 1
+      const blue = data[i + 2];
+      sumRed += red;
       sumGreen += green;
+      sumBlue += blue;
       pixelCount++;
     }
 
+    const avgRed = sumRed / pixelCount;
     const avgGreen = sumGreen / pixelCount;
+    const avgBlue = sumBlue / pixelCount;
+
+    // Debug logging every 30 frames (~1 second)
+    if (this.frameCount % 30 === 0) {
+      console.log('[rPPG Pixel Data] R:', avgRed.toFixed(1), '| G:', avgGreen.toFixed(1), '| B:', avgBlue.toFixed(1), '| Pixels sampled:', pixelCount);
+      console.log('[rPPG Buffer] Size:', this.buffer.length, '| Latest values:', this.buffer.slice(-5).map(v => v.toFixed(1)).join(', '));
+    }
 
     // Add to circular buffer
     this.buffer.push(avgGreen);
@@ -119,8 +133,8 @@ export class BioScannerEngine {
     console.log('[rPPG Debug] Signal mean:', mean.toFixed(2));
     
     // If signal is too flat, quality is poor (lowered threshold significantly for real-world conditions)
-    if (stdDev < 0.1) {
-      console.log('[rPPG Debug] Signal too flat, stdDev < 0.1');
+    if (stdDev < 0.05) {
+      console.log('[rPPG Debug] Signal too flat, stdDev < 0.05');
       return {
         bpm: 0,
         confidence: 0,
@@ -131,7 +145,7 @@ export class BioScannerEngine {
     }
 
     // Step 3: Detect peaks (local maxima above threshold)
-    const threshold = stdDev * 0.15; // Adaptive threshold based on signal strength (lowered significantly)
+    const threshold = stdDev * 0.08; // Adaptive threshold based on signal strength (lowered significantly for subtle signals)
     console.log('[rPPG Debug] Peak detection threshold:', threshold.toFixed(3));
     const peaks: number[] = [];
     const peakIndices: number[] = [];
@@ -143,8 +157,8 @@ export class BioScannerEngine {
 
       // Peak detection: current value is higher than neighbors and above threshold
       if (current > prev && current > next && current > threshold) {
-        // Ensure peaks are at least 0.3s apart (200 BPM max)
-        const minPeakDistance = this.fps * 0.3;
+        // Ensure peaks are at least 0.25s apart (240 BPM max, allows for faster heart rates)
+        const minPeakDistance = this.fps * 0.25;
         if (peakIndices.length === 0 || i - peakIndices[peakIndices.length - 1] > minPeakDistance) {
           peaks.push(current);
           peakIndices.push(i);
@@ -152,10 +166,10 @@ export class BioScannerEngine {
       }
     }
 
-    // Need at least 3 peaks for reliable calculation
+    // Need at least 2 peaks for calculation (lowered from 3 for faster response)
     console.log('[rPPG Debug] Peaks detected:', peaks.length);
-    if (peaks.length < 3) {
-      console.log('[rPPG Debug] Not enough peaks (need 3, found', peaks.length + ')');
+    if (peaks.length < 2) {
+      console.log('[rPPG Debug] Not enough peaks (need 2, found', peaks.length + ')');
       return {
         bpm: 0,
         confidence: 20,
