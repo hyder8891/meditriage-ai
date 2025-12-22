@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Users, Search, Shield, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { TableSkeleton } from "@/components/SkeletonLoader";
+import { AppLogo } from "@/components/AppLogo";
 
 export default function AdminUsers() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,14 +68,17 @@ export default function AdminUsers() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-              <Users className="h-8 w-8 text-teal-600" />
-              إدارة المستخدمين
-            </h1>
-            <p className="text-slate-600 mt-1">
-              إدارة حسابات المستخدمين والصلاحيات
-            </p>
+          <div className="flex items-center gap-4">
+            <AppLogo href="/admin/dashboard" size="lg" showText={false} />
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                <Users className="h-8 w-8 text-teal-600" />
+                إدارة المستخدمين
+              </h1>
+              <p className="text-slate-600 mt-1">
+                إدارة حسابات المستخدمين والصلاحيات
+              </p>
+            </div>
           </div>
         </div>
 

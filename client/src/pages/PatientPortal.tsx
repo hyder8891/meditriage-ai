@@ -28,6 +28,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 import { Progress } from "@/components/ui/progress";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
+import { AppLogo } from "@/components/AppLogo";
 
 export default function PatientPortal() {
   const { language } = useLanguage();
@@ -72,10 +73,7 @@ export default function PatientPortal() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
-              <div className="flex items-center gap-2">
-                <Heart className="w-6 h-6 text-rose-500" />
-                <span className="text-lg font-bold text-slate-900">MediTriage AI Pro</span>
-              </div>
+              <AppLogo href="/patient/portal" size="md" showText={true} />
               <div className="hidden md:flex items-center gap-1">
                 <Button variant="ghost" className="text-rose-600 bg-rose-50">
                   <Activity className="w-4 h-4 mr-2" />

@@ -23,6 +23,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { AppLogo } from "@/components/AppLogo";
 
 interface ClinicianLayoutProps {
   children: ReactNode;
@@ -56,22 +57,21 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
       <aside className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-50 overflow-y-auto ${sidebarOpen ? 'w-64' : 'w-20'}`}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-8">
-            {sidebarOpen && (
-              <img 
-                src="/logo.png" 
-                alt="My Doctor طبيبي" 
-                className="h-12 w-auto" 
-                style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
-              />
+            {sidebarOpen ? (
+              <AppLogo href="/dashboard" size="md" showText={true} />
+            ) : (
+              <AppLogo href="/dashboard" size="sm" showText={false} className="mx-auto" />
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className={sidebarOpen ? "ml-auto" : "mx-auto"}
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
+            {sidebarOpen && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="ml-auto"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            )}
           </div>
 
           <nav className="space-y-2">
