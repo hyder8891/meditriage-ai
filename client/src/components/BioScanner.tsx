@@ -4,8 +4,7 @@ import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Heart, Activity, AlertTriangle, Camera, Brain, Zap } from "lucide-react";
 import { toast } from "sonner";
-import type { HeartRateResult } from "@/lib/rppg-engine";
-import { BioScannerEngine } from "@/lib/rppg-engine";
+import type { HeartRateResult, HRVMetrics } from "@/lib/rppg-engine";
 
 /**
  * 🧬 HYBRID BIO-ENGINE v4.0 - Medical-Grade rPPG
@@ -32,6 +31,7 @@ class HybridBioEngine {
   buffer: number[] = [];
   timestamps: number[] = [];
   rawBuffer: number[] = []; // For motion detection
+  peakIndices: number[] = []; // Track peak positions for HRV
   
   // Timing
   startTime: number = 0;
@@ -54,6 +54,7 @@ class HybridBioEngine {
     this.buffer = [];
     this.timestamps = [];
     this.rawBuffer = [];
+    this.peakIndices = [];
     this.startTime = performance.now();
     this.fps = 30;
     this.lastFpsUpdate = 0;
@@ -86,7 +87,30 @@ class HybridBioEngine {
     
     const avg = sumGreen / pixelCount;
     
-    // --- 2. MOTION DETECTION (Signal Quality Assessment) ---
+    // --- 2. SIGNAL QUALITY VALIDATION (Prevent False Readings) ---
+    // Check if there's actual variation in the signal (not just a blank screen)
+    // Calculate brightness variance across the image
+    let brightnessVariance = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      brightnessVariance += Math.pow(brightness - avg, 2);
+    }
+    brightnessVariance = brightnessVariance / pixelCount;
+    
+    // Minimum variance threshold - if signal is too flat, no person is present
+    const MIN_VARIANCE = 100; // Empirically determined - blank screens have < 50
+    if (brightnessVariance < MIN_VARIANCE) {
+      return {
+        bpm: null,
+        confidence: 0,
+        val: avg,
+        debug: `⚠️ No face/finger detected (variance: ${brightnessVariance.toFixed(1)} < ${MIN_VARIANCE})`,
+        motion: false,
+        stability: 0
+      };
+    }
+    
+    // --- 3. MOTION DETECTION (Signal Quality Assessment) ---
     this.rawBuffer.push(avg);
     if (this.rawBuffer.length > 10) this.rawBuffer.shift(); // Keep last 10 frames
     
@@ -102,6 +126,11 @@ class HybridBioEngine {
           if (this.buffer.length > 30) {
             this.buffer = this.buffer.slice(-30);
             this.timestamps = this.timestamps.slice(-30);
+            // Keep only recent peak indices (those still in buffer)
+            const oldestTimestamp = this.timestamps[0];
+            this.peakIndices = this.peakIndices.filter(idx => 
+              idx >= 0 && idx < this.buffer.length && this.timestamps[idx] >= oldestTimestamp
+            );
           }
           
           return { 
@@ -143,7 +172,7 @@ class HybridBioEngine {
         return { bpm: null, confidence: 0, val: avg, debug: `Warming up... ${this.buffer.length}/30` };
     }
 
-    // --- 3. PROGRESSIVE SIGNAL PROCESSING ---
+    // --- 4. PROGRESSIVE SIGNAL PROCESSING ---
     
     // Determine current tier based on elapsed time
     const elapsed = (now - this.startTime) / 1000; // seconds
@@ -153,22 +182,22 @@ class HybridBioEngine {
     let tier: string;
     
     if (elapsed < 3) {
-      // Tier 1: Ultra-aggressive for immediate feedback
-      thresholdPercent = 0.15; // Lowered from 0.20
+      // Tier 1: Balanced initial detection (increased from 0.15 to reduce false peaks)
+      thresholdPercent = 0.20;
       minDebounce = 150;
-      minPeaks = 1;
+      minPeaks = 2; // Require at least 2 peaks to avoid single noise spike
       tier = "T1";
     } else if (elapsed < 8) {
-      // Tier 2: Moderate detection
-      thresholdPercent = 0.20; // Lowered from 0.30
+      // Tier 2: Moderate detection with higher threshold
+      thresholdPercent = 0.25; // Increased from 0.20
       minDebounce = 200;
-      minPeaks = 2;
+      minPeaks = 3; // Increased from 2
       tier = "T2";
     } else {
-      // Tier 3: High accuracy
-      thresholdPercent = 0.25; // Lowered from 0.35
+      // Tier 3: High accuracy with strict filtering
+      thresholdPercent = 0.30; // Increased from 0.25
       minDebounce = 250;
-      minPeaks = 3;
+      minPeaks = 4; // Increased from 3
       tier = "T3";
     }
     
@@ -222,6 +251,7 @@ class HybridBioEngine {
           // Progressive debounce
           if (peaks.length === 0 || (this.timestamps[i] - this.timestamps[peaks[peaks.length-1]]) > minDebounce) {
             peaks.push(i);
+            this.peakIndices.push(i); // Store for HRV calculation
             if (this.buffer.length % 30 === 0) {
               console.log(`[${tier}] ✅ Peak ${peaks.length} detected at index ${i}, value: ${curr.toFixed(2)}`);
             }
@@ -240,7 +270,7 @@ class HybridBioEngine {
       });
     }
     
-    // --- 4. BPM CALCULATION WITH OUTLIER REJECTION ---
+    // --- 5. BPM CALCULATION WITH OUTLIER REJECTION ---
     if (peaks.length < minPeaks) {
       return { 
         bpm: this.lastBpm, 
@@ -301,19 +331,33 @@ class HybridBioEngine {
     const avgIntervalMs = filteredIntervals.reduce((a, b) => a + b) / filteredIntervals.length;
     const instantaneousBpm = 60000 / avgIntervalMs;
 
-    // Filter impossible values
-    if (instantaneousBpm < this.MIN_BPM || instantaneousBpm > this.MAX_BPM) {
+    // STRICT physiological validation (40-180 BPM for adults)
+    // Reject readings outside this range immediately
+    if (instantaneousBpm < 40 || instantaneousBpm > 180) {
       return { 
         bpm: this.lastBpm, 
         confidence: 0, 
         val: avg, 
-        debug: `Out of range: ${instantaneousBpm.toFixed(0)} BPM`, 
+        debug: `⚠️ Physiologically impossible: ${instantaneousBpm.toFixed(0)} BPM (valid: 40-180)`, 
+        peaks: peaks.length,
+        stability: this.stableFrames
+      };
+    }
+    
+    // Additional validation: reject if too far from normal range (50-150)
+    // This catches edge cases where reading is technically possible but unlikely
+    if (instantaneousBpm < this.MIN_BPM || instantaneousBpm > this.MAX_BPM) {
+      return { 
+        bpm: this.lastBpm, 
+        confidence: Math.max(0, 20 - Math.abs(instantaneousBpm - 100)), // Low confidence for edge values
+        val: avg, 
+        debug: `Edge of normal range: ${instantaneousBpm.toFixed(0)} BPM`, 
         peaks: peaks.length,
         stability: this.stableFrames
       };
     }
 
-    // --- 5. STABILITY LOCKING (Smooth Updates) ---
+    // --- 6. STABILITY LOCKING (Smooth Updates) ---
     let finalBpm: number;
     
     if (this.lastBpm === null) {
@@ -334,7 +378,7 @@ class HybridBioEngine {
     
     this.lastBpm = finalBpm;
 
-    // --- 6. MULTI-FACTOR CONFIDENCE SCORING ---
+    // --- 7. MULTI-FACTOR CONFIDENCE SCORING ---
     
     // Factor 1: Variance-based confidence (60% weight)
     let variance = 0;
@@ -364,6 +408,67 @@ class HybridBioEngine {
       debug: `[${tier}] ✓ ${peaks.length} peaks | ${finalBpm.toFixed(0)} BPM | ${confidence.toFixed(0)}% | Stability: ${this.stableFrames}`
     };
   }
+}
+
+/**
+ * Calculate HRV metrics from peak indices
+ * Extracted from BioScannerEngine for direct use with HybridBioEngine
+ */
+function calculateHRVFromPeaks(
+  peakIndices: number[],
+  timestamps: number[],
+  fps: number
+): HRVMetrics | null {
+  // Need at least 5 peaks for meaningful HRV analysis
+  if (peakIndices.length < 5) return null;
+
+  // Calculate NN intervals (Normal-to-Normal intervals in milliseconds)
+  const nnIntervals: number[] = [];
+  for (let i = 1; i < peakIndices.length; i++) {
+    const intervalMs = timestamps[peakIndices[i]] - timestamps[peakIndices[i - 1]];
+    nnIntervals.push(intervalMs);
+  }
+
+  // 1. RMSSD (Root Mean Square of Successive Differences)
+  const successiveDiffs = nnIntervals.slice(1).map((interval, i) => interval - nnIntervals[i]);
+  const squaredDiffs = successiveDiffs.map(diff => diff * diff);
+  const rmssd = Math.sqrt(squaredDiffs.reduce((a, b) => a + b, 0) / squaredDiffs.length);
+
+  // 2. SDNN (Standard Deviation of NN intervals)
+  const meanNN = nnIntervals.reduce((a, b) => a + b, 0) / nnIntervals.length;
+  const nnVariance = nnIntervals.reduce((sum, interval) => sum + Math.pow(interval - meanNN, 2), 0) / nnIntervals.length;
+  const sdnn = Math.sqrt(nnVariance);
+
+  // 3. pNN50 (Percentage of NN intervals > 50ms different)
+  const nn50Count = successiveDiffs.filter(diff => Math.abs(diff) > 50).length;
+  const pnn50 = (nn50Count / successiveDiffs.length) * 100;
+
+  // 4. LF/HF Ratio (simplified heuristic)
+  const lfHfRatio = sdnn / (rmssd + 1);
+
+  // 5. Stress Score (0-100, higher = more stressed)
+  const normalizedRmssd = Math.min(rmssd / 50, 1);
+  const normalizedLfHf = Math.min(lfHfRatio / 3, 1);
+  const stressScore = Math.round((1 - normalizedRmssd) * 50 + normalizedLfHf * 50);
+
+  // 6. ANS Balance
+  let ansBalance: 'PARASYMPATHETIC' | 'BALANCED' | 'SYMPATHETIC';
+  if (lfHfRatio < 1.5) {
+    ansBalance = 'PARASYMPATHETIC';
+  } else if (lfHfRatio < 2.5) {
+    ansBalance = 'BALANCED';
+  } else {
+    ansBalance = 'SYMPATHETIC';
+  }
+
+  return {
+    rmssd: Math.round(rmssd * 10) / 10,
+    sdnn: Math.round(sdnn * 10) / 10,
+    pnn50: Math.round(pnn50 * 10) / 10,
+    lfHfRatio: Math.round(lfHfRatio * 100) / 100,
+    stressScore: Math.max(0, Math.min(100, stressScore)),
+    ansBalance,
+  };
 }
 
 type DetectionMode = "forehead" | "finger";
@@ -396,7 +501,6 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   
   // Use a Ref for the engine so it persists across renders
   const engineRef = useRef(new HybridBioEngine());
-  const hrvEngineRef = useRef(new BioScannerEngine({ minWindowSeconds: 30, maxBufferSeconds: 60 }));
   const animationFrameRef = useRef<number>();
   const streamRef = useRef<MediaStream>();
   const isScanningRef = useRef(false); // Use ref to avoid race condition with state
@@ -432,7 +536,6 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         setStability(0);
         setHrvMetrics(null);
         engineRef.current.reset();
-        hrvEngineRef.current.reset();
         setDebugInfo("Camera active - Starting scan...");
         
         console.log('[BioScanner] 🚀 Starting processLoop, isScanningRef:', isScanningRef.current);
@@ -514,17 +617,19 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       imageData = ctx.getImageData(centerX, centerY, regionSize, regionSize); // 3,600 pixels
     }
     
-    // 3. Process frame with both engines
+    // 3. Process frame with HybridBioEngine
     const result = engineRef.current.process(imageData);
     
-    // Also process with HRV engine for extended analysis
-    hrvEngineRef.current.processFrame(imageData);
-    
-    // Calculate HRV if enough data (30+ seconds)
-    if (hrvEngineRef.current.isReady()) {
-      const hrvResult = hrvEngineRef.current.calculateHeartRate();
-      if (hrvResult && hrvResult.hrv) {
-        setHrvMetrics(hrvResult.hrv);
+    // Calculate HRV directly from peak indices if we have enough data
+    // Need at least 5 peaks for meaningful HRV analysis (30+ seconds of scanning)
+    if (engineRef.current.peakIndices.length >= 5) {
+      const hrv = calculateHRVFromPeaks(
+        engineRef.current.peakIndices,
+        engineRef.current.timestamps,
+        engineRef.current.fps
+      );
+      if (hrv) {
+        setHrvMetrics(hrv);
       }
     }
     
