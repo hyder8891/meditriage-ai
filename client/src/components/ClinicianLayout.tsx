@@ -9,7 +9,8 @@ import {
   MessageSquare,
   FileText,
   TrendingUp,
-  Crown
+  Crown,
+  Users
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -99,7 +100,15 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               onClick={() => setLocation("/clinician/xray-analysis")}
             >
               <FileImage className="w-5 h-5 mr-3" />
-              X-Ray Analysis
+              Medical Imaging
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/medical-reports")}
+            >
+              <FileText className="w-5 h-5 mr-3" />
+              Medical Reports
             </Button>
             <Button
               variant="ghost"
@@ -116,6 +125,14 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
             >
               <Pill className="w-5 h-5 mr-3" />
               Medications
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/my-patients")}
+            >
+              <Users className="w-5 h-5 mr-3" />
+              Patients
             </Button>
             <Button
               variant="ghost"

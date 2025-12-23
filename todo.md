@@ -102,3 +102,31 @@
 - [x] Add Subscription button to ClinicianLayout sidebar
 - [x] Ensure all clinician pages use consistent navigation
 - [x] Test navigation across all pages
+
+## NEW: Medical Reports Analysis System (User Request)
+- [x] Create comprehensive medical reports analysis system (similar to Medical Imaging design)
+- [x] Add report type selector dropdown with 15+ report types:
+  - [x] Pathology Reports (biopsy, cytology)
+  - [x] Blood Test Reports (CBC, metabolic panels, lipid panels)
+  - [x] Discharge Summaries
+  - [x] Consultation Notes
+  - [x] ECG/EKG Reports
+  - [x] Pulmonary Function Tests (PFT)
+  - [x] Endoscopy Reports
+  - [x] Colonoscopy Reports
+  - [x] Cardiac Stress Test Reports
+  - [x] Sleep Study Reports
+  - [x] Genetic Test Reports
+  - [x] Microbiology/Culture Reports
+  - [x] Allergy Test Reports
+  - [x] Urinalysis Reports
+  - [x] Other Medical Reports
+- [x] Backend: Create medical-reports-analysis.ts module with specialized AI prompts per report type
+- [x] Backend: Create medical-reports-router.ts with upload and analysis endpoints
+- [x] Backend: Integrate with existing lab-router for blood test reports
+- [x] Frontend: Create MedicalReportsAnalysis.tsx page matching Medical Imaging design
+- [x] Frontend: Add report type selector dropdown (bilingual Arabic/English)
+- [x] Frontend: Add file upload with validation (PDF/Image, 16MB limit)
+- [x] Frontend: Display structured analysis results with findings, diagnosis, recommendations
+- [x] Add route to clinician dashboard sidebar
+- [x] Test complete workflow: select type → upload → analyze → display results

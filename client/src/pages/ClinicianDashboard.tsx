@@ -141,7 +141,7 @@ export default function ClinicianDashboard() {
               onClick={() => setLocation("/clinician/xray-analysis")}
             >
               <FileImage className="w-5 h-5 mr-3" />
-              X-Ray Analysis
+              Medical Imaging
             </Button>
             <Button
               variant="ghost"
@@ -158,6 +158,14 @@ export default function ClinicianDashboard() {
             >
               <Pill className="w-5 h-5 mr-3" />
               Medications
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/my-patients")}
+            >
+              <Users className="w-5 h-5 mr-3" />
+              Patients
             </Button>
             <Button
               variant="ghost"
