@@ -204,6 +204,13 @@
       "when": 1766489861031,
       "tag": "0028_secret_diamondback",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1766490446662,
+      "tag": "0029_nosy_trish_tilby",
+      "breakpoints": true
     }
   ]
 }

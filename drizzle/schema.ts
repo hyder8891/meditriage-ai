@@ -2290,3 +2290,151 @@ export const networkQualityMetrics = mysqlTable("network_quality_metrics", {
 
 export type NetworkQualityMetric = typeof networkQualityMetrics.$inferSelect;
 export type InsertNetworkQualityMetric = typeof networkQualityMetrics.$inferInsert;
+
+/**
+ * Wearable device connections
+ * Tracks which wearable devices are connected to each user
+ */
+export const wearableConnections = mysqlTable("wearable_connections", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  
+  // Device information
+  deviceType: mysqlEnum("device_type", ["apple_watch", "fitbit"]).notNull(),
+  deviceId: varchar("device_id", { length: 255 }).notNull(), // External device identifier
+  deviceName: varchar("device_name", { length: 255 }), // User-friendly name
+  deviceModel: varchar("device_model", { length: 100 }), // e.g., "Apple Watch Series 8", "Fitbit Charge 5"
+  
+  // Connection status
+  status: mysqlEnum("status", ["active", "disconnected", "error"]).default("active").notNull(),
+  lastSyncAt: timestamp("last_sync_at"),
+  
+  // OAuth tokens (encrypted)
+  accessToken: text("access_token"), // Encrypted OAuth access token
+  refreshToken: text("refresh_token"), // Encrypted OAuth refresh token
+  tokenExpiresAt: timestamp("token_expires_at"),
+  
+  // Sync settings
+  syncEnabled: boolean("sync_enabled").default(true).notNull(),
+  syncFrequency: int("sync_frequency").default(3600).notNull(), // seconds, default 1 hour
+  
+  // Data type preferences (JSON array of enabled metrics)
+  enabledMetrics: text("enabled_metrics").notNull(), // ["heart_rate", "steps", "sleep", "blood_oxygen", "hrv"]
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WearableConnection = typeof wearableConnections.$inferSelect;
+export type InsertWearableConnection = typeof wearableConnections.$inferInsert;
+
+/**
+ * Wearable data points
+ * Stores time-series health metrics from wearable devices
+ */
+export const wearableDataPoints = mysqlTable("wearable_data_points", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  connectionId: int("connection_id").notNull(), // FK to wearable_connections
+  
+  // Metric information
+  metricType: mysqlEnum("metric_type", [
+    "heart_rate",
+    "steps",
+    "distance",
+    "calories",
+    "active_minutes",
+    "sleep_duration",
+    "sleep_quality",
+    "blood_oxygen",
+    "hrv",
+    "resting_heart_rate",
+    "blood_pressure_systolic",
+    "blood_pressure_diastolic",
+    "respiratory_rate",
+    "body_temperature",
+    "weight",
+    "bmi"
+  ]).notNull(),
+  
+  // Data value
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  unit: varchar("unit", { length: 50 }).notNull(), // "bpm", "steps", "km", "kcal", "minutes", "hours", "%", "mmHg", "breaths/min", "°C", "kg"
+  
+  // Timestamp (when the measurement was taken, not when it was synced)
+  measuredAt: timestamp("measured_at").notNull(),
+  
+  // Context and quality
+  confidence: decimal("confidence", { precision: 3, scale: 2 }).default("1.00").notNull(), // 0-1, data quality score
+  context: text("context"), // JSON: {"activity": "sleeping", "location": "home", "device_battery": 85}
+  
+  // Source tracking
+  sourceDevice: varchar("source_device", { length: 100 }).notNull(), // "Apple Watch Series 8", "Fitbit Charge 5"
+  sourceApp: varchar("source_app", { length: 100 }), // "Health", "Fitbit", "Strava"
+  
+  // Sync metadata
+  syncedAt: timestamp("synced_at").defaultNow().notNull(),
+  externalId: varchar("external_id", { length: 255 }), // Original ID from wearable API
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type WearableDataPoint = typeof wearableDataPoints.$inferSelect;
+export type InsertWearableDataPoint = typeof wearableDataPoints.$inferInsert;
+
+/**
+ * Aggregated wearable metrics
+ * Pre-computed daily/weekly summaries for faster Context Vector queries
+ */
+export const wearableMetricsSummary = mysqlTable("wearable_metrics_summary", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  
+  // Time period
+  periodType: mysqlEnum("period_type", ["daily", "weekly", "monthly"]).notNull(),
+  periodStart: date("period_start").notNull(),
+  periodEnd: date("period_end").notNull(),
+  
+  // Heart rate metrics
+  avgHeartRate: decimal("avg_heart_rate", { precision: 5, scale: 2 }),
+  minHeartRate: int("min_heart_rate"),
+  maxHeartRate: int("max_heart_rate"),
+  restingHeartRate: int("resting_heart_rate"),
+  avgHRV: decimal("avg_hrv", { precision: 6, scale: 2 }), // Heart Rate Variability in ms
+  
+  // Activity metrics
+  totalSteps: int("total_steps"),
+  totalDistance: decimal("total_distance", { precision: 8, scale: 2 }), // km
+  totalCalories: int("total_calories"),
+  totalActiveMinutes: int("total_active_minutes"),
+  
+  // Sleep metrics
+  avgSleepDuration: decimal("avg_sleep_duration", { precision: 4, scale: 2 }), // hours
+  avgSleepQuality: decimal("avg_sleep_quality", { precision: 3, scale: 2 }), // 0-100 score
+  
+  // Respiratory metrics
+  avgBloodOxygen: decimal("avg_blood_oxygen", { precision: 5, scale: 2 }), // %
+  avgRespiratoryRate: decimal("avg_respiratory_rate", { precision: 4, scale: 2 }), // breaths/min
+  
+  // Blood pressure (if available)
+  avgSystolic: int("avg_systolic"),
+  avgDiastolic: int("avg_diastolic"),
+  
+  // Body metrics
+  avgWeight: decimal("avg_weight", { precision: 5, scale: 2 }), // kg
+  avgBMI: decimal("avg_bmi", { precision: 4, scale: 2 }),
+  avgBodyTemp: decimal("avg_body_temp", { precision: 4, scale: 2 }), // °C
+  
+  // Data quality
+  dataCompleteness: decimal("data_completeness", { precision: 3, scale: 2 }).default("1.00").notNull(), // 0-1
+  measurementCount: int("measurement_count").default(0).notNull(),
+  
+  // Anomalies detected (JSON array)
+  anomalies: text("anomalies"), // [{"type": "elevated_heart_rate", "severity": "moderate", "timestamp": "..."}]
+  
+  lastUpdated: timestamp("last_updated").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type WearableMetricsSummary = typeof wearableMetricsSummary.$inferSelect;
+export type InsertWearableMetricsSummary = typeof wearableMetricsSummary.$inferInsert;

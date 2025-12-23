@@ -259,16 +259,54 @@ async function fetchFinancialConstraints(userId: number): Promise<any> {
 
 async function fetchWearableData(userId: number): Promise<any> {
   try {
-    // Check Redis for recent wearable data (updated by mobile app)
-    const wearableKey = `user:${userId}:wearable`;
-    const data = await redis.get(wearableKey);
-
-    if (data && typeof data === "object") {
-      return data;
+    // Import wearable integration service
+    const { getRecentWearableData, getDailySummary } = await import("../avicenna/wearable-integration");
+    
+    // Get today's summary if available (pre-computed aggregates)
+    const today = new Date();
+    const dailySummary = await getDailySummary(userId, today);
+    
+    if (dailySummary.length > 0) {
+      const summary = dailySummary[0];
+      return {
+        avgHeartRate: summary.avgHeartRate ? parseFloat(summary.avgHeartRate) : undefined,
+        restingHeartRate: summary.restingHeartRate,
+        avgHRV: summary.avgHRV ? parseFloat(summary.avgHRV) : undefined,
+        totalSteps: summary.totalSteps,
+        avgSleepDuration: summary.avgSleepDuration ? parseFloat(summary.avgSleepDuration) : undefined,
+        avgBloodOxygen: summary.avgBloodOxygen ? parseFloat(summary.avgBloodOxygen) : undefined,
+        anomalies: summary.anomalies ? JSON.parse(summary.anomalies) : [],
+      };
     }
-
-    // No wearable data available
-    return undefined;
+    
+    // Fallback: Get recent data points (last 24 hours)
+    const recentData = await getRecentWearableData(userId, 24);
+    
+    if (recentData.length === 0) {
+      return undefined; // No wearable data available
+    }
+    
+    // Compute basic aggregates from recent data
+    const heartRateData = recentData.filter(d => d.metricType === "heart_rate");
+    const stepsData = recentData.filter(d => d.metricType === "steps");
+    const hrvData = recentData.filter(d => d.metricType === "hrv");
+    const bloodOxygenData = recentData.filter(d => d.metricType === "blood_oxygen");
+    
+    return {
+      avgHeartRate: heartRateData.length > 0
+        ? heartRateData.reduce((sum, d) => sum + parseFloat(d.value), 0) / heartRateData.length
+        : undefined,
+      totalSteps: stepsData.length > 0
+        ? Math.max(...stepsData.map(d => parseFloat(d.value)))
+        : undefined,
+      avgHRV: hrvData.length > 0
+        ? hrvData.reduce((sum, d) => sum + parseFloat(d.value), 0) / hrvData.length
+        : undefined,
+      avgBloodOxygen: bloodOxygenData.length > 0
+        ? bloodOxygenData.reduce((sum, d) => sum + parseFloat(d.value), 0) / bloodOxygenData.length
+        : undefined,
+      anomalies: [], // No anomaly detection on raw data
+    };
   } catch (error) {
     console.error("[Context Vector] Error fetching wearable data:", error);
     return undefined;
@@ -313,9 +351,43 @@ function calculateSymptomSeverity(input: SymptomInput, wearableData?: any): numb
     }
   }
 
-  // Adjust based on wearable data (heart rate variability is a strong indicator)
-  if (wearableData?.heartRateVariability) {
-    if (wearableData.heartRateVariability < 20) severity += 1; // Low HRV = stress/illness
+  // Adjust based on wearable data (comprehensive health metrics)
+  if (wearableData) {
+    // Heart Rate Variability (HRV) - strong stress/illness indicator
+    if (wearableData.avgHRV) {
+      if (wearableData.avgHRV < 20) severity += 2; // Very low HRV = significant stress/illness
+      else if (wearableData.avgHRV < 30) severity += 1; // Low HRV = moderate stress
+    }
+    
+    // Resting Heart Rate - elevated RHR can indicate illness
+    if (wearableData.restingHeartRate) {
+      if (wearableData.restingHeartRate > 100) severity += 2; // Tachycardia at rest
+      else if (wearableData.restingHeartRate > 90) severity += 1;
+    }
+    
+    // Blood Oxygen - critical indicator
+    if (wearableData.avgBloodOxygen) {
+      if (wearableData.avgBloodOxygen < 90) severity += 3; // Critical hypoxemia
+      else if (wearableData.avgBloodOxygen < 92) severity += 2;
+      else if (wearableData.avgBloodOxygen < 95) severity += 1;
+    }
+    
+    // Sleep Duration - insufficient sleep weakens immune system
+    if (wearableData.avgSleepDuration) {
+      if (wearableData.avgSleepDuration < 4) severity += 1; // Severe sleep deprivation
+      else if (wearableData.avgSleepDuration < 5) severity += 0.5;
+    }
+    
+    // Detected Anomalies from wearable data
+    if (wearableData.anomalies && Array.isArray(wearableData.anomalies)) {
+      for (const anomaly of wearableData.anomalies) {
+        if (anomaly.severity === "high" || anomaly.severity === "critical") {
+          severity += 2;
+        } else if (anomaly.severity === "moderate") {
+          severity += 1;
+        }
+      }
+    }
   }
 
   // Keyword analysis for severity

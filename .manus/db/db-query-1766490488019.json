@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `wearable_connections` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`user_id` int NOT NULL,\n\t`device_type` enum('apple_watch','fitbit') NOT NULL,\n\t`device_id` varchar(255) NOT NULL,\n\t`device_name` varchar(255),\n\t`device_model` varchar(100),\n\t`status` enum('active','disconnected','error') NOT NULL DEFAULT 'active',\n\t`last_sync_at` timestamp,\n\t`access_token` text,\n\t`refresh_token` text,\n\t`token_expires_at` timestamp,\n\t`sync_enabled` boolean NOT NULL DEFAULT true,\n\t`sync_frequency` int NOT NULL DEFAULT 3600,\n\t`enabled_metrics` text NOT NULL,\n\t`created_at` timestamp NOT NULL DEFAULT (now()),\n\t`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `wearable_connections_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `wearable_connections` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`user_id` int NOT NULL,\n\t`device_type` enum('apple_watch','fitbit') NOT NULL,\n\t`device_id` varchar(255) NOT NULL,\n\t`device_name` varchar(255),\n\t`device_model` varchar(100),\n\t`status` enum('active','disconnected','error') NOT NULL DEFAULT 'active',\n\t`last_sync_at` timestamp,\n\t`access_token` text,\n\t`refresh_token` text,\n\t`token_expires_at` timestamp,\n\t`sync_enabled` boolean NOT NULL DEFAULT true,\n\t`sync_frequency` int NOT NULL DEFAULT 3600,\n\t`enabled_metrics` text NOT NULL,\n\t`created_at` timestamp NOT NULL DEFAULT (now()),\n\t`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `wearable_connections_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1710
+}
