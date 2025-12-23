@@ -136,10 +136,10 @@ ${isFinalStep
      2. Possible conditions with probabilities
      3. Clear recommendations
      4. Any red flags to watch for` 
-  : `CRITICAL: Review the conversation history above to see what questions you've already asked and what answers the patient provided.
+  : `CRITICAL: Review the conversation history to see what questions you've already asked and what answers the patient provided.
      DO NOT repeat questions that have already been answered.
      Ask the SINGLE most important NEXT question to narrow down the diagnosis.
-     Be empathetic but concise. Focus on gathering NEW critical information.`}
+     Be empathetic but concise. Focus on gathering NEW critical information that hasn't been provided yet.`}
 
 OUTPUT FORMAT:
 You MUST return ONLY valid JSON. No markdown. No explanations. Just pure JSON.
@@ -191,7 +191,7 @@ ${isFinalStep ? `
     // 4. Build conversation messages with full history
     const conversationMessages = [
       { role: "system" as const, content: systemPrompt },
-      ...vector.conversationHistory.slice(-10).map(msg => ({ // Last 10 messages to avoid token limits
+      ...vector.conversationHistory.slice(-20).map(msg => ({ // Last 20 messages to avoid token limits
         role: msg.role,
         content: msg.content
       }))

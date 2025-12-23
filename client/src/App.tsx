@@ -202,12 +202,12 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path={"/settings"} component={Settings} />
-      <Route path={"/symptom-checker"} component={SymptomCheckerStructured} />
+      <Route path={"/symptom-checker"} component={SymptomChecker} />
       <Route path={"/brain"} component={BRAINAnalysis} />
       <Route path={"/brain/dashboard"} component={BRAINDashboard} />
       <Route path={"/brain/training"} component={TrainingDashboard} />
       <Route path={"/brain/performance"} component={BrainPerformance} />
-      <Route path={"/symptom-checker-old"} component={SymptomChecker} />
+      <Route path={"/symptom-checker-structured"} component={SymptomCheckerStructured} />
       <Route path={"/test-notifications"} component={TestNotifications} />
       <Route path={"/debug-user"} component={DebugUser} />
       <Route path={"/debug-auth"} component={DebugAuth} />

@@ -26,7 +26,7 @@ interface Message {
 }
 
 interface Recommendations {
-  urgencyLevel: "emergency" | "urgent" | "routine" | "self-care";
+  urgencyLevel: "emergency" | "urgent" | "routine" | "self_care";
   urgencyDescription: string;
   possibleConditions: string[];
   recommendedActions: string[];
@@ -39,38 +39,70 @@ interface Recommendations {
 
 export default function SymptomChecker() {
   const { language } = useLanguage();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content:
-        language === "ar"
-          ? "مرحباً! أنا مساعدك الصحي الذكي. سأساعدك في تقييم أعراضك. ما هي الأعراض التي تعاني منها؟"
-          : "Hello! I'm your AI health assistant. I'll help you assess your symptoms. What symptoms are you experiencing?",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [context, setContext] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<Recommendations | null>(null);
-  const [messageCount, setMessageCount] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const sendMessage = trpc.triageEnhanced.chatWithRecommendations.useMutation({
-    onSuccess: (data: { content: string; recommendations?: Recommendations; isFinalAssessment?: boolean }) => {
+  // Initialize conversation on mount
+  const startConversation = trpc.conversational.startConversation.useMutation({
+    onSuccess: (data) => {
+      setContext(data.context);
+      setMessages([{
+        id: "welcome",
+        role: "assistant",
+        content: data.message,
+        timestamp: new Date(),
+      }]);
+      setIsInitialized(true);
+    },
+    onError: () => {
+      toast.error(
+        language === "ar"
+          ? "فشل بدء المحادثة. يرجى إعادة تحميل الصفحة."
+          : "Failed to start conversation. Please reload the page."
+      );
+    }
+  });
+
+  // Send message mutation using conversational router
+  const sendMessage = trpc.conversational.sendMessage.useMutation({
+    onSuccess: (data) => {
+      // Add assistant response to messages
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
           role: "assistant",
-          content: data.content,
+          content: data.message,
           timestamp: new Date(),
         },
       ]);
       
-      // If we received recommendations, display them
-      if (data.recommendations && data.isFinalAssessment) {
-        setRecommendations(data.recommendations);
+      // CRITICAL: Save context for next request
+      setContext(data.context);
+      
+      // Handle final triage result
+      if (data.triageResult) {
+        const recommendations: Recommendations = {
+          urgencyLevel: data.triageResult.urgency,
+          urgencyDescription: `Assessment complete - ${data.triageResult.urgency} priority`,
+          possibleConditions: data.triageResult.possibleConditions.map(c => c.name),
+          recommendedActions: data.triageResult.recommendations,
+          redFlagSymptoms: data.triageResult.redFlags,
+          selfCareInstructions: [],
+          timelineForCare: data.triageResult.urgency === "emergency" 
+            ? "Seek immediate emergency care" 
+            : data.triageResult.urgency === "urgent"
+            ? "Seek care within 24 hours"
+            : "Schedule appointment within a week",
+          emergencyWarning: data.triageResult.urgency === "emergency" 
+            ? "This appears to be a medical emergency. Please seek immediate care." 
+            : undefined,
+        };
+        setRecommendations(recommendations);
       }
     },
     onError: (error: any) => {
@@ -79,11 +111,12 @@ export default function SymptomChecker() {
           ? "حدث خطأ. يرجى المحاولة مرة أخرى."
           : "An error occurred. Please try again."
       );
+      console.error("Send message error:", error);
     },
   });
 
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !isInitialized) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -93,22 +126,14 @@ export default function SymptomChecker() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const messageToSend = input;
     setInput("");
-    setMessageCount(prev => prev + 1);
-    
-    // Request final assessment after 5+ messages
-    const shouldRequestAssessment = messageCount >= 4;
 
+    // Send to conversational router with context
     sendMessage.mutate({
-      messages: [
-        ...messages.filter(m => m.id !== "welcome").map(m => ({
-          role: m.role as "user" | "assistant",
-          content: m.content,
-        })),
-        { role: "user" as const, content: input },
-      ],
-      language: language === "ar" ? "ar" : "en",
-      requestFinalAssessment: shouldRequestAssessment,
+      message: messageToSend,
+      context: context,
+      language: language === "ar" ? "ar" : "en"
     });
   };
 
@@ -124,6 +149,11 @@ export default function SymptomChecker() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Initialize conversation on component mount
+  useEffect(() => {
+    startConversation.mutate({ language: language === "ar" ? "ar" : "en" });
+  }, []); // Only run once on mount
 
   const t = {
     title: language === "ar" ? "فاحص الأعراض" : "Symptom Checker",
@@ -218,7 +248,7 @@ export default function SymptomChecker() {
                 ))}
 
                 {/* Typing Indicator */}
-                {sendMessage.isPending && (
+                {(sendMessage.isPending || startConversation.isPending) && (
                   <div className="flex gap-3">
                     <Avatar className="h-10 w-10 bg-primary/10">
                       <AvatarFallback>
@@ -246,12 +276,12 @@ export default function SymptomChecker() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={t.placeholder}
-                  disabled={sendMessage.isPending}
+                  disabled={sendMessage.isPending || !isInitialized}
                   className="flex-1 rounded-xl border-2 focus:border-primary"
                 />
                 <Button
                   onClick={handleSend}
-                  disabled={!input.trim() || sendMessage.isPending}
+                  disabled={!input.trim() || sendMessage.isPending || !isInitialized}
                   className="rounded-xl px-6"
                   size="lg"
                 >
@@ -302,55 +332,61 @@ export default function SymptomChecker() {
         {/* Quick Tips */}
         <div className="mt-6 grid md:grid-cols-3 gap-4">
           <Card className="border-2 hover:border-primary/50 transition-colors">
-            <CardContent className="p-4 flex items-start gap-3">
-              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">
-                  {language === "ar" ? "كن محدداً" : "Be Specific"}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {language === "ar"
-                    ? "صف أعراضك بالتفصيل للحصول على تقييم أفضل"
-                    : "Describe your symptoms in detail for better assessment"}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 hover:border-primary/50 transition-colors">
-            <CardContent className="p-4 flex items-start gap-3">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <Info className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">
-                  {language === "ar" ? "اذكر المدة" : "Mention Duration"}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {language === "ar"
-                    ? "أخبرنا منذ متى تعاني من هذه الأعراض"
-                    : "Tell us how long you've had these symptoms"}
-                </p>
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-green-100 p-2 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">
+                    {language === "ar" ? "كن محدداً" : "Be Specific"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar"
+                      ? "قدم تفاصيل واضحة حول أعراضك ومدتها"
+                      : "Provide clear details about your symptoms and duration"}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-2 hover:border-primary/50 transition-colors">
-            <CardContent className="p-4 flex items-start gap-3">
-              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                <AlertCircle className="h-5 w-5 text-red-600" />
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-blue-100 p-2 rounded-lg">
+                  <Info className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">
+                    {language === "ar" ? "كن صادقاً" : "Be Honest"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar"
+                      ? "شارك جميع الأعراض ذات الصلة للحصول على تقييم دقيق"
+                      : "Share all relevant symptoms for accurate assessment"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold mb-1">
-                  {language === "ar" ? "حالات الطوارئ" : "Emergencies"}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {language === "ar"
-                    ? "للحالات الطارئة، اتصل بـ 122 فوراً"
-                    : "For emergencies, call 122 immediately"}
-                </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-red-100 p-2 rounded-lg">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">
+                    {language === "ar" ? "حالة طوارئ؟" : "Emergency?"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar"
+                      ? "إذا كانت حالة طارئة، اتصل بالطوارئ فوراً"
+                      : "If emergency, call emergency services immediately"}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

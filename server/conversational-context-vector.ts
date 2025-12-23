@@ -219,7 +219,8 @@ export class ConversationalContextVector {
       questionCount: this.questionCount,
       stepCount: this.stepCount,
       ruledOut: this.ruledOut,
-      confirmedSymptoms: this.confirmedSymptoms
+      confirmedSymptoms: this.confirmedSymptoms,
+      conversationHistory: this.conversationHistory
     };
   }
 
