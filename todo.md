@@ -94,3 +94,11 @@
 - [x] Create seeding script with all facility data
 - [x] Execute seeding script and verify database population
 - [x] Test CareLocator with real data
+
+## Sidebar Inconsistency Between Dashboard and Other Pages
+- [x] Investigate differences between ClinicianDashboard and ClinicianLayout sidebars
+- [x] Add missing logo to ClinicianLayout sidebar
+- [x] Add missing menu items (PharmaGuard, X-Ray Analysis) to ClinicianLayout
+- [x] Add Subscription button to ClinicianLayout sidebar
+- [x] Ensure all clinician pages use consistent navigation
+- [x] Test navigation across all pages
