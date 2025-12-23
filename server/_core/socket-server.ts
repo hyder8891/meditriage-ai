@@ -8,8 +8,14 @@ let io: SocketIOServer | null = null;
 export function initializeSocketServer(httpServer: HttpServer) {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: "*", // Lock this down to your specific domain in production!
-      methods: ["GET", "POST"]
+      // Allow dynamic origins for preview environments
+      origin: (requestOrigin, callback) => {
+        // Allow all origins (null means no origin, e.g. server-to-server)
+        callback(null, true);
+      },
+      methods: ["GET", "POST"],
+      credentials: true,
+      allowedHeaders: ["content-type"]
     },
     // Reliability settings for Iraq's mobile networks
     pingTimeout: 20000,

@@ -190,6 +190,8 @@ async function handleContextGathering(
   context: ConversationalContextVector,
   language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
+  console.log("[handleContextGathering] START", { userMessage, questionCount: context.questionCount });
+  
   // Update context with new information using class methods
   await updateContextFromMessage(userMessage, context);
 
@@ -318,7 +320,13 @@ async function updateContextFromMessage(
 
     console.log("[updateContext] Updated context:", context.getSummary());
   } catch (error) {
-    console.error("Error extracting context from message:", error);
+    console.error("[updateContext] Error extracting context from message:", error);
+    console.error("[updateContext] Error details:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      userMessage,
+      contextBefore: context.getSummary()
+    });
     // Context remains unchanged if extraction fails
   }
 }

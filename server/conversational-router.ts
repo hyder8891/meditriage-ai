@@ -65,14 +65,19 @@ export const conversationalRouter = router({
       console.log("[sendMessage] Rehydrated context:", hydratedContext.getSummary());
 
       // Process the message through conversational flow engine
-      const response = await processConversationalAssessment(
-        message,
-        conversationHistory,
-        hydratedContext,
-        language || "en"
-      );
+      try {
+        const response = await processConversationalAssessment(
+          message,
+          conversationHistory,
+          hydratedContext,
+          language || "en"
+        );
 
-      return response;
+        return response;
+      } catch (error) {
+        console.error("[sendMessage] Error in processConversationalAssessment:", error);
+        throw error;
+      }
     }),
 
   /**

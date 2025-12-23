@@ -57,17 +57,33 @@ export const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://accounts.google.com", "https://apis.google.com"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://accounts.google.com",
+        "https://apis.google.com",
+        "https://manus-analytics.com", // Analytics
+        "https://*.manus.computer"      // Preview environments
+      ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://api.manus.im", "https://*.manus-asia.computer"],
+      connectSrc: [
+        "'self'",
+        "https://api.manus.im",
+        "https://*.manus-asia.computer",
+        "https://manus-analytics.com",
+        "wss://*.manus.computer",       // WebSocket connections
+        "https://*.manus.computer"      // API calls to preview env
+      ],
       frameSrc: ["'self'", "https://accounts.google.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
   },
   crossOriginEmbedderPolicy: false, // Allow embedding for OAuth
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow resources to be loaded
   hsts: {
     maxAge: 31536000, // 1 year
     includeSubDomains: true,
