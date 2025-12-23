@@ -269,8 +269,8 @@ async function updateContextFromMessage(
     const extractedStr = typeof extractedContent === 'string' ? extractedContent : '{}';
     const extracted = JSON.parse(extractedStr || "{}");
 
-    // Merge with current context
-    return {
+    // Merge with current context (filter out null values)
+    const merged = {
       ...currentContext,
       symptoms: [...(currentContext.symptoms || []), ...(extracted.symptoms || [])],
       duration: extracted.duration || currentContext.duration,
@@ -282,6 +282,11 @@ async function updateContextFromMessage(
       medicalHistory: [...(currentContext.medicalHistory || []), ...(extracted.medicalHistory || [])],
       medications: [...(currentContext.medications || []), ...(extracted.medications || [])]
     };
+
+    // Filter out null values to ensure Zod validation passes
+    return Object.fromEntries(
+      Object.entries(merged).filter(([_, value]) => value !== null)
+    ) as Partial<ConversationContext>;
   } catch (error) {
     console.error("Error extracting context from message:", error);
     // Return current context unchanged if extraction fails

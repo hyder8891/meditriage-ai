@@ -365,3 +365,9 @@
 - [x] Implement robust question counter and state management
 - [x] Ensure proper context persistence across all 10 questions
 - [x] Test complete 10-question flow from start to finish
+
+## Symptom Checker Validation Error Fix (Current Session)
+- [x] Fix tRPC validation error: context.duration, context.severity, context.location expecting string but receiving null
+- [x] Make context fields optional in conversational-router.ts schema
+- [x] Test that conversation starts without validation errors
+- [x] Verify all 10 questions flow works correctly after fix
