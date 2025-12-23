@@ -6,6 +6,7 @@
  */
 
 import { invokeLLM } from "./_core/llm";
+import { ConversationalContextVector } from "./conversational-context-vector";
 
 // ============================================================================
 // Types
@@ -68,13 +69,11 @@ const TOTAL_QUESTIONS = 10;
 export async function processConversationalAssessment(
   userMessage: string,
   conversationHistory: ConversationMessage[],
-  context: Partial<ConversationContext>,
+  context: ConversationalContextVector,
   language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
-  // Initialize question count if not present
-  if (context.questionCount === undefined) {
-    context.questionCount = 0;
-  }
+  // Context is now a class instance with methods!
+  // No need to initialize - the class constructor handles it
 
   // Determine current conversation stage
   const stage = determineConversationStage(conversationHistory, context);
@@ -98,7 +97,7 @@ export async function processConversationalAssessment(
 
 function determineConversationStage(
   history: ConversationMessage[],
-  context: Partial<ConversationContext>
+  context: ConversationalContextVector
 ): "greeting" | "gathering" | "analyzing" {
   // First message = greeting
   if (history.length === 0) {
@@ -106,12 +105,12 @@ function determineConversationStage(
   }
 
   // NEW: Check if we've reached 10 questions
-  if (context.questionCount && context.questionCount >= TOTAL_QUESTIONS) {
+  if (context.questionCount >= TOTAL_QUESTIONS) {
     return "analyzing";
   }
 
   // If we have enough context, move to analysis
-  const hasSymptoms = context.symptoms && context.symptoms.length > 0;
+  const hasSymptoms = context.symptoms.length > 0;
   const hasDuration = !!context.duration;
   const hasSeverity = !!context.severity;
 
@@ -131,11 +130,13 @@ function determineConversationStage(
 
 async function handleGreeting(
   userMessage: string,
-  context: Partial<ConversationContext>,
+  context: ConversationalContextVector,
   language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
-  // Extract symptoms from initial message
+  // Extract symptoms from initial message and update context
   const symptoms = await extractSymptoms(userMessage);
+  context.updateSymptoms(symptoms);
+  context.incrementQuestionCount();
 
   // Generate empathetic greeting with follow-up question
   const languageInstruction = language === "ar" 
@@ -175,10 +176,7 @@ ${languageInstruction}`
     message,
     quickReplies,
     conversationStage: "gathering",
-    updatedContext: { 
-      symptoms,
-      questionCount: 1 // Start counting questions
-    }
+    updatedContext: context.toJSON() // Serialize to JSON for tRPC transfer
   };
 }
 
@@ -189,57 +187,56 @@ ${languageInstruction}`
 async function handleContextGathering(
   userMessage: string,
   history: ConversationMessage[],
-  context: Partial<ConversationContext>,
+  context: ConversationalContextVector,
   language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
-  // Update context with new information
-  const updatedContext = await updateContextFromMessage(userMessage, context);
+  // Update context with new information using class methods
+  await updateContextFromMessage(userMessage, context);
 
-  // Increment question count
-  const currentQuestionCount = updatedContext.questionCount || 0;
-  updatedContext.questionCount = currentQuestionCount + 1;
+  // Increment question count using class method
+  context.incrementQuestionCount();
 
-  console.log(`[DEBUG] Question count: ${updatedContext.questionCount}/${TOTAL_QUESTIONS}`);
-  console.log(`[DEBUG] Context state:`, JSON.stringify(updatedContext, null, 2));
+  console.log(`[DEBUG] Question count: ${context.questionCount}/${TOTAL_QUESTIONS}`);
+  console.log(`[DEBUG] Context state:`, context.getSummary());
 
   // Check if we've reached 10 questions
-  if (updatedContext.questionCount >= TOTAL_QUESTIONS) {
+  if (context.questionCount >= TOTAL_QUESTIONS) {
     console.log(`[DEBUG] Reached question limit, moving to analysis phase`);
-    return handleAnalysis(userMessage, history, updatedContext, language);
+    return handleAnalysis(userMessage, history, context, language);
   }
 
-  // Determine what information is still missing
-  const missingInfo = identifyMissingInformation(updatedContext);
+  // Determine what information is still missing using class method
+  const missingInfo = context.getMissingCriticalInfo();
 
   // Generate next follow-up question
   const nextQuestion = await generateFollowUpQuestion(
     missingInfo.length > 0 ? missingInfo[0] : "general",
-    updatedContext,
-    updatedContext.questionCount,
+    context,
+    context.questionCount,
     language
   );
 
   // Generate contextual quick replies
   const quickReplies = generateQuickReplies(
     missingInfo.length > 0 ? missingInfo[0] : "general",
-    updatedContext
+    context
   );
 
   return {
     message: nextQuestion,
     quickReplies,
     conversationStage: "gathering",
-    updatedContext // Return updated context to frontend
+    updatedContext: context.toJSON() // Serialize to JSON for tRPC transfer
   };
 }
 
 /**
- * Extract and update context from user message
+ * Extract and update context from user message using class methods
  */
 async function updateContextFromMessage(
   userMessage: string,
-  currentContext: Partial<ConversationContext>
-): Promise<Partial<ConversationContext>> {
+  context: ConversationalContextVector
+): Promise<void> {
   try {
     // Use LLM to extract structured information from user message
     const response = await invokeLLM({
@@ -269,7 +266,9 @@ async function updateContextFromMessage(
               relievingFactors: { type: "array", items: { type: "string" } },
               associatedSymptoms: { type: "array", items: { type: "string" } },
               medicalHistory: { type: "array", items: { type: "string" } },
-              medications: { type: "array", items: { type: "string" } }
+              medications: { type: "array", items: { type: "string" } },
+              age: { type: "number" },
+              gender: { type: "string" }
             },
             required: [],
             additionalProperties: false
@@ -282,74 +281,55 @@ async function updateContextFromMessage(
     const extractedStr = typeof extractedContent === 'string' ? extractedContent : '{}';
     const extracted = JSON.parse(extractedStr || "{}");
 
-    // Merge with current context (filter out null values)
-    const merged = {
-      ...currentContext,
-      symptoms: [...(currentContext.symptoms || []), ...(extracted.symptoms || [])],
-      duration: extracted.duration || currentContext.duration,
-      severity: extracted.severity || currentContext.severity,
-      location: extracted.location || currentContext.location,
-      aggravatingFactors: [...(currentContext.aggravatingFactors || []), ...(extracted.aggravatingFactors || [])],
-      relievingFactors: [...(currentContext.relievingFactors || []), ...(extracted.relievingFactors || [])],
-      associatedSymptoms: [...(currentContext.associatedSymptoms || []), ...(extracted.associatedSymptoms || [])],
-      medicalHistory: [...(currentContext.medicalHistory || []), ...(extracted.medicalHistory || [])],
-      medications: [...(currentContext.medications || []), ...(extracted.medications || [])]
-    };
+    // Update context using class methods (prevents duplicates)
+    if (extracted.symptoms && extracted.symptoms.length > 0) {
+      context.updateSymptoms(extracted.symptoms);
+    }
+    if (extracted.duration) {
+      context.duration = extracted.duration;
+    }
+    if (extracted.severity) {
+      context.severity = extracted.severity;
+    }
+    if (extracted.location) {
+      context.location = extracted.location;
+    }
+    if (extracted.aggravatingFactors && extracted.aggravatingFactors.length > 0) {
+      context.updateAggravatingFactors(extracted.aggravatingFactors);
+    }
+    if (extracted.relievingFactors && extracted.relievingFactors.length > 0) {
+      context.updateRelievingFactors(extracted.relievingFactors);
+    }
+    if (extracted.associatedSymptoms && extracted.associatedSymptoms.length > 0) {
+      context.updateAssociatedSymptoms(extracted.associatedSymptoms);
+    }
+    if (extracted.medicalHistory && extracted.medicalHistory.length > 0) {
+      context.updateMedicalHistory(extracted.medicalHistory);
+    }
+    if (extracted.medications && extracted.medications.length > 0) {
+      context.updateMedications(extracted.medications);
+    }
+    if (extracted.age) {
+      context.age = extracted.age;
+    }
+    if (extracted.gender) {
+      context.gender = extracted.gender;
+    }
 
-    // Filter out null and undefined values to ensure Zod validation passes
-    // Keep empty arrays as they represent "none" answers
-    return Object.fromEntries(
-      Object.entries(merged).filter(([_, value]) => {
-        if (value === null || value === undefined) return false;
-        return true;
-      })
-    ) as Partial<ConversationContext>;
+    console.log("[updateContext] Updated context:", context.getSummary());
   } catch (error) {
     console.error("Error extracting context from message:", error);
-    // Return current context unchanged if extraction fails
-    return currentContext;
+    // Context remains unchanged if extraction fails
   }
 }
 
 /**
  * Identify what critical information is still missing
+ * (This function is now redundant - use context.getMissingCriticalInfo() instead)
+ * Kept for backward compatibility with other parts of the code
  */
-function identifyMissingInformation(context: Partial<ConversationContext>): string[] {
-  const missing: string[] = [];
-
-  if (!context.symptoms || context.symptoms.length === 0) {
-    missing.push("symptoms");
-  }
-  if (!context.duration) {
-    missing.push("duration");
-  }
-  if (!context.severity) {
-    missing.push("severity");
-  }
-  if (!context.location) {
-    missing.push("location");
-  }
-  if (!context.aggravatingFactors || context.aggravatingFactors.length === 0) {
-    missing.push("aggravatingFactors");
-  }
-  if (!context.relievingFactors || context.relievingFactors.length === 0) {
-    missing.push("relievingFactors");
-  }
-  if (!context.associatedSymptoms || context.associatedSymptoms.length === 0) {
-    missing.push("associatedSymptoms");
-  }
-  // Check if medicalHistory is undefined (not asked yet), not just empty
-  // Empty array means "none" was answered
-  if (context.medicalHistory === undefined) {
-    missing.push("medicalHistory");
-  }
-  // Check if medications is undefined (not asked yet), not just empty
-  // Empty array means "none" was answered
-  if (context.medications === undefined) {
-    missing.push("medications");
-  }
-
-  return missing;
+function identifyMissingInformation(context: ConversationalContextVector): string[] {
+  return context.getMissingCriticalInfo();
 }
 
 /**
@@ -357,7 +337,7 @@ function identifyMissingInformation(context: Partial<ConversationContext>): stri
  */
 async function generateFollowUpQuestion(
   missingInfo: string,
-  context: Partial<ConversationContext>,
+  context: ConversationalContextVector,
   questionNumber: number,
   language: "en" | "ar" = "en"
 ): Promise<string> {
@@ -434,7 +414,7 @@ ${languageInstruction}`
  */
 function generateQuickReplies(
   missingInfo: string,
-  context: Partial<ConversationContext>
+  context: ConversationalContextVector
 ): QuickReplyChip[] {
   const replyOptions: Record<string, QuickReplyChip[]> = {
     duration: [
@@ -488,11 +468,11 @@ function generateQuickReplies(
 async function handleAnalysis(
   userMessage: string,
   history: ConversationMessage[],
-  context: Partial<ConversationContext>,
+  context: ConversationalContextVector,
   language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
-  // Build comprehensive context summary
-  const contextSummary = buildContextSummary(context);
+  // Build comprehensive context summary using class method
+  const contextSummary = context.getSummary();
 
   // Generate differential diagnosis and triage recommendation
   const languageInstruction = language === "ar" 
@@ -565,39 +545,17 @@ Return your response in JSON format.`
     message: summaryMessage,
     conversationStage: "analyzing",
     triageResult,
-    updatedContext: context
+    updatedContext: context.toJSON() // Serialize to JSON for tRPC transfer
   };
 }
 
 /**
  * Build context summary for analysis
+ * (This function is now redundant - use context.getSummary() instead)
+ * Kept for backward compatibility
  */
-function buildContextSummary(context: Partial<ConversationContext>): string {
-  const parts: string[] = [];
-
-  if (context.symptoms && context.symptoms.length > 0) {
-    parts.push(`Symptoms: ${context.symptoms.join(", ")}`);
-  }
-  if (context.duration) {
-    parts.push(`Duration: ${context.duration}`);
-  }
-  if (context.severity) {
-    parts.push(`Severity: ${context.severity}`);
-  }
-  if (context.location) {
-    parts.push(`Location: ${context.location}`);
-  }
-  if (context.aggravatingFactors && context.aggravatingFactors.length > 0) {
-    parts.push(`Aggravating factors: ${context.aggravatingFactors.join(", ")}`);
-  }
-  if (context.relievingFactors && context.relievingFactors.length > 0) {
-    parts.push(`Relieving factors: ${context.relievingFactors.join(", ")}`);
-  }
-  if (context.associatedSymptoms && context.associatedSymptoms.length > 0) {
-    parts.push(`Associated symptoms: ${context.associatedSymptoms.join(", ")}`);
-  }
-
-  return parts.join("\n");
+function buildContextSummary(context: ConversationalContextVector): string {
+  return context.getSummary();
 }
 
 /**

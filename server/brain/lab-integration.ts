@@ -81,9 +81,9 @@ export async function uploadLabReport(
     riskLevel: abnormalFlags.length > 0 ? "moderate" : "low",
     extractionStatus: "completed",
     status: "uploaded",
-  }).returning();
+  });
 
-  return report as LabReport;
+  return { id: report.insertId, userId, reportName: parsedData.testName, reportDate: new Date(parsedData.testDate), uploadDate: new Date(), fileUrl, fileType: mimeType, ocrText: JSON.stringify(parsedData), overallInterpretation: clinicalSignificance, riskLevel: abnormalFlags.length > 0 ? "moderate" : "low", extractionStatus: "completed" as const, status: "uploaded" as const } as LabReport;
 }
 
 /**
@@ -114,8 +114,8 @@ Return a JSON object with this exact structure:
 
 Extract ALL biomarkers/test results visible in the report. For status, compare value to reference range.`;
 
-  const response = await invokeGeminiFlash({
-    messages: [
+  const response = await invokeGeminiFlash(
+    [
       {
         role: "user",
         content: [
@@ -130,43 +130,46 @@ Extract ALL biomarkers/test results visible in the report. For status, compare v
         ],
       },
     ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "lab_report_data",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            testName: { type: "string" },
-            testDate: { type: "string" },
-            laboratory: { type: "string" },
-            biomarkers: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  value: { type: "string" },
-                  unit: { type: "string" },
-                  referenceRange: { type: "string" },
-                  status: {
-                    type: "string",
-                    enum: ["normal", "low", "high", "critical"],
+    {
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "lab_report_data",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              testName: { type: "string" },
+              testDate: { type: "string" },
+              laboratory: { type: "string" },
+              biomarkers: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    value: { type: "string" },
+                    unit: { type: "string" },
+                    referenceRange: { type: "string" },
+                    status: {
+                      type: "string",
+                      enum: ["normal", "low", "high", "critical"],
+                    },
                   },
+                  required: ["name", "value", "unit", "referenceRange", "status"],
+                  additionalProperties: false,
                 },
-                required: ["name", "value", "unit", "referenceRange", "status"],
-                additionalProperties: false,
               },
+              summary: { type: "string" },
             },
-            summary: { type: "string" },
+            required: ["testName", "testDate", "laboratory", "biomarkers", "summary"],
+            additionalProperties: false,
           },
-          required: ["testName", "testDate", "laboratory", "biomarkers", "summary"],
-          additionalProperties: false,
         },
       },
-    },
-  });
+    }
+  );
+
 
   const content = response.choices[0].message.content;
   return JSON.parse(content);
@@ -233,11 +236,12 @@ export async function getRecentLabReports(
   const db = await getDb();
   if (!db) return [];
   
-  const reports = await db.query.labReports.findMany({
-    where: eq(labReports.userId, userId),
-    orderBy: [desc(labReports.reportDate)],
-    limit,
-  });
+  const reports = await db
+    .select()
+    .from(labReports)
+    .where(eq(labReports.userId, userId))
+    .orderBy(desc(labReports.reportDate))
+    .limit(limit);
 
   return reports as LabReport[];
 }
@@ -252,12 +256,16 @@ export async function getLabReportById(
   const db = await getDb();
   if (!db) return null;
   
-  const report = await db.query.labReports.findFirst({
-    where: and(
+  const reports = await db
+    .select()
+    .from(labReports)
+    .where(and(
       eq(labReports.id, reportId),
       eq(labReports.userId, userId)
-    ),
-  });
+    ))
+    .limit(1);
+  
+  const report = reports[0] || null;
 
   return report as LabReport | null;
 }
@@ -296,10 +304,11 @@ export async function getBiomarkerTrend(
   const db = await getDb();
   if (!db) return [];
   
-  const reports = await db.query.labReports.findMany({
-    where: eq(labReports.userId, userId),
-    orderBy: [desc(labReports.reportDate)],
-  });
+  const reports = await db
+    .select()
+    .from(labReports)
+    .where(eq(labReports.userId, userId))
+    .orderBy(desc(labReports.reportDate));
 
   const trend: Array<{ date: Date; value: string; status: string }> = [];
 

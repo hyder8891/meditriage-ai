@@ -11,6 +11,7 @@ import {
   type ConversationMessage,
   type AssessmentResponse
 } from "./conversational-assessment";
+import { ConversationalContextVector, createContextVector } from "./conversational-context-vector";
 
 // ============================================================================
 // Schemas
@@ -57,11 +58,17 @@ export const conversationalRouter = router({
       console.log("[sendMessage] Received input:", JSON.stringify(input, null, 2));
       const { message, conversationHistory, context, language } = input;
 
+      // 🔧 FIX: Rehydrate the Context Vector Class
+      // The context arrives as plain JSON, but we need a class instance with methods
+      const hydratedContext = createContextVector(context || {});
+      
+      console.log("[sendMessage] Rehydrated context:", hydratedContext.getSummary());
+
       // Process the message through conversational flow engine
       const response = await processConversationalAssessment(
         message,
         conversationHistory,
-        context || {},
+        hydratedContext,
         language || "en"
       );
 
