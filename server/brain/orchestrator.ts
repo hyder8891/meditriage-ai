@@ -48,6 +48,18 @@ export interface ContextVector {
   medicalHistory: string;
   environmentalFactors: {
     barometricPressure?: number;
+    pressureChange?: {
+      velocity: number;
+      trend: "rising" | "falling" | "stable";
+      change1h?: number;
+      change3h?: number;
+      change24h?: number;
+    };
+    pressureAlerts?: Array<{
+      type: "rapid_drop" | "rapid_rise" | "extreme_low" | "extreme_high";
+      severity: "low" | "moderate" | "high";
+      message: string;
+    }>;
     temperature?: number;
     location?: { city: string; lat: number; lng: number };
   };
@@ -198,12 +210,13 @@ export async function executeAvicennaLoop(
 
 async function gatherContext(userId: number, input: SymptomInput): Promise<ContextVector> {
   // Parallel data fetching for speed
-  const [user, medicalHistory, labContext, geolocation, financialPrefs] = await Promise.all([
+  const [user, medicalHistory, labContext, geolocation, financialPrefs, environmentalFactors] = await Promise.all([
     db.query.users.findFirst({ where: (users, { eq }) => eq(users.id, userId) }),
     fetchMedicalHistory(userId),
     fetchRecentLabReports(userId),
     fetchGeolocation(userId),
     fetchFinancialPreferences(userId),
+    fetchEnvironmentalFactors(userId, geolocation),
   ]);
 
   // Combine medical history with lab context
@@ -220,8 +233,8 @@ async function gatherContext(userId: number, input: SymptomInput): Promise<Conte
     symptomSeverity,
     medicalHistory: enrichedHistory || "No significant medical history",
     environmentalFactors: {
+      ...environmentalFactors,
       location: geolocation,
-      // TODO: Add barometric pressure API integration
     },
     financialConstraints: financialPrefs,
     wearableData: {
@@ -267,6 +280,73 @@ async function fetchFinancialPreferences(userId: number): Promise<any> {
     budgetFilterClicked: false,
     selectedPriceRange: "medium",
   };
+}
+
+async function fetchEnvironmentalFactors(
+  userId: number,
+  location?: { city: string; lat: number; lng: number }
+): Promise<any> {
+  try {
+    if (!location) {
+      return {};
+    }
+
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    if (!apiKey) {
+      return {};
+    }
+
+    // Fetch current weather
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lng}&appid=${apiKey}&units=metric`;
+    const response = await fetch(weatherUrl, {
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (!response.ok) {
+      return {};
+    }
+
+    const weatherData = await response.json();
+    const currentPressure = weatherData.main?.pressure || 1013;
+
+    // Get pressure history and calculate changes
+    const { getWeatherHistory } = await import("../db-weather");
+    const { calculatePressureChange, detectPressureAlerts } = await import(
+      "../services/weather-service"
+    );
+
+    const pressureHistory = await getWeatherHistory(
+      location.lat,
+      location.lng,
+      24
+    ).catch(() => []);
+
+    let pressureChange = null;
+    let pressureAlerts: any[] = [];
+
+    if (pressureHistory.length > 0) {
+      pressureChange = calculatePressureChange(currentPressure, pressureHistory);
+      pressureAlerts = detectPressureAlerts(pressureChange);
+    }
+
+    return {
+      barometricPressure: currentPressure,
+      pressureChange: pressureChange
+        ? {
+            velocity: pressureChange.velocity,
+            trend: pressureChange.trend,
+            change1h: pressureChange.change1h,
+            change3h: pressureChange.change3h,
+            change24h: pressureChange.change24h,
+          }
+        : null,
+      pressureAlerts: pressureAlerts.length > 0 ? pressureAlerts : null,
+      temperature: weatherData.main?.temp,
+    };
+  } catch (error) {
+    console.error("[Orchestrator] Error fetching environmental factors:", error);
+    return {};
+  }
 }
 
 function calculateSeverity(input: SymptomInput): number {

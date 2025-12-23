@@ -192,9 +192,32 @@ async function fetchEnvironmentalFactors(userId: number): Promise<any> {
 
     const weatherData = await response.json();
     
+    // Get pressure history and calculate changes
+    const { getWeatherHistory } = await import("../db-weather");
+    const { calculatePressureChange, detectPressureAlerts } = await import("../services/weather-service");
+    
+    const currentPressure = weatherData.main?.pressure || 1013;
+    const pressureHistory = await getWeatherHistory(location.lat, location.lng, 24).catch(() => []);
+    
+    let pressureChange = null;
+    let pressureAlerts: any[] = [];
+    
+    if (pressureHistory.length > 0) {
+      pressureChange = calculatePressureChange(currentPressure, pressureHistory);
+      pressureAlerts = detectPressureAlerts(pressureChange);
+    }
+    
     // Extract relevant environmental factors
     const environmentalFactors = {
-      barometricPressure: weatherData.main?.pressure, // hPa
+      barometricPressure: currentPressure, // hPa
+      pressureChange: pressureChange ? {
+        velocity: pressureChange.velocity,
+        trend: pressureChange.trend,
+        change1h: pressureChange.change1h,
+        change3h: pressureChange.change3h,
+        change24h: pressureChange.change24h,
+      } : null,
+      pressureAlerts: pressureAlerts.length > 0 ? pressureAlerts : null,
       temperature: weatherData.main?.temp, // Celsius
       humidity: weatherData.main?.humidity, // Percentage
       airQualityIndex: undefined, // Would need separate AQI API
@@ -202,7 +225,7 @@ async function fetchEnvironmentalFactors(userId: number): Promise<any> {
       windSpeed: weatherData.wind?.speed, // m/s
     };
 
-    console.log(`[Context Vector] Weather data fetched for ${location.city}: ${environmentalFactors.temperature}°C, ${environmentalFactors.humidity}% humidity`);
+    console.log(`[Context Vector] Weather data fetched for ${location.city}: ${environmentalFactors.temperature}°C, ${environmentalFactors.barometricPressure}mb (${pressureChange?.trend || 'stable'})`);
     
     return environmentalFactors;
   } catch (error) {

@@ -21,6 +21,7 @@ import { vitalsRouter } from "./routers/vitals-router";
 import { medicalReportsRouter } from "./routers/medical-reports-router";
 import { resourceAuctionRouter } from "./avicenna/resource-auction-router";
 import { wearableRouter } from "./avicenna/wearable-router";
+import { weatherRouter } from "./routers/weather-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -79,6 +80,7 @@ export const appRouter = router({
   medicalReports: medicalReportsRouter,
   resourceAuction: resourceAuctionRouter,
   wearable: wearableRouter,
+  weather: weatherRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),

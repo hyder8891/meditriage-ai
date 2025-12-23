@@ -2438,3 +2438,157 @@ export const wearableMetricsSummary = mysqlTable("wearable_metrics_summary", {
 
 export type WearableMetricsSummary = typeof wearableMetricsSummary.$inferSelect;
 export type InsertWearableMetricsSummary = typeof wearableMetricsSummary.$inferInsert;
+
+/**
+ * Weather conditions
+ * Stores historical weather data including barometric pressure
+ */
+export const weatherConditions = mysqlTable("weather_conditions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Location
+  latitude: decimal("latitude", { precision: 10, scale: 7 }).notNull(),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }).notNull(),
+  cityName: varchar("city_name", { length: 255 }),
+  countryCode: varchar("country_code", { length: 2 }),
+  
+  // Weather metrics
+  pressure: decimal("pressure", { precision: 6, scale: 2 }).notNull(), // millibars (hPa)
+  temperature: decimal("temperature", { precision: 5, scale: 2 }), // Celsius
+  humidity: int("humidity"), // percentage
+  weatherCondition: varchar("weather_condition", { length: 100 }), // clear, rain, storm, etc.
+  windSpeed: decimal("wind_speed", { precision: 5, scale: 2 }), // m/s
+  
+  // Pressure change metrics
+  pressureChange1h: decimal("pressure_change_1h", { precision: 5, scale: 2 }), // mb/hour
+  pressureChange3h: decimal("pressure_change_3h", { precision: 5, scale: 2 }), // mb/3hours
+  pressureChange24h: decimal("pressure_change_24h", { precision: 5, scale: 2 }), // mb/day
+  
+  // Data source
+  source: varchar("source", { length: 50 }).default("openweather").notNull(),
+  externalId: varchar("external_id", { length: 255 }), // API-specific ID
+  
+  // Timestamps
+  observedAt: timestamp("observed_at").notNull(), // When weather was observed
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type WeatherCondition = typeof weatherConditions.$inferSelect;
+export type InsertWeatherCondition = typeof weatherConditions.$inferInsert;
+
+/**
+ * Pressure sensitive conditions
+ * Medical conditions known to be triggered by barometric pressure changes
+ */
+export const pressureSensitiveConditions = mysqlTable("pressure_sensitive_conditions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  conditionName: varchar("condition_name", { length: 255 }).notNull(),
+  category: mysqlEnum("category", [
+    "migraine",
+    "headache",
+    "joint_pain",
+    "arthritis",
+    "respiratory",
+    "cardiovascular",
+    "neurological",
+    "other"
+  ]).notNull(),
+  
+  // Trigger thresholds
+  pressureDropThreshold: decimal("pressure_drop_threshold", { precision: 5, scale: 2 }), // mb drop that triggers
+  pressureRiseThreshold: decimal("pressure_rise_threshold", { precision: 5, scale: 2 }), // mb rise that triggers
+  changeVelocityThreshold: decimal("change_velocity_threshold", { precision: 5, scale: 2 }), // mb/hour
+  
+  // Symptom information
+  commonSymptoms: text("common_symptoms"), // JSON array
+  severityFactors: text("severity_factors"), // JSON array
+  
+  // Clinical information
+  description: text("description"),
+  prevalence: varchar("prevalence", { length: 50 }), // common, uncommon, rare
+  evidenceLevel: varchar("evidence_level", { length: 10 }), // A, B, C (clinical evidence strength)
+  
+  // References
+  references: text("references"), // JSON array of medical sources
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PressureSensitiveCondition = typeof pressureSensitiveConditions.$inferSelect;
+export type InsertPressureSensitiveCondition = typeof pressureSensitiveConditions.$inferInsert;
+
+/**
+ * Patient pressure sensitivity tracking
+ * Tracks individual patient sensitivity to barometric pressure changes
+ */
+export const patientPressureSensitivity = mysqlTable("patient_pressure_sensitivity", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  conditionId: int("condition_id").notNull(), // FK to pressure_sensitive_conditions
+  
+  // Sensitivity profile
+  confirmed: boolean("confirmed").default(false).notNull(), // Doctor-confirmed vs self-reported
+  sensitivity: mysqlEnum("sensitivity", ["low", "moderate", "high", "severe"]).default("moderate").notNull(),
+  
+  // Trigger patterns (learned from patient history)
+  typicalDropTrigger: decimal("typical_drop_trigger", { precision: 5, scale: 2 }), // mb
+  typicalRiseTrigger: decimal("typical_rise_trigger", { precision: 5, scale: 2 }), // mb
+  typicalOnsetDelay: int("typical_onset_delay"), // minutes from pressure change to symptoms
+  
+  // Symptom tracking
+  lastSymptomDate: date("last_symptom_date"),
+  symptomFrequency: int("symptom_frequency"), // episodes per month
+  averageSeverity: int("average_severity"), // 1-10 scale
+  
+  // Notes
+  notes: text("notes"),
+  managementStrategies: text("management_strategies"), // JSON array
+  
+  // Metadata
+  firstReportedAt: timestamp("first_reported_at").defaultNow().notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PatientPressureSensitivity = typeof patientPressureSensitivity.$inferSelect;
+export type InsertPatientPressureSensitivity = typeof patientPressureSensitivity.$inferInsert;
+
+/**
+ * Pressure symptom events
+ * Records when patients experience pressure-triggered symptoms
+ */
+export const pressureSymptomEvents = mysqlTable("pressure_symptom_events", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  sensitivityId: int("sensitivity_id").notNull(), // FK to patient_pressure_sensitivity
+  weatherId: int("weather_id"), // FK to weather_conditions (optional)
+  
+  // Event details
+  symptomOnset: timestamp("symptom_onset").notNull(),
+  symptomResolution: timestamp("symptom_resolution"),
+  severity: int("severity").notNull(), // 1-10 scale
+  
+  // Weather context at onset
+  pressureAtOnset: decimal("pressure_at_onset", { precision: 6, scale: 2 }),
+  pressureChange1h: decimal("pressure_change_1h", { precision: 5, scale: 2 }),
+  pressureChange3h: decimal("pressure_change_3h", { precision: 5, scale: 2 }),
+  temperatureAtOnset: decimal("temperature_at_onset", { precision: 5, scale: 2 }),
+  humidityAtOnset: int("humidity_at_onset"),
+  
+  // Symptoms
+  symptoms: text("symptoms"), // JSON array
+  
+  // Treatment/management
+  interventionTaken: text("intervention_taken"),
+  interventionEffectiveness: int("intervention_effectiveness"), // 1-10 scale
+  
+  // Notes
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PressureSymptomEvent = typeof pressureSymptomEvents.$inferSelect;
+export type InsertPressureSymptomEvent = typeof pressureSymptomEvents.$inferInsert;
