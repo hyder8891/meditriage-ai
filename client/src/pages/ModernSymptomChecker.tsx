@@ -86,7 +86,7 @@ export default function ModernSymptomChecker() {
 
   const handleStartConversation = async () => {
     try {
-      const response = await startConversationMutation.mutateAsync();
+      const response = await startConversationMutation.mutateAsync({ language });
       setCurrentResponse(response);
       
       // Add assistant greeting to messages
@@ -124,7 +124,8 @@ export default function ModernSymptomChecker() {
       const response = await sendMessageMutation.mutateAsync({
         message: messageText,
         conversationHistory: messages, // Use current messages (before adding user message)
-        context
+        context,
+        language
       });
 
       // Add assistant response to chat

@@ -371,3 +371,9 @@
 - [x] Make context fields optional in conversational-router.ts schema
 - [x] Test that conversation starts without validation errors
 - [x] Verify all 10 questions flow works correctly after fix
+
+## Symptom Checker Language Detection (Current Session)
+- [x] Investigate how language context is passed from frontend to backend
+- [x] Update LLM prompts to detect and respond in Arabic when interface is in Arabic
+- [x] Ensure AI responses match the interface language (Arabic/English)
+- [x] Test complete conversation flow in Arabic

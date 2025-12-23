@@ -68,7 +68,8 @@ const TOTAL_QUESTIONS = 10;
 export async function processConversationalAssessment(
   userMessage: string,
   conversationHistory: ConversationMessage[],
-  context: Partial<ConversationContext>
+  context: Partial<ConversationContext>,
+  language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
   // Initialize question count if not present
   if (context.questionCount === undefined) {
@@ -81,13 +82,13 @@ export async function processConversationalAssessment(
   // Route to appropriate handler
   switch (stage) {
     case "greeting":
-      return handleGreeting(userMessage, context);
+      return handleGreeting(userMessage, context, language);
     case "gathering":
-      return handleContextGathering(userMessage, conversationHistory, context);
+      return handleContextGathering(userMessage, conversationHistory, context, language);
     case "analyzing":
-      return handleAnalysis(userMessage, conversationHistory, context);
+      return handleAnalysis(userMessage, conversationHistory, context, language);
     default:
-      return handleGreeting(userMessage, context);
+      return handleGreeting(userMessage, context, language);
   }
 }
 
@@ -130,12 +131,17 @@ function determineConversationStage(
 
 async function handleGreeting(
   userMessage: string,
-  context: Partial<ConversationContext>
+  context: Partial<ConversationContext>,
+  language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
   // Extract symptoms from initial message
   const symptoms = await extractSymptoms(userMessage);
 
   // Generate empathetic greeting with follow-up question
+  const languageInstruction = language === "ar" 
+    ? "Respond in Arabic (العربية). Use natural, conversational Arabic."
+    : "Respond in English.";
+
   const response = await invokeLLM({
     messages: [
       {
@@ -144,7 +150,8 @@ async function handleGreeting(
 Respond with:
 1. Brief empathetic acknowledgment (1 sentence)
 2. ONE specific follow-up question to understand duration or severity
-Keep it conversational and caring. Use simple language.`
+Keep it conversational and caring. Use simple language.
+${languageInstruction}`
       },
       {
         role: "user",
@@ -182,7 +189,8 @@ Keep it conversational and caring. Use simple language.`
 async function handleContextGathering(
   userMessage: string,
   history: ConversationMessage[],
-  context: Partial<ConversationContext>
+  context: Partial<ConversationContext>,
+  language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
   // Update context with new information
   const updatedContext = await updateContextFromMessage(userMessage, context);
@@ -203,7 +211,8 @@ async function handleContextGathering(
   const nextQuestion = await generateFollowUpQuestion(
     missingInfo.length > 0 ? missingInfo[0] : "general",
     updatedContext,
-    updatedContext.questionCount
+    updatedContext.questionCount,
+    language
   );
 
   // Generate contextual quick replies
@@ -337,10 +346,11 @@ function identifyMissingInformation(context: Partial<ConversationContext>): stri
 async function generateFollowUpQuestion(
   missingInfo: string,
   context: Partial<ConversationContext>,
-  questionNumber: number
+  questionNumber: number,
+  language: "en" | "ar" = "en"
 ): Promise<string> {
   // Define question templates for each missing info type
-  const questionTemplates: Record<string, string> = {
+  const questionTemplatesEn: Record<string, string> = {
     symptoms: "What symptoms are you experiencing?",
     duration: "How long have you been experiencing these symptoms?",
     severity: "How would you describe the severity? Is it mild, moderate, or severe?",
@@ -353,7 +363,21 @@ async function generateFollowUpQuestion(
     general: "Can you tell me more about your symptoms?"
   };
 
-  // Use template as base
+  const questionTemplatesAr: Record<string, string> = {
+    symptoms: "ما هي الأعراض التي تعاني منها؟",
+    duration: "منذ متى وأنت تعاني من هذه الأعراض؟",
+    severity: "كيف تصف شدة الأعراض؟ هل هي خفيفة أم متوسطة أم شديدة؟",
+    location: "أين تشعر بالضبط بهذه الأعراض؟",
+    aggravatingFactors: "هل هناك شيء يجعل أعراضك أسوأ؟",
+    relievingFactors: "هل هناك شيء يجعل أعراضك أفضل؟",
+    associatedSymptoms: "هل تعاني من أي أعراض أخرى مع هذا؟",
+    medicalHistory: "هل لديك أي حالات طبية سابقة أو مشاكل صحية؟",
+    medications: "هل تتناول حاليًا أي أدوية؟",
+    general: "هل يمكنك إخباري المزيد عن أعراضك؟"
+  };
+
+  // Select templates based on language
+  const questionTemplates = language === "ar" ? questionTemplatesAr : questionTemplatesEn;
   const baseQuestion = questionTemplates[missingInfo] || questionTemplates.general;
 
   // For questions 1-3, use templates directly
@@ -362,6 +386,10 @@ async function generateFollowUpQuestion(
   }
 
   // For questions 4-10, generate contextual questions using LLM
+  const languageInstruction = language === "ar" 
+    ? "Respond in Arabic (العربية). Use natural, conversational Arabic."
+    : "Respond in English.";
+
   try {
     const response = await invokeLLM({
       messages: [
@@ -371,7 +399,8 @@ async function generateFollowUpQuestion(
 This is question ${questionNumber} of 10.
 Generate a natural, conversational follow-up question about: ${missingInfo}.
 Keep it brief (1-2 sentences) and empathetic.
-Context: ${JSON.stringify(context)}`
+Context: ${JSON.stringify(context)}
+${languageInstruction}`
         },
         {
           role: "user",
@@ -447,12 +476,17 @@ function generateQuickReplies(
 async function handleAnalysis(
   userMessage: string,
   history: ConversationMessage[],
-  context: Partial<ConversationContext>
+  context: Partial<ConversationContext>,
+  language: "en" | "ar" = "en"
 ): Promise<AssessmentResponse> {
   // Build comprehensive context summary
   const contextSummary = buildContextSummary(context);
 
   // Generate differential diagnosis and triage recommendation
+  const languageInstruction = language === "ar" 
+    ? "Provide all text fields (condition names, reasoning, recommendations) in Arabic (العربية)."
+    : "Provide all text fields in English.";
+
   const analysisResponse = await invokeLLM({
     messages: [
       {
@@ -463,6 +497,7 @@ async function handleAnalysis(
 3. Clear, actionable recommendations
 
 Be conservative with urgency - when in doubt, recommend seeking medical attention.
+${languageInstruction}
 Return your response in JSON format.`
       },
       {

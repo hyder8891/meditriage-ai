@@ -49,17 +49,19 @@ export const conversationalRouter = router({
       z.object({
         message: z.string().min(1),
         conversationHistory: z.array(conversationMessageSchema),
-        context: conversationContextSchema.optional()
+        context: conversationContextSchema.optional(),
+        language: z.enum(["en", "ar"]).optional().default("en")
       })
     )
     .mutation(async ({ input, ctx }): Promise<AssessmentResponse> => {
-      const { message, conversationHistory, context } = input;
+      const { message, conversationHistory, context, language } = input;
 
       // Process the message through conversational flow engine
       const response = await processConversationalAssessment(
         message,
         conversationHistory,
-        context || {}
+        context || {},
+        language || "en"
       );
 
       return response;
@@ -69,11 +71,20 @@ export const conversationalRouter = router({
    * Start a new conversation
    */
   startConversation: publicProcedure
-    .mutation(async ({ ctx }): Promise<AssessmentResponse> => {
-      // Return initial greeting
+    .input(
+      z.object({
+        language: z.enum(["en", "ar"]).optional().default("en")
+      })
+    )
+    .mutation(async ({ input, ctx }): Promise<AssessmentResponse> => {
+      const { language } = input;
+      // Return initial greeting based on language
+      const message = language === "ar" 
+        ? "مرحباً! أنا هنا لمساعدتك في تقييم أعراضك. ما الذي يجعلك تأتي اليوم؟"
+        : "Hello! I'm here to help assess your symptoms. What brings you here today?";
+      
       return {
-        message: "Hello! I'm here to help assess your symptoms. What brings you here today?",
-        messageAr: "مرحباً! أنا هنا لمساعدتك في تقييم أعراضك. ما الذي يجعلك تأتي اليوم؟",
+        message,
         conversationStage: "greeting"
       };
     }),
