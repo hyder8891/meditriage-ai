@@ -76,3 +76,10 @@
 - [x] Confidence-weighted averaging for better accuracy
 - [x] Coefficient of Variation < 5% for stability detection
 - [ ] Awaiting user testing to verify improvements
+
+## URGENT: CareLocator Authentication Issue (COMPLETED)
+- [x] Fix patient portal "Clinics" navigation - currently redirects to /clinician/login instead of /patient/care-locator
+- [x] Verify CareLocator page works without ClinicianLayout wrapper  
+- [x] Removed ClinicianLayout from CareLocator - now uses simple patient-friendly header
+- [x] CareLocator now accessible to authenticated patients at /patient/care-locator
+- [x] Added "Back to Portal" button for easy navigation
