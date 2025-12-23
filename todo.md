@@ -254,8 +254,8 @@
 - [x] Audit current Avicenna-x implementation
 - [x] Identify missing phases in Avicenna-x
 - [x] CRITICAL: Implement Medical Guardrails querying and evaluation
-- [ ] CRITICAL: Implement Emergency Clinic Routing
-- [ ] CRITICAL: Implement Lab Reports Integration
+- [x] CRITICAL: Implement Emergency Clinic Routing
+- [x] CRITICAL: Implement Lab Reports Integration
 - [ ] HIGH: Implement Resource Auction Algorithm
 - [ ] HIGH: Implement Doctor Scoring Algorithm
 - [ ] HIGH: Implement Wearable Integration (Apple Watch/Fitbit)

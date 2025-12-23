@@ -211,9 +211,9 @@ Consider Iraqi medical context in all recommendations.`;
  * Use for: Symptom checker, voice input, case documentation
  */
 export async function invokeGeminiFlash(
-  messages: Array<{ role: string; content: string }>,
-  config: GeminiFlashConfig = {}
-): Promise<string> {
+  messages: Array<{ role: string; content: string | Array<any> }>,
+  config: GeminiFlashConfig & { response_format?: any } = {}
+): Promise<any> {
   const {
     temperature = 0.2, // Strict adherence to safety/triage levels
     thinkingLevel = 'low',
@@ -241,12 +241,24 @@ Consider Iraqi medical context.`;
     ];
 
     // Use Manus built-in LLM
-    const response = await invokeLLM({
+    const llmConfig: any = {
       messages: formattedMessages.map(msg => ({
         role: msg.role as 'system' | 'user' | 'assistant',
         content: msg.content,
       })),
-    });
+    };
+
+    // Add response_format if provided
+    if (config.response_format) {
+      llmConfig.response_format = config.response_format;
+    }
+
+    const response = await invokeLLM(llmConfig);
+
+    // If response_format is specified, return the full response for structured parsing
+    if (config.response_format) {
+      return response;
+    }
 
     const content = response.choices[0]?.message?.content;
     const text = typeof content === 'string' ? content : JSON.stringify(content);

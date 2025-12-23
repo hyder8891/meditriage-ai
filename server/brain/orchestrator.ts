@@ -14,6 +14,8 @@ import { invokeGeminiPro, invokeGeminiFlash } from "../_core/gemini-dual";
 import type { User } from "../../drizzle/schema";
 import { medicalGuardrails } from "../../drizzle/avicenna-schema";
 import { eq } from "drizzle-orm";
+import { routeToEmergencyClinic, type EmergencyRoute } from "./emergency-routing";
+import { getLabContextForDiagnosis } from "./lab-integration";
 
 // Initialize Redis for epidemiology tracking
 // Convert rediss:// to https:// for Upstash SDK
@@ -115,6 +117,7 @@ export interface OrchestrationResult {
     careemLink?: string;
     googleMapsLink?: string;
   };
+  emergencyRoute?: EmergencyRoute;
 }
 
 // ============================================================================
@@ -195,13 +198,18 @@ export async function executeAvicennaLoop(
 
 async function gatherContext(userId: number, input: SymptomInput): Promise<ContextVector> {
   // Parallel data fetching for speed
-  const [user, medicalHistory, labReports, geolocation, financialPrefs] = await Promise.all([
+  const [user, medicalHistory, labContext, geolocation, financialPrefs] = await Promise.all([
     db.query.users.findFirst({ where: (users, { eq }) => eq(users.id, userId) }),
     fetchMedicalHistory(userId),
     fetchRecentLabReports(userId),
     fetchGeolocation(userId),
     fetchFinancialPreferences(userId),
   ]);
+
+  // Combine medical history with lab context
+  const enrichedHistory = medicalHistory
+    ? `${medicalHistory}\n\n${labContext}`
+    : labContext;
 
   // Calculate symptom severity
   const symptomSeverity = input.severity || calculateSeverity(input);
@@ -210,7 +218,7 @@ async function gatherContext(userId: number, input: SymptomInput): Promise<Conte
   const contextVector: ContextVector = {
     userId,
     symptomSeverity,
-    medicalHistory: medicalHistory || "No significant medical history",
+    medicalHistory: enrichedHistory || "No significant medical history",
     environmentalFactors: {
       location: geolocation,
       // TODO: Add barometric pressure API integration
@@ -240,9 +248,8 @@ async function fetchMedicalHistory(userId: number): Promise<string> {
   return conditions.join(", ");
 }
 
-async function fetchRecentLabReports(userId: number): Promise<any[]> {
-  // TODO: Integrate with lab_reports table
-  return [];
+async function fetchRecentLabReports(userId: number): Promise<string> {
+  return await getLabContextForDiagnosis(userId);
 }
 
 async function fetchGeolocation(userId: number): Promise<{ city: string; lat: number; lng: number } | undefined> {
@@ -559,24 +566,80 @@ async function orchestrateResources(
   context: ContextVector
 ): Promise<Omit<OrchestrationResult, "diagnosis" | "contextVector" | "executionMetrics">> {
   if (diagnosis.severity === "EMERGENCY") {
-    // Find nearest emergency facility
-    const emergencyClinic = await findNearestEmergency(context.environmentalFactors.location);
+    // Use emergency routing system
+    const location = context.environmentalFactors.location;
+    if (!location) {
+      throw new Error("User location required for emergency routing");
+    }
+
+    const emergencyRoute = await routeToEmergencyClinic(
+      { lat: location.lat, lng: location.lng },
+      "EMERGENCY"
+    );
     
     return {
       action: "EMERGENCY_BYPASS",
-      target: emergencyClinic,
-      deepLinks: emergencyClinic ? generateDeepLinks(emergencyClinic) : undefined,
+      target: {
+        resourceId: emergencyRoute.clinic.id,
+        resourceType: "emergency",
+        score: emergencyRoute.urgencyScore,
+        scoreBreakdown: {
+          skillMatch: 100,
+          proximity: 100 - (emergencyRoute.clinic.distance * 5),
+          priceAdherence: 100,
+          networkQuality: 100,
+        },
+        metadata: {
+          name: emergencyRoute.clinic.name,
+          location: emergencyRoute.clinic.location.address,
+          estimatedWaitTime: emergencyRoute.clinic.currentWaitTime,
+        },
+      },
+      deepLinks: {
+        uberLink: emergencyRoute.transportOptions.uber?.deepLink,
+        careemLink: emergencyRoute.transportOptions.careem?.deepLink,
+        googleMapsLink: emergencyRoute.transportOptions.googleMaps.deepLink,
+      },
+      emergencyRoute,
     };
   }
 
   if (diagnosis.severity === "HIGH") {
-    // Find best clinic with required equipment
-    const clinic = await findBestClinic(diagnosis, context);
+    // Use emergency routing for HIGH severity too (non-emergency clinics)
+    const location = context.environmentalFactors.location;
+    if (!location) {
+      throw new Error("User location required for clinic routing");
+    }
+
+    const emergencyRoute = await routeToEmergencyClinic(
+      { lat: location.lat, lng: location.lng },
+      "HIGH"
+    );
     
     return {
       action: "NAVIGATE_TO_CLINIC",
-      target: clinic,
-      deepLinks: clinic ? generateDeepLinks(clinic) : undefined,
+      target: {
+        resourceId: emergencyRoute.clinic.id,
+        resourceType: "clinic",
+        score: emergencyRoute.urgencyScore,
+        scoreBreakdown: {
+          skillMatch: 90,
+          proximity: 100 - (emergencyRoute.clinic.distance * 5),
+          priceAdherence: 80,
+          networkQuality: 85,
+        },
+        metadata: {
+          name: emergencyRoute.clinic.name,
+          location: emergencyRoute.clinic.location.address,
+          estimatedWaitTime: emergencyRoute.clinic.currentWaitTime,
+        },
+      },
+      deepLinks: {
+        uberLink: emergencyRoute.transportOptions.uber?.deepLink,
+        careemLink: emergencyRoute.transportOptions.careem?.deepLink,
+        googleMapsLink: emergencyRoute.transportOptions.googleMaps.deepLink,
+      },
+      emergencyRoute,
     };
   }
 

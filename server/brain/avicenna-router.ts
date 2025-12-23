@@ -11,6 +11,8 @@ import { buildContextVector, trackBudgetFilterClick, updateWearableData, updateU
 import { getLocalRisks, getDiseaseHeatmap, getOutbreakAlerts, recordSymptomReport } from "./epidemiology";
 import { findBestDoctor, findBestClinic } from "./resource-auction";
 import { recordMedicalCorrection, calculateAccuracyRate, getPromptPerformanceMetrics } from "./medical-aec";
+import { uploadLabReport, getRecentLabReports, getLabReportById, getBiomarkerTrend, deleteLabReport } from "./lab-integration";
+import { routeToEmergencyClinic, updateClinicWaitTime, getClinicWaitTime } from "./emergency-routing";
 
 export const avicennaRouter = router({
   // ============================================================================
@@ -184,6 +186,147 @@ export const avicennaRouter = router({
       
       const clinic = await findBestClinic(input.diagnosis as any, contextVector);
       return clinic;
+    }),
+
+  // ============================================================================
+  // Lab Reports Integration
+  // ============================================================================
+
+  /**
+   * Upload and parse a lab report
+   */
+  uploadLabReport: protectedProcedure
+    .input(z.object({
+      fileUrl: z.string(),
+      fileName: z.string(),
+      mimeType: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Note: File should already be uploaded to S3 by the client
+      // This endpoint parses the report and saves metadata
+      // For now, we'll fetch the file from the URL and process it
+      const response = await fetch(input.fileUrl);
+      const buffer = Buffer.from(await response.arrayBuffer());
+      
+      const report = await uploadLabReport(
+        ctx.user.id,
+        buffer,
+        input.fileName,
+        input.mimeType
+      );
+      
+      return report;
+    }),
+
+  /**
+   * Get recent lab reports for current user
+   */
+  getMyLabReports: protectedProcedure
+    .input(z.object({
+      limit: z.number().min(1).max(50).default(10),
+    }))
+    .query(async ({ ctx, input }) => {
+      const reports = await getRecentLabReports(ctx.user.id, input.limit);
+      return reports;
+    }),
+
+  /**
+   * Get specific lab report by ID
+   */
+  getLabReport: protectedProcedure
+    .input(z.object({
+      reportId: z.number(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const report = await getLabReportById(input.reportId, ctx.user.id);
+      if (!report) {
+        throw new Error("Lab report not found");
+      }
+      return report;
+    }),
+
+  /**
+   * Get biomarker trend over time
+   */
+  getBiomarkerTrend: protectedProcedure
+    .input(z.object({
+      biomarkerName: z.string(),
+      months: z.number().min(1).max(24).default(6),
+    }))
+    .query(async ({ ctx, input }) => {
+      const trend = await getBiomarkerTrend(
+        ctx.user.id,
+        input.biomarkerName,
+        input.months
+      );
+      return trend;
+    }),
+
+  /**
+   * Delete a lab report
+   */
+  deleteLabReport: protectedProcedure
+    .input(z.object({
+      reportId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const success = await deleteLabReport(input.reportId, ctx.user.id);
+      return { success };
+    }),
+
+  // ============================================================================
+  // Emergency Routing
+  // ============================================================================
+
+  /**
+   * Find best emergency clinic and get transport links
+   */
+  routeToEmergency: protectedProcedure
+    .input(z.object({
+      userLocation: z.object({
+        lat: z.number(),
+        lng: z.number(),
+      }),
+      severity: z.enum(["HIGH", "EMERGENCY"]),
+      requiredCapabilities: z.array(z.string()).optional(),
+    }))
+    .query(async ({ input }) => {
+      const route = await routeToEmergencyClinic(
+        input.userLocation,
+        input.severity,
+        input.requiredCapabilities
+      );
+      return route;
+    }),
+
+  /**
+   * Update clinic wait time (for clinic staff)
+   */
+  updateClinicWaitTime: protectedProcedure
+    .input(z.object({
+      clinicId: z.number(),
+      waitTimeMinutes: z.number().min(0).max(600),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Only clinic staff can update wait times
+      if (ctx.user.role !== "clinic_admin" && ctx.user.role !== "super_admin") {
+        throw new Error("Only clinic staff can update wait times");
+      }
+
+      await updateClinicWaitTime(input.clinicId, input.waitTimeMinutes);
+      return { success: true };
+    }),
+
+  /**
+   * Get current wait time for a clinic
+   */
+  getClinicWaitTime: publicProcedure
+    .input(z.object({
+      clinicId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      const waitTime = await getClinicWaitTime(input.clinicId);
+      return { waitTimeMinutes: waitTime };
     }),
 
   // ============================================================================
