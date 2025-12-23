@@ -292,9 +292,14 @@ async function updateContextFromMessage(
       medications: [...(currentContext.medications || []), ...(extracted.medications || [])]
     };
 
-    // Filter out null values to ensure Zod validation passes
+    // Filter out null and undefined values to ensure Zod validation passes
+    // Also filter out empty arrays to keep context clean
     return Object.fromEntries(
-      Object.entries(merged).filter(([_, value]) => value !== null)
+      Object.entries(merged).filter(([_, value]) => {
+        if (value === null || value === undefined) return false;
+        if (Array.isArray(value) && value.length === 0) return false;
+        return true;
+      })
     ) as Partial<ConversationContext>;
   } catch (error) {
     console.error("Error extracting context from message:", error);

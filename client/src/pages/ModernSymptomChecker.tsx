@@ -121,6 +121,12 @@ export default function ModernSymptomChecker() {
     try {
       // Send to backend (use messages BEFORE adding current user message)
       // Don't use state 'messages' directly as it hasn't updated yet
+      console.log("[Frontend] Sending to backend:", {
+        message: messageText,
+        conversationHistory: messages,
+        context,
+        language
+      });
       const response = await sendMessageMutation.mutateAsync({
         message: messageText,
         conversationHistory: messages, // Use current messages (before adding user message)

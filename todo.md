@@ -377,3 +377,9 @@
 - [x] Update LLM prompts to detect and respond in Arabic when interface is in Arabic
 - [x] Ensure AI responses match the interface language (Arabic/English)
 - [x] Test complete conversation flow in Arabic
+
+## Symptom Checker 400 Error Fix (Current Session)
+- [x] Investigate 400 error occurring in follow-up messages after initial symptom input
+- [x] Check tRPC schema validation for conversationHistory parameter
+- [x] Fix validation or context handling issue (filter null/undefined values from context)
+- [x] Test complete conversation flow from start to final recommendation

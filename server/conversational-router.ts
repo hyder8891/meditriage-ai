@@ -54,6 +54,7 @@ export const conversationalRouter = router({
       })
     )
     .mutation(async ({ input, ctx }): Promise<AssessmentResponse> => {
+      console.log("[sendMessage] Received input:", JSON.stringify(input, null, 2));
       const { message, conversationHistory, context, language } = input;
 
       // Process the message through conversational flow engine
