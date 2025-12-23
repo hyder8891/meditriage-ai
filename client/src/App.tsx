@@ -71,6 +71,7 @@ import PatientMedicalRecords from "./pages/PatientMedicalRecords";
 import BioScannerPage from "./pages/patient/BioScannerPage";
 import { PatientVitalsViewer } from "./pages/clinician/PatientVitalsViewer";
 import VitalsTrends from "./pages/VitalsTrends";
+import PatientAppointments from "./pages/PatientAppointments";
 import { Redirect } from "wouter";
 
 function Router() {
@@ -164,6 +165,9 @@ function Router() {
       </Route>
       <Route path="/patient/vitals-trends">
         {() => <ProtectedRoute requiredRole="patient"><VitalsTrends /></ProtectedRoute>}
+      </Route>
+      <Route path="/patient/appointments">
+        {() => <ProtectedRoute requiredRole="patient"><PatientAppointments /></ProtectedRoute>}
       </Route>
       <Route path="/patient/profile">
         {() => <ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>}
