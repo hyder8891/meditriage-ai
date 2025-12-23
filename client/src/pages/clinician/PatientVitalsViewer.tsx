@@ -163,7 +163,7 @@ export function PatientVitalsViewer() {
           </div>
 
           <div className="grid gap-4">
-            {vitals.map((vital) => {
+            {vitals.map((vital: any) => {
               const hrStatus = getHeartRateStatus(vital.heartRate);
               const StatusIcon = hrStatus.icon;
 

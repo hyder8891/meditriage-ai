@@ -18,18 +18,18 @@ import {
 } from "lucide-react";
 import { AppLogo } from "@/components/AppLogo";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
-import type { HeartRateResult } from "@/lib/rppg-engine";
+// V2 BioScanner returns simple result: { bpm: number; confidence: number }
 import { VitalsTrendsChart } from "@/components/VitalsTrendsChart";
 
 export default function BioScannerPage() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
-  const [lastResult, setLastResult] = useState<HeartRateResult | null>(null);
+  const [lastResult, setLastResult] = useState<{ bpm: number; confidence: number } | null>(null);
 
   const { data: stats, refetch: refetchStats } = trpc.vitals.getStats.useQuery();
   const { data: recentVitals, refetch: refetchRecent } = trpc.vitals.getRecent.useQuery({ limit: 5 });
 
-  const handleScanComplete = (result: HeartRateResult) => {
+  const handleScanComplete = (result: { bpm: number; confidence: number }) => {
     setLastResult(result);
     // Refetch stats and recent vitals after successful scan
     setTimeout(() => {

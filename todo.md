@@ -35,7 +35,14 @@
 - [x] Fix profile dropdown - only shows logout, missing other options
 - [x] Fix doctor availability status toggle - user reports cannot change status
 
-## Bio-Scanner BPM Reading Fix (Current Session - COMPLETED)
+## Bio-Scanner V2 Revert (User Request - COMPLETED)
+- [x] User reported V4 not working as well as V2
+- [x] Found V2 commit 687dab0 (working 78 BPM version)
+- [x] Reverted from V4 (1054 lines) to V2 (600 lines) - removed 538 lines
+- [x] Fixed TypeScript errors to match V2 interface
+- [x] V2 restored with three-tier progressive detection
+
+## Bio-Scanner BPM Reading Fix (Previous Session - COMPLETED)
 - [x] User reported Bio-Scanner showing over 100 BPM after "harmonic doubling fix"
 - [x] Investigated git history - compared working version (78 BPM) with current
 - [x] Root cause: Overcorrected debounce times (150ms → 400ms = 3x longer)
