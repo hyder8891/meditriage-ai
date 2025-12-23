@@ -113,6 +113,12 @@
   - [x] Lower peak threshold from 0.2 to 0.1 (2x more sensitive)
   - [x] Reduce minimum peak distance from 12 to 10 samples
   - [ ] Test with user to verify confidence increases above 0%
+  - [ ] ULTRA-AGGRESSIVE v3: Add frame-by-frame console logging
+  - [ ] Log raw green channel values from every frame
+  - [ ] Log signal array and stdDev calculation
+  - [ ] Log peak detection results in detail
+  - [ ] Consider removing stdDev threshold entirely
+  - [ ] Consider accepting single peak for BPM
 
 ## Optic-Vitals Enhancements (Current Session)
 - [x] Add HRV (Heart Rate Variability) analysis to rPPG engine
@@ -131,3 +137,55 @@
   - [x] Add time range selector (24h, 7d, 30d, all time)
   - [x] Add metric selector (HR, HRV, stress level)
   - [x] Integrate charts into both patient and doctor views
+
+## Bio-Scanner Hybrid Fix (Math Bug + Aggressive Detection)
+- [ ] Implement hybrid Bio-Scanner combining math fix with aggressive detection
+  - [ ] Fix sampling division bug (divide by actual sample count, not total pixels)
+  - [ ] Add raw green channel value display for debugging
+  - [ ] Keep 120x120 scan area (aggressive detection)
+  - [ ] Keep dynamic peak detection with confidence scoring
+  - [ ] Add live waveform visualization
+  - [ ] Add real-time signal quality indicators
+  - [ ] Test with user to verify improvements
+
+## Bio-Scanner Critical Bugs (Current Session - URGENT)
+- [ ] Fix BioScanner null BPM values (showing "BPM: null" in logs)
+- [ ] Fix BioScanner 0% confidence persisting despite all previous fixes
+- [ ] Resolve Content Security Policy error: "blocks the use of 'eval' in JavaScript"
+- [ ] Investigate why video plays but no measurements are captured
+- [ ] Check if rPPG signal processing is actually running
+
+## Bio-Scanner Camera Loop Fixes (COMPLETED)
+- [x] Fix Bio-Scanner camera loop stopping immediately after video plays
+- [x] Root cause: Race condition with async setState
+- [x] Solution: Added isScanningRef for synchronous state tracking
+- [x] Fix progress bar timing bug (stale state + hardcoded FPS)
+- [x] Add dynamic FPS detection to ProgressiveBioEngine
+- [x] Test complete 15-second scan with user - SUCCESS
+- [x] Verified confidence increases (achieved 15% with 78 BPM reading)
+
+## Bio-Scanner Peak Detection (COMPLETED)
+- [x] Camera loop runs for full 15 seconds
+- [x] Signal is being captured (RAW green channel values visible)
+- [x] Peak detection failing - 0 peaks detected (FIXED with bandpass filter)
+- [x] Added detailed debug logging for signal processing
+- [x] Lowered peak detection thresholds (T1: 15%, T2: 20%, T3: 25%)
+- [x] Verified normalized signal has sufficient variation after detrending
+- [x] Tested with fingertip method - SUCCESS (78 BPM detected)
+
+## Bio-Scanner Signal Extraction Issue (COMPLETED)
+- [x] Identified root cause: candidatePeaks = 0 (signal is completely flat)
+- [x] Signal has maxAmplitude of only 0.24 with NO local maxima
+- [x] Fix: Sample ALL pixels (not just every 4th)
+- [x] Fix: Use smaller focused region (60x60 instead of 120x120)
+- [x] Signal quality improved dramatically (maxAmplitude: 0.24 → 18)
+- [x] Test with improved signal extraction - SUCCESS!
+
+## Bio-Scanner Bandpass Filtering (COMPLETED)
+- [x] Signal amplitude improved from 0.24 to 18 (70x stronger!)
+- [x] Root cause identified: Raw signal includes slow drift and noise, hiding heartbeat
+- [x] Solution: Added bandpass filter (moving average detrending)
+- [x] Implemented simple moving average high-pass filter
+- [x] Tested filtered signal - shows periodic peaks (14-19 candidate peaks)
+- [x] Successfully detecting BPM (78 BPM achieved!)
+- [x] Lowered detection thresholds for better sensitivity

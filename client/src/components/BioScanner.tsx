@@ -5,105 +5,210 @@ import { trpc } from "@/lib/trpc";
 import { Heart, Activity, RefreshCw, Camera } from "lucide-react";
 import { toast } from "sonner";
 
-// 🧠 INTERNAL MATH ENGINE (No external file dependencies)
-class InternalBioEngine {
+/**
+ * 🧬 PROGRESSIVE ENGINE v3.0
+ * Three-tier detection system:
+ * Tier 1 (0-3s): Ultra-aggressive (20% threshold, 150ms debounce, 1+ peaks)
+ * Tier 2 (3-8s): Moderate (30% threshold, 200ms debounce, 2+ peaks)
+ * Tier 3 (8s+): High accuracy (35% threshold, 250ms debounce, 3+ peaks)
+ */
+class ProgressiveBioEngine {
   buffer: number[] = [];
-  times: number[] = [];
-  lastFrameTime = 0;
-
-  process(imageData: ImageData): { bpm: number | null; confidence: number; debug: string; peaks?: number } {
-    const now = performance.now();
-    
-    // 1. Get Green Average from center region
-    let sum = 0;
-    const data = imageData.data;
-    const sampleEvery = 4; // Sample every 4th pixel for performance
-    
-    for (let i = 0; i < data.length; i += sampleEvery * 4) {
-      sum += data[i + 1]; // Green channel
-    }
-    const avg = sum / (data.length / (sampleEvery * 4));
-
-    // 2. Add to buffer
-    this.buffer.push(avg);
-    this.times.push(now);
-
-    // Keep last 450 samples (~15 seconds at 30fps)
-    if (this.buffer.length > 450) {
-      this.buffer.shift();
-      this.times.shift();
-    }
-
-    // 3. Calculate BPM
-    // Need at least 90 samples (~3 seconds)
-    if (this.buffer.length < 90) {
-      return { bpm: null, confidence: 0, debug: `Gathering data... ${this.buffer.length}/90` };
-    }
-
-    // Normalize signal
-    const mean = this.buffer.reduce((a, b) => a + b) / this.buffer.length;
-    const stdDev = Math.sqrt(
-      this.buffer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / this.buffer.length
-    );
-    
-    // Check if signal has enough variation (VERY LOW threshold for maximum sensitivity)
-    if (stdDev < 0.1) {
-      return { bpm: null, confidence: 0, debug: `Signal too flat (stdDev: ${stdDev.toFixed(2)})` };
-    }
-
-    const normalized = this.buffer.map(v => (v - mean) / stdDev);
-
-    // Count Peaks (Zero Crossing Method)
-    let peaks = 0;
-    let lastPeakIndex = -10; // Prevent counting same peak multiple times
-    
-    for (let i = 2; i < normalized.length - 1; i++) {
-      // Peak detection: current value is higher than neighbors and crosses threshold
-      // VERY LOW threshold (0.1) for maximum sensitivity
-      if (
-        normalized[i] > 0.1 && // Very low threshold for better detection
-        normalized[i] > normalized[i - 1] &&
-        normalized[i] > normalized[i + 1] &&
-        i - lastPeakIndex > 10 // Minimum distance between peaks (reduced to 10)
-      ) {
-        peaks++;
-        lastPeakIndex = i;
-      }
-    }
-
-    // Calculate time duration in seconds
-    const durationSec = (this.times[this.times.length - 1] - this.times[0]) / 1000;
-    
-    if (durationSec < 2) {
-      return { bpm: null, confidence: 0, debug: "Not enough time data" };
-    }
-
-    // BPM Formula: (peaks / duration) * 60
-    const bpm = (peaks / durationSec) * 60;
-
-    // Filter unrealistic values
-    if (bpm < 40 || bpm > 200) {
-      return { bpm: null, confidence: 0, debug: `Out of range: ${bpm.toFixed(0)} BPM` };
-    }
-
-    // Calculate confidence based on signal quality and number of peaks detected
-    // More peaks = more confident measurement
-    const signalQuality = Math.min(100, Math.floor((stdDev / 3) * 100));
-    const peakConfidence = Math.min(100, Math.floor((peaks / (durationSec / 60)) * 10)); // Expect ~60-100 peaks per minute
-    const confidence = Math.floor((signalQuality + peakConfidence) / 2);
-
-    return { 
-      bpm: Math.round(bpm), 
-      confidence,
-      peaks,
-      debug: `✓ ${peaks} peaks in ${durationSec.toFixed(1)}s | stdDev: ${stdDev.toFixed(2)} | BPM: ${Math.round(bpm)}` 
-    };
-  }
+  timestamps: number[] = [];
+  startTime: number = 0;
+  fps: number = 30; // Dynamic FPS tracking
+  private lastFpsUpdate: number = 0;
+  
+  // Configuration for progressive detection
+  private MIN_BPM = 45;
+  private MAX_BPM = 200;
+  private WINDOW_SIZE = 150; // ~5 seconds at 30fps
 
   reset() {
     this.buffer = [];
-    this.times = [];
-    this.lastFrameTime = 0;
+    this.timestamps = [];
+    this.startTime = performance.now();
+    this.fps = 30;
+    this.lastFpsUpdate = 0;
+  }
+
+  process(imageData: ImageData): { bpm: number | null; confidence: number; val: number; debug: string; peaks?: number } {
+    const now = performance.now();
+    
+    // --- 1. SIGNAL EXTRACTION ---
+    let sumGreen = 0;
+    let pixelCount = 0;
+    const data = imageData.data;
+    
+    // Sample EVERY pixel for maximum signal strength (4 bytes per pixel: RGBA)
+    for (let i = 0; i < data.length; i += 4) {
+      sumGreen += data[i + 1]; // Green channel
+      pixelCount++;
+    }
+    
+    const avg = sumGreen / pixelCount; 
+
+    // Add to buffer
+    this.buffer.push(avg);
+    this.timestamps.push(now);
+    
+    // Update FPS dynamically every second
+    if (this.timestamps.length > 1 && now - this.lastFpsUpdate > 1000) {
+      const recentWindow = this.timestamps.slice(-60); // Last 60 frames
+      if (recentWindow.length > 1) {
+        const duration = recentWindow[recentWindow.length - 1] - recentWindow[0];
+        this.fps = Math.round((recentWindow.length - 1) / (duration / 1000));
+        this.lastFpsUpdate = now;
+      }
+    }
+
+    // Maintain sliding window
+    if (this.buffer.length > this.WINDOW_SIZE) {
+      this.buffer.shift();
+      this.timestamps.shift();
+    }
+
+    // Need minimal data to start (1 second at 30fps = 30 samples)
+    if (this.buffer.length < 30) {
+        return { bpm: null, confidence: 0, val: avg, debug: `Warming up... ${this.buffer.length}/30` };
+    }
+
+    // --- 2. PROGRESSIVE SIGNAL PROCESSING ---
+    
+    // Determine current tier based on elapsed time
+    const elapsed = (now - this.startTime) / 1000; // seconds
+    let thresholdPercent: number;
+    let minDebounce: number;
+    let minPeaks: number;
+    let tier: string;
+    
+    if (elapsed < 3) {
+      // Tier 1: Ultra-aggressive for immediate feedback
+      thresholdPercent = 0.15; // Lowered from 0.20
+      minDebounce = 150;
+      minPeaks = 1;
+      tier = "T1";
+    } else if (elapsed < 8) {
+      // Tier 2: Moderate detection
+      thresholdPercent = 0.20; // Lowered from 0.30
+      minDebounce = 200;
+      minPeaks = 2;
+      tier = "T2";
+    } else {
+      // Tier 3: High accuracy
+      thresholdPercent = 0.25; // Lowered from 0.35
+      minDebounce = 250;
+      minPeaks = 3;
+      tier = "T3";
+    }
+    
+    // A. Detrend using Moving Average (removes slow drift, keeps heartbeat oscillations)
+    const windowSize = 30; // ~1 second at 30fps - removes slow changes
+    const detrended: number[] = [];
+    
+    for (let i = 0; i < this.buffer.length; i++) {
+      // Calculate moving average around this point
+      const start = Math.max(0, i - Math.floor(windowSize / 2));
+      const end = Math.min(this.buffer.length, i + Math.floor(windowSize / 2));
+      const window = this.buffer.slice(start, end);
+      const movingAvg = window.reduce((a, b) => a + b) / window.length;
+      
+      // Subtract moving average to remove trend
+      detrended.push(this.buffer[i] - movingAvg);
+    }
+    
+    // B. Zero-mean normalization
+    const mean = detrended.reduce((a, b) => a + b) / detrended.length;
+    const normalized = detrended.map(v => v - mean);
+
+    // B. Dynamic Peak Thresholding
+    const maxAmp = Math.max(...normalized.map(Math.abs));
+    const threshold = maxAmp * thresholdPercent;
+    
+    // Debug logging every 30 frames (~1 second)
+    if (this.buffer.length % 30 === 0) {
+      console.log(`[${tier}] 🔬 Signal Analysis:`, {
+        bufferSize: this.buffer.length,
+        rawMean: mean.toFixed(2),
+        maxAmplitude: maxAmp.toFixed(2),
+        threshold: threshold.toFixed(2),
+        thresholdPercent: (thresholdPercent * 100).toFixed(0) + '%',
+        signalRange: `${Math.min(...normalized).toFixed(2)} to ${Math.max(...normalized).toFixed(2)}`
+      });
+    }
+
+    // C. Peak Detection with Progressive Debounce
+    let peaks: number[] = [];
+    let candidatePeaks = 0; // Track how many potential peaks we find
+    for (let i = 1; i < normalized.length - 1; i++) {
+      const prev = normalized[i-1];
+      const curr = normalized[i];
+      const next = normalized[i+1];
+      
+      // Local maxima greater than dynamic threshold
+      if (curr > prev && curr > next) {
+        candidatePeaks++; // Found a local maximum
+        if (curr > threshold) {
+          // Progressive debounce
+          if (peaks.length === 0 || (this.timestamps[i] - this.timestamps[peaks[peaks.length-1]]) > minDebounce) {
+            peaks.push(i);
+            if (this.buffer.length % 30 === 0) {
+              console.log(`[${tier}] ✅ Peak ${peaks.length} detected at index ${i}, value: ${curr.toFixed(2)}`);
+            }
+          }
+        }
+      }
+    }
+
+    // Debug logging for peak detection results
+    if (this.buffer.length % 30 === 0) {
+      console.log(`[${tier}] 📊 Peak Detection:`, {
+        candidatePeaks,
+        peaksAboveThreshold: peaks.length,
+        minRequired: minPeaks,
+        minDebounce: minDebounce + 'ms'
+      });
+    }
+    
+    // --- 3. BPM CALCULATION ---
+    if (peaks.length < minPeaks) {
+        return { bpm: null, confidence: 5, val: avg, debug: `[${tier}] Detecting... (${peaks.length}/${minPeaks} peaks)`, peaks: peaks.length };
+    }
+
+    // Calculate average interval between peaks in milliseconds
+    let totalInterval = 0;
+    for (let i = 1; i < peaks.length; i++) {
+        totalInterval += (this.timestamps[peaks[i]] - this.timestamps[peaks[i-1]]);
+    }
+    const avgIntervalMs = totalInterval / (peaks.length - 1);
+    
+    const calculatedBpm = 60000 / avgIntervalMs;
+
+    // --- 4. CONFIDENCE SCORING (VARIANCE-BASED) ---
+    // Score based on regularity of intervals
+    let variance = 0;
+    for (let i = 1; i < peaks.length; i++) {
+        const interval = this.timestamps[peaks[i]] - this.timestamps[peaks[i-1]];
+        variance += Math.pow(interval - avgIntervalMs, 2);
+    }
+    variance /= (peaks.length - 1);
+    
+    // Lower variance = Higher confidence
+    // Variance of 100ms² = 90% confidence, 1000ms² = 0% confidence
+    let confidence = Math.max(0, 100 - (variance / 10)); 
+
+    // Filter impossible values
+    if (calculatedBpm < this.MIN_BPM || calculatedBpm > this.MAX_BPM) {
+        return { bpm: null, confidence: 0, val: avg, debug: `Out of range: ${calculatedBpm.toFixed(0)} BPM`, peaks: peaks.length };
+    }
+
+    return { 
+        bpm: Math.round(calculatedBpm), 
+        confidence: Math.round(confidence), 
+        val: avg,
+        peaks: peaks.length,
+        debug: `[${tier}] ✓ ${peaks.length} peaks | ${calculatedBpm.toFixed(0)} BPM | ${confidence.toFixed(0)}%`
+    };
   }
 }
 
@@ -113,7 +218,7 @@ interface BioScannerProps {
 }
 
 export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerProps) {
-  console.log('🚀 BioScanner MONOLITH v3.0 loaded - Built-in engine with on-screen debug');
+  console.log('🚀 BioScanner PROGRESSIVE v3.0 - Three-tier detection system');
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -127,9 +232,10 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   const [signalStrength, setSignalStrength] = useState(0);
   
   // Use a Ref for the engine so it persists across renders
-  const engineRef = useRef(new InternalBioEngine());
+  const engineRef = useRef(new ProgressiveBioEngine());
   const animationFrameRef = useRef<number>();
   const streamRef = useRef<MediaStream>();
+  const isScanningRef = useRef(false); // Use ref to avoid race condition with state
   
   const saveVital = trpc.vitals.logVital.useMutation();
 
@@ -154,12 +260,14 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         console.log('[BioScanner] ▶️ Video playing');
         
         setScanning(true);
+        isScanningRef.current = true; // Set ref immediately (no async delay)
         setBpm(null);
         setProgress(0);
         setConfidence(0);
         engineRef.current.reset();
         setDebugInfo("Camera active - Starting scan...");
         
+        console.log('[BioScanner] 🚀 Starting processLoop, isScanningRef:', isScanningRef.current);
         // Start the processing loop
         animationFrameRef.current = requestAnimationFrame(processLoop);
       }
@@ -202,8 +310,12 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   };
 
   const processLoop = () => {
-    if (!videoRef.current || !canvasRef.current || !scanning) {
-      console.log('[BioScanner] ⏹️ Loop stopped');
+    if (!videoRef.current || !canvasRef.current || !isScanningRef.current) {
+      console.log('[BioScanner] ⏹️ Loop stopped', { 
+        hasVideo: !!videoRef.current, 
+        hasCanvas: !!canvasRef.current, 
+        isScanning: isScanningRef.current 
+      });
       return;
     }
     
@@ -216,13 +328,13 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       return;
     }
 
-    // 1. Draw video frame to canvas (LARGER for better signal capture)
+    // 1. Draw video frame to canvas (300x300)
     ctx.drawImage(video, 0, 0, 300, 300);
     
-    // 2. Extract center region (150x150 pixels from center - MUCH LARGER)
-    const centerX = 75;
-    const centerY = 75;
-    const regionSize = 150;
+    // 2. Extract center region (60x60 pixels from center for focused signal)
+    const centerX = 120; // (300 - 60) / 2
+    const centerY = 120;
+    const regionSize = 60;
     const imageData = ctx.getImageData(centerX, centerY, regionSize, regionSize);
     
     // 3. Process frame with engine
@@ -243,25 +355,31 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
 
     // 6. Update progress
     setProgress(prev => {
-      const newProgress = prev + (100 / (measurementDuration * 30)); // Assuming 30fps
+      // Use actual FPS from engine, not assumed 30fps
+      const actualFPS = engineRef.current.fps || 30;
+      const increment = 100 / (measurementDuration * actualFPS);
+      const newProgress = prev + increment;
+      
+      console.log('[BioScanner] 📊 Progress:', newProgress.toFixed(1), '% | FPS:', actualFPS);
       
       if (newProgress >= 100) {
         stopScanning(result.bpm, result.confidence);
         return 100;
       }
+      
+      // Continue loop INSIDE callback to avoid stale state
+      animationFrameRef.current = requestAnimationFrame(processLoop);
       return newProgress;
     });
 
-    // 7. Continue loop
-    if (progress < 100) {
-      animationFrameRef.current = requestAnimationFrame(processLoop);
-    }
+    // 7. Loop continuation moved inside setProgress callback above
   };
 
   const stopScanning = (finalBpm: number | null, finalConfidence: number) => {
     console.log('[BioScanner] 🛑 Stopping scan. BPM:', finalBpm, 'Confidence:', finalConfidence);
     
     setScanning(false);
+    isScanningRef.current = false; // Stop the ref immediately
     
     // Stop camera
     if (streamRef.current) {
@@ -350,10 +468,10 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         {/* Hidden canvas for processing */}
         <canvas ref={canvasRef} width={300} height={300} className="hidden" />
         
-        {/* Scan region indicator */}
+        {/* Scan region indicator (120x120 center area) */}
         {scanning && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-48 h-48 border-4 border-emerald-400 rounded-full animate-pulse" />
+            <div className="w-40 h-40 border-4 border-emerald-400 rounded-lg animate-pulse" />
           </div>
         )}
         
@@ -370,6 +488,9 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
                 <span>✓ {confidence}%</span>
               </div>
             )}
+            <div className="text-[10px] text-emerald-300">
+              RAW: {engineRef.current.buffer.length > 0 ? engineRef.current.buffer[engineRef.current.buffer.length - 1].toFixed(1) : '0'}
+            </div>
           </div>
         )}
         
@@ -469,7 +590,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         <p className="font-semibold mb-1">📋 For best results:</p>
         <ul className="space-y-1 ml-4 list-disc">
           <li>Ensure your face is well-lit (natural light works best)</li>
-          <li>Position your face in the center of the circle</li>
+          <li>Position your face in the center of the square</li>
           <li>Stay still and avoid talking during the scan</li>
           <li>Remove glasses if possible</li>
         </ul>
