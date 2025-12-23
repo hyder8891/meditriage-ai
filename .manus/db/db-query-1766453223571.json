@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `bio_scanner_calibration` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL UNIQUE,\n  `reference_heart_rate` int NOT NULL,\n  `measured_heart_rate` int NOT NULL,\n  `correction_factor` decimal(10, 4) NOT NULL,\n  `calibration_date` timestamp NOT NULL DEFAULT (now()),\n  `reference_device` varchar(100),\n  `notes` text,\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `bio_scanner_calibration_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `bio_scanner_calibration` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL UNIQUE,\n  `reference_heart_rate` int NOT NULL,\n  `measured_heart_rate` int NOT NULL,\n  `correction_factor` decimal(10, 4) NOT NULL,\n  `calibration_date` timestamp NOT NULL DEFAULT (now()),\n  `reference_device` varchar(100),\n  `notes` text,\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `bio_scanner_calibration_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1705
+}

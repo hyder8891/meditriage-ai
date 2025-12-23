@@ -190,6 +190,13 @@
       "when": 1766391520685,
       "tag": "0026_grey_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1766453201205,
+      "tag": "0027_worthless_marvel_boy",
+      "breakpoints": true
     }
   ]
 }

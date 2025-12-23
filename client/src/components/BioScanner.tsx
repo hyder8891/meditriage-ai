@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Heart, Activity, AlertTriangle, Camera } from "lucide-react";
+import { Heart, Activity, AlertTriangle, Camera, Brain, Zap } from "lucide-react";
 import { toast } from "sonner";
 import type { HeartRateResult } from "@/lib/rppg-engine";
+import { BioScannerEngine } from "@/lib/rppg-engine";
 
 /**
  * 🧬 HYBRID BIO-ENGINE v4.0 - Medical-Grade rPPG
@@ -385,9 +386,14 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   const [signalStrength, setSignalStrength] = useState(0);
   const [motionDetected, setMotionDetected] = useState(false);
   const [stability, setStability] = useState(0);
+  const [hrvMetrics, setHrvMetrics] = useState<HeartRateResult['hrv'] | null>(null);
+  
+  // Fetch calibration data
+  const { data: calibration } = trpc.vitals.getCalibration.useQuery();
   
   // Use a Ref for the engine so it persists across renders
   const engineRef = useRef(new HybridBioEngine());
+  const hrvEngineRef = useRef(new BioScannerEngine({ minWindowSeconds: 30, maxBufferSeconds: 60 }));
   const animationFrameRef = useRef<number>();
   const streamRef = useRef<MediaStream>();
   const isScanningRef = useRef(false); // Use ref to avoid race condition with state
@@ -421,7 +427,9 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         setConfidence(0);
         setMotionDetected(false);
         setStability(0);
+        setHrvMetrics(null);
         engineRef.current.reset();
+        hrvEngineRef.current.reset();
         setDebugInfo("Camera active - Starting scan...");
         
         console.log('[BioScanner] 🚀 Starting processLoop, isScanningRef:', isScanningRef.current);
@@ -494,8 +502,19 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
     const regionSize = 60;
     const imageData = ctx.getImageData(centerX, centerY, regionSize, regionSize);
     
-    // 3. Process frame with engine
+    // 3. Process frame with both engines
     const result = engineRef.current.process(imageData);
+    
+    // Also process with HRV engine for extended analysis
+    hrvEngineRef.current.processFrame(imageData);
+    
+    // Calculate HRV if enough data (30+ seconds)
+    if (hrvEngineRef.current.isReady()) {
+      const hrvResult = hrvEngineRef.current.calculateHeartRate();
+      if (hrvResult && hrvResult.hrv) {
+        setHrvMetrics(hrvResult.hrv);
+      }
+    }
     
     // 4. Update UI
     if (result.bpm !== null) {
@@ -555,7 +574,11 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
     
     // Save result if valid
     if (finalBpm && finalBpm >= 40 && finalBpm <= 200) {
-      const stressLevel = finalBpm < 60 ? 'LOW' : finalBpm > 100 ? 'HIGH' : 'NORMAL';
+      // Apply calibration correction factor if available
+      const calibratedBpm = calibration?.correctionFactor 
+        ? Math.round(finalBpm * calibration.correctionFactor)
+        : finalBpm;
+      const stressLevel = calibratedBpm < 60 ? 'LOW' : calibratedBpm > 100 ? 'HIGH' : 'NORMAL';
       
       // Determine quality based on confidence
       let quality: 'poor' | 'fair' | 'good' | 'excellent';
@@ -566,20 +589,29 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       
       // Create full result object
       const result: HeartRateResult = {
-        bpm: finalBpm,
+        bpm: calibratedBpm,
         confidence: finalConfidence,
         quality,
         signalStrength: Math.min(1, finalConfidence / 100),
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        hrv: hrvMetrics || undefined
       };
       
       saveVital.mutate({ 
-        heartRate: finalBpm, 
+        heartRate: calibratedBpm, 
         confidence: finalConfidence,
-        stress: stressLevel
+        stress: stressLevel,
+        measurementDuration,
+        hrvRmssd: hrvMetrics?.rmssd,
+        hrvSdnn: hrvMetrics?.sdnn,
+        hrvPnn50: hrvMetrics?.pnn50,
+        hrvLfHfRatio: hrvMetrics?.lfHfRatio,
+        hrvStressScore: hrvMetrics?.stressScore,
+        hrvAnsBalance: hrvMetrics?.ansBalance
       }, {
         onSuccess: () => {
-          toast.success(`Heart rate saved: ${finalBpm} BPM (${finalConfidence}% confidence)`);
+          const calibrationNote = calibration?.correctionFactor ? ` (calibrated)` : '';
+          toast.success(`Heart rate saved: ${calibratedBpm} BPM${calibrationNote} (${finalConfidence}% confidence)`);
           if (onComplete) {
             onComplete(result);
           }
@@ -590,7 +622,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         }
       });
       
-      setDebugInfo(`✅ Scan complete: ${finalBpm} BPM (${finalConfidence}% confidence)`);
+      setDebugInfo(`✅ Scan complete: ${calibratedBpm} BPM (${finalConfidence}% confidence)`);
     } else {
       setDebugInfo("❌ Scan failed - insufficient data quality");
       toast.error("Scan failed. Please try again with better lighting and less movement.");
@@ -736,6 +768,67 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
           </div>
         )}
       </div>
+
+      {/* HRV Metrics Display */}
+      {hrvMetrics && (
+        <div className="space-y-3 border-t pt-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <Brain className="w-5 h-5 text-purple-600" />
+            Heart Rate Variability Analysis
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            {/* Stress Score */}
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+              <div className="text-xs text-purple-700 font-medium mb-1">Stress Level</div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-purple-900">{hrvMetrics.stressScore}</span>
+                <span className="text-xs text-purple-600">/100</span>
+              </div>
+              <div className="text-xs text-purple-600 mt-1">
+                {hrvMetrics.stressScore < 30 ? '😌 Relaxed' : hrvMetrics.stressScore < 60 ? '😐 Moderate' : '😰 High'}
+              </div>
+            </div>
+
+            {/* ANS Balance */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
+              <div className="text-xs text-blue-700 font-medium mb-1">ANS Balance</div>
+              <div className="text-sm font-bold text-blue-900 leading-tight">
+                {hrvMetrics.ansBalance === 'PARASYMPATHETIC' ? '🧘 Relaxed' : 
+                 hrvMetrics.ansBalance === 'BALANCED' ? '⚖️ Balanced' : 
+                 '⚡ Stressed'}
+              </div>
+              <div className="text-xs text-blue-600 mt-1">
+                {hrvMetrics.ansBalance.toLowerCase()}
+              </div>
+            </div>
+
+            {/* RMSSD */}
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-3 rounded-lg border border-emerald-200">
+              <div className="text-xs text-emerald-700 font-medium mb-1">RMSSD</div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-emerald-900">{hrvMetrics.rmssd.toFixed(1)}</span>
+                <span className="text-xs text-emerald-600">ms</span>
+              </div>
+              <div className="text-xs text-emerald-600 mt-1">Short-term variability</div>
+            </div>
+
+            {/* SDNN */}
+            <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-3 rounded-lg border border-amber-200">
+              <div className="text-xs text-amber-700 font-medium mb-1">SDNN</div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-amber-900">{hrvMetrics.sdnn.toFixed(1)}</span>
+                <span className="text-xs text-amber-600">ms</span>
+              </div>
+              <div className="text-xs text-amber-600 mt-1">Overall variability</div>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-500 bg-slate-50 p-2 rounded border border-slate-200">
+            💡 <strong>Tip:</strong> Higher HRV (RMSSD, SDNN) generally indicates better cardiovascular health and stress resilience.
+          </div>
+        </div>
+      )}
 
       {/* Progress Bar */}
       {scanning && (

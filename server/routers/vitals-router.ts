@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
-import { patientVitals } from "../../drizzle/schema";
+import { patientVitals, bioScannerCalibration } from "../../drizzle/schema";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -178,5 +178,98 @@ export const vitalsRouter = router({
         value: input.metric === "heartRate" ? vital.heartRate : vital.hrvStressScore,
         confidence: vital.confidenceScore,
       }));
+    }),
+
+  /**
+   * Save or update calibration data for the current user
+   */
+  saveCalibration: protectedProcedure
+    .input(z.object({
+      referenceHeartRate: z.number().min(30).max(250),
+      measuredHeartRate: z.number().min(30).max(250),
+      referenceDevice: z.string().optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const correctionFactor = input.referenceHeartRate / input.measuredHeartRate;
+
+      // Check if calibration exists for this user
+      const existing = await db
+        .select()
+        .from(bioScannerCalibration)
+        .where(eq(bioScannerCalibration.userId, ctx.user.id))
+        .limit(1);
+
+      if (existing.length > 0) {
+        // Update existing calibration
+        await db
+          .update(bioScannerCalibration)
+          .set({
+            referenceHeartRate: input.referenceHeartRate,
+            measuredHeartRate: input.measuredHeartRate,
+            correctionFactor: correctionFactor.toString(),
+            referenceDevice: input.referenceDevice,
+            notes: input.notes,
+          })
+          .where(eq(bioScannerCalibration.userId, ctx.user.id));
+      } else {
+        // Insert new calibration
+        await db.insert(bioScannerCalibration).values({
+          userId: ctx.user.id,
+          referenceHeartRate: input.referenceHeartRate,
+          measuredHeartRate: input.measuredHeartRate,
+          correctionFactor: correctionFactor.toString(),
+          referenceDevice: input.referenceDevice,
+          notes: input.notes,
+        });
+      }
+
+      return {
+        success: true,
+        correctionFactor: Number(correctionFactor.toFixed(4)),
+        message: "Calibration saved successfully"
+      };
+    }),
+
+  /**
+   * Get calibration data for the current user
+   */
+  getCalibration: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const calibration = await db
+        .select()
+        .from(bioScannerCalibration)
+        .where(eq(bioScannerCalibration.userId, ctx.user.id))
+        .limit(1);
+
+      if (calibration.length === 0) {
+        return null;
+      }
+
+      return {
+        ...calibration[0],
+        correctionFactor: Number(calibration[0].correctionFactor),
+      };
+    }),
+
+  /**
+   * Delete calibration for the current user
+   */
+  deleteCalibration: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      await db
+        .delete(bioScannerCalibration)
+        .where(eq(bioScannerCalibration.userId, ctx.user.id));
+
+      return { success: true, message: "Calibration deleted successfully" };
     }),
 });

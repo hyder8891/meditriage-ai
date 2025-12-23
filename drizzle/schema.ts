@@ -2160,3 +2160,27 @@ export const patientVitals = mysqlTable("patient_vitals", {
 
 export type PatientVital = typeof patientVitals.$inferSelect;
 export type InsertPatientVital = typeof patientVitals.$inferInsert;
+
+/**
+ * Bio-Scanner Calibration - User-specific correction factors
+ * Allows users to calibrate camera-based readings against reference devices
+ */
+export const bioScannerCalibration = mysqlTable("bio_scanner_calibration", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(), // One calibration per user
+  
+  // Calibration data
+  referenceHeartRate: int("reference_heart_rate").notNull(), // From pulse oximeter or other device
+  measuredHeartRate: int("measured_heart_rate").notNull(), // From Bio-Scanner
+  correctionFactor: decimal("correction_factor", { precision: 10, scale: 4 }).notNull(), // referenceHeartRate / measuredHeartRate
+  
+  // Metadata
+  calibrationDate: timestamp("calibration_date").defaultNow().notNull(),
+  referenceDevice: varchar("reference_device", { length: 100 }), // e.g., "Pulse Oximeter", "Apple Watch"
+  notes: text("notes"),
+  
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BioScannerCalibration = typeof bioScannerCalibration.$inferSelect;
+export type InsertBioScannerCalibration = typeof bioScannerCalibration.$inferInsert;

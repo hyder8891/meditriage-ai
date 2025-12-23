@@ -197,3 +197,65 @@
 - [x] Tested filtered signal - shows periodic peaks (14-19 candidate peaks)
 - [x] Successfully detecting BPM (78 BPM achieved!)
 - [x] Lowered detection thresholds for better sensitivity
+
+## Bio-Scanner Next Steps (User Requested - Current Session)
+- [ ] Add HRV Analysis with Stress Assessment
+  - [ ] Extend measurement duration to 60+ seconds for HRV accuracy
+  - [ ] Calculate SDNN (Standard Deviation of NN intervals)
+  - [ ] Calculate RMSSD (Root Mean Square of Successive Differences)
+  - [ ] Calculate pNN50 (percentage of NN intervals > 50ms different)
+  - [ ] Calculate LF/HF ratio (Low Frequency / High Frequency power)
+  - [ ] Add stress level assessment (LOW/NORMAL/HIGH)
+  - [ ] Add ANS balance indicator (Parasympathetic/Balanced/Sympathetic)
+  - [ ] Display HRV metrics in Bio-Scanner results
+  - [ ] Store HRV data in patient_vitals table
+
+- [ ] Build Calibration System for Personalized Accuracy
+  - [ ] Create calibration flow UI (one-time setup)
+  - [ ] Add reference device input (user enters pulse oximeter reading)
+  - [ ] Calculate personalized correction factor
+  - [ ] Store calibration data per user
+  - [ ] Apply correction factor to all future measurements
+  - [ ] Add re-calibration option in settings
+  - [ ] Display calibration status in Bio-Scanner
+
+- [ ] Create Historical Trends Dashboard
+  - [ ] Build dedicated vitals trends page at /patient/vitals-trends
+  - [ ] Add interactive time-series charts (Recharts)
+  - [ ] Show BPM patterns over days/weeks/months
+  - [ ] Add stress level correlation analysis
+  - [ ] Add time-of-day pattern analysis
+  - [ ] Add weekly/monthly summary statistics
+  - [ ] Add export functionality (CSV/PDF)
+  - [ ] Add comparison view (current vs previous period)
+  - [ ] Add health insights based on trends
+
+## Bio-Scanner HRV Implementation (COMPLETED - Current Session)
+- [x] Add HRV metrics display in BioScanner UI
+  - [x] Display stress score (0-100 with emoji indicators)
+  - [x] Display ANS balance (Parasympathetic/Balanced/Sympathetic)
+  - [x] Display RMSSD (short-term variability)
+  - [x] Display SDNN (overall variability)
+  - [x] Add gradient card styling for each metric
+  - [x] Add educational tooltip about HRV
+- [x] Integrate HRV engine with existing BioScanner
+  - [x] Import BioScannerEngine for HRV calculation
+  - [x] Process frames with both engines (HybridBioEngine + BioScannerEngine)
+  - [x] Calculate HRV metrics when 30+ seconds of data available
+  - [x] Pass HRV data to saveVital mutation
+  - [x] Store all HRV metrics in database
+
+## Bio-Scanner Calibration System (COMPLETED - Current Session)
+- [x] Create bio_scanner_calibration database table
+  - [x] Add userId, referenceHeartRate, measuredHeartRate fields
+  - [x] Add correctionFactor calculation (reference / measured)
+  - [x] Add calibrationDate, referenceDevice, notes metadata
+- [x] Build calibration router procedures
+  - [x] saveCalibration - insert or update calibration for user
+  - [x] getCalibration - fetch user's calibration data
+  - [x] deleteCalibration - remove calibration
+- [x] Integrate calibration into BioScanner
+  - [x] Fetch calibration data on component mount
+  - [x] Apply correction factor to measured BPM
+  - [x] Show "(calibrated)" note in success toast
+  - [x] Save calibrated BPM to database
