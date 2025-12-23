@@ -25,16 +25,16 @@ const conversationMessageSchema = z.object({
 
 const conversationContextSchema = z.object({
   symptoms: z.array(z.string()).optional(),
-  duration: z.string().optional(),
-  severity: z.string().optional(),
-  location: z.string().optional(),
+  duration: z.string().nullable().optional(),
+  severity: z.string().nullable().optional(),
+  location: z.string().nullable().optional(),
   aggravatingFactors: z.array(z.string()).optional(),
   relievingFactors: z.array(z.string()).optional(),
   associatedSymptoms: z.array(z.string()).optional(),
   medicalHistory: z.array(z.string()).optional(),
   medications: z.array(z.string()).optional(),
-  age: z.number().optional(),
-  gender: z.string().optional()
+  age: z.number().nullable().optional(),
+  gender: z.string().nullable().optional()
 });
 
 // ============================================================================
@@ -60,7 +60,21 @@ export const conversationalRouter = router({
 
       // 🔧 FIX: Rehydrate the Context Vector Class
       // The context arrives as plain JSON, but we need a class instance with methods
-      const hydratedContext = createContextVector(context || {});
+      // Filter out null values to match ConversationalContextVector type expectations
+      const sanitizedContext = context ? {
+        symptoms: context.symptoms,
+        duration: context.duration ?? undefined,
+        severity: context.severity ?? undefined,
+        location: context.location ?? undefined,
+        aggravatingFactors: context.aggravatingFactors,
+        relievingFactors: context.relievingFactors,
+        associatedSymptoms: context.associatedSymptoms,
+        medicalHistory: context.medicalHistory,
+        medications: context.medications,
+        age: context.age ?? undefined,
+        gender: context.gender ?? undefined
+      } : {};
+      const hydratedContext = createContextVector(sanitizedContext);
       
       console.log("[sendMessage] Rehydrated context:", hydratedContext.getSummary());
 

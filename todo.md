@@ -395,3 +395,9 @@
 - [ ] Complete full 10-question flow test to final diagnosis/recommendation
 - [ ] Consider integrating with advanced Brain Architecture (server/brain/) for better clinical reasoning
 - [ ] Write vitest tests for conversational flow
+
+
+## CRITICAL: Production WebSocket & Validation Fixes (User Analysis)
+- [x] Fix data validation crash in conversational-router.ts (nullable context fields)
+- [x] Fix WebSocket CSP blocking in security.ts (whitelist production domain)
+- [x] Fix WebSocket CORS rejection in socket-server.ts (accept all origins)

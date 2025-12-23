@@ -59,7 +59,7 @@ export function initializeSocketServer(httpServer: HttpServer) {
   }
 
   io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
+    console.log(`🔌 Socket connected: ${socket.id} from ${socket.handshake.headers.origin}`);
     
     // ---------------------------------------------------------
     // 1. SCALABLE USER REGISTRATION (Using Rooms)
@@ -142,18 +142,17 @@ export function initializeSocketServer(httpServer: HttpServer) {
 
     socket.on('disconnect', (reason) => {
       // Redis Adapter automatically handles removing socket from rooms
-      console.log(`User disconnected: ${socket.id} (reason: ${reason})`);
+      console.log(`Socket disconnected: ${socket.id} (Reason: ${reason})`);
       
       // Additional cleanup for flaky connections
-      // The adapter handles room cleanup, but we log for monitoring
       if (reason === 'transport error' || reason === 'ping timeout') {
         console.log(`[Socket] Flaky connection detected for ${socket.id}`);
       }
     });
     
     // Handle connection errors explicitly
-    socket.on('error', (error) => {
-      console.error(`[Socket] Connection error for ${socket.id}:`, error.message);
+    socket.on('error', (err) => {
+      console.error(`Socket error on ${socket.id}:`, err);
     });
     
     // Heartbeat to detect zombie connections

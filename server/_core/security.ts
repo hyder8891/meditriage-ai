@@ -71,11 +71,15 @@ export const securityHeaders = helmet({
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: [
         "'self'",
+        "https:", // Allow all HTTPS calls
+        "wss:",   // 🟢 FIX: Allow all Secure WebSockets
+        "ws:",    // Allow standard WebSockets
         "https://api.manus.im",
         "https://*.manus-asia.computer",
         "https://manus-analytics.com",
         "wss://*.manus.computer",       // WebSocket connections
-        "https://*.manus.computer"      // API calls to preview env
+        "https://*.manus.computer",     // API calls to preview env
+        "wss://tabibi.clinic"           // 🟢 FIX: Explicitly allow Prod Socket
       ],
       frameSrc: ["'self'", "https://accounts.google.com"],
       objectSrc: ["'none'"],
