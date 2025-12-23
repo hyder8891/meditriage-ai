@@ -220,7 +220,7 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
         careLocator: { title: 'Care Locator', desc: 'Find nearby medical facilities and specialists' },
       },
       benefits: {
-        title: 'Why Choose MediTriage AI Pro',
+        title: 'Why Choose My Doctor',
         items: [
           'Reduce diagnostic errors with AI-powered clinical decision support',
           'Save time with automated documentation and SOAP note generation',
@@ -232,7 +232,7 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
       },
       cta: {
         title: 'Ready to Transform Your Clinical Practice?',
-        subtitle: 'Join thousands of healthcare professionals using MediTriage AI Pro',
+        subtitle: 'Join thousands of healthcare professionals using My Doctor',
         startTrial: 'Start Free Trial',
         scheduleDemo: 'Schedule Demo',
       },
@@ -323,7 +323,7 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
         medications: 'Medications',
       },
     },
-    title: "MediTriage AI Pro",
+    title: "My Doctor",
     subtitle: "Advanced Medical Triage, Imaging Analysis & Detailed Advisory",
     startTriage: "Start Comprehensive Assessment",
     disclaimerBanner: "Health Notice: This system provides guidance only and is not a substitute for professional medical diagnosis. Call emergency services immediately in critical situations.",
@@ -452,7 +452,7 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
         careLocator: { title: 'Care Locator', desc: 'ابحث عن المرافق الطبية والمتخصصين القريبين' },
       },
       benefits: {
-        title: 'لماذا تختار MediTriage AI Pro',
+        title: 'لماذا تختار My Doctor',
         items: [
           'قلل أخطاء التشخيص بدعم القرار السريري المدعوم بالذكاء الاصطناعي',
           'وفر الوقت بالتوثيق الآلي وإنشاء ملاحظات SOAP',
@@ -464,7 +464,7 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
       },
       cta: {
         title: 'هل أنت مستعد لتحويل ممارستك السريرية؟',
-        subtitle: 'انضم إلى آلاف المهنيين الصحيين الذين يستخدمون MediTriage AI Pro',
+        subtitle: 'انضم إلى آلاف المهنيين الصحيين الذين يستخدمون My Doctor',
         startTrial: 'ابدأ تجربة مجانية',
         scheduleDemo: 'احجز عرضًا توضيحيًا',
       },

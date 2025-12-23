@@ -159,10 +159,10 @@ function SettingsContent() {
                   </p>
                 </div>
                 <Switch
-                  checked={emailPrefs?.newMessages !== false}
+                  checked={emailPrefs?.newMessageNotifications !== false}
                   onCheckedChange={(checked) =>
                     updateEmailPrefsMutation.mutate({
-                      newMessages: checked,
+                      newMessageNotifications: checked,
                     })
                   }
                 />
@@ -175,10 +175,10 @@ function SettingsContent() {
                   </p>
                 </div>
                 <Switch
-                  checked={emailPrefs?.labResults !== false}
+                  checked={emailPrefs?.labResultNotifications !== false}
                   onCheckedChange={(checked) =>
                     updateEmailPrefsMutation.mutate({
-                      labResults: checked,
+                      labResultNotifications: checked,
                     })
                   }
                 />

@@ -54,7 +54,7 @@ export async function sendPhoneVerification(phoneNumber: string): Promise<{ succ
     // Example with AWS SNS:
     // await sns.publish({
     //   PhoneNumber: phoneNumber,
-    //   Message: `Your MediTriage verification code is: ${code}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`
+    //   Message: `Your My Doctor verification code is: ${code}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`
     // }).promise();
 
     // For development: return the code so it can be displayed in the UI

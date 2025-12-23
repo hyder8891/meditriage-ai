@@ -108,7 +108,7 @@ export default function DebugAuth() {
               <h2 className="text-xl font-semibold mb-4">Expected Test Data</h2>
               <div className="space-y-2 text-sm">
                 <p><strong>Expected User ID:</strong> 3150028</p>
-                <p><strong>Expected Email:</strong> patient.test@meditriage.com</p>
+                <p><strong>Expected Email:</strong> patient.test@mydoctor.com</p>
                 <p><strong>Expected Messages:</strong> 3</p>
                 <p><strong>Expected Doctors:</strong> 2</p>
                 <hr className="my-3" />

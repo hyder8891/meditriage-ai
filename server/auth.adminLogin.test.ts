@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 
 describe("auth.adminLogin", () => {
   let testUserId: number;
-  const testEmail = "test-admin@meditriage.test";
+  const testEmail = "test-admin@mydoctor.test";
   const testPassword = "TestPassword123!";
 
   beforeAll(async () => {

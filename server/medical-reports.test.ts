@@ -13,7 +13,7 @@ import path from "path";
 const mockClinicianContext: TrpcContext = {
   user: {
     id: 999,
-    email: "test-clinician@meditriage.test",
+    email: "test-clinician@mydoctor.test",
     name: "Test Clinician",
     role: "clinician",
     createdAt: new Date(),

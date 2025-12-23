@@ -2,7 +2,7 @@
 /**
  * Avicenna-X Orchestration Engine
  * 
- * The core "Predictive Health Graph" algorithm that transforms MediTriage
+ * The core "Predictive Health Graph" algorithm that transforms My Doctor
  * from a passive tool into an active health operating system.
  * 
  * Named after Ibn Sina (Avicenna), the father of modern medicine.
@@ -12,6 +12,8 @@ import { getDb } from "../db";
 import { Redis } from "@upstash/redis";
 import { invokeGeminiPro, invokeGeminiFlash } from "../_core/gemini-dual";
 import type { User } from "../../drizzle/schema";
+import { medicalGuardrails } from "../../drizzle/avicenna-schema";
+import { eq } from "drizzle-orm";
 
 // Initialize Redis for epidemiology tracking
 // Convert rediss:// to https:// for Upstash SDK
@@ -329,27 +331,123 @@ async function generateHybridDiagnosis(
 }
 
 async function checkMedicalGuardrails(context: ContextVector, input: SymptomInput): Promise<any[]> {
-  // TODO: Query medical_guardrails table and evaluate conditions
   const triggered = [];
 
-  // Example: Heart rate > 120 AND chest pain
-  if (input.vitals?.heartRate && input.vitals.heartRate > 120) {
-    const hasChestPain = input.text?.toLowerCase().includes("chest pain") || 
-                         input.symptoms?.some(s => s.toLowerCase().includes("chest"));
-    
-    if (hasChestPain) {
-      triggered.push({
-        ruleName: "CARDIAC_EMERGENCY",
-        action: {
-          bypassAI: true,
-          urgencyLevel: "emergency",
-          immediateAction: "Possible cardiac event - immediate medical attention required",
-        },
-      });
+  try {
+    // Query active medical guardrails from database, sorted by priority
+    const guardrails = await db.query.medicalGuardrails.findMany({
+      where: (guardrails, { eq }) => eq(guardrails.isActive, true),
+      orderBy: (guardrails, { desc }) => [desc(guardrails.priority)],
+    });
+
+    // Evaluate each guardrail condition
+    for (const guardrail of guardrails) {
+      const condition = guardrail.condition as any;
+      let conditionMet = false;
+
+      // Vital sign threshold check
+      if (condition.vitalSign && condition.operator && condition.threshold !== undefined) {
+        const vitalValue = getVitalValue(input.vitals, condition.vitalSign);
+        if (vitalValue !== null) {
+          conditionMet = evaluateCondition(vitalValue, condition.operator, condition.threshold);
+        }
+      }
+
+      // Symptom keyword check
+      if (condition.symptomKeywords && condition.symptomKeywords.length > 0) {
+        const text = (input.text || "").toLowerCase();
+        const symptoms = (input.symptoms || []).map(s => s.toLowerCase());
+        const allText = text + " " + symptoms.join(" ");
+
+        const keywordMatches = condition.symptomKeywords.filter((keyword: string) =>
+          allText.includes(keyword.toLowerCase())
+        );
+
+        const keywordConditionMet = condition.logicalOperator === "AND"
+          ? keywordMatches.length === condition.symptomKeywords.length
+          : keywordMatches.length > 0;
+
+        // Combine with vital sign condition if both exist
+        if (condition.vitalSign) {
+          conditionMet = condition.logicalOperator === "AND"
+            ? conditionMet && keywordConditionMet
+            : conditionMet || keywordConditionMet;
+        } else {
+          conditionMet = keywordConditionMet;
+        }
+      }
+
+      // If condition met, add to triggered list
+      if (conditionMet) {
+        triggered.push({
+          ruleName: guardrail.ruleName,
+          action: guardrail.action,
+          ruleType: guardrail.ruleType,
+        });
+
+        // Update trigger count
+        await db.update(medicalGuardrails)
+          .set({ timesTriggered: guardrail.timesTriggered + 1 })
+          .where(eq(medicalGuardrails.id, guardrail.id));
+
+        // If emergency bypass, stop checking further rules
+        if ((guardrail.action as any).bypassAI) {
+          break;
+        }
+      }
+    }
+  } catch (error) {
+    console.error("[Guardrails] Error checking medical guardrails:", error);
+    // Fallback to hardcoded emergency rules
+    if (input.vitals?.heartRate && input.vitals.heartRate > 120) {
+      const hasChestPain = input.text?.toLowerCase().includes("chest pain") ||
+                           input.symptoms?.some(s => s.toLowerCase().includes("chest"));
+
+      if (hasChestPain) {
+        triggered.push({
+          ruleName: "CARDIAC_EMERGENCY_FALLBACK",
+          action: {
+            bypassAI: true,
+            urgencyLevel: "emergency",
+            immediateAction: "Possible cardiac event - immediate medical attention required",
+          },
+        });
+      }
     }
   }
 
   return triggered;
+}
+
+// Helper: Get vital value by name
+function getVitalValue(vitals: any, vitalName: string): number | null {
+  if (!vitals) return null;
+  const normalized = vitalName.toLowerCase().replace(/[_\s]/g, "");
+  
+  if (normalized === "heartrate") return vitals.heartRate || null;
+  if (normalized === "temperature") return vitals.temperature || null;
+  if (normalized === "oxygensaturation" || normalized === "spo2") return vitals.oxygenSaturation || null;
+  if (normalized === "bloodpressure") {
+    // Parse systolic from "120/80" format
+    if (typeof vitals.bloodPressure === "string") {
+      const systolic = parseInt(vitals.bloodPressure.split("/")[0]);
+      return isNaN(systolic) ? null : systolic;
+    }
+  }
+  
+  return null;
+}
+
+// Helper: Evaluate condition operator
+function evaluateCondition(value: number, operator: string, threshold: number): boolean {
+  switch (operator) {
+    case ">": return value > threshold;
+    case "<": return value < threshold;
+    case ">=": return value >= threshold;
+    case "<=": return value <= threshold;
+    case "=": return value === threshold;
+    default: return false;
+  }
 }
 
 async function analyzeWithAI(

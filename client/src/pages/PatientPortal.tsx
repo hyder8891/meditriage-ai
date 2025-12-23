@@ -107,7 +107,7 @@ export default function PatientPortal() {
             </div>
             <div className="flex items-center gap-3">
               <Badge className="bg-gradient-to-r from-rose-500 to-purple-500 text-white">
-                {usage?.planName || 'Free'}
+                {usage?.plan || 'Free'}
               </Badge>
               <UserProfileDropdown />
             </div>

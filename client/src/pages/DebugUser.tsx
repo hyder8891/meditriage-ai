@@ -72,7 +72,7 @@ export default function DebugUser() {
         <h2 className="text-xl font-semibold">Expected Values</h2>
         <div className="space-y-2 font-mono text-sm">
           <div><strong>Expected User ID:</strong> 3150028</div>
-          <div><strong>Expected Email:</strong> patient.test@meditriage.com</div>
+          <div><strong>Expected Email:</strong> patient.test@mydoctor.com</div>
           <div><strong>Expected Messages:</strong> 3</div>
           <div><strong>Expected Doctors:</strong> 2</div>
         </div>

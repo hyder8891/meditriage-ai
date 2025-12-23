@@ -27,15 +27,11 @@ function PatientSymptomCheckerContent() {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [useAudioInput, setUseAudioInput] = useState(false);
 
-  const trackUsageMutation = trpc.b2b2c.subscription.trackUsage.useMutation();
-
   const analyzeMutation = trpc.clinical.patientSymptomAnalysis.useMutation({
     onSuccess: (data) => {
       setAnalysis(data);
       toast.success("Analysis complete");
-      
-      // Track usage after successful consultation
-      trackUsageMutation.mutate({ featureType: "consultation" });
+      // TODO: Add usage tracking when trackUsage procedure is implemented
     },
     onError: (error) => {
       toast.error("Analysis failed: " + error.message);

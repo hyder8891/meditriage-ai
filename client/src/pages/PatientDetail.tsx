@@ -137,12 +137,10 @@ export default function PatientDetail() {
                     {isArabic ? 'الحالة' : 'Status'}
                   </label>
                   <div>
-                    <Badge variant={patient.accountStatus === 'active' ? 'default' : 'secondary'}>
-                      {patient.accountStatus === 'active' 
-                        ? (isArabic ? 'نشط' : 'Active')
-                        : (isArabic ? 'غير نشط' : 'Inactive')
-                      }
+                    <Badge variant='default'>
+                      {isArabic ? 'نشط' : 'Active'}
                     </Badge>
+                    {/* TODO: Add accountStatus field to patient schema if needed */}
                   </div>
                 </div>
                 <div>

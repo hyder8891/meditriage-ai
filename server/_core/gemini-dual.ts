@@ -55,7 +55,7 @@ async function getMedicalContextCache(): Promise<string | null> {
  * Contains 20,000+ medical concepts and Iraqi-specific medical context
  */
 const MEDICAL_KNOWLEDGE_BASE = `
-# Medical Knowledge Base - MediTriage AI Pro
+# Medical Knowledge Base - My Doctor
 
 ## Disease Ontology (10,000+ Diseases)
 This system has comprehensive knowledge of diseases from the Disease Ontology including:

@@ -27,7 +27,7 @@ export default function PortalSelection() {
             <Activity className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">MediTriage AI</h1>
+            <h1 className="text-2xl font-bold">My Doctor</h1>
             <p className="text-xs text-purple-200">Medical Operating System</p>
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function PortalSelection() {
 
       {/* Footer */}
       <footer className="container py-8 text-center text-purple-300 text-sm border-t border-purple-400/20">
-        <p>© 2024 MediTriage AI Pro - {language === 'en' ? 'Developed by Hyder Janabi' : 'تطوير حيدر الجنابي'}</p>
+        <p>© 2024 My Doctor - {language === 'en' ? 'Developed by Hyder Janabi' : 'تطوير حيدر الجنابي'}</p>
       </footer>
     </div>
   );

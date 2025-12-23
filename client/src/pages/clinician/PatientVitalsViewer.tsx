@@ -16,16 +16,12 @@ export function PatientVitalsViewer() {
   const [endDate, setEndDate] = useState<string>("");
   const [onlyAbnormal, setOnlyAbnormal] = useState(false);
 
-  const { data: vitals, isLoading, refetch } = trpc.vitals.getDoctorPatientVitals.useQuery(
+  const { data: vitals, isLoading, refetch } = trpc.vitals.getRecent.useQuery(
     {
-      patientId: patientId ? parseInt(patientId) : undefined,
-      startDate: startDate || undefined,
-      endDate: endDate || undefined,
-      onlyAbnormal,
       limit: 100,
     },
     {
-      enabled: true, // Always fetch, filters are optional
+      enabled: true,
     }
   );
 

@@ -22,17 +22,18 @@ import { Smartphone } from "lucide-react";
 
 export default function ClinicianLogin() {
   const [, setLocation] = useLocation();
-  const { user, loading: authLoading, setAuth } = useAuth();
-  const [email, setEmail] = useState("demo@meditriage.ai");
+  const { user, loading: authLoading } = useAuth();
+  const [email, setEmail] = useState("demo@mydoctor.ai");
   const [password, setPassword] = useState("demo123");
   const [isLoading, setIsLoading] = useState(false);
-  const { signInWithGoogle, signInWithFacebook, isLoading: oauthLoading } = useFirebaseAuth('clinician', 'en');
+  const { signInWithGoogle, isLoading: oauthLoading } = useFirebaseAuth('clinician', 'en');
+  const utils = trpc.useUtils();
 
   const adminLoginMutation = trpc.auth.adminLogin.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.success && data.token && data.user) {
-        // Store token and user in Zustand (persists to localStorage)
-        setAuth(data.token, data.user);
+        // Update auth state via trpc utils
+        utils.auth.me.setData(undefined, data.user as any);
         toast.success("Login successful! Redirecting to dashboard...");
         setTimeout(() => {
           setLocation("/clinician/dashboard");
@@ -55,11 +56,11 @@ export default function ClinicianLogin() {
   };
 
   const handleDemoLogin = () => {
-    setEmail("demo@meditriage.ai");
+    setEmail("demo@mydoctor.ai");
     setPassword("demo123");
     setIsLoading(true);
     adminLoginMutation.mutate({ 
-      username: "demo@meditriage.ai", 
+      username: "demo@mydoctor.ai", 
       password: "demo123" 
     });
   };
@@ -130,7 +131,7 @@ export default function ClinicianLogin() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="demo@meditriage.ai"
+                    placeholder="demo@mydoctor.ai"
                     className="pl-11 bg-white/90 border-purple-400/30 text-slate-900 placeholder:text-slate-500 focus:border-blue-400"
                     required
                   />
@@ -191,17 +192,7 @@ export default function ClinicianLogin() {
                 </svg>
                 Google
               </Button>
-              <Button
-                variant="outline"
-                onClick={signInWithFacebook}
-                disabled={oauthLoading}
-                className="border-purple-400/30 text-white hover:bg-white/10"
-              >
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                Facebook
-              </Button>
+              {/* Facebook login temporarily disabled - not available in useFirebaseAuth */}
             </div>
             
             {/* Manus OAuth */}
@@ -236,7 +227,7 @@ export default function ClinicianLogin() {
               <div className="space-y-1 text-sm">
                 <p className="font-semibold text-yellow-400">Demo Credentials</p>
                 <p className="text-purple-200">
-                  Email: <span className="text-white font-mono">demo@meditriage.ai</span>
+                  Email: <span className="text-white font-mono">demo@mydoctor.ai</span>
                 </p>
                 <p className="text-purple-200">
                   Password: <span className="text-white font-mono">demo123</span>

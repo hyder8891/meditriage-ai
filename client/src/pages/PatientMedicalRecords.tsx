@@ -27,8 +27,10 @@ export default function PatientMedicalRecords() {
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
 
   // Fetch patient's medical records
-  const { data: labResults, isLoading: labLoading } = trpc.clinical.getLabResults.useQuery();
-  const { data: imagingResults, isLoading: imagingLoading } = trpc.clinical.getImagingResults.useQuery();
+  const { data: labResults, isLoading: labLoading } = trpc.lab.getMyLabResults.useQuery();
+  // TODO: Add imaging results when medical imaging router is integrated
+  const imagingResults: any[] = [];
+  const imagingLoading = false;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">

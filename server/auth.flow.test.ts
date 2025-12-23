@@ -4,7 +4,7 @@ import { hashPassword, verifyPassword, generateToken, verifyToken } from "./_cor
 describe("Authentication Flow", () => {
   let testToken: string;
   const testUserId = 12345;
-  const testEmail = "doctor.test@meditriage.com";
+  const testEmail = "doctor.test@mydoctor.com";
   const testRole = "clinician";
 
   describe("Password Hashing", () => {

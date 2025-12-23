@@ -31,7 +31,7 @@ const mockDoctorContext: Context = {
   user: {
     id: 3,
     name: 'Dr. Ahmed Al-Husseini',
-    email: 'ahmed.husseini@meditriage.iq',
+    email: 'ahmed.husseini@mydoctor.iq',
     role: 'doctor',
     specialty: 'Emergency Medicine',
     licenseNumber: 'IQ-MED-2018-4521',

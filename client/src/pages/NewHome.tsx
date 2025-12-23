@@ -83,8 +83,8 @@ export default function NewHome() {
     cta: {
       title: language === 'ar' ? 'ابدأ اليوم' : 'Get Started Today',
       subtitle: language === 'ar' 
-        ? 'انضم إلى آلاف المهنيين الطبيين والمرضى الذين يستخدمون MediTriage AI Pro'
-        : 'Join thousands of medical professionals and patients using MediTriage AI Pro',
+        ? 'انضم إلى آلاف المهنيين الطبيين والمرضى الذين يستخدمون My Doctor'
+        : 'Join thousands of medical professionals and patients using My Doctor',
     },
   };
 
@@ -170,7 +170,7 @@ export default function NewHome() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  {language === 'ar' ? 'MediTriage AI Pro' : 'MediTriage AI Pro'}
+                  {language === 'ar' ? 'My Doctor' : 'My Doctor'}
                 </h1>
                 <p className="text-xs text-gray-500">
                   {language === 'ar' ? 'نظام التشغيل الطبي الذكي' : 'AI Medical Operating System'}
@@ -393,7 +393,7 @@ export default function NewHome() {
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Activity className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">MediTriage AI Pro</span>
+              <span className="text-xl font-bold text-white">My Doctor</span>
             </div>
             <p className="text-gray-400 mb-4">
               {language === 'ar' 
@@ -401,7 +401,7 @@ export default function NewHome() {
                 : 'AI Medical Operating System for Iraq'}
             </p>
             <p className="text-sm text-gray-500">
-              © 2025 MediTriage AI Pro. {language === 'ar' ? 'جميع الحقوق محفوظة' : 'All rights reserved'}.
+              © 2025 My Doctor. {language === 'ar' ? 'جميع الحقوق محفوظة' : 'All rights reserved'}.
             </p>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { mysqlTable, int, varchar, text, timestamp, decimal, boolean, json, mysq
  * Avicenna-X Orchestration System Schema
  * 
  * This schema implements the "Predictive Health Graph" architecture
- * that transforms MediTriage from a passive tool into an active health OS.
+ * that transforms My Doctor from a passive tool into an active health OS.
  */
 
 // ============================================================================
