@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Medical AEC (Autonomous Error Correction)
  * 

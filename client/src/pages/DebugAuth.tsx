@@ -46,19 +46,19 @@ export default function DebugAuth() {
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <span className="font-semibold">User ID:</span>
-                  <span className="font-mono text-lg text-blue-600">{data.user.id}</span>
+                  <span className="font-mono text-lg text-blue-600">{data.user?.id}</span>
                 </div>
                 <div className="flex gap-2">
                   <span className="font-semibold">Email:</span>
-                  <span>{data.user.email}</span>
+                  <span>{data.user?.email}</span>
                 </div>
                 <div className="flex gap-2">
                   <span className="font-semibold">Name:</span>
-                  <span>{data.user.name}</span>
+                  <span>{data.user?.name}</span>
                 </div>
                 <div className="flex gap-2">
                   <span className="font-semibold">Role:</span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{data.user.role}</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{data.user?.role}</span>
                 </div>
               </div>
             </div>
@@ -98,7 +98,7 @@ export default function DebugAuth() {
                 <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-yellow-800 font-semibold">⚠️ No conversations found</p>
                   <p className="text-sm text-yellow-700 mt-2">
-                    This means the messages table has no records for user ID {data.user.id}
+                    This means the messages table has no records for user ID {data.user?.id}
                   </p>
                 </div>
               )}
@@ -112,11 +112,11 @@ export default function DebugAuth() {
                 <p><strong>Expected Messages:</strong> 3</p>
                 <p><strong>Expected Doctors:</strong> 2</p>
                 <hr className="my-3" />
-                {data.user.id === 3150028 ? (
+                {data.user?.id === 3150028 ? (
                   <p className="text-green-600 font-semibold">✅ User ID matches! You're logged in as the test patient.</p>
                 ) : (
                   <p className="text-red-600 font-semibold">
-                    ❌ User ID mismatch! You're logged in as ID {data.user.id}, but test data is for ID 3150028.
+                    ❌ User ID mismatch! You're logged in as ID {data.user?.id}, but test data is for ID 3150028.
                   </p>
                 )}
               </div>

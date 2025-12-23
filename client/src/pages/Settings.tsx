@@ -159,10 +159,10 @@ function SettingsContent() {
                   </p>
                 </div>
                 <Switch
-                  checked={emailPrefs?.newMessage !== "off"}
+                  checked={emailPrefs?.newMessages !== false}
                   onCheckedChange={(checked) =>
                     updateEmailPrefsMutation.mutate({
-                      newMessage: checked ? "instant" : "off",
+                      newMessages: checked,
                     })
                   }
                 />
@@ -175,10 +175,10 @@ function SettingsContent() {
                   </p>
                 </div>
                 <Switch
-                  checked={emailPrefs?.labResultReady !== "off"}
+                  checked={emailPrefs?.labResults !== false}
                   onCheckedChange={(checked) =>
                     updateEmailPrefsMutation.mutate({
-                      labResultReady: checked ? "instant" : "off",
+                      labResults: checked,
                     })
                   }
                 />
@@ -191,10 +191,10 @@ function SettingsContent() {
                   </p>
                 </div>
                 <Switch
-                  checked={emailPrefs?.appointmentConfirmation !== "off"}
+                  checked={emailPrefs?.appointmentConfirmations !== false}
                   onCheckedChange={(checked) =>
                     updateEmailPrefsMutation.mutate({
-                      appointmentConfirmation: checked ? "instant" : "off",
+                      appointmentConfirmations: checked,
                     })
                   }
                 />
@@ -261,7 +261,7 @@ function SettingsContent() {
                 <Label>اللغة</Label>
                 <Select
                   value={settings?.language || "ar"}
-                  onValueChange={(value) =>
+                  onValueChange={(value: "en" | "ar") =>
                     updateSettingsMutation.mutate({ language: value })
                   }
                 >
@@ -300,9 +300,9 @@ function SettingsContent() {
                   </p>
                 </div>
                 <Switch
-                  checked={settings?.showProfile ?? true}
+                  checked={settings?.profileVisibility === "public"}
                   onCheckedChange={(checked) =>
-                    updateSettingsMutation.mutate({ showProfile: checked })
+                    updateSettingsMutation.mutate({ profileVisibility: checked ? "public" : "private" })
                   }
                 />
               </div>

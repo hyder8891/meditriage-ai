@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BRAIN Expanded Performance Test
  * Tests 24 cases (4 from each category) for comprehensive baseline

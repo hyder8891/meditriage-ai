@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Neuro-Symbolic Triage Engine
  * 

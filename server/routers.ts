@@ -327,6 +327,7 @@ export const appRouter = router({
             userId: user.id,
             email: user.email!,
             role: user.role,
+            tokenVersion: user.tokenVersion || 0,
           });
           
           // Set session cookie

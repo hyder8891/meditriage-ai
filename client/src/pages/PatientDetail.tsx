@@ -118,7 +118,7 @@ export default function PatientDetail() {
                   </label>
                   <p className="text-slate-900 flex items-center gap-2">
                     <Phone className="w-4 h-4" />
-                    {patient.phone || (isArabic ? 'غير متوفر' : 'Not available')}
+                    {patient.phoneNumber || (isArabic ? 'غير متوفر' : 'Not available')}
                   </p>
                 </div>
               </div>
@@ -129,7 +129,7 @@ export default function PatientDetail() {
                   </label>
                   <p className="text-slate-900 flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    {patient.connectedAt ? new Date(patient.connectedAt).toLocaleDateString(isArabic ? 'ar-IQ' : 'en-US') : '-'}
+                    {patient.createdAt ? new Date(patient.createdAt).toLocaleDateString(isArabic ? 'ar-IQ' : 'en-US') : '-'}
                   </p>
                 </div>
                 <div>
@@ -137,8 +137,8 @@ export default function PatientDetail() {
                     {isArabic ? 'الحالة' : 'Status'}
                   </label>
                   <div>
-                    <Badge variant={patient.status === 'active' ? 'default' : 'secondary'}>
-                      {patient.status === 'active' 
+                    <Badge variant={patient.accountStatus === 'active' ? 'default' : 'secondary'}>
+                      {patient.accountStatus === 'active' 
                         ? (isArabic ? 'نشط' : 'Active')
                         : (isArabic ? 'غير نشط' : 'Inactive')
                       }
@@ -151,8 +151,8 @@ export default function PatientDetail() {
                   </label>
                   <p className="text-slate-900 flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    {patient.lastConsultation 
-                      ? new Date(patient.lastConsultation).toLocaleDateString(isArabic ? 'ar-IQ' : 'en-US')
+                    {patient.lastSignedIn 
+                      ? new Date(patient.lastSignedIn).toLocaleDateString(isArabic ? 'ar-IQ' : 'en-US')
                       : (isArabic ? 'لا توجد استشارات سابقة' : 'No previous consultations')
                     }
                   </p>

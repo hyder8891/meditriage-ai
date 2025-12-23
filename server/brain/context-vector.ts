@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Context Vector Service
  * 

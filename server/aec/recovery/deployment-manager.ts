@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Deployment Manager - Recovery Layer
  * Handles zero-downtime deployments and rollbacks

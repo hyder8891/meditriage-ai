@@ -653,7 +653,7 @@ export async function sendEmail(
       return false;
     }
 
-    const langTemplate = template[language];
+    const langTemplate = template[language as keyof typeof template];
     const subject =
       typeof langTemplate.subject === "function"
         ? langTemplate.subject(data)

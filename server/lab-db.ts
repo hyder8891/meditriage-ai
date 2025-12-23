@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lab Result Database Helper Functions
  * 

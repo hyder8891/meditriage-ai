@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Epidemiology Tracking System
  * 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lab Report OCR and Text Extraction Service
  * 

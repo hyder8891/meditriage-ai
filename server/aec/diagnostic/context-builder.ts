@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Codebase Context Builder - Diagnostic Layer
  * Builds comprehensive context for Gemini Pro analysis

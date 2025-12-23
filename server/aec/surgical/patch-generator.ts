@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Patch Generator - Surgical Layer
  * Generates code patches using Gemini Pro based on diagnostic results

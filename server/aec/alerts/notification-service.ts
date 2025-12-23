@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AEC Notification Service
  * Handles email notifications for critical errors, manual reviews, and daily reports

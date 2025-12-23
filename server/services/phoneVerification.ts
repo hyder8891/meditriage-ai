@@ -133,7 +133,7 @@ export async function verifyPhoneCode(phoneNumber: string, code: string): Promis
  */
 function cleanupExpiredOTPs() {
   const now = Date.now();
-  for (const [phoneNumber, record] of otpStore.entries()) {
+  for (const [phoneNumber, record] of Array.from(otpStore.entries())) {
     if (now > record.expiresAt) {
       otpStore.delete(phoneNumber);
       console.log(`[SMS OTP] Cleaned up expired code for ${phoneNumber}`);

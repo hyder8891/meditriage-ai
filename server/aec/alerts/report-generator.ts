@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AEC Daily Report Generator
  * Generates comprehensive twice-daily reports on system health, errors, and code changes

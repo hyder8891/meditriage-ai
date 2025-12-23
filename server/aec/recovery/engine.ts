@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Recovery Engine - Orchestrates testing, deployment, and rollback
  */

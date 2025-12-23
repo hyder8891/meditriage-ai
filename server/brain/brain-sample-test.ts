@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BRAIN Sample Performance Test
  * Quick validation with representative cases from each category

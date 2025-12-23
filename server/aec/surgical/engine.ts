@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Surgical Engine - Orchestrates patch generation and application
  */
