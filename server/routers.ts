@@ -19,6 +19,7 @@ import { oauthRouter } from "./oauth-router";
 import { preferencesRouter } from "./preferences-router";
 import { vitalsRouter } from "./routers/vitals-router";
 import { medicalReportsRouter } from "./routers/medical-reports-router";
+import { resourceAuctionRouter } from "./avicenna/resource-auction-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -75,6 +76,7 @@ export const appRouter = router({
   preferences: preferencesRouter,
   vitals: vitalsRouter,
   medicalReports: medicalReportsRouter,
+  resourceAuction: resourceAuctionRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),

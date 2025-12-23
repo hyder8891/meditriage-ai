@@ -2184,3 +2184,109 @@ export const bioScannerCalibration = mysqlTable("bio_scanner_calibration", {
 
 export type BioScannerCalibration = typeof bioScannerCalibration.$inferSelect;
 export type InsertBioScannerCalibration = typeof bioScannerCalibration.$inferInsert;
+
+// ============================================================================
+// AVICENNA-X: RESOURCE AUCTION ALGORITHM
+// ============================================================================
+
+/**
+ * Doctor performance metrics for resource auction algorithm
+ * Tracks historical performance to score doctors
+ */
+export const doctorPerformanceMetrics = mysqlTable("doctor_performance_metrics", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull().unique(),
+  
+  // Consultation statistics
+  totalConsultations: int("total_consultations").default(0).notNull(),
+  successfulConsultations: int("successful_consultations").default(0).notNull(),
+  cancelledConsultations: int("cancelled_consultations").default(0).notNull(),
+  
+  // Response metrics
+  avgResponseTime: int("avg_response_time").default(180).notNull(), // seconds
+  avgConsultationDuration: int("avg_consultation_duration").default(20).notNull(), // minutes
+  
+  // Patient satisfaction
+  patientSatisfactionAvg: decimal("patient_satisfaction_avg", { precision: 3, scale: 2 }).default("4.20").notNull(), // 0-5 scale
+  totalRatings: int("total_ratings").default(0).notNull(),
+  
+  // Specialty-specific success rates (JSON)
+  specialtySuccessRates: text("specialty_success_rates").notNull(), // { "cardiology": 0.95, "internal medicine": 0.92 }
+  
+  // Availability metrics
+  avgDailyAvailableHours: decimal("avg_daily_available_hours", { precision: 4, scale: 2 }).default("8.00").notNull(),
+  totalOnlineHours: int("total_online_hours").default(0).notNull(),
+  
+  // Quality indicators
+  followUpRate: decimal("follow_up_rate", { precision: 3, scale: 2 }).default("0.80").notNull(), // 0-1
+  prescriptionAccuracyRate: decimal("prescription_accuracy_rate", { precision: 3, scale: 2 }).default("0.95").notNull(), // 0-1
+  
+  lastUpdated: timestamp("last_updated").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type DoctorPerformanceMetric = typeof doctorPerformanceMetrics.$inferSelect;
+export type InsertDoctorPerformanceMetric = typeof doctorPerformanceMetrics.$inferInsert;
+
+/**
+ * Network quality logs for telemedicine readiness scoring
+ * Tracks connection quality for each doctor
+ */
+export const networkQualityLogs = mysqlTable("network_quality_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull(),
+  
+  // Connection metrics
+  latency: int("latency").notNull(), // milliseconds
+  bandwidth: decimal("bandwidth", { precision: 6, scale: 2 }).notNull(), // Mbps
+  packetLoss: decimal("packet_loss", { precision: 5, scale: 4 }).default("0.0000").notNull(), // 0-1
+  jitter: int("jitter").default(0).notNull(), // milliseconds
+  
+  // Connection quality assessment
+  quality: mysqlEnum("quality", ["EXCELLENT", "GOOD", "FAIR", "POOR"]).notNull(),
+  
+  // Session information
+  consultationId: int("consultation_id"), // null if standalone test
+  sessionDuration: int("session_duration"), // seconds
+  disconnectionCount: int("disconnection_count").default(0).notNull(),
+  
+  // Device/network info
+  deviceType: varchar("device_type", { length: 50 }), // "desktop", "mobile", "tablet"
+  networkType: varchar("network_type", { length: 50 }), // "wifi", "4g", "5g", "ethernet"
+  
+  measuredAt: timestamp("measured_at").defaultNow().notNull(),
+});
+
+export type NetworkQualityLog = typeof networkQualityLogs.$inferSelect;
+export type InsertNetworkQualityLog = typeof networkQualityLogs.$inferInsert;
+
+/**
+ * Aggregated network quality metrics per doctor
+ * Pre-computed for faster auction algorithm execution
+ */
+export const networkQualityMetrics = mysqlTable("network_quality_metrics", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull().unique(),
+  
+  // Aggregated metrics (last 30 days)
+  avgLatency: int("avg_latency").notNull(), // milliseconds
+  avgBandwidth: decimal("avg_bandwidth", { precision: 6, scale: 2 }).notNull(), // Mbps
+  connectionDropRate: decimal("connection_drop_rate", { precision: 5, scale: 4 }).default("0.0000").notNull(), // 0-1
+  avgJitter: int("avg_jitter").default(0).notNull(), // milliseconds
+  
+  // Quality distribution
+  excellentCount: int("excellent_count").default(0).notNull(),
+  goodCount: int("good_count").default(0).notNull(),
+  fairCount: int("fair_count").default(0).notNull(),
+  poorCount: int("poor_count").default(0).notNull(),
+  
+  // Current status
+  lastConnectionQuality: mysqlEnum("last_connection_quality", ["EXCELLENT", "GOOD", "FAIR", "POOR"]).notNull(),
+  measurementCount: int("measurement_count").default(0).notNull(),
+  
+  lastMeasured: timestamp("last_measured").defaultNow().notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NetworkQualityMetric = typeof networkQualityMetrics.$inferSelect;
+export type InsertNetworkQualityMetric = typeof networkQualityMetrics.$inferInsert;

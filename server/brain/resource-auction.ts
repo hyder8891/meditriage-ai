@@ -290,6 +290,8 @@ async function loadAvailableClinics(): Promise<ClinicCandidate[]> {
 /**
  * Calculate skill match score (0-1)
  * Factors: specialty alignment, diagnosis accuracy rate, patient satisfaction
+ * 
+ * NOTE: Enhanced implementation available in ../avicenna/resource-auction.ts
  */
 function calculateSkillMatch(doctor: DoctorCandidate, diagnosis: HybridDiagnosis): number {
   let score = 0;
