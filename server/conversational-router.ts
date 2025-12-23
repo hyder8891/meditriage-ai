@@ -17,19 +17,30 @@ import {
 // ============================================================================
 
 const conversationContextSchema = z.object({
+  // Arrays (Critical for memory)
   symptoms: z.array(z.string()).optional(),
-  stepCount: z.number().optional(),
-  duration: z.string().nullable().optional(),
-  severity: z.string().nullable().optional(),
-  location: z.string().nullable().optional(),
   aggravatingFactors: z.array(z.string()).optional(),
   relievingFactors: z.array(z.string()).optional(),
   associatedSymptoms: z.array(z.string()).optional(),
   medicalHistory: z.array(z.string()).optional(),
   medications: z.array(z.string()).optional(),
+  ruledOut: z.array(z.string()).optional(),
+  confirmedSymptoms: z.array(z.string()).optional(),
+  conversationHistory: z.array(z.object({
+    role: z.enum(["user", "assistant"]),
+    content: z.string()
+  })).optional(),
+  
+  // Counters (Critical for flow)
+  stepCount: z.number().optional(),
+  questionCount: z.number().optional(),
+  
+  // Strings (Allow nulls)
+  duration: z.string().nullable().optional(),
+  severity: z.string().nullable().optional(),
+  location: z.string().nullable().optional(),
   age: z.number().nullable().optional(),
-  gender: z.string().nullable().optional(),
-  questionCount: z.number().optional()
+  gender: z.string().nullable().optional()
 }).optional().nullable(); // Allow the entire object to be null
 
 // ============================================================================
@@ -107,7 +118,16 @@ export const conversationalRouter = router({
         conversationStage: "greeting",
         context: {
           symptoms: [],
-          stepCount: 0
+          stepCount: 0,
+          questionCount: 0,
+          aggravatingFactors: [],
+          relievingFactors: [],
+          associatedSymptoms: [],
+          medicalHistory: [],
+          medications: [],
+          ruledOut: [],
+          confirmedSymptoms: [],
+          conversationHistory: []
         }
       };
     }),

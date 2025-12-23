@@ -64,6 +64,9 @@ export interface ConversationContext {
   gender?: string;
   questionCount?: number;
   stepCount?: number; // Track step count
+  ruledOut?: string[]; // Items patient explicitly denied
+  confirmedSymptoms?: string[]; // Symptoms patient explicitly confirmed
+  conversationHistory?: Array<{ role: 'user' | 'assistant', content: string }>; // Full conversation history
 }
 
 export interface QuickReplyChip {
@@ -263,6 +266,9 @@ ${isFinalStep ? `
     console.error("❌ AI Logic Failed:", error);
     console.error("Error details:", error instanceof Error ? error.message : String(error));
     
+    // 🔧 CRITICAL FIX: Increment step count BEFORE fallback to prevent infinite loops
+    vector.stepCount = currentStep + 1;
+    
     // Add fallback response to conversation history
     const fallbackQuestion = FALLBACK_QUESTIONS[Math.min(currentStep, FALLBACK_QUESTIONS.length - 1)];
     vector.conversationHistory.push({ role: 'assistant', content: fallbackQuestion });
@@ -277,7 +283,7 @@ ${isFinalStep ? `
       message: fallbackQuestion,
       messageAr: fallbackQuestionAr,
       conversationStage: "gathering",
-      context: vector.toJSON()
+      context: vector.toJSON() // Now includes incremented stepCount
     };
   }
 }

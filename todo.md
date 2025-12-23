@@ -420,3 +420,34 @@
   - [x] Verify no crashes with invalid AI responses
   - [x] Verify no repeated questions
   - [x] Verify conversation flows naturally
+
+
+## URGENT: Conversation Memory Not Persisting (Current Issue)
+- [x] Fix router schema in conversational-router.ts to accept complete memory structure
+  - [x] Add stepCount field to Zod schema
+  - [x] Add symptoms array to Zod schema
+  - [x] Add ruledOut array to Zod schema
+  - [x] Add confirmedSymptoms array to Zod schema
+  - [x] Add conversationHistory array to Zod schema
+  - [x] Allow nullable/optional context fields
+- [x] Verify context vector class properly rehydrates state
+  - [x] Check ConversationalContextVector constructor handles all fields
+  - [x] Verify toJSON() method exports all state fields
+  - [x] Ensure addSymptoms() properly accumulates symptoms
+- [x] Fix assessment logic to increment step count properly
+  - [x] Increment stepCount in success case (already working)
+  - [x] Increment stepCount in fallback/error case (FIXED - was missing)
+  - [x] Prevent infinite loops on same question
+- [x] Update ConversationContext interface to match complete schema
+- [x] Test conversation flow end-to-end
+  - [x] Verify stepCount increments correctly
+  - [x] Verify symptoms array accumulates
+  - [x] Verify AI doesn't repeat introduction
+  - [x] Test fallback mechanism maintains state
+- [x] Create comprehensive test suite (15 tests, all passing)
+  - [x] Step count increment tests (4 tests)
+  - [x] Symptoms accumulation tests (2 tests)
+  - [x] Context preservation tests (2 tests)
+  - [x] Conversation history tests (1 test)
+  - [x] Context vector rehydration tests (3 tests)
+  - [x] Edge case tests (3 tests)
