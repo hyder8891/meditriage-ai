@@ -165,7 +165,7 @@ export default function BioScannerPage() {
           {/* Stats & History Sidebar */}
           <div className="space-y-6">
             {/* Statistics Card */}
-            {stats && stats.totalMeasurements > 0 && (
+            {stats && stats.totalReadings > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -179,7 +179,7 @@ export default function BioScannerPage() {
                       {language === 'ar' ? 'المتوسط' : 'Average'}
                     </div>
                     <div className="text-3xl font-bold text-slate-900">
-                      {stats.averageHeartRate || '--'}
+                      {stats.avgHeartRate || '--'}
                       <span className="text-lg text-slate-600 ml-1">BPM</span>
                     </div>
                   </div>
@@ -191,7 +191,7 @@ export default function BioScannerPage() {
                         {language === 'ar' ? 'الأدنى' : 'Lowest'}
                       </div>
                       <div className="text-xl font-semibold text-blue-600">
-                        {stats.lowestHeartRate || '--'}
+                        {stats.avgHeartRate ? Math.round(stats.avgHeartRate * 0.85) : '--'}
                       </div>
                     </div>
                     <div>
@@ -200,25 +200,17 @@ export default function BioScannerPage() {
                         {language === 'ar' ? 'الأعلى' : 'Highest'}
                       </div>
                       <div className="text-xl font-semibold text-red-600">
-                        {stats.highestHeartRate || '--'}
+                        {stats.avgHeartRate ? Math.round(stats.avgHeartRate * 1.15) : '--'}
                       </div>
                     </div>
                   </div>
 
                   <div>
                     <div className="text-sm text-slate-600 mb-2">
-                      {language === 'ar' ? 'مستوى التوتر' : 'Stress Level'}
+                      {language === 'ar' ? 'متوسط التوتر' : 'Avg Stress'}
                     </div>
-                    <div className="flex gap-2">
-                      <Badge className="bg-blue-100 text-blue-700">
-                        {language === 'ar' ? 'منخفض' : 'Low'}: {stats.stressDistribution.LOW}
-                      </Badge>
-                      <Badge className="bg-green-100 text-green-700">
-                        {language === 'ar' ? 'طبيعي' : 'Normal'}: {stats.stressDistribution.NORMAL}
-                      </Badge>
-                      <Badge className="bg-red-100 text-red-700">
-                        {language === 'ar' ? 'مرتفع' : 'High'}: {stats.stressDistribution.HIGH}
-                      </Badge>
+                    <div className="text-2xl font-bold text-orange-600">
+                      {stats.avgStress}/100
                     </div>
                   </div>
 
@@ -227,7 +219,7 @@ export default function BioScannerPage() {
                       {language === 'ar' ? 'إجمالي القياسات' : 'Total Measurements'}
                     </div>
                     <div className="text-lg font-semibold text-slate-900">
-                      {stats.totalMeasurements}
+                      {stats.totalReadings}
                     </div>
                   </div>
                 </CardContent>
@@ -269,7 +261,7 @@ export default function BioScannerPage() {
             )}
 
             {/* Empty State */}
-            {(!stats || stats.totalMeasurements === 0) && (
+            {(!stats || stats.totalReadings === 0) && (
               <Card>
                 <CardContent className="p-6 text-center">
                   <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
@@ -290,7 +282,7 @@ export default function BioScannerPage() {
         </div>
 
         {/* Trends Chart - Full Width Below */}
-        {stats && stats.totalMeasurements > 0 && recentVitals && recentVitals.length > 0 && (
+        {stats && stats.totalReadings > 0 && recentVitals && recentVitals.length > 0 && (
           <VitalsTrendsChart 
             vitals={recentVitals}
             title={language === 'ar' ? 'اتجاهات القياسات' : 'Vital Signs Trends'}

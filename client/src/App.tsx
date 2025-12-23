@@ -70,6 +70,7 @@ import Settings from "./pages/Settings";
 import PatientMedicalRecords from "./pages/PatientMedicalRecords";
 import BioScannerPage from "./pages/patient/BioScannerPage";
 import { PatientVitalsViewer } from "./pages/clinician/PatientVitalsViewer";
+import VitalsTrends from "./pages/VitalsTrends";
 import { Redirect } from "wouter";
 
 function Router() {
@@ -160,6 +161,9 @@ function Router() {
       </Route>
       <Route path="/patient/bio-scanner">
         {() => <ProtectedRoute requiredRole="patient"><BioScannerPage /></ProtectedRoute>}
+      </Route>
+      <Route path="/patient/vitals-trends">
+        {() => <ProtectedRoute requiredRole="patient"><VitalsTrends /></ProtectedRoute>}
       </Route>
       <Route path="/patient/profile">
         {() => <ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>}

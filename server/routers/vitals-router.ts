@@ -105,43 +105,45 @@ export const vitalsRouter = router({
 
       if (vitals.length === 0) {
         return {
-          totalMeasurements: 0,
-          averageHeartRate: null,
-          lowestHeartRate: null,
-          highestHeartRate: null,
-          stressDistribution: {
-            LOW: 0,
-            NORMAL: 0,
-            HIGH: 0,
-          },
-          lastMeasurement: null,
+          totalReadings: 0,
+          avgHeartRate: 0,
+          avgStress: 0,
+          avgRMSSD: 0,
+          avgSDNN: 0,
         };
       }
 
       // Calculate statistics
       const heartRates = vitals.map(v => v.heartRate).filter((hr): hr is number => hr !== null);
-      const averageHeartRate = heartRates.length > 0
+      const avgHeartRate = heartRates.length > 0
         ? Math.round(heartRates.reduce((sum, hr) => sum + hr, 0) / heartRates.length)
-        : null;
-      const lowestHeartRate = heartRates.length > 0 ? Math.min(...heartRates) : null;
-      const highestHeartRate = heartRates.length > 0 ? Math.max(...heartRates) : null;
+        : 0;
 
-      // Count stress levels
-      const stressDistribution = vitals.reduce((acc, vital) => {
-        const level = vital.stressLevel as "LOW" | "NORMAL" | "HIGH" | null;
-        if (level && (level === "LOW" || level === "NORMAL" || level === "HIGH")) {
-          acc[level]++;
-        }
-        return acc;
-      }, { LOW: 0, NORMAL: 0, HIGH: 0 });
+      const stressScores = vitals.map(v => v.hrvStressScore).filter((s): s is number => s !== null);
+      const avgStress = stressScores.length > 0
+        ? Math.round(stressScores.reduce((sum, s) => sum + s, 0) / stressScores.length)
+        : 0;
+
+      const rmssdValues = vitals
+        .map(v => v.hrvRmssd ? parseFloat(v.hrvRmssd) : null)
+        .filter((r): r is number => r !== null);
+      const avgRMSSD = rmssdValues.length > 0
+        ? Math.round(rmssdValues.reduce((sum, r) => sum + r, 0) / rmssdValues.length)
+        : 0;
+
+      const sdnnValues = vitals
+        .map(v => v.hrvSdnn ? parseFloat(v.hrvSdnn) : null)
+        .filter((s): s is number => s !== null);
+      const avgSDNN = sdnnValues.length > 0
+        ? Math.round(sdnnValues.reduce((sum, s) => sum + s, 0) / sdnnValues.length)
+        : 0;
 
       return {
-        totalMeasurements: vitals.length,
-        averageHeartRate,
-        lowestHeartRate,
-        highestHeartRate,
-        stressDistribution,
-        lastMeasurement: vitals[0]?.createdAt || null,
+        totalReadings: vitals.length,
+        avgHeartRate,
+        avgStress,
+        avgRMSSD,
+        avgSDNN,
       };
     }),
 
@@ -150,9 +152,8 @@ export const vitalsRouter = router({
    */
   getTrends: protectedProcedure
     .input(z.object({
-      startDate: z.date().optional(),
-      endDate: z.date().optional(),
-      metric: z.enum(["heartRate", "hrvStressScore"]).default("heartRate"),
+      timeRange: z.enum(["24h", "7d", "30d", "all"]).default("7d"),
+      metric: z.enum(["heartRate", "stress", "rmssd", "sdnn"]).default("heartRate"),
     }))
     .query(async ({ ctx, input }) => {
       const db = await getDb();
@@ -160,11 +161,27 @@ export const vitalsRouter = router({
 
       const conditions = [eq(patientVitals.userId, ctx.user.id)];
       
-      if (input.startDate) {
-        conditions.push(gte(patientVitals.createdAt, input.startDate));
+      // Calculate date range based on timeRange
+      const now = new Date();
+      let startDate: Date | null = null;
+      
+      switch (input.timeRange) {
+        case "24h":
+          startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case "7d":
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case "30d":
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case "all":
+          // No date filter
+          break;
       }
-      if (input.endDate) {
-        conditions.push(lte(patientVitals.createdAt, input.endDate));
+      
+      if (startDate) {
+        conditions.push(gte(patientVitals.createdAt, startDate));
       }
 
       const vitals = await db
@@ -173,11 +190,30 @@ export const vitalsRouter = router({
         .where(and(...conditions))
         .orderBy(patientVitals.createdAt);
 
-      return vitals.map(vital => ({
-        timestamp: vital.createdAt,
-        value: input.metric === "heartRate" ? vital.heartRate : vital.hrvStressScore,
-        confidence: vital.confidenceScore,
-      }));
+      return vitals.map(vital => {
+        let value: number | null = null;
+        
+        switch (input.metric) {
+          case "heartRate":
+            value = vital.heartRate;
+            break;
+          case "stress":
+            value = vital.hrvStressScore;
+            break;
+          case "rmssd":
+            value = vital.hrvRmssd ? parseFloat(vital.hrvRmssd) : null;
+            break;
+          case "sdnn":
+            value = vital.hrvSdnn ? parseFloat(vital.hrvSdnn) : null;
+            break;
+        }
+        
+        return {
+          timestamp: vital.createdAt,
+          value,
+          confidence: vital.confidenceScore,
+        };
+      }).filter(item => item.value !== null); // Filter out null values
     }),
 
   /**

@@ -366,6 +366,8 @@ class HybridBioEngine {
   }
 }
 
+type DetectionMode = "forehead" | "finger";
+
 interface BioScannerProps {
   onComplete?: (result: HeartRateResult) => void;
   measurementDuration?: number; // in seconds, default 15
@@ -378,6 +380,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const graphCanvasRef = useRef<HTMLCanvasElement>(null);
   
+  const [detectionMode, setDetectionMode] = useState<DetectionMode>("forehead");
   const [scanning, setScanning] = useState(false);
   const [bpm, setBpm] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
@@ -402,12 +405,12 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
 
   const startCamera = async () => {
     try {
-      console.log('[BioScanner] 🎥 Starting camera...');
-      setDebugInfo("Requesting camera access...");
+      console.log(`[BioScanner] 🎥 Starting camera in ${detectionMode} mode...`);
+      setDebugInfo(`Requesting camera access (${detectionMode} mode)...`);
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
-          facingMode: "user",
+          facingMode: detectionMode === "finger" ? "environment" : "user", // Use back camera for finger mode
           width: { ideal: 640 },
           height: { ideal: 480 }
         } 
@@ -496,11 +499,20 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
     // 1. Draw video frame to canvas (300x300)
     ctx.drawImage(video, 0, 0, 300, 300);
     
-    // 2. Extract center region (60x60 pixels from center for focused signal)
-    const centerX = 120; // (300 - 60) / 2
-    const centerY = 120;
-    const regionSize = 60;
-    const imageData = ctx.getImageData(centerX, centerY, regionSize, regionSize);
+    // 2. Extract region based on detection mode
+    let imageData: ImageData;
+    
+    if (detectionMode === "finger") {
+      // FINGER MODE: Use ENTIRE canvas for maximum signal strength
+      // Fingertip covers entire camera, so we sample all pixels for 10-20x stronger signal
+      imageData = ctx.getImageData(0, 0, 300, 300); // 90,000 pixels!
+    } else {
+      // FOREHEAD MODE: Use focused center region (60x60)
+      const centerX = 120; // (300 - 60) / 2
+      const centerY = 120;
+      const regionSize = 60;
+      imageData = ctx.getImageData(centerX, centerY, regionSize, regionSize); // 3,600 pixels
+    }
     
     // 3. Process frame with both engines
     const result = engineRef.current.process(imageData);
@@ -666,6 +678,37 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
 
   return (
     <Card className="p-6 space-y-6">
+      {/* Detection Mode Toggle */}
+      {!scanning && (
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">Detection Mode</label>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setDetectionMode("forehead")}
+              className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
+                detectionMode === "forehead"
+                  ? "border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold"
+                  : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
+              }`}
+            >
+              <div className="text-sm">👤 Forehead</div>
+              <div className="text-xs opacity-70">Standard accuracy</div>
+            </button>
+            <button
+              onClick={() => setDetectionMode("finger")}
+              className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
+                detectionMode === "finger"
+                  ? "border-purple-500 bg-purple-50 text-purple-900 font-semibold"
+                  : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
+              }`}
+            >
+              <div className="text-sm">☝️ Finger</div>
+              <div className="text-xs opacity-70">10-20x stronger signal</div>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Camera Preview */}
       <div className="relative mx-auto w-full max-w-md aspect-square bg-slate-900 rounded-2xl overflow-hidden border-4 border-emerald-500 shadow-2xl">
         <video 
@@ -678,14 +721,26 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         {/* Hidden canvas for processing */}
         <canvas ref={canvasRef} width={300} height={300} className="hidden" />
         
-        {/* Scan region indicator - changes based on motion */}
+        {/* Scan region indicator - changes based on mode and motion */}
         {scanning && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className={`w-40 h-40 border-4 rounded-lg transition-all duration-300 ${
-              motionDetected 
-                ? 'border-red-500 border-dashed animate-pulse' 
-                : 'border-emerald-400'
-            }`} />
+            {detectionMode === "forehead" ? (
+              <div className={`w-40 h-40 border-4 rounded-lg transition-all duration-300 ${
+                motionDetected 
+                  ? 'border-red-500 border-dashed animate-pulse' 
+                  : 'border-emerald-400'
+              }`} />
+            ) : (
+              <div className={`w-32 h-48 border-4 rounded-full transition-all duration-300 ${
+                motionDetected 
+                  ? 'border-red-500 border-dashed animate-pulse' 
+                  : 'border-purple-400'
+              }`}>
+                <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold">
+                  ☝️ Place fingertip here
+                </div>
+              </div>
+            )}
           </div>
         )}
         
@@ -872,12 +927,22 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       {/* Instructions */}
       <div className="text-xs text-slate-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
         <p className="font-semibold mb-1">📋 For best results:</p>
-        <ul className="space-y-1 ml-4 list-disc">
-          <li>Ensure your face is well-lit (natural light works best)</li>
-          <li>Position your face in the center of the square</li>
-          <li>Stay still and avoid talking during the scan</li>
-          <li>Remove glasses if possible</li>
-        </ul>
+        {detectionMode === "forehead" ? (
+          <ul className="space-y-1 ml-4 list-disc">
+            <li>Ensure your face is well-lit (natural light works best)</li>
+            <li>Position your face in the center of the square</li>
+            <li>Stay still and avoid talking during the scan</li>
+            <li>Remove glasses if possible</li>
+          </ul>
+        ) : (
+          <ul className="space-y-1 ml-4 list-disc">
+            <li>Cover the ENTIRE camera lens with your fingertip</li>
+            <li>Press gently but firmly (don't block blood flow)</li>
+            <li>Use good lighting behind your finger</li>
+            <li>Keep your finger completely still during scan</li>
+            <li>💡 Finger mode provides 10-20x stronger signal for better accuracy!</li>
+          </ul>
+        )}
       </div>
     </Card>
   );

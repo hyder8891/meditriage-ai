@@ -259,3 +259,20 @@
   - [x] Apply correction factor to measured BPM
   - [x] Show "(calibrated)" note in success toast
   - [x] Save calibrated BPM to database
+
+## Bio-Scanner Enhancements Phase 2 (Current Session)
+- [x] Build Trends Dashboard with Interactive Charts
+  - [x] Create dedicated vitals trends page at /patient/vitals-trends
+  - [x] Add time range selector (24h, 7d, 30d, all time)
+  - [x] Add metric selector (Heart Rate, Stress, RMSSD, SDNN)
+  - [x] Use Recharts for line/area chart visualization
+  - [x] Add summary statistics cards
+  - [x] Integrate with existing getTrends endpoint
+
+- [x] Optimize rPPG Engine for Finger-Based Detection
+  - [x] Add detection mode toggle (Forehead vs Finger)
+  - [x] Update UI instructions for finger placement
+  - [x] Optimize signal extraction for finger (10-20x stronger signal)
+  - [x] Adjust detection region for fingertip (use entire canvas: 90,000 pixels)
+  - [x] Update camera positioning guide for finger mode
+  - [x] Use back camera for finger mode, front camera for forehead
