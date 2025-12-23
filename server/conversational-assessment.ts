@@ -2,6 +2,7 @@
  * Conversational Assessment Engine
  * 
  * Implements intelligent, context-aware conversational flow for symptom assessment
+ * with exactly 10 questions before providing diagnosis
  */
 
 import { invokeLLM } from "./_core/llm";
@@ -28,6 +29,7 @@ export interface ConversationContext {
   medications?: string[];
   age?: number;
   gender?: string;
+  questionCount?: number; // NEW: Track question count
 }
 
 export interface QuickReplyChip {
@@ -54,6 +56,12 @@ export interface AssessmentResponse {
 }
 
 // ============================================================================
+// Constants
+// ============================================================================
+
+const TOTAL_QUESTIONS = 10;
+
+// ============================================================================
 // Main Processing Function
 // ============================================================================
 
@@ -62,6 +70,11 @@ export async function processConversationalAssessment(
   conversationHistory: ConversationMessage[],
   context: Partial<ConversationContext>
 ): Promise<AssessmentResponse> {
+  // Initialize question count if not present
+  if (context.questionCount === undefined) {
+    context.questionCount = 0;
+  }
+
   // Determine current conversation stage
   const stage = determineConversationStage(conversationHistory, context);
 
@@ -91,14 +104,21 @@ function determineConversationStage(
     return "greeting";
   }
 
+  // NEW: Check if we've reached 10 questions
+  if (context.questionCount && context.questionCount >= TOTAL_QUESTIONS) {
+    return "analyzing";
+  }
+
   // If we have enough context, move to analysis
   const hasSymptoms = context.symptoms && context.symptoms.length > 0;
   const hasDuration = !!context.duration;
   const hasSeverity = !!context.severity;
 
-  if (hasSymptoms && hasDuration && hasSeverity) {
-    return "analyzing";
-  }
+  // OLD LOGIC: Move to analysis after 3 key pieces of info
+  // NEW LOGIC: Only move to analysis after 10 questions
+  // if (hasSymptoms && hasDuration && hasSeverity) {
+  //   return "analyzing";
+  // }
 
   // Otherwise, keep gathering context
   return "gathering";
@@ -148,7 +168,10 @@ Keep it conversational and caring. Use simple language.`
     message,
     quickReplies,
     conversationStage: "gathering",
-    updatedContext: { symptoms } // Return extracted symptoms
+    updatedContext: { 
+      symptoms,
+      questionCount: 1 // Start counting questions
+    }
   };
 }
 
@@ -164,19 +187,30 @@ async function handleContextGathering(
   // Update context with new information
   const updatedContext = await updateContextFromMessage(userMessage, context);
 
-  // Determine what information is still missing
-  const missingInfo = identifyMissingInformation(updatedContext);
+  // Increment question count
+  const currentQuestionCount = updatedContext.questionCount || 0;
+  updatedContext.questionCount = currentQuestionCount + 1;
 
-  // If we have enough information, move to analysis
-  if (missingInfo.length === 0) {
+  // Check if we've reached 10 questions
+  if (updatedContext.questionCount >= TOTAL_QUESTIONS) {
     return handleAnalysis(userMessage, history, updatedContext);
   }
 
+  // Determine what information is still missing
+  const missingInfo = identifyMissingInformation(updatedContext);
+
   // Generate next follow-up question
-  const nextQuestion = await generateFollowUpQuestion(missingInfo[0], updatedContext);
+  const nextQuestion = await generateFollowUpQuestion(
+    missingInfo.length > 0 ? missingInfo[0] : "general",
+    updatedContext,
+    updatedContext.questionCount
+  );
 
   // Generate contextual quick replies
-  const quickReplies = generateQuickReplies(missingInfo[0], updatedContext);
+  const quickReplies = generateQuickReplies(
+    missingInfo.length > 0 ? missingInfo[0] : "general",
+    updatedContext
+  );
 
   return {
     message: nextQuestion,
@@ -270,27 +304,83 @@ function identifyMissingInformation(context: Partial<ConversationContext>): stri
   if (!context.severity) {
     missing.push("severity");
   }
+  if (!context.location) {
+    missing.push("location");
+  }
+  if (!context.aggravatingFactors || context.aggravatingFactors.length === 0) {
+    missing.push("aggravatingFactors");
+  }
+  if (!context.relievingFactors || context.relievingFactors.length === 0) {
+    missing.push("relievingFactors");
+  }
+  if (!context.associatedSymptoms || context.associatedSymptoms.length === 0) {
+    missing.push("associatedSymptoms");
+  }
+  if (!context.medicalHistory || context.medicalHistory.length === 0) {
+    missing.push("medicalHistory");
+  }
+  if (!context.medications || context.medications.length === 0) {
+    missing.push("medications");
+  }
 
   return missing;
 }
 
 /**
- * Generate intelligent follow-up question
+ * Generate intelligent follow-up question based on missing info and question number
  */
 async function generateFollowUpQuestion(
   missingInfo: string,
-  context: Partial<ConversationContext>
+  context: Partial<ConversationContext>,
+  questionNumber: number
 ): Promise<string> {
-  const questionPrompts: Record<string, string> = {
+  // Define question templates for each missing info type
+  const questionTemplates: Record<string, string> = {
     symptoms: "What symptoms are you experiencing?",
     duration: "How long have you been experiencing these symptoms?",
     severity: "How would you describe the severity? Is it mild, moderate, or severe?",
     location: "Where exactly do you feel this?",
-    aggravatingFactors: "Does anything make it worse?",
-    relievingFactors: "Does anything make it better?"
+    aggravatingFactors: "Does anything make your symptoms worse?",
+    relievingFactors: "Does anything make your symptoms better?",
+    associatedSymptoms: "Are you experiencing any other symptoms along with this?",
+    medicalHistory: "Do you have any relevant medical conditions or past health issues?",
+    medications: "Are you currently taking any medications?",
+    general: "Can you tell me more about your symptoms?"
   };
 
-  return questionPrompts[missingInfo] || "Can you tell me more about your symptoms?";
+  // Use template as base
+  const baseQuestion = questionTemplates[missingInfo] || questionTemplates.general;
+
+  // For questions 1-3, use templates directly
+  if (questionNumber <= 3) {
+    return baseQuestion;
+  }
+
+  // For questions 4-10, generate contextual questions using LLM
+  try {
+    const response = await invokeLLM({
+      messages: [
+        {
+          role: "system",
+          content: `You are a medical AI assistant conducting a symptom assessment. 
+This is question ${questionNumber} of 10.
+Generate a natural, conversational follow-up question about: ${missingInfo}.
+Keep it brief (1-2 sentences) and empathetic.
+Context: ${JSON.stringify(context)}`
+        },
+        {
+          role: "user",
+          content: `Generate question about ${missingInfo}`
+        }
+      ]
+    });
+
+    const content = response.choices[0].message.content;
+    return (typeof content === 'string' ? content : baseQuestion) || baseQuestion;
+  } catch (error) {
+    console.error("Error generating contextual question:", error);
+    return baseQuestion;
+  }
 }
 
 /**
@@ -322,6 +412,23 @@ function generateQuickReplies(
       { text: "Rest", textAr: "الراحة", value: "rest" },
       { text: "Medication", textAr: "الدواء", value: "medication" },
       { text: "Nothing helps", textAr: "لا شيء يساعد", value: "none" }
+    ],
+    associatedSymptoms: [
+      { text: "Fever", textAr: "حمى", value: "fever" },
+      { text: "Nausea", textAr: "غثيان", value: "nausea" },
+      { text: "Fatigue", textAr: "إرهاق", value: "fatigue" },
+      { text: "None", textAr: "لا شيء", value: "none" }
+    ],
+    medicalHistory: [
+      { text: "Diabetes", textAr: "السكري", value: "diabetes" },
+      { text: "Hypertension", textAr: "ضغط الدم", value: "hypertension" },
+      { text: "Heart disease", textAr: "أمراض القلب", value: "heart" },
+      { text: "None", textAr: "لا شيء", value: "none" }
+    ],
+    medications: [
+      { text: "Yes, prescription", textAr: "نعم، بوصفة", value: "prescription" },
+      { text: "Yes, over-the-counter", textAr: "نعم، بدون وصفة", value: "otc" },
+      { text: "No medications", textAr: "لا أدوية", value: "none" }
     ]
   };
 
