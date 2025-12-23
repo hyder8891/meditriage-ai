@@ -199,9 +199,13 @@ async function handleContextGathering(
   const currentQuestionCount = updatedContext.questionCount || 0;
   updatedContext.questionCount = currentQuestionCount + 1;
 
+  console.log(`[DEBUG] Question count: ${updatedContext.questionCount}/${TOTAL_QUESTIONS}`);
+  console.log(`[DEBUG] Context state:`, JSON.stringify(updatedContext, null, 2));
+
   // Check if we've reached 10 questions
   if (updatedContext.questionCount >= TOTAL_QUESTIONS) {
-    return handleAnalysis(userMessage, history, updatedContext);
+    console.log(`[DEBUG] Reached question limit, moving to analysis phase`);
+    return handleAnalysis(userMessage, history, updatedContext, language);
   }
 
   // Determine what information is still missing
@@ -293,11 +297,10 @@ async function updateContextFromMessage(
     };
 
     // Filter out null and undefined values to ensure Zod validation passes
-    // Also filter out empty arrays to keep context clean
+    // Keep empty arrays as they represent "none" answers
     return Object.fromEntries(
       Object.entries(merged).filter(([_, value]) => {
         if (value === null || value === undefined) return false;
-        if (Array.isArray(value) && value.length === 0) return false;
         return true;
       })
     ) as Partial<ConversationContext>;
@@ -335,10 +338,14 @@ function identifyMissingInformation(context: Partial<ConversationContext>): stri
   if (!context.associatedSymptoms || context.associatedSymptoms.length === 0) {
     missing.push("associatedSymptoms");
   }
-  if (!context.medicalHistory || context.medicalHistory.length === 0) {
+  // Check if medicalHistory is undefined (not asked yet), not just empty
+  // Empty array means "none" was answered
+  if (context.medicalHistory === undefined) {
     missing.push("medicalHistory");
   }
-  if (!context.medications || context.medications.length === 0) {
+  // Check if medications is undefined (not asked yet), not just empty
+  // Empty array means "none" was answered
+  if (context.medications === undefined) {
     missing.push("medications");
   }
 

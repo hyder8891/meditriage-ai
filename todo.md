@@ -383,3 +383,15 @@
 - [x] Check tRPC schema validation for conversationHistory parameter
 - [x] Fix validation or context handling issue (filter null/undefined values from context)
 - [x] Test complete conversation flow from start to final recommendation
+
+## Symptom Checker Fixes (Current Session - Dec 23, 2025)
+- [x] Fix tRPC validation error: context fields (duration, severity, location) expecting string but receiving null
+- [x] Filter out null/undefined values from context before sending to tRPC
+- [x] Add language parameter to conversational symptom checker (Arabic/English)
+- [x] Update LLM prompts to respond in appropriate language based on user selection
+- [x] Add Arabic question templates for first 3 questions
+- [x] Fix "none" answer handling - treat empty arrays as valid responses
+- [x] Add debug logging to track question count and context state
+- [ ] Complete full 10-question flow test to final diagnosis/recommendation
+- [ ] Consider integrating with advanced Brain Architecture (server/brain/) for better clinical reasoning
+- [ ] Write vitest tests for conversational flow
