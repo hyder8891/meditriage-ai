@@ -53,6 +53,7 @@ interface AssessmentResponse {
   }>;
   showActions?: boolean;
   conversationStage: "greeting" | "gathering" | "analyzing" | "complete";
+  updatedContext?: any; // Context returned from backend
 }
 
 // ============================================================================
@@ -94,6 +95,11 @@ export default function ModernSymptomChecker() {
         content: response.message,
         timestamp: Date.now()
       }]);
+
+      // Initialize context if returned
+      if (response.updatedContext) {
+        setContext(response.updatedContext);
+      }
     } catch (error) {
       console.error("Failed to start conversation:", error);
     }
@@ -113,10 +119,11 @@ export default function ModernSymptomChecker() {
     setIsTyping(true);
 
     try {
-      // Send to backend
+      // Send to backend (use messages BEFORE adding current user message)
+      // Don't use state 'messages' directly as it hasn't updated yet
       const response = await sendMessageMutation.mutateAsync({
         message: messageText,
-        conversationHistory: messages,
+        conversationHistory: messages, // Use current messages (before adding user message)
         context
       });
 
@@ -129,8 +136,10 @@ export default function ModernSymptomChecker() {
       setMessages(prev => [...prev, assistantMessage]);
       setCurrentResponse(response);
 
-      // Update context if needed
-      // (In a real implementation, extract context from response)
+      // Update context with the returned context from backend
+      if (response.updatedContext) {
+        setContext(response.updatedContext);
+      }
     } catch (error) {
       console.error("Failed to send message:", error);
       const errorMessage: ConversationMessage = {

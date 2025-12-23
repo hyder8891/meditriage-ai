@@ -352,3 +352,10 @@
 
 ## Homepage Button Routing Fix
 - [x] Fix "ابدأ التقييم المجاني" button to route directly to /patient/symptom-checker instead of patient dashboard
+
+## Bug Fixes (Current Session)
+- [x] Fix conversational symptom checker getting stuck in loop after 3 questions
+  - [x] Root cause: Context not being persisted between messages
+  - [x] Solution: Added updatedContext to backend response and frontend state management
+  - [x] Changed from protectedProcedure to publicProcedure for unauthenticated access
+  - [x] Fixed conversation history handling in frontend

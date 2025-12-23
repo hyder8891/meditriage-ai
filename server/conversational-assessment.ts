@@ -1,29 +1,14 @@
 /**
- * Conversational AI Assessment System
+ * Conversational Assessment Engine
  * 
- * Multi-stage conversation flow for patient symptom assessment:
- * 1. Greeting & Initial Symptoms
- * 2. Follow-up Questions (context gathering)
- * 3. Analysis & Triage
- * 4. Recommendations & Actions
+ * Implements intelligent, context-aware conversational flow for symptom assessment
  */
 
 import { invokeLLM } from "./_core/llm";
-import { enhancedBrain } from "./brain/brain-enhanced";
-// Avicenna-X validation (simplified for now)
-const validateMedicalConcept = async (concept: string, type: string) => ({ isValid: true });
 
 // ============================================================================
-// Types & Interfaces
+// Types
 // ============================================================================
-
-export type TriageLevel = "green" | "yellow" | "red";
-
-export interface QuickReplyChip {
-  text: string;
-  textAr?: string; // Arabic translation
-  value: string;
-}
 
 export interface ConversationMessage {
   role: "user" | "assistant";
@@ -31,26 +16,7 @@ export interface ConversationMessage {
   timestamp: number;
 }
 
-export interface AssessmentResponse {
-  message: string;
-  messageAr?: string; // Arabic translation
-  quickReplies?: QuickReplyChip[];
-  triageLevel?: TriageLevel;
-  triageReason?: string;
-  triageReasonAr?: string;
-  recommendations?: string[];
-  recommendationsAr?: string[];
-  differentialDiagnosis?: Array<{
-    condition: string;
-    conditionAr?: string;
-    probability: number;
-    reasoning: string;
-  }>;
-  showActions?: boolean; // Show "Find Doctor" and "Book Appointment" buttons
-  conversationStage: "greeting" | "gathering" | "analyzing" | "complete";
-}
-
-interface ConversationContext {
+export interface ConversationContext {
   symptoms: string[];
   duration?: string;
   severity?: string;
@@ -64,21 +30,42 @@ interface ConversationContext {
   gender?: string;
 }
 
+export interface QuickReplyChip {
+  text: string;
+  textAr: string;
+  value: string;
+}
+
+export interface AssessmentResponse {
+  message: string;
+  messageAr?: string;
+  quickReplies?: QuickReplyChip[];
+  conversationStage: "greeting" | "gathering" | "analyzing";
+  triageResult?: {
+    urgency: "emergency" | "urgent" | "routine" | "self_care";
+    possibleConditions: Array<{
+      name: string;
+      probability: number;
+      reasoning: string;
+    }>;
+    recommendations: string[];
+  };
+  updatedContext?: Partial<ConversationContext>;
+}
+
 // ============================================================================
-// Conversation Flow Engine
+// Main Processing Function
 // ============================================================================
 
-/**
- * Main entry point for conversational assessment
- */
 export async function processConversationalAssessment(
   userMessage: string,
   conversationHistory: ConversationMessage[],
-  context: Partial<ConversationContext> = {}
+  context: Partial<ConversationContext>
 ): Promise<AssessmentResponse> {
-  // Determine conversation stage
+  // Determine current conversation stage
   const stage = determineConversationStage(conversationHistory, context);
 
+  // Route to appropriate handler
   switch (stage) {
     case "greeting":
       return handleGreeting(userMessage, context);
@@ -91,9 +78,10 @@ export async function processConversationalAssessment(
   }
 }
 
-/**
- * Determine current conversation stage based on history and context
- */
+// ============================================================================
+// Stage Detection
+// ============================================================================
+
 function determineConversationStage(
   history: ConversationMessage[],
   context: Partial<ConversationContext>
@@ -159,7 +147,8 @@ Keep it conversational and caring. Use simple language.`
   return {
     message,
     quickReplies,
-    conversationStage: "gathering"
+    conversationStage: "gathering",
+    updatedContext: { symptoms } // Return extracted symptoms
   };
 }
 
@@ -192,7 +181,8 @@ async function handleContextGathering(
   return {
     message: nextQuestion,
     quickReplies,
-    conversationStage: "gathering"
+    conversationStage: "gathering",
+    updatedContext // Return updated context to frontend
   };
 }
 
@@ -200,73 +190,69 @@ async function handleContextGathering(
  * Extract and update context from user message
  */
 async function updateContextFromMessage(
-  message: string,
+  userMessage: string,
   currentContext: Partial<ConversationContext>
 ): Promise<Partial<ConversationContext>> {
-  const response = await invokeLLM({
-    messages: [
-      {
-        role: "system",
-        content: `Extract medical information from the patient's message. Return JSON with these fields (only include if mentioned):
-{
-  "symptoms": ["symptom1", "symptom2"],
-  "duration": "timeframe",
-  "severity": "mild|moderate|severe",
-  "location": "body part",
-  "aggravatingFactors": ["factor1"],
-  "relievingFactors": ["factor1"],
-  "associatedSymptoms": ["symptom1"],
-  "medicalHistory": ["condition1"],
-  "medications": ["med1"]
-}`
-      },
-      {
-        role: "user",
-        content: message
-      }
-    ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "medical_context",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            symptoms: { type: "array", items: { type: "string" } },
-            duration: { type: "string" },
-            severity: { type: "string" },
-            location: { type: "string" },
-            aggravatingFactors: { type: "array", items: { type: "string" } },
-            relievingFactors: { type: "array", items: { type: "string" } },
-            associatedSymptoms: { type: "array", items: { type: "string" } },
-            medicalHistory: { type: "array", items: { type: "string" } },
-            medications: { type: "array", items: { type: "string" } }
-          },
-          required: [],
-          additionalProperties: false
+  try {
+    // Use LLM to extract structured information from user message
+    const response = await invokeLLM({
+      messages: [
+        {
+          role: "system",
+          content: `Extract medical information from the user's message. Return a JSON object with any relevant fields.`
+        },
+        {
+          role: "user",
+          content: userMessage
+        }
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "medical_context",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              symptoms: { type: "array", items: { type: "string" } },
+              duration: { type: "string" },
+              severity: { type: "string" },
+              location: { type: "string" },
+              aggravatingFactors: { type: "array", items: { type: "string" } },
+              relievingFactors: { type: "array", items: { type: "string" } },
+              associatedSymptoms: { type: "array", items: { type: "string" } },
+              medicalHistory: { type: "array", items: { type: "string" } },
+              medications: { type: "array", items: { type: "string" } }
+            },
+            required: [],
+            additionalProperties: false
+          }
         }
       }
-    }
-  });
+    });
 
-  const extractedContent = response.choices[0].message.content;
-  const extractedStr = typeof extractedContent === 'string' ? extractedContent : '{}';
-  const extracted = JSON.parse(extractedStr || "{}");
+    const extractedContent = response.choices[0].message.content;
+    const extractedStr = typeof extractedContent === 'string' ? extractedContent : '{}';
+    const extracted = JSON.parse(extractedStr || "{}");
 
-  // Merge with current context
-  return {
-    ...currentContext,
-    symptoms: [...(currentContext.symptoms || []), ...(extracted.symptoms || [])],
-    duration: extracted.duration || currentContext.duration,
-    severity: extracted.severity || currentContext.severity,
-    location: extracted.location || currentContext.location,
-    aggravatingFactors: [...(currentContext.aggravatingFactors || []), ...(extracted.aggravatingFactors || [])],
-    relievingFactors: [...(currentContext.relievingFactors || []), ...(extracted.relievingFactors || [])],
-    associatedSymptoms: [...(currentContext.associatedSymptoms || []), ...(extracted.associatedSymptoms || [])],
-    medicalHistory: [...(currentContext.medicalHistory || []), ...(extracted.medicalHistory || [])],
-    medications: [...(currentContext.medications || []), ...(extracted.medications || [])]
-  };
+    // Merge with current context
+    return {
+      ...currentContext,
+      symptoms: [...(currentContext.symptoms || []), ...(extracted.symptoms || [])],
+      duration: extracted.duration || currentContext.duration,
+      severity: extracted.severity || currentContext.severity,
+      location: extracted.location || currentContext.location,
+      aggravatingFactors: [...(currentContext.aggravatingFactors || []), ...(extracted.aggravatingFactors || [])],
+      relievingFactors: [...(currentContext.relievingFactors || []), ...(extracted.relievingFactors || [])],
+      associatedSymptoms: [...(currentContext.associatedSymptoms || []), ...(extracted.associatedSymptoms || [])],
+      medicalHistory: [...(currentContext.medicalHistory || []), ...(extracted.medicalHistory || [])],
+      medications: [...(currentContext.medications || []), ...(extracted.medications || [])]
+    };
+  } catch (error) {
+    console.error("Error extracting context from message:", error);
+    // Return current context unchanged if extraction fails
+    return currentContext;
+  }
 }
 
 /**
@@ -351,68 +337,83 @@ async function handleAnalysis(
   history: ConversationMessage[],
   context: Partial<ConversationContext>
 ): Promise<AssessmentResponse> {
-  // Build comprehensive symptom description
-  const symptomDescription = buildSymptomDescription(context);
+  // Build comprehensive context summary
+  const contextSummary = buildContextSummary(context);
 
-  // Analyze with BRAIN (differential diagnosis)
-  const brainAnalysis = await enhancedBrain.reason({
-    symptoms: context.symptoms || [],
-    patientInfo: {
-      age: context.age || 30,
-      gender: (context.gender as 'male' | 'female' | 'other') || 'other',
-      medicalHistory: context.medicalHistory || []
-    },
-    language: 'en'
+  // Generate differential diagnosis and triage recommendation
+  const analysisResponse = await invokeLLM({
+    messages: [
+      {
+        role: "system",
+        content: `You are a medical triage AI. Based on the patient's symptoms and context, provide:
+1. Triage urgency level (emergency, urgent, routine, self_care)
+2. Top 3 possible conditions with probability (0-100)
+3. Clear, actionable recommendations
+
+Be conservative with urgency - when in doubt, recommend seeking medical attention.
+Return your response in JSON format.`
+      },
+      {
+        role: "user",
+        content: contextSummary
+      }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "triage_result",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            urgency: {
+              type: "string",
+              enum: ["emergency", "urgent", "routine", "self_care"]
+            },
+            possibleConditions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  probability: { type: "number" },
+                  reasoning: { type: "string" }
+                },
+                required: ["name", "probability", "reasoning"],
+                additionalProperties: false
+              }
+            },
+            recommendations: {
+              type: "array",
+              items: { type: "string" }
+            }
+          },
+          required: ["urgency", "possibleConditions", "recommendations"],
+          additionalProperties: false
+        }
+      }
+    }
   });
 
-  // Validate top diagnoses with Avicenna-X
-  const validatedDiagnoses = await Promise.all(
-    brainAnalysis.diagnosis.differentialDiagnosis.slice(0, 3).map(async (dx: any) => {
-      const validation = await validateMedicalConcept(dx.condition, "diagnosis");
-      return {
-        condition: dx.condition,
-        probability: dx.probability,
-        reasoning: dx.reasoning,
-        validated: validation.isValid
-      };
-    })
-  );
+  const analysisContent = analysisResponse.choices[0].message.content;
+  const analysisStr = typeof analysisContent === 'string' ? analysisContent : '{}';
+  const triageResult = JSON.parse(analysisStr || "{}");
 
-  // Determine triage level
-  const triage = determineTriageLevel(context, brainAnalysis);
-
-  // Generate recommendations
-  const recommendations = generateRecommendations(triage.level, brainAnalysis);
-
-  // Generate Arabic translations
-  const messageAr = await translateToArabic(triage.message);
-  const triageReasonAr = await translateToArabic(triage.reason);
-  const recommendationsAr = await Promise.all(
-    recommendations.map(r => translateToArabic(r))
-  );
+  // Generate human-readable summary message
+  const summaryMessage = generateSummaryMessage(triageResult);
 
   return {
-    message: triage.message,
-    messageAr,
-    triageLevel: triage.level,
-    triageReason: triage.reason,
-    triageReasonAr,
-    recommendations,
-    recommendationsAr,
-    differentialDiagnosis: validatedDiagnoses.map(dx => ({
-      condition: dx.condition,
-      probability: dx.probability,
-      reasoning: dx.reasoning
-    })),
-    showActions: true, // Show "Find Doctor" and "Book Appointment" buttons
-    conversationStage: "complete"
+    message: summaryMessage,
+    conversationStage: "analyzing",
+    triageResult,
+    updatedContext: context
   };
 }
 
 /**
- * Build comprehensive symptom description from context
+ * Build context summary for analysis
  */
-function buildSymptomDescription(context: Partial<ConversationContext>): string {
+function buildContextSummary(context: Partial<ConversationContext>): string {
   const parts: string[] = [];
 
   if (context.symptoms && context.symptoms.length > 0) {
@@ -427,155 +428,82 @@ function buildSymptomDescription(context: Partial<ConversationContext>): string 
   if (context.location) {
     parts.push(`Location: ${context.location}`);
   }
-  if (context.associatedSymptoms && context.associatedSymptoms.length > 0) {
-    parts.push(`Associated symptoms: ${context.associatedSymptoms.join(", ")}`);
-  }
   if (context.aggravatingFactors && context.aggravatingFactors.length > 0) {
     parts.push(`Aggravating factors: ${context.aggravatingFactors.join(", ")}`);
   }
   if (context.relievingFactors && context.relievingFactors.length > 0) {
     parts.push(`Relieving factors: ${context.relievingFactors.join(", ")}`);
   }
+  if (context.associatedSymptoms && context.associatedSymptoms.length > 0) {
+    parts.push(`Associated symptoms: ${context.associatedSymptoms.join(", ")}`);
+  }
 
-  return parts.join(". ");
+  return parts.join("\n");
 }
 
 /**
- * Determine triage level based on symptoms and analysis
+ * Generate human-readable summary message
  */
-function determineTriageLevel(
-  context: Partial<ConversationContext>,
-  brainAnalysis: any
-): { level: TriageLevel; reason: string; message: string } {
-  // Red flags (emergency)
-  const redFlags = [
-    "chest pain",
-    "difficulty breathing",
-    "severe bleeding",
-    "loss of consciousness",
-    "severe headache",
-    "stroke symptoms",
-    "severe abdominal pain",
-    "suicidal thoughts"
-  ];
-
-  const symptomsLower = context.symptoms?.map(s => s.toLowerCase()) || [];
-  const hasRedFlag = redFlags.some(flag => 
-    symptomsLower.some(symptom => symptom.includes(flag))
-  );
-
-  if (hasRedFlag || context.severity === "severe") {
-    return {
-      level: "red",
-      reason: "Severe symptoms requiring immediate medical attention",
-      message: "Based on your symptoms, I recommend seeking immediate medical care. This appears to require urgent evaluation."
-    };
-  }
-
-  // Yellow flags (urgent but not emergency)
-  if (context.severity === "moderate" || (context.duration && context.duration.includes("week"))) {
-    return {
-      level: "yellow",
-      reason: "Moderate symptoms that should be evaluated soon",
-      message: "Your symptoms suggest you should see a healthcare provider within the next 1-2 days for proper evaluation."
-    };
-  }
-
-  // Green (routine care)
-  return {
-    level: "green",
-    reason: "Mild symptoms that can be managed with routine care",
-    message: "Your symptoms appear to be mild. Consider scheduling a routine appointment with your healthcare provider if symptoms persist or worsen."
+function generateSummaryMessage(triageResult: any): string {
+  const urgencyMessages: Record<string, string> = {
+    emergency: "⚠️ Based on your symptoms, I recommend seeking emergency medical attention immediately.",
+    urgent: "⚠️ Your symptoms suggest you should see a healthcare provider soon, ideally within 24 hours.",
+    routine: "Based on your symptoms, I recommend scheduling an appointment with your healthcare provider.",
+    self_care: "Your symptoms may be manageable with self-care, but monitor them closely."
   };
+
+  const baseMessage = urgencyMessages[triageResult.urgency] || urgencyMessages.routine;
+  
+  const conditions = triageResult.possibleConditions
+    .slice(0, 3)
+    .map((c: any, i: number) => `${i + 1}. ${c.name} (${c.probability}%)`)
+    .join("\n");
+
+  return `${baseMessage}\n\nPossible conditions to discuss with your doctor:\n${conditions}\n\nRemember: This is not a diagnosis. Please consult a healthcare professional for proper evaluation.`;
 }
 
 /**
- * Generate actionable recommendations
+ * Extract symptoms from user message
  */
-function generateRecommendations(triageLevel: TriageLevel, brainAnalysis: any): string[] {
-  const recommendations: string[] = [];
-
-  switch (triageLevel) {
-    case "red":
-      recommendations.push("Seek emergency medical care immediately");
-      recommendations.push("Call emergency services or go to the nearest emergency room");
-      recommendations.push("Do not drive yourself - have someone take you or call an ambulance");
-      break;
-    case "yellow":
-      recommendations.push("Schedule an appointment with your healthcare provider within 1-2 days");
-      recommendations.push("Monitor your symptoms closely");
-      recommendations.push("Seek immediate care if symptoms worsen");
-      break;
-    case "green":
-      recommendations.push("Rest and stay hydrated");
-      recommendations.push("Monitor symptoms for any changes");
-      recommendations.push("Consider over-the-counter remedies if appropriate");
-      recommendations.push("Schedule a routine appointment if symptoms persist beyond a few days");
-      break;
-  }
-
-  return recommendations;
-}
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-/**
- * Extract symptoms from natural language
- */
-async function extractSymptoms(text: string): Promise<string[]> {
-  const response = await invokeLLM({
-    messages: [
-      {
-        role: "system",
-        content: "Extract all medical symptoms mentioned in the text. Return as JSON array of strings."
-      },
-      {
-        role: "user",
-        content: text
-      }
-    ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "symptoms",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            symptoms: { type: "array", items: { type: "string" } }
-          },
-          required: ["symptoms"],
-          additionalProperties: false
+async function extractSymptoms(message: string): Promise<string[]> {
+  try {
+    const response = await invokeLLM({
+      messages: [
+        {
+          role: "system",
+          content: "Extract all symptoms mentioned in the user's message. Return as a JSON array of strings."
+        },
+        {
+          role: "user",
+          content: message
+        }
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "symptoms",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              symptoms: {
+                type: "array",
+                items: { type: "string" }
+              }
+            },
+            required: ["symptoms"],
+            additionalProperties: false
+          }
         }
       }
-    }
-  });
+    });
 
-  const content = response.choices[0].message.content;
-  const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
-  const result = JSON.parse(contentStr || '{"symptoms":[]}');
-  return result.symptoms || [];
-}
-
-/**
- * Translate text to Arabic
- */
-async function translateToArabic(text: string): Promise<string> {
-  const response = await invokeLLM({
-    messages: [
-      {
-        role: "system",
-        content: "Translate the following medical text to Arabic. Maintain medical accuracy and cultural sensitivity."
-      },
-      {
-        role: "user",
-        content: text
-      }
-    ]
-  });
-
-  const content = response.choices[0].message.content;
-  return (typeof content === 'string' ? content : text) || text;
+    const content = response.choices[0].message.content;
+    const contentStr = typeof content === 'string' ? content : '{}';
+    const parsed = JSON.parse(contentStr || "{}");
+    return parsed.symptoms || [];
+  } catch (error) {
+    console.error("Error extracting symptoms:", error);
+    return [];
+  }
 }

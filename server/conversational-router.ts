@@ -44,7 +44,7 @@ export const conversationalRouter = router({
   /**
    * Process user message in conversational assessment
    */
-  sendMessage: protectedProcedure
+  sendMessage: publicProcedure
     .input(
       z.object({
         message: z.string().min(1),
@@ -68,7 +68,7 @@ export const conversationalRouter = router({
   /**
    * Start a new conversation
    */
-  startConversation: protectedProcedure
+  startConversation: publicProcedure
     .mutation(async ({ ctx }): Promise<AssessmentResponse> => {
       // Return initial greeting
       return {
@@ -81,7 +81,7 @@ export const conversationalRouter = router({
   /**
    * Get conversation history for a user
    */
-  getHistory: protectedProcedure
+  getHistory: publicProcedure
     .query(async ({ ctx }) => {
       // In a real implementation, this would fetch from database
       // For now, return empty array (conversation history managed client-side)
