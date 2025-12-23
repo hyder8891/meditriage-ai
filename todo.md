@@ -348,3 +348,7 @@
 - [x] Test visual triage display
 - [x] Verify mobile responsiveness
 - [x] Create vitest tests (8/10 passing - core functionality verified)
+
+
+## Homepage Button Routing Fix
+- [x] Fix "ابدأ التقييم المجاني" button to route directly to /patient/symptom-checker instead of patient dashboard

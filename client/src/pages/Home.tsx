@@ -239,7 +239,13 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button
                     size="lg"
-                    onClick={() => setLocation("/patient-login")}
+                    onClick={() => {
+                      if (isAuthenticated) {
+                        setLocation("/patient/symptom-checker");
+                      } else {
+                        setLocation("/patient-login");
+                      }
+                    }}
                     className="bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600 text-white px-8 py-6 text-lg"
                   >
                     <Activity className="w-5 h-5 mr-2" />
