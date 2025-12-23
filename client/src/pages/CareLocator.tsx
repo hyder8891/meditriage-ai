@@ -61,7 +61,7 @@ function CareLocatorContent() {
   const [facilityType, setFacilityType] = useState<string>("");
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [sortBy, setSortBy] = useState<'distance' | 'rating'>('distance');
-  const [useRealData, setUseRealData] = useState(true);
+  const [useRealData, setUseRealData] = useState(false);
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
 

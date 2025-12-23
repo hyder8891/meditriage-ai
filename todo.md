@@ -83,3 +83,14 @@
 - [x] Removed ClinicianLayout from CareLocator - now uses simple patient-friendly header
 - [x] CareLocator now accessible to authenticated patients at /patient/care-locator
 - [x] Added "Back to Portal" button for easy navigation
+
+## NEW: Populate CareLocator with Real Iraqi Healthcare Facilities
+- [x] Research comprehensive list of hospitals and clinics in Iraq
+- [x] Gather data for Baghdad facilities
+- [x] Gather data for Basra facilities
+- [x] Gather data for Erbil facilities
+- [x] Gather data for Mosul facilities
+- [x] Gather data for other major cities (Najaf, Karbala, Sulaymaniyah)
+- [x] Create seeding script with all facility data
+- [x] Execute seeding script and verify database population
+- [x] Test CareLocator with real data
