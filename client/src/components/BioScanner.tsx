@@ -154,21 +154,21 @@ class HybridBioEngine {
     
     if (elapsed < 3) {
       // Tier 1: Ultra-aggressive for immediate feedback
-      thresholdPercent = 0.15; // Lowered from 0.20
-      minDebounce = 150;
-      minPeaks = 1;
+      thresholdPercent = 0.20; // Increased to avoid harmonic doubling
+      minDebounce = 400; // Increased from 150ms to prevent detecting both systolic/diastolic
+      minPeaks = 2; // Need at least 2 peaks to calculate interval
       tier = "T1";
     } else if (elapsed < 8) {
       // Tier 2: Moderate detection
-      thresholdPercent = 0.20; // Lowered from 0.30
-      minDebounce = 200;
-      minPeaks = 2;
+      thresholdPercent = 0.25; // Increased to avoid harmonic doubling
+      minDebounce = 450; // Increased from 200ms to prevent detecting both systolic/diastolic
+      minPeaks = 3;
       tier = "T2";
     } else {
       // Tier 3: High accuracy
-      thresholdPercent = 0.25; // Lowered from 0.35
-      minDebounce = 250;
-      minPeaks = 3;
+      thresholdPercent = 0.30; // Increased to avoid harmonic doubling
+      minDebounce = 500; // Increased from 250ms to prevent detecting both systolic/diastolic
+      minPeaks = 4;
       tier = "T3";
     }
     

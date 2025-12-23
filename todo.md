@@ -260,6 +260,14 @@
   - [x] Show "(calibrated)" note in success toast
   - [x] Save calibrated BPM to database
 
+## Bio-Scanner Bug Fixes (Latest Session)
+- [x] Fix Bio-Scanner harmonic doubling issue (156 BPM = 2x actual rate)
+  - [x] Diagnosed root cause: Detecting both systolic AND diastolic peaks
+  - [x] Increased peak detection thresholds (20% → 25% → 30%)
+  - [x] Increased minimum debounce times (150ms → 400ms, 200ms → 450ms, 250ms → 500ms)
+  - [x] Adjusted minimum peak requirements to prevent premature readings
+  - [x] Validated fix prevents double-counting within one cardiac cycle
+
 ## Bio-Scanner Enhancements Phase 2 (Current Session)
 - [x] Build Trends Dashboard with Interactive Charts
   - [x] Create dedicated vitals trends page at /patient/vitals-trends
