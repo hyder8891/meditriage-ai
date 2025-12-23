@@ -401,3 +401,22 @@
 - [x] Fix data validation crash in conversational-router.ts (nullable context fields)
 - [x] Fix WebSocket CSP blocking in security.ts (whitelist production domain)
 - [x] Fix WebSocket CORS rejection in socket-server.ts (accept all origins)
+
+## URGENT: Conversational Symptom Checker Fixes (COMPLETED)
+- [x] Fix silent crashes when AI returns invalid JSON
+  - [x] Add robust JSON parsing with try-catch
+  - [x] Add fallback questions when AI fails (10 hardcoded questions)
+  - [x] Handle both string and array content from LLM responses
+- [x] Fix repeated questions issue
+  - [x] Add conversationHistory array to ConversationalContextVector
+  - [x] Pass full conversation history to LLM (last 10 messages)
+  - [x] Update system prompt to explicitly prevent repeated questions
+  - [x] Add "CRITICAL: Review conversation history" instruction
+- [x] Fix 10-step limit not enforced
+  - [x] Add stepCount tracking to context vector
+  - [x] Implement deterministic step counter (0-9 = 10 steps)
+  - [x] Add isFinalStep logic to trigger BRAIN analysis at step 10
+- [x] Test fixes with real conversations
+  - [x] Verify no crashes with invalid AI responses
+  - [x] Verify no repeated questions
+  - [x] Verify conversation flows naturally

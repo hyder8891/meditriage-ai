@@ -22,8 +22,10 @@ export class ConversationalContextVector {
   public age?: number;
   public gender?: string;
   public questionCount: number = 0;
+  public stepCount: number = 0;
   public ruledOut: string[] = [];
   public confirmedSymptoms: string[] = [];
+  public conversationHistory: Array<{ role: 'user' | 'assistant', content: string }> = [];
 
   /**
    * Constructor accepts raw data for rehydration from JSON
@@ -43,8 +45,10 @@ export class ConversationalContextVector {
       this.age = data.age;
       this.gender = data.gender;
       this.questionCount = data.questionCount || 0;
+      this.stepCount = data.stepCount || 0;
       this.ruledOut = data.ruledOut || [];
       this.confirmedSymptoms = data.confirmedSymptoms || [];
+      this.conversationHistory = data.conversationHistory || [];
     }
   }
 
@@ -213,6 +217,7 @@ export class ConversationalContextVector {
       age: this.age,
       gender: this.gender,
       questionCount: this.questionCount,
+      stepCount: this.stepCount,
       ruledOut: this.ruledOut,
       confirmedSymptoms: this.confirmedSymptoms
     };

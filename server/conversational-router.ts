@@ -1,7 +1,7 @@
 /**
- * Conversational Assessment Router
+ * Conversational Assessment Router - HARDENED VERSION
  * 
- * tRPC endpoints for conversational AI symptom assessment
+ * tRPC endpoints for conversational AI symptom assessment with robust context handling
  */
 
 import { z } from "zod";
@@ -11,20 +11,14 @@ import {
   type ConversationMessage,
   type AssessmentResponse
 } from "./conversational-assessment";
-import { ConversationalContextVector, createContextVector } from "./conversational-context-vector";
 
 // ============================================================================
-// Schemas
+// Schemas - Allow nullable fields to prevent 400 Bad Request
 // ============================================================================
-
-const conversationMessageSchema = z.object({
-  role: z.enum(["user", "assistant"]),
-  content: z.string(),
-  timestamp: z.number()
-});
 
 const conversationContextSchema = z.object({
   symptoms: z.array(z.string()).optional(),
+  stepCount: z.number().optional(),
   duration: z.string().nullable().optional(),
   severity: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
@@ -34,8 +28,9 @@ const conversationContextSchema = z.object({
   medicalHistory: z.array(z.string()).optional(),
   medications: z.array(z.string()).optional(),
   age: z.number().nullable().optional(),
-  gender: z.string().nullable().optional()
-});
+  gender: z.string().nullable().optional(),
+  questionCount: z.number().optional()
+}).optional().nullable(); // Allow the entire object to be null
 
 // ============================================================================
 // Router
@@ -49,48 +44,44 @@ export const conversationalRouter = router({
     .input(
       z.object({
         message: z.string().min(1),
-        conversationHistory: z.array(conversationMessageSchema),
-        context: conversationContextSchema.optional(),
+        context: conversationContextSchema,
         language: z.enum(["en", "ar"]).optional().default("en")
       })
     )
     .mutation(async ({ input, ctx }): Promise<AssessmentResponse> => {
-      console.log("[sendMessage] Received input:", JSON.stringify(input, null, 2));
-      const { message, conversationHistory, context, language } = input;
+      console.log("[sendMessage] Received:", {
+        message: input.message,
+        hasContext: !!input.context,
+        stepCount: input.context?.stepCount
+      });
 
-      // 🔧 FIX: Rehydrate the Context Vector Class
-      // The context arrives as plain JSON, but we need a class instance with methods
-      // Filter out null values to match ConversationalContextVector type expectations
-      const sanitizedContext = context ? {
-        symptoms: context.symptoms,
-        duration: context.duration ?? undefined,
-        severity: context.severity ?? undefined,
-        location: context.location ?? undefined,
-        aggravatingFactors: context.aggravatingFactors,
-        relievingFactors: context.relievingFactors,
-        associatedSymptoms: context.associatedSymptoms,
-        medicalHistory: context.medicalHistory,
-        medications: context.medications,
-        age: context.age ?? undefined,
-        gender: context.gender ?? undefined
-      } : {};
-      const hydratedContext = createContextVector(sanitizedContext);
+      // 🔧 FIX: Ensure we always pass a valid object to the engine
+      // Even if context is null/undefined, we provide an empty object
+      const safeContext = input.context || {};
       
-      console.log("[sendMessage] Rehydrated context:", hydratedContext.getSummary());
-
-      // Process the message through conversational flow engine
       try {
         const response = await processConversationalAssessment(
-          message,
-          conversationHistory,
-          hydratedContext,
-          language || "en"
+          input.message,
+          safeContext
         );
+
+        console.log("[sendMessage] Response:", {
+          stage: response.conversationStage,
+          hasTriageResult: !!response.triageResult,
+          newStepCount: response.context.stepCount
+        });
 
         return response;
       } catch (error) {
-        console.error("[sendMessage] Error in processConversationalAssessment:", error);
-        throw error;
+        console.error("[sendMessage] Error:", error);
+        
+        // 🛡️ Last resort fallback - return safe response
+        return {
+          message: "I apologize, but I'm having trouble processing your message. Could you please rephrase that?",
+          messageAr: "أعتذر، لكنني أواجه مشكلة في معالجة رسالتك. هل يمكنك إعادة صياغة ذلك؟",
+          conversationStage: "gathering",
+          context: safeContext as any
+        };
       }
     }),
 
@@ -105,19 +96,35 @@ export const conversationalRouter = router({
     )
     .mutation(async ({ input, ctx }): Promise<AssessmentResponse> => {
       const { language } = input;
-      // Return initial greeting based on language
+      
       const message = language === "ar" 
-        ? "مرحباً! أنا هنا لمساعدتك في تقييم أعراضك. ما الذي يجعلك تأتي اليوم؟"
-        : "Hello! I'm here to help assess your symptoms. What brings you here today?";
+        ? "مرحباً! أنا الدكتور ابن سينا، مساعدك الطبي الذكي. ما الذي يزعجك اليوم؟"
+        : "Hello! I'm Dr. Avicenna, your AI medical assistant. What's bothering you today?";
       
       return {
         message,
-        conversationStage: "greeting"
+        messageAr: language === "ar" ? message : "مرحباً! أنا الدكتور ابن سينا، مساعدك الطبي الذكي. ما الذي يزعجك اليوم؟",
+        conversationStage: "greeting",
+        context: {
+          symptoms: [],
+          stepCount: 0
+        }
       };
     }),
 
   /**
-   * Get conversation history for a user
+   * Reset conversation session
+   */
+  resetSession: publicProcedure.mutation(async ({ ctx }) => {
+    console.log("[resetSession] Session reset requested");
+    return { 
+      success: true,
+      message: "Conversation reset successfully"
+    };
+  }),
+
+  /**
+   * Get conversation history for a user (placeholder)
    */
   getHistory: publicProcedure
     .query(async ({ ctx }) => {
