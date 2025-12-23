@@ -42,6 +42,14 @@
 - [x] Fixed TypeScript errors to match V2 interface
 - [x] V2 restored with three-tier progressive detection
 
+## Bio-Scanner V2 Still Showing High BPM (Current Issue - FIXED)
+- [x] User reports V2 revert still shows 153 BPM (too high)
+- [x] Investigated - 153 BPM = 2x ~76 BPM (harmonic doubling)
+- [x] Root cause: Thresholds too low (15%/20%/25%) detect BOTH systolic and diastolic peaks
+- [x] Solution: Increased thresholds (30%/35%/40%) and debounce times (400/450/500ms)
+- [x] This ensures only ONE peak detected per cardiac cycle
+- [ ] Awaiting user testing to verify accurate BPM readings (~70-80 BPM)
+
 ## Bio-Scanner BPM Reading Fix (Previous Session - COMPLETED)
 - [x] User reported Bio-Scanner showing over 100 BPM after "harmonic doubling fix"
 - [x] Investigated git history - compared working version (78 BPM) with current
@@ -52,3 +60,14 @@
   - [x] Tier 2: 20% threshold, 200ms debounce (was 25%/450ms)
   - [x] Tier 3: 25% threshold, 250ms debounce (was 30%/500ms)
 - [x] Tested and verified fix applied successfully
+
+## Bio-Scanner Accuracy Improvements (User Request - COMPLETED)
+- [x] Extend measurement window from 5s to 8s+ (256 samples at 30fps)
+- [x] Implement multi-measurement averaging (rolling average of last 5 readings)
+- [x] Add outlier rejection using Median Absolute Deviation (MAD)
+- [x] Add confidence-based filtering (only readings >40% confidence)
+- [x] Show stabilization indicator (🎯 STABLE vs 📊 Averaging)
+- [x] Add visual feedback showing sample size (n=X)
+- [x] Confidence-weighted averaging for better accuracy
+- [x] Coefficient of Variation < 5% for stability detection
+- [ ] Awaiting user testing to verify improvements

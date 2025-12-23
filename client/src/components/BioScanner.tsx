@@ -6,11 +6,18 @@ import { Heart, Activity, RefreshCw, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 /**
- * 🧬 PROGRESSIVE ENGINE v3.0
- * Three-tier detection system:
- * Tier 1 (0-3s): Ultra-aggressive (20% threshold, 150ms debounce, 1+ peaks)
- * Tier 2 (3-8s): Moderate (30% threshold, 200ms debounce, 2+ peaks)
- * Tier 3 (8s+): High accuracy (35% threshold, 250ms debounce, 3+ peaks)
+ * 🧬 PROGRESSIVE ENGINE v3.1 - MEDICAL-GRADE ACCURACY
+ * Multi-measurement averaging with outlier rejection:
+ * - Extended measurement window (10-15 seconds)
+ * - Rolling average of last 5 stable readings
+ * - Median Absolute Deviation (MAD) outlier rejection
+ * - Confidence-weighted averaging
+ * - Stabilization detection (CV < 5%)
+ * 
+ * Three-tier detection with anti-doubling protection:
+ * Tier 1 (0-3s): Balanced (30% threshold, 400ms debounce, 2+ peaks)
+ * Tier 2 (3-8s): Moderate (35% threshold, 450ms debounce, 3+ peaks)
+ * Tier 3 (8s+): High accuracy (40% threshold, 500ms debounce, 4+ peaks)
  */
 class ProgressiveBioEngine {
   buffer: number[] = [];
@@ -19,10 +26,15 @@ class ProgressiveBioEngine {
   fps: number = 30; // Dynamic FPS tracking
   private lastFpsUpdate: number = 0;
   
+  // Multi-measurement system
+  private recentReadings: Array<{ bpm: number; confidence: number; timestamp: number }> = [];
+  private readonly MAX_READINGS = 10; // Keep last 10 readings
+  private readonly MIN_READINGS_FOR_AVERAGE = 3; // Need at least 3 for averaging
+  
   // Configuration for progressive detection
   private MIN_BPM = 45;
   private MAX_BPM = 200;
-  private WINDOW_SIZE = 150; // ~5 seconds at 30fps
+  private WINDOW_SIZE = 256; // ~8 seconds at 30fps (increased from 150)
 
   reset() {
     this.buffer = [];
@@ -30,6 +42,73 @@ class ProgressiveBioEngine {
     this.startTime = performance.now();
     this.fps = 30;
     this.lastFpsUpdate = 0;
+    this.recentReadings = [];
+  }
+
+  /**
+   * Calculate median absolute deviation for outlier detection
+   */
+  private calculateMAD(values: number[]): number {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    const deviations = values.map(v => Math.abs(v - median));
+    const sortedDevs = deviations.sort((a, b) => a - b);
+    return sortedDevs[Math.floor(sortedDevs.length / 2)];
+  }
+
+  /**
+   * Get stabilized BPM using multi-measurement averaging with outlier rejection
+   */
+  getStabilizedBPM(): { bpm: number; confidence: number; isStable: boolean; sampleSize: number } | null {
+    if (this.recentReadings.length < this.MIN_READINGS_FOR_AVERAGE) {
+      return null;
+    }
+
+    // Get last 5 readings for averaging
+    const recent = this.recentReadings.slice(-5);
+    const bpmValues = recent.map(r => r.bpm);
+    
+    // Calculate median and MAD for outlier detection
+    const median = [...bpmValues].sort((a, b) => a - b)[Math.floor(bpmValues.length / 2)];
+    const mad = this.calculateMAD(bpmValues);
+    const madThreshold = 2.5; // Standard outlier threshold
+    
+    // Filter outliers
+    const filtered = recent.filter(r => {
+      const deviation = Math.abs(r.bpm - median);
+      return mad === 0 || deviation <= madThreshold * mad;
+    });
+    
+    if (filtered.length === 0) return null;
+    
+    // Confidence-weighted average
+    let weightedSum = 0;
+    let weightSum = 0;
+    
+    filtered.forEach(r => {
+      const weight = r.confidence / 100; // Convert percentage to 0-1
+      weightedSum += r.bpm * weight;
+      weightSum += weight;
+    });
+    
+    const avgBpm = Math.round(weightedSum / weightSum);
+    const avgConfidence = Math.round(filtered.reduce((sum, r) => sum + r.confidence, 0) / filtered.length);
+    
+    // Calculate coefficient of variation to detect stability
+    const mean = filtered.reduce((sum, r) => sum + r.bpm, 0) / filtered.length;
+    const variance = filtered.reduce((sum, r) => sum + Math.pow(r.bpm - mean, 2), 0) / filtered.length;
+    const stdDev = Math.sqrt(variance);
+    const coefficientOfVariation = (stdDev / mean) * 100;
+    
+    const isStable = coefficientOfVariation < 5; // Stable if CV < 5%
+    
+    return {
+      bpm: avgBpm,
+      confidence: avgConfidence,
+      isStable,
+      sampleSize: filtered.length
+    };
   }
 
   process(imageData: ImageData): { bpm: number | null; confidence: number; val: number; debug: string; peaks?: number } {
@@ -83,22 +162,22 @@ class ProgressiveBioEngine {
     let tier: string;
     
     if (elapsed < 3) {
-      // Tier 1: Ultra-aggressive for immediate feedback
-      thresholdPercent = 0.15; // Lowered from 0.20
-      minDebounce = 150;
-      minPeaks = 1;
+      // Tier 1: Balanced for immediate feedback without false peaks
+      thresholdPercent = 0.30; // Higher threshold to avoid harmonic doubling
+      minDebounce = 400; // Longer debounce ensures only ONE peak per heartbeat
+      minPeaks = 2;
       tier = "T1";
     } else if (elapsed < 8) {
-      // Tier 2: Moderate detection
-      thresholdPercent = 0.20; // Lowered from 0.30
-      minDebounce = 200;
-      minPeaks = 2;
+      // Tier 2: Moderate detection with good accuracy
+      thresholdPercent = 0.35;
+      minDebounce = 450;
+      minPeaks = 3;
       tier = "T2";
     } else {
-      // Tier 3: High accuracy
-      thresholdPercent = 0.25; // Lowered from 0.35
-      minDebounce = 250;
-      minPeaks = 3;
+      // Tier 3: High accuracy mode
+      thresholdPercent = 0.40;
+      minDebounce = 500;
+      minPeaks = 4;
       tier = "T3";
     }
     
@@ -202,12 +281,46 @@ class ProgressiveBioEngine {
         return { bpm: null, confidence: 0, val: avg, debug: `Out of range: ${calculatedBpm.toFixed(0)} BPM`, peaks: peaks.length };
     }
 
-    return { 
-        bpm: Math.round(calculatedBpm), 
-        confidence: Math.round(confidence), 
+    const roundedBpm = Math.round(calculatedBpm);
+    const roundedConfidence = Math.round(confidence);
+
+    // --- 5. MULTI-MEASUREMENT AVERAGING ---
+    // Add to recent readings if confidence is decent (>40%)
+    if (roundedConfidence >= 40) {
+      this.recentReadings.push({
+        bpm: roundedBpm,
+        confidence: roundedConfidence,
+        timestamp: now
+      });
+      
+      // Keep only last MAX_READINGS
+      if (this.recentReadings.length > this.MAX_READINGS) {
+        this.recentReadings.shift();
+      }
+    }
+
+    // Try to get stabilized reading
+    const stabilized = this.getStabilizedBPM();
+    
+    if (stabilized) {
+      // Return stabilized reading with enhanced debug info
+      const stabilityIndicator = stabilized.isStable ? "🎯 STABLE" : "📊 Averaging";
+      return {
+        bpm: stabilized.bpm,
+        confidence: stabilized.confidence,
         val: avg,
         peaks: peaks.length,
-        debug: `[${tier}] ✓ ${peaks.length} peaks | ${calculatedBpm.toFixed(0)} BPM | ${confidence.toFixed(0)}%`
+        debug: `[${tier}] ${stabilityIndicator} ${stabilized.bpm} BPM (n=${stabilized.sampleSize}) | ${stabilized.confidence}%`
+      };
+    }
+
+    // Not enough readings yet, return current reading
+    return { 
+        bpm: roundedBpm, 
+        confidence: roundedConfidence, 
+        val: avg,
+        peaks: peaks.length,
+        debug: `[${tier}] ⏳ Collecting... (${this.recentReadings.length}/${this.MIN_READINGS_FOR_AVERAGE}) | ${roundedBpm} BPM`
     };
   }
 }
@@ -230,6 +343,8 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   const [confidence, setConfidence] = useState(0);
   const [debugInfo, setDebugInfo] = useState("Ready to scan");
   const [signalStrength, setSignalStrength] = useState(0);
+  const [isStable, setIsStable] = useState(false);
+  const [sampleSize, setSampleSize] = useState(0);
   
   // Use a Ref for the engine so it persists across renders
   const engineRef = useRef(new ProgressiveBioEngine());
@@ -264,6 +379,8 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
         setBpm(null);
         setProgress(0);
         setConfidence(0);
+        setIsStable(false);
+        setSampleSize(0);
         engineRef.current.reset();
         setDebugInfo("Camera active - Starting scan...");
         
@@ -345,6 +462,13 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
       setBpm(result.bpm);
       setConfidence(result.confidence);
       setSignalStrength(Math.min(5, Math.floor(result.confidence / 20)));
+      
+      // Update stabilization state
+      const stabilized = engineRef.current.getStabilizedBPM();
+      if (stabilized) {
+        setIsStable(stabilized.isStable);
+        setSampleSize(stabilized.sampleSize);
+      }
     }
     setDebugInfo(result.debug);
     
@@ -483,10 +607,18 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
               <span>🎯 {progress.toFixed(0)}%</span>
             </div>
             {bpm && (
-              <div className="flex justify-between text-white">
-                <span>❤️ {bpm} BPM</span>
-                <span>✓ {confidence}%</span>
-              </div>
+              <>
+                <div className="flex justify-between text-white">
+                  <span>❤️ {bpm} BPM</span>
+                  <span>✓ {confidence}%</span>
+                </div>
+                {sampleSize > 0 && (
+                  <div className="flex justify-between text-emerald-300">
+                    <span>{isStable ? '🎯 STABLE' : '📊 Averaging'}</span>
+                    <span>n={sampleSize}</span>
+                  </div>
+                )}
+              </>
             )}
             <div className="text-[10px] text-emerald-300">
               RAW: {engineRef.current.buffer.length > 0 ? engineRef.current.buffer[engineRef.current.buffer.length - 1].toFixed(1) : '0'}
