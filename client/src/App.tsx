@@ -37,6 +37,7 @@ import ClinicianLogin from "./pages/ClinicianLogin";
 import ClinicianDashboard from "./pages/ClinicianDashboard";
 import ClinicalReasoning from "./pages/ClinicalReasoning";
 import PatientSymptomChecker from "./pages/PatientSymptomChecker";
+import ModernSymptomChecker from "./pages/ModernSymptomChecker";
 import PharmaGuard from "./pages/PharmaGuard";
 import CareLocator from "./pages/CareLocator";
 
@@ -101,7 +102,8 @@ function Router() {
       <Route path={"/clinician/reasoning"}>
         {() => <ProtectedRoute requiredRole="clinician"><ClinicalReasoning /></ProtectedRoute>}
       </Route>
-      <Route path={"/patient/symptom-checker"} component={PatientSymptomChecker} />
+      <Route path={"/patient/symptom-checker"} component={ModernSymptomChecker} />
+      <Route path={"/patient/symptom-checker-old"} component={PatientSymptomChecker} />
       <Route path={"/clinician/pharmaguard"}>
         {() => <ProtectedRoute requiredRole="clinician"><PharmaGuard /></ProtectedRoute>}
       </Route>
