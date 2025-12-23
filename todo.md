@@ -284,3 +284,14 @@
   - [x] Adjust detection region for fingertip (use entire canvas: 90,000 pixels)
   - [x] Update camera positioning guide for finger mode
   - [x] Use back camera for finger mode, front camera for forehead
+
+## Bio-Scanner BPM Reading Fix (Current Session - COMPLETED)
+- [x] User reported Bio-Scanner showing over 100 BPM after "harmonic doubling fix"
+- [x] Investigated git history - compared working version (78 BPM) with current
+- [x] Root cause: Overcorrected debounce times (150ms → 400ms = 3x longer)
+- [x] Effect: Algorithm missing real heartbeats, causing inflated BPM readings
+- [x] Solution: Reverted to working threshold values from 687dab0 commit
+  - [x] Tier 1: 15% threshold, 150ms debounce (was 20%/400ms)
+  - [x] Tier 2: 20% threshold, 200ms debounce (was 25%/450ms)
+  - [x] Tier 3: 25% threshold, 250ms debounce (was 30%/500ms)
+- [x] Tested and verified fix applied successfully
