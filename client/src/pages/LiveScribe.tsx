@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Streamdown } from "streamdown";
 import {
   Mic,
   MicOff,
@@ -705,12 +706,10 @@ function LiveScribeContent() {
           </DialogHeader>
           
           <div className="space-y-4">
-            {/* SOAP Note Content */}
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <div className="prose prose-sm max-w-none">
-                <div className="whitespace-pre-wrap font-mono text-sm text-gray-800">
-                  {soapNote}
-                </div>
+            {/* SOAP Note Content - Force LTR for English medical terminology */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm" dir="ltr">
+              <div className="prose prose-sm max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h1:mb-4 prose-h1:pb-3 prose-h1:border-b-2 prose-h1:border-gray-200 prose-h2:text-xl prose-h2:mt-6 prose-h2:mb-3 prose-h2:text-blue-900 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-h3:text-gray-800 prose-table:border-collapse prose-table:w-full prose-th:bg-gray-100 prose-th:border prose-th:border-gray-300 prose-th:p-2 prose-th:text-left prose-th:font-semibold prose-td:border prose-td:border-gray-300 prose-td:p-2 prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700 prose-hr:my-6 prose-hr:border-gray-300">
+                <Streamdown>{soapNote}</Streamdown>
               </div>
             </div>
 
