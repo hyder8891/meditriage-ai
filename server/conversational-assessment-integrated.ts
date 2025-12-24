@@ -22,6 +22,28 @@ const FALLBACK_QUESTIONS = [
 const GREETING_EN = "Hello. I am AI Doctor, your intelligent medical assistant. Please tell me, what symptoms are you experiencing today?";
 const GREETING_AR = "مرحباً. أنا AI Doctor، مساعدك الطبي الذكي. من فضلك أخبرني، ما هي الأعراض التي تعاني منها اليوم؟";
 
+// Fallback questions in Arabic
+const FALLBACK_QUESTIONS_AR = [
+  "ما هو العرض الرئيسي الذي يزعجك؟",
+  "منذ متى وأنت تعاني من هذه الأعراض؟",
+  "على مقياس من 1 إلى 10، ما مدى شدته؟",
+  "أين بالضبط الألم أو المشكلة؟",
+  "هل لديك حمى أو ارتفاع في درجة الحرارة؟",
+  "هل تناولت أي أدوية لهذا؟",
+  "هل لديك أي حالات طبية موجودة؟",
+  "هل هناك شيء يجعل الأعراض أفضل أو أسوأ؟",
+  "هل تعاني من أي أعراض أخرى؟",
+  "هل هناك أي شيء آخر يجب أن أعرفه؟",
+];
+
+/**
+ * Simple helper to get fallback question in the correct language
+ */
+function getFallbackQuestion(index: number, language: string): string {
+  const idx = Math.min(index, 9);
+  return language === 'ar' ? FALLBACK_QUESTIONS_AR[idx] : FALLBACK_QUESTIONS[idx];
+}
+
 /**
  * Start a new conversation
  */
@@ -62,9 +84,14 @@ export async function processConversationalAssessment(
   }
 
   // 4. Prompt Engineering for symptom gathering
+  const languageInstruction = language === 'ar'
+    ? 'IMPORTANT: You must respond in Arabic language. All questions and responses must be in Arabic.'
+    : '';
+  
   const systemPrompt = `
     ROLE: AI Doctor (Intelligent Medical Assistant).
     TASK: Step-by-step medical intake.
+    ${languageInstruction}
     
     CURRENT STATUS:
     - Step: ${currentStep + 1}/8 (will finalize at step 8)
@@ -77,6 +104,7 @@ export async function processConversationalAssessment(
     1. Extract new information from the patient's message.
     2. Ask ONE focused follow-up question to gather critical details.
     3. Be conversational and empathetic.
+    ${language === 'ar' ? '4. Respond in Arabic language.' : ''}
 
     OUTPUT FORMAT (JSON ONLY):
     {
@@ -86,7 +114,7 @@ export async function processConversationalAssessment(
         "severity": "string or null",
         "location": "string or null"
       },
-      "nextQuestion": "Your question here"
+      "nextQuestion": "Your question here${language === 'ar' ? ' (in Arabic)' : ''}"
     }
   `;
 
@@ -127,7 +155,7 @@ export async function processConversationalAssessment(
 
     return {
       message: data.nextQuestion,
-      messageAr: data.nextQuestion, // TODO: Add Arabic translation
+      messageAr: language === 'ar' ? data.nextQuestion : data.nextQuestion,
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
       quickReplies: []
@@ -138,11 +166,11 @@ export async function processConversationalAssessment(
     
     // Auto-Recovery
     vector.stepCount = currentStep + 1;
-    const nextQ = FALLBACK_QUESTIONS[Math.min(vector.stepCount, 7)];
-
+    const nextQ = getFallbackQuestion(vector.stepCount, language);
+    
     return {
       message: nextQ,
-      messageAr: nextQ, // TODO: Add Arabic translation
+      messageAr: language === 'ar' ? nextQ : FALLBACK_QUESTIONS_AR[Math.min(vector.stepCount, 9)],
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
       quickReplies: []

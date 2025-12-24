@@ -266,8 +266,15 @@ export class BRAIN {
     recommendations: any;
     confidence: number;
   }> {
+    // Language-specific instructions
+    const languageInstruction = context.language === 'ar' 
+      ? 'IMPORTANT: Respond in Arabic language. All medical terms, diagnoses, recommendations, and explanations must be in Arabic.'
+      : '';
+    
     // Optimized prompt for faster response while maintaining clinical quality
     const prompt = `BRAIN Medical AI - Differential Diagnosis
+
+${languageInstruction}
 
 **Patient:** ${context.patientInfo.age}yo ${context.patientInfo.gender}, ${context.patientInfo.location || 'Iraq'}
 **History:** ${context.patientInfo.medicalHistory?.join(', ') || 'None'}
@@ -300,11 +307,15 @@ ${context.knowledgeBaseDiagnoses.length > 0 ? `**KB Matches:** ${context.knowled
 
     try {
       // Use Gemini Pro for deep clinical reasoning with grounding
+      const systemContent = context.language === 'ar'
+        ? 'أنت BRAIN، نظام ذكاء اصطناعي طبي متقدم. قدم تقييمات طبية دقيقة مبنية على الأدلة. يجب أن تكون جميع الاستجابات باللغة العربية بتنسيق JSON صالح.'
+        : 'You are BRAIN, an advanced medical AI system. Provide evidence-based, accurate medical assessments with PubMed citations. Always respond in valid JSON format.';
+      
       const responseText = await invokeGeminiPro(
         [
           { 
             role: 'system', 
-            content: 'You are BRAIN, an advanced medical AI system. Provide evidence-based, accurate medical assessments with PubMed citations. Always respond in valid JSON format.' 
+            content: systemContent
           },
           { role: 'user', content: prompt }
         ],
@@ -312,7 +323,9 @@ ${context.knowledgeBaseDiagnoses.length > 0 ? `**KB Matches:** ${context.knowled
           temperature: 1.0,
           thinkingLevel: 'high',
           grounding: true,
-          systemInstruction: 'Use Chain-of-Thought reasoning. Verify information against current medical guidelines using Google Search. Provide evidence-based recommendations with citations.'
+          systemInstruction: context.language === 'ar'
+            ? 'استخدم التفكير المتسلسل. تحقق من المعلومات مقابل الإرشادات الطبية الحالية باستخدام بحث Google. قدم توصيات مبنية على الأدلة مع الاستشهادات. يجب أن تكون جميع الاستجابات باللغة العربية.'
+            : 'Use Chain-of-Thought reasoning. Verify information against current medical guidelines using Google Search. Provide evidence-based recommendations with citations.'
         }
       );
 

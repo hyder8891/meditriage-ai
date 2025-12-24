@@ -738,3 +738,6 @@
 - [ ] Optimize loading states and skeletons for mobile
 - [ ] Improve error messages and toasts for mobile (larger, better positioned)
 - [ ] Add mobile-specific breakpoints and utilities to Tailwind config
+
+## NEW: Arabic Localization Issues
+- [x] Fix Arabic localization in AI assessment output - medical content showing in English despite Arabic being selected
