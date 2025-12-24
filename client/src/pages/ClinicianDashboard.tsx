@@ -32,14 +32,16 @@ import { NotificationBadge } from "@/components/NotificationBadge";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-export default function ClinicianDashboard() {
+function ClinicianDashboardContent() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
   const authLoading = false; // Zustand auth is synchronous
   const { requestPermission, hasPermission } = useNotifications();
   const [searchQuery, setSearchQuery] = useState("");
-  const sidebarOpen = true; // Always keep sidebar open
   
   // Request notification permission on mount
   useEffect(() => {
@@ -82,292 +84,193 @@ export default function ClinicianDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 overflow-y-auto">
-        <div className="p-4">
-          <div className="mb-8">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/logo.png" 
-                alt="My Doctor طبيبي" 
-                className="h-14 w-auto" 
-                style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
-              />
-            </div>
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 p-4 sm:p-6">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              {language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+              {language === 'ar' 
+                ? `مرحباً، د. ${user?.name || "الطبيب"}`
+                : `Welcome back, Dr. ${user?.name || "Clinician"}`}
+            </p>
           </div>
-
-          <nav className="space-y-2">
-            <Button
-              variant="default"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/dashboard")}
-            >
-              <Activity className="w-5 h-5 mr-3" />
-              Dashboard
+          <div className="flex items-center gap-2 sm:gap-4">
+            <NotificationBadge />
+            <Button onClick={handleNewCase} className="bg-blue-600 hover:bg-blue-700" size="sm">
+              <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">{language === 'ar' ? 'حالة جديدة' : 'New Case'}</span>
+              <span className="sm:hidden">{language === 'ar' ? 'جديد' : 'New'}</span>
             </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/reasoning")}
-            >
-              <TrendingUp className="w-5 h-5 mr-3" />
-              Clinical Reasoning
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/pharmaguard")}
-            >
-              <FileText className="w-5 h-5 mr-3" />
-              PharmaGuard
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/live-scribe")}
-            >
-              <Mic className="w-5 h-5 mr-3" />
-              Live Scribe
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/lab-results")}
-            >
-              <FileText className="w-5 h-5 mr-3" />
-              Lab Results
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/xray-analysis")}
-            >
-              <FileImage className="w-5 h-5 mr-3" />
-              Medical Imaging
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/calendar")}
-            >
-              <Calendar className="w-5 h-5 mr-3" />
-              Calendar
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/medications")}
-            >
-              <Pill className="w-5 h-5 mr-3" />
-              Medications
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/my-patients")}
-            >
-              <Users className="w-5 h-5 mr-3" />
-              Patients
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/messages")}
-            >
-              <MessageSquare className="w-5 h-5 mr-3" />
-              Messages
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/budget-tracking")}
-            >
-              <DollarSign className="w-5 h-5 mr-3" />
-              Budget Tracking
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation("/clinician/orchestration-logs")}
-            >
-              <Database className="w-5 h-5 mr-3" />
-              Orchestration Logs
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 text-orange-700"
-              onClick={() => setLocation("/clinician/subscription")}
-            >
-              <Crown className="w-5 h-5 mr-3" />
-              Subscription
-            </Button>
-          </nav>
-
-          <div className="absolute bottom-4 left-0 right-0 px-4">
-            <UserProfileDropdown />
           </div>
         </div>
-      </aside>
+      </header>
 
-      {/* Main Content */}
-      <main className="ml-64">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-sm text-gray-500 mt-1">Welcome back, Dr. {user?.name || "Clinician"}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <NotificationBadge />
-              <Button onClick={handleNewCase} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                New Case
-              </Button>
-            </div>
-          </div>
-        </header>
+      {/* Availability Toggle */}
+      <div className="p-4 sm:p-6 pb-0">
+        <DoctorAvailabilityToggle />
+      </div>
 
-          {/* Availability Toggle */}
-          <div className="p-6 pb-0">
-            <DoctorAvailabilityToggle />
-          </div>
-
-          {/* Stats Cards */}
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="card-modern">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Active Cases</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-gray-900">{activeCases.length}</div>
-                  <Activity className="w-8 h-8 text-blue-500" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="card-modern border-red-200 bg-red-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-red-700">Emergency</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-red-700">{emergencyCases.length}</div>
-                  <AlertCircle className="w-8 h-8 text-red-500" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="card-modern border-orange-200 bg-orange-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-orange-700">Urgent</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-orange-700">{urgentCases.length}</div>
-                  <Clock className="w-8 h-8 text-orange-500" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="card-modern">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Patients</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-gray-900">{cases?.length || 0}</div>
-                  <Users className="w-8 h-8 text-green-500" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search patients by name or complaint..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11"
-              />
-            </div>
-          </div>
-
-          {/* Cases List */}
+      {/* Stats Cards */}
+      <div className="p-4 sm:p-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
           <Card className="card-modern">
-            <CardHeader>
-              <CardTitle>Recent Cases</CardTitle>
-              <CardDescription>Manage your patient cases</CardDescription>
+            <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium text-gray-600">
+                {language === 'ar' ? 'الحالات النشطة' : 'Active Cases'}
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              {casesLoading ? (
-                <div className="text-center py-8 text-gray-500">Loading cases...</div>
-              ) : activeCases.length === 0 ? (
-                <div className="text-center py-12">
-                  <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">No active cases</p>
-                  <Button onClick={handleNewCase}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create First Case
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {activeCases
-                    .filter((c: any) => 
-                      searchQuery === "" || 
-                      c.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      c.chiefComplaint.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((caseItem: any) => (
-                      <div
-                        key={caseItem.id}
-                        className="p-4 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer"
-                        onClick={() => setLocation(`/clinician/case/${caseItem.id}/timeline`)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-semibold text-gray-900">{caseItem.patientName}</h3>
-                              {caseItem.urgency && (
-                                <Badge
-                                  className={
-                                    caseItem.urgency === "emergency"
-                                      ? "bg-red-100 text-red-700"
-                                      : caseItem.urgency === "urgent"
-                                      ? "bg-orange-100 text-orange-700"
-                                      : "bg-blue-100 text-blue-700"
-                                  }
-                                >
-                                  {caseItem.urgency}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-600 mb-1">{caseItem.chiefComplaint}</p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
-                              {caseItem.patientAge && <span>Age: {caseItem.patientAge}</span>}
-                              {caseItem.patientGender && <span>Gender: {caseItem.patientGender}</span>}
-                              <span>{new Date(caseItem.createdAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            View Details
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              )}
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="flex items-center justify-between">
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900">{activeCases.length}</div>
+                <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card-modern border-red-200 bg-red-50">
+            <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium text-red-700">
+                {language === 'ar' ? 'طوارئ' : 'Emergency'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="flex items-center justify-between">
+                <div className="text-2xl sm:text-3xl font-bold text-red-700">{emergencyCases.length}</div>
+                <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card-modern border-orange-200 bg-orange-50">
+            <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium text-orange-700">
+                {language === 'ar' ? 'عاجل' : 'Urgent'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="flex items-center justify-between">
+                <div className="text-2xl sm:text-3xl font-bold text-orange-700">{urgentCases.length}</div>
+                <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card-modern">
+            <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium text-gray-600">
+                {language === 'ar' ? 'إجمالي المرضى' : 'Total Patients'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="flex items-center justify-between">
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900">{cases?.length || 0}</div>
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+              </div>
             </CardContent>
           </Card>
         </div>
-      </main>
+
+        {/* Search Bar */}
+        <div className="mb-4 sm:mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+            <Input
+              type="text"
+              placeholder={language === 'ar' ? 'ابحث عن المرضى...' : 'Search patients...'}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 sm:pl-11 text-sm sm:text-base h-9 sm:h-10"
+            />
+          </div>
+        </div>
+
+        {/* Cases List */}
+        <Card className="card-modern">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">
+              {language === 'ar' ? 'الحالات الأخيرة' : 'Recent Cases'}
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              {language === 'ar' ? 'إدارة حالات المرضى' : 'Manage your patient cases'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            {casesLoading ? (
+              <div className="text-center py-8 text-gray-500 text-sm sm:text-base">
+                {language === 'ar' ? 'جاري التحميل...' : 'Loading cases...'}
+              </div>
+            ) : activeCases.length === 0 ? (
+              <div className="text-center py-8 sm:py-12">
+                <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+                <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
+                  {language === 'ar' ? 'لا توجد حالات نشطة' : 'No active cases'}
+                </p>
+                <Button onClick={handleNewCase} size="sm">
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  {language === 'ar' ? 'إنشاء أول حالة' : 'Create First Case'}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2 sm:space-y-3">
+                {activeCases
+                  .filter((c: any) => 
+                    searchQuery === "" || 
+                    c.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.chiefComplaint.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((caseItem: any) => (
+                    <div
+                      key={caseItem.id}
+                      className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 active:scale-[0.98] transition-all cursor-pointer"
+                      onClick={() => setLocation(`/clinician/case/${caseItem.id}/timeline`)}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2 flex-wrap">
+                            <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{caseItem.patientName}</h3>
+                            {caseItem.urgency && (
+                              <Badge
+                                className={`text-xs ${
+                                  caseItem.urgency === "emergency"
+                                    ? "bg-red-100 text-red-700"
+                                    : caseItem.urgency === "urgent"
+                                    ? "bg-orange-100 text-orange-700"
+                                    : "bg-blue-100 text-blue-700"
+                                }`}
+                              >
+                                {caseItem.urgency}
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs sm:text-sm text-gray-600 mb-1 line-clamp-1">{caseItem.chiefComplaint}</p>
+                          <div className="flex items-center gap-2 sm:gap-4 text-xs text-gray-500 flex-wrap">
+                            {caseItem.patientAge && <span>{language === 'ar' ? 'العمر' : 'Age'}: {caseItem.patientAge}</span>}
+                            {caseItem.patientGender && <span>{language === 'ar' ? 'الجنس' : 'Gender'}: {caseItem.patientGender}</span>}
+                            <span className="hidden sm:inline">{new Date(caseItem.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="hidden sm:flex flex-shrink-0">
+                          {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
+  );
+}
+
+export default function ClinicianDashboard() {
+  return (
+    <ClinicianLayout>
+      <ClinicianDashboardContent />
+    </ClinicianLayout>
   );
 }

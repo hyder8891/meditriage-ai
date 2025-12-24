@@ -84,17 +84,17 @@ export default function FindDoctor() {
   ) || [];
 
   return (
-    <div className="container max-w-6xl py-8 space-y-6">
+    <div className="container max-w-6xl py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6 px-3 sm:px-4">
       <div>
-        <h1 className="text-3xl font-bold">Find a Doctor</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">Find a Doctor</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Connect with available doctors instantly for consultation
         </p>
       </div>
 
       {/* Search and Filters */}
-      <Card className="p-4">
-        <div className="space-y-4">
+      <Card className="p-3 sm:p-4">
+        <div className="space-y-3 sm:space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -105,14 +105,15 @@ export default function FindDoctor() {
             />
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 flex-wrap">
             <Button
               variant={statusFilter === "available" ? "default" : "outline"}
               size="sm"
               onClick={() => setStatusFilter("available")}
             >
-              <Circle className="h-3 w-3 mr-2 fill-green-500 text-green-500" />
-              Available Now
+              <Circle className="h-3 w-3 mr-1 sm:mr-2 fill-green-500 text-green-500" />
+              <span className="hidden sm:inline">Available Now</span>
+              <span className="sm:hidden">Available</span>
             </Button>
             <Button
               variant={statusFilter === "busy" ? "default" : "outline"}
@@ -161,23 +162,23 @@ export default function FindDoctor() {
           </div>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3 sm:gap-4">
           {filteredDoctors.map((doctor) => {
             const isAvailable = doctor.availabilityStatus === "available";
             const isBusy = doctor.availabilityStatus === "busy";
             const isOffline = doctor.availabilityStatus === "offline";
 
             return (
-              <Card key={doctor.id} className="p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex gap-4 flex-1">
-                    <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-8 w-8 text-primary" />
+              <Card key={doctor.id} className="p-3 sm:p-4 hover:shadow-md active:scale-[0.98] transition-all">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-0">
+                  <div className="flex gap-3 sm:gap-4 flex-1 w-full">
+                    <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                     </div>
                     
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-lg">{doctor.name || "Dr. Unknown"}</h3>
+                    <div className="flex-1 space-y-1 sm:space-y-2 min-w-0">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                        <h3 className="font-semibold text-base sm:text-lg truncate">{doctor.name || "Dr. Unknown"}</h3>
                         <AvailabilityBadge status={doctor.availabilityStatus || "offline"} />
                         {doctor.verified && (
                           <Badge variant="outline" className="text-xs">

@@ -696,3 +696,45 @@
 - [x] Style tour overlay with proper RTL layout and Arabic typography
 - [x] Test tour flow for Arabic-speaking users (7/7 tests passing)
 - [x] Verify tour completion persistence across sessions
+
+
+## NEW: Mobile-First Optimization (Patient & Doctor Portals)
+
+### Patient Portal Mobile Optimization
+- [x] Optimize PatientPortal dashboard for mobile (responsive grid, touch-friendly cards)
+- [x] Add mobile hamburger menu and bottom navigation to PatientPortal
+- [x] Optimize FindDoctor page for mobile (responsive cards, touch targets)
+- [ ] Make symptom checker mobile-friendly (larger touch targets, simplified layout)
+- [ ] Optimize care locator/clinic finder for mobile (map view, list view toggle)
+- [ ] Improve medical records view on mobile (collapsible sections, swipeable cards)
+- [ ] Optimize bio-scanner for mobile (full-screen camera, better controls)
+- [ ] Make appointments page mobile-friendly (calendar view optimization)
+- [ ] Optimize patient profile for mobile (stacked layout, easier editing)
+- [ ] Improve conversational assessment for mobile (chat-style interface)
+
+### Doctor/Clinician Portal Mobile Optimization
+- [x] Optimize ClinicianDashboard for mobile (responsive stats, collapsible sections)
+- [x] Add mobile hamburger menu and bottom navigation to ClinicianLayout
+- [x] Make ClinicianLayout responsive with collapsible sidebar
+- [ ] Make patient list mobile-friendly (searchable, filterable, swipeable)
+- [ ] Optimize consultation interface for mobile (split-screen to stacked)
+- [ ] Improve medical imaging analysis on mobile (pinch-zoom, full-screen view)
+- [ ] Make SOAP notes mobile-friendly (voice input, quick templates)
+- [ ] Optimize prescription writing for mobile (drug search, quick add)
+- [ ] Improve patient vitals viewer on mobile (charts optimization)
+- [x] Make doctor availability toggle easily accessible on mobile
+
+### Shared Components Mobile Optimization
+- [x] Optimize navigation menus for mobile (hamburger menu, bottom nav)
+- [x] Make DashboardLayout mobile-friendly (collapsible sidebar, bottom nav)
+- [x] Optimize ClinicianLayout for mobile (hamburger menu, bottom nav, responsive sidebar)
+- [ ] Optimize UserProfileDropdown for mobile (full-screen modal on small screens)
+- [ ] Improve LanguageSwitcher for mobile (larger touch target)
+- [x] Make onboarding tour mobile-friendly (adjusted positioning, larger buttons)
+- [ ] Optimize all forms for mobile (larger inputs, better keyboard handling)
+- [ ] Improve table components for mobile (horizontal scroll, card view toggle)
+- [ ] Make all modals and dialogs mobile-friendly (full-screen on small devices)
+- [ ] Add touch gestures where appropriate (swipe, pinch-zoom)
+- [ ] Optimize loading states and skeletons for mobile
+- [ ] Improve error messages and toasts for mobile (larger, better positioned)
+- [ ] Add mobile-specific breakpoints and utilities to Tailwind config
