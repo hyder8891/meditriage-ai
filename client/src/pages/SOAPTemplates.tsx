@@ -569,7 +569,7 @@ function SOAPTemplatesContent() {
 
       {/* Template Preview Modal */}
       <Dialog open={showTemplateModal} onOpenChange={setShowTemplateModal}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[85vh] overflow-y-auto">
           {selectedTemplate && (
             <>
               <DialogHeader>
@@ -622,7 +622,7 @@ function SOAPTemplatesContent() {
                     <h3 className="font-semibold mb-2">Subjective Template</h3>
                     <Card>
                       <CardContent className="pt-4">
-                        <pre className="text-sm whitespace-pre-wrap">
+                        <pre className="text-sm whitespace-pre-wrap break-words overflow-x-auto">
                           {JSON.stringify(selectedTemplate.subjectiveTemplate, null, 2)}
                         </pre>
                       </CardContent>
@@ -633,7 +633,7 @@ function SOAPTemplatesContent() {
                     <h3 className="font-semibold mb-2">Objective Template</h3>
                     <Card>
                       <CardContent className="pt-4">
-                        <pre className="text-sm whitespace-pre-wrap">
+                        <pre className="text-sm whitespace-pre-wrap break-words overflow-x-auto">
                           {JSON.stringify(selectedTemplate.objectiveTemplate, null, 2)}
                         </pre>
                       </CardContent>
@@ -644,8 +644,8 @@ function SOAPTemplatesContent() {
                     <h3 className="font-semibold mb-2">Assessment Template</h3>
                     <Card>
                       <CardContent className="pt-4">
-                        <pre className="text-sm whitespace-pre-wrap">
-                          {JSON.stringify(selectedTemplate.assessmentTemplate, null, 2)}
+                        <pre className="text-sm whitespace-pre-wrap break-words overflow-x-auto">
+                        {JSON.stringify(selectedTemplate.assessmentTemplate, null, 2)}
                         </pre>
                       </CardContent>
                     </Card>
@@ -655,7 +655,7 @@ function SOAPTemplatesContent() {
                     <h3 className="font-semibold mb-2">Plan Template</h3>
                     <Card>
                       <CardContent className="pt-4">
-                        <pre className="text-sm whitespace-pre-wrap">
+                        <pre className="text-sm whitespace-pre-wrap break-words overflow-x-auto">
                           {JSON.stringify(selectedTemplate.planTemplate, null, 2)}
                         </pre>
                       </CardContent>

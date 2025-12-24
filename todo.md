@@ -704,3 +704,8 @@
 - [x] Add export history tracking and audit log
 - [x] Implement download functionality for exported files
 - [x] Write comprehensive vitest tests for export functions
+
+- [ ] Fix SOAP note dialog width - make dialog wider or content narrower to avoid horizontal scrolling
+
+## SOAP Note Dialog Width Fix (Current)
+- [x] Fix SOAP note dialog width - make dialog wider or content narrower to avoid horizontal scrolling
