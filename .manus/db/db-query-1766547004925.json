@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `budget_limits` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int,\n  `clinic_id` int,\n  `limit_type` enum('daily','weekly','monthly','total') NOT NULL,\n  `limit_amount_cents` int NOT NULL,\n  `current_usage_cents` int DEFAULT 0 NOT NULL,\n  `period_start` timestamp NOT NULL,\n  `period_end` timestamp NOT NULL,\n  `alert_threshold_percent` int DEFAULT 80,\n  `alert_sent` enum('true','false') DEFAULT 'false' NOT NULL,\n  `active` enum('true','false') DEFAULT 'true' NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `budget_limits_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `budget_limits` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int,\n  `clinic_id` int,\n  `limit_type` enum('daily','weekly','monthly','total') NOT NULL,\n  `limit_amount_cents` int NOT NULL,\n  `current_usage_cents` int DEFAULT 0 NOT NULL,\n  `period_start` timestamp NOT NULL,\n  `period_end` timestamp NOT NULL,\n  `alert_threshold_percent` int DEFAULT 80,\n  `alert_sent` enum('true','false') DEFAULT 'false' NOT NULL,\n  `active` enum('true','false') DEFAULT 'true' NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `budget_limits_id` PRIMARY KEY(`id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1659
+}

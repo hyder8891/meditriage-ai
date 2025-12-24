@@ -55,7 +55,12 @@ function AddPatientContent() {
     setLocation("/clinician/patients");
   };
 
-  const formFields = [
+  const formFields: Array<{
+    name: string;
+    label: string;
+    type?: 'text' | 'number' | 'date' | 'select';
+    placeholder?: string;
+  }> = [
     { name: "name", label: "اسم المريض / Patient Name", type: "text" },
     { name: "age", label: "العمر / Age", type: "number" },
     { name: "gender", label: "الجنس / Gender", type: "select" },

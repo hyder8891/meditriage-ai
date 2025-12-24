@@ -24,6 +24,8 @@ import { wearableRouter } from "./avicenna/wearable-router";
 import { weatherRouter } from "./routers/weather-router";
 import { conversationalRouter } from "./conversational-router";
 import { conversationHistoryRouter } from "./conversation-history-router";
+import { budgetRouter } from "./budget-router";
+import { orchestrationRouter } from "./orchestration-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -85,6 +87,8 @@ export const appRouter = router({
   weather: weatherRouter,
   conversational: conversationalRouter,
   conversationHistory: conversationHistoryRouter,
+  budget: budgetRouter,
+  orchestration: orchestrationRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),

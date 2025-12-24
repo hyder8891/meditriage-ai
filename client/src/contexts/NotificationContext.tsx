@@ -81,7 +81,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       toast({
         title: 'رسالة جديدة',
         description: data.content.substring(0, 100) + (data.content.length > 100 ? '...' : ''),
-        duration: 5000,
       });
 
       // Show browser notification if permitted

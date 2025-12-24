@@ -25,6 +25,10 @@ class ProgressiveBioEngine {
   startTime: number = 0;
   fps: number = 30; // Dynamic FPS tracking
   private lastFpsUpdate: number = 0;
+
+  constructor() {
+    this.reset();
+  }
   
   // Multi-measurement system
   private recentReadings: Array<{ bpm: number; confidence: number; timestamp: number }> = [];
@@ -348,8 +352,8 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   
   // Use a Ref for the engine so it persists across renders
   const engineRef = useRef(new ProgressiveBioEngine());
-  const animationFrameRef = useRef<number>();
-  const streamRef = useRef<MediaStream>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
+  const streamRef = useRef<MediaStream | undefined>(undefined);
   const isScanningRef = useRef(false); // Use ref to avoid race condition with state
   
   const saveVital = trpc.vitals.logVital.useMutation();

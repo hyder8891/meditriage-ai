@@ -99,7 +99,10 @@ export function VitalsTrendsChart({ vitals, title = "Vital Signs Trends", descri
 
   // Calculate statistics
   const values = chartData
-    .map(d => d[currentConfig.dataKey] as number | null)
+    .map(d => {
+      const key = currentConfig.dataKey as keyof typeof d;
+      return d[key] as number | null;
+    })
     .filter(v => v !== null) as number[];
 
   const stats = values.length > 0 ? {

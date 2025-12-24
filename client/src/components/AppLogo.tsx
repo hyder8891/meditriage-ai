@@ -29,7 +29,7 @@ export function AppLogo({
   const navigationHref = href || (() => {
     if (!user) return "/";
     // Admin users go to clinician dashboard (functional tools), not admin user management
-    if (user.role === 'admin' || user.role === 'clinician' || user.role === 'doctor') {
+    if (user.role === 'admin' || user.role === 'clinician') {
       return "/clinician/dashboard";
     }
     return "/patient/portal";

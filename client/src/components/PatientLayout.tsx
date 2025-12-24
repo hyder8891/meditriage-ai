@@ -30,7 +30,7 @@ export function PatientLayout({ children, showBackButton = true, title }: Patien
   const isArabic = language === 'ar';
 
   // Redirect if not authenticated or not patient
-  if (!isAuthenticated || !user || (user.role !== 'patient' && user.role !== 'user')) {
+  if (!isAuthenticated || !user || (user.role !== 'patient')) {
     setLocation("/patient-login");
     return null;
   }

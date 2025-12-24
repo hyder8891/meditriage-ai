@@ -35,7 +35,6 @@ export function SMSLogin({ role = "patient", onSuccess }: SMSLoginProps) {
         toast({
           title: "Development Mode",
           description: `Your verification code is: ${data.code}`,
-          duration: 10000,
         });
       } else {
         toast({

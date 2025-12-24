@@ -85,7 +85,7 @@ function Router() {
           const { user } = useAuth();
           if (!user) return <Redirect to="/patient-login" />;
           if (user.role === 'admin') return <Redirect to="/admin/dashboard" />;
-          if (user.role === 'clinician' || user.role === 'doctor') return <Redirect to="/clinician/dashboard" />;
+          if (user.role === 'clinician') return <Redirect to="/clinician/dashboard" />;
           return <Redirect to="/patient/portal" />;
         }}
       </Route>
