@@ -681,3 +681,18 @@
 - [x] Add Arabic translations to UserProfileDropdown
 - [x] Fix profile section positioning in ClinicianLayout sidebar (prevent overlap with subscription button)
 - [x] Test all Arabic RTL layouts across patient and doctor portals
+
+
+## NEW: User Onboarding Tour for Arabic-Speaking Users
+- [x] Install onboarding tour library (driver.js)
+- [x] Create onboarding tour state management in database schema
+- [x] Implement backend procedures for tour state (get/update completion status)
+- [x] Create OnboardingTour component with Arabic RTL support
+- [x] Define tour steps highlighting key features (symptom checker, find doctor, medical history, bio-scanner, language switcher, profile menu)
+- [x] Add Arabic translations for all tour content
+- [x] Implement tour trigger logic (first-time users, manual restart option)
+- [x] Add "Skip Tour" and "Next/Previous" navigation controls with Arabic labels
+- [x] Create settings option to restart tour (useRestartOnboardingTour hook)
+- [x] Style tour overlay with proper RTL layout and Arabic typography
+- [x] Test tour flow for Arabic-speaking users (7/7 tests passing)
+- [x] Verify tour completion persistence across sessions

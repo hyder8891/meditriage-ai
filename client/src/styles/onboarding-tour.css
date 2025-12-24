@@ -1,0 +1,191 @@
+/* Custom styles for onboarding tour with Arabic RTL support */
+
+/* Override driver.js default styles for better Arabic typography */
+.driver-popover {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* RTL support for Arabic */
+[dir="rtl"] .driver-popover {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Title styling */
+.driver-popover-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #1e293b;
+}
+
+[dir="rtl"] .driver-popover-title {
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Description styling */
+.driver-popover-description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+[dir="rtl"] .driver-popover-description {
+  font-family: 'Cairo', sans-serif;
+  line-height: 1.8;
+}
+
+/* Button container */
+.driver-popover-footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+[dir="rtl"] .driver-popover-footer {
+  flex-direction: row-reverse;
+}
+
+/* Button styling */
+.driver-popover-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+}
+
+[dir="rtl"] .driver-popover-btn {
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Next button */
+.driver-popover-next-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.driver-popover-next-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Previous button */
+.driver-popover-prev-btn {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.driver-popover-prev-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Close button */
+.driver-popover-close-btn {
+  background: transparent;
+  color: #64748b;
+  padding: 0.5rem;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+[dir="rtl"] .driver-popover-close-btn {
+  right: auto;
+  left: 0.75rem;
+}
+
+.driver-popover-close-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Progress text */
+.driver-popover-progress-text {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+[dir="rtl"] .driver-popover-progress-text {
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+}
+
+/* Highlight overlay */
+.driver-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+/* Highlighted element */
+.driver-highlighted-element {
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+}
+
+/* Arrow positioning for RTL */
+[dir="rtl"] .driver-popover-arrow {
+  transform: scaleX(-1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .driver-popover {
+    max-width: 90vw;
+  }
+  
+  .driver-popover-title {
+    font-size: 1.1rem;
+  }
+  
+  .driver-popover-description {
+    font-size: 0.9rem;
+  }
+  
+  .driver-popover-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Animation for popover entrance */
+@keyframes driver-popover-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.driver-popover {
+  animation: driver-popover-fade-in 0.3s ease-out;
+}
+
+/* Custom medical theme colors */
+.driver-popover-title {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Ensure proper spacing for Arabic text */
+[dir="rtl"] .driver-popover-description {
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
+}

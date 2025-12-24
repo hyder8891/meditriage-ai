@@ -29,6 +29,8 @@ import { useLocation } from "wouter";
 import { Progress } from "@/components/ui/progress";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 import { AppLogo } from "@/components/AppLogo";
+import { OnboardingTour } from "@/components/OnboardingTour";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function PatientPortal() {
   const { language } = useLanguage();
@@ -76,6 +78,7 @@ export default function PatientPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+      <OnboardingTour />
       {/* Top Navigation */}
       <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4">
@@ -109,7 +112,12 @@ export default function PatientPortal() {
               <Badge className="bg-gradient-to-r from-rose-500 to-purple-500 text-white">
                 {usage?.plan || 'Free'}
               </Badge>
-              <UserProfileDropdown />
+              <div data-tour="language-switcher">
+                <LanguageSwitcher />
+              </div>
+              <div data-tour="profile-menu">
+                <UserProfileDropdown />
+              </div>
             </div>
           </div>
         </div>
@@ -169,7 +177,7 @@ export default function PatientPortal() {
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Start AI Assessment */}
-          <Card className="border-2 hover:shadow-xl transition-all cursor-pointer group" onClick={() => setLocation('/symptom-checker')}>
+          <Card data-tour="symptom-checker" className="border-2 hover:shadow-xl transition-all cursor-pointer group" onClick={() => setLocation('/symptom-checker')}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -193,7 +201,7 @@ export default function PatientPortal() {
           </Card>
 
           {/* Find Doctor */}
-          <Card className="border-2 hover:shadow-xl transition-all cursor-pointer group" onClick={() => setLocation('/patient/find-doctors')}>
+          <Card data-tour="find-doctor" className="border-2 hover:shadow-xl transition-all cursor-pointer group" onClick={() => setLocation('/patient/find-doctors')}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -218,7 +226,7 @@ export default function PatientPortal() {
         </div>
 
         {/* My Doctors */}
-        <Card className="mb-8">
+        <Card data-tour="medical-history" className="mb-8">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -310,6 +318,7 @@ export default function PatientPortal() {
               {patientTools.map((tool, idx) => (
                 <Card 
                   key={idx} 
+                  data-tour={tool.path === '/patient/bio-scanner' ? 'bio-scanner' : undefined}
                   className="border-2 hover:shadow-lg transition-all cursor-pointer group"
                   onClick={() => setLocation(tool.path)}
                 >

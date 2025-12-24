@@ -58,6 +58,11 @@ export const users = mysqlTable("users", {
   // Increment this when password changes or logout-all-devices is triggered
   tokenVersion: int("token_version").default(0).notNull(),
   
+  // Onboarding tour tracking
+  onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
+  onboardingCompletedAt: timestamp("onboarding_completed_at"),
+  onboardingSkipped: boolean("onboarding_skipped").default(false).notNull(),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
