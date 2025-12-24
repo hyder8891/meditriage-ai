@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { clinicalRouter } from "./clinical-routers";
+import { pharmaguardRouter } from "./pharmaguard-router";
 import { authRouter } from "./auth-router";
 import { consultationRouter } from "./consultation-router";
 import { adminRouter } from "./admin-router";
@@ -970,6 +971,7 @@ export const appRouter = router({
 
   // Clinical features (Medical OS)
   clinical: clinicalRouter,
+  pharmaguard: pharmaguardRouter,
 
   documents: router({
     // Upload medical document

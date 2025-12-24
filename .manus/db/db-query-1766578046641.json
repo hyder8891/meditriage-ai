@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `medical_conditions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `patient_id` int NOT NULL,\n  `condition_name` varchar(255) NOT NULL,\n  `condition_type` enum('chronic_disease','allergy','contraindication','risk_factor','past_condition') NOT NULL,\n  `severity` enum('mild','moderate','severe') DEFAULT 'moderate',\n  `status` enum('active','resolved','managed') DEFAULT 'active',\n  `diagnosed_date` timestamp,\n  `resolved_date` timestamp,\n  `notes` text,\n  `affects_medications` boolean DEFAULT true,\n  `icd_code` varchar(20),\n  `diagnosed_by` varchar(255),\n  `created_at` timestamp DEFAULT (now()),\n  `updated_at` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `medical_conditions_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `medical_conditions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `patient_id` int NOT NULL,\n  `condition_name` varchar(255) NOT NULL,\n  `condition_type` enum('chronic_disease','allergy','contraindication','risk_factor','past_condition') NOT NULL,\n  `severity` enum('mild','moderate','severe') DEFAULT 'moderate',\n  `status` enum('active','resolved','managed') DEFAULT 'active',\n  `diagnosed_date` timestamp,\n  `resolved_date` timestamp,\n  `notes` text,\n  `affects_medications` boolean DEFAULT true,\n  `icd_code` varchar(20),\n  `diagnosed_by` varchar(255),\n  `created_at` timestamp DEFAULT (now()),\n  `updated_at` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `medical_conditions_id` PRIMARY KEY(`id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1655
+}

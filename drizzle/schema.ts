@@ -3293,3 +3293,165 @@ export const aqiImpactLogs = mysqlTable("aqi_impact_logs", {
 
 export type AQIImpactLog = typeof aqiImpactLogs.$inferSelect;
 export type InsertAQIImpactLog = typeof aqiImpactLogs.$inferInsert;
+
+/**
+ * Patient Medications - Active medication tracking for personalized interaction checking
+ * Tracks what medications a patient is currently taking
+ */
+export const patientMedications = mysqlTable("patient_medications", {
+  id: int("id").autoincrement().primaryKey(),
+  patientId: int("patient_id").notNull(), // references users.id
+  
+  // Medication details
+  drugName: varchar("drug_name", { length: 255 }).notNull(),
+  genericName: varchar("generic_name", { length: 255 }),
+  brandName: varchar("brand_name", { length: 255 }),
+  dosage: varchar("dosage", { length: 100 }), // e.g., "500mg"
+  frequency: varchar("frequency", { length: 100 }), // e.g., "twice daily"
+  route: varchar("route", { length: 50 }), // e.g., "oral", "topical", "injection"
+  
+  // Timing
+  startDate: timestamp("start_date").defaultNow().notNull(),
+  endDate: timestamp("end_date"), // null if ongoing
+  isActive: boolean("is_active").default(true).notNull(),
+  
+  // Source tracking
+  prescribedBy: int("prescribed_by"), // clinician user_id, null if self-reported
+  prescriptionId: int("prescription_id"), // link to prescriptions table if available
+  source: mysqlEnum("source", ["prescription", "otc", "self_reported"]).default("self_reported").notNull(),
+  
+  // Image recognition data
+  identifiedFromImage: boolean("identified_from_image").default(false).notNull(),
+  medicineImageId: int("medicine_image_id"), // link to medicineImages table
+  
+  // Notes
+  purpose: text("purpose"), // why patient is taking this
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PatientMedication = typeof patientMedications.$inferSelect;
+export type InsertPatientMedication = typeof patientMedications.$inferInsert;
+
+/**
+ * Medical Conditions - Patient health conditions for interaction checking
+ * Tracks chronic conditions, allergies, and contraindications
+ */
+export const medicalConditions = mysqlTable("medical_conditions", {
+  id: int("id").autoincrement().primaryKey(),
+  patientId: int("patient_id").notNull(), // references users.id
+  
+  // Condition details
+  conditionName: varchar("condition_name", { length: 255 }).notNull(),
+  conditionCode: varchar("condition_code", { length: 50 }), // ICD-10 or SNOMED code
+  conditionType: mysqlEnum("condition_type", [
+    "chronic_disease",
+    "allergy",
+    "contraindication",
+    "risk_factor",
+    "past_condition"
+  ]).notNull(),
+  
+  // Severity and status
+  severity: mysqlEnum("severity", ["mild", "moderate", "severe"]).default("moderate"),
+  status: mysqlEnum("status", ["active", "resolved", "in_remission"]).default("active").notNull(),
+  
+  // Timing
+  diagnosedDate: date("diagnosed_date"),
+  resolvedDate: date("resolved_date"),
+  
+  // Clinical details
+  diagnosedBy: int("diagnosed_by"), // clinician user_id
+  notes: text("notes"),
+  affectsMedications: boolean("affects_medications").default(true).notNull(), // should this be considered in drug interactions?
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MedicalCondition = typeof medicalConditions.$inferSelect;
+export type InsertMedicalCondition = typeof medicalConditions.$inferInsert;
+
+/**
+ * Medicine Images - Stores uploaded medicine box/strip photos for identification
+ */
+export const medicineImages = mysqlTable("medicine_images", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(), // who uploaded it
+  
+  // Image storage
+  imageUrl: varchar("image_url", { length: 500 }).notNull(), // S3 URL
+  imageKey: varchar("image_key", { length: 500 }).notNull(), // S3 key for deletion
+  thumbnailUrl: varchar("thumbnail_url", { length: 500 }),
+  
+  // Image metadata
+  fileSize: int("file_size"), // bytes
+  mimeType: varchar("mime_type", { length: 50 }),
+  width: int("width"), // pixels
+  height: int("height"), // pixels
+  
+  // AI identification results
+  identificationStatus: mysqlEnum("identification_status", [
+    "pending",
+    "identified",
+    "failed",
+    "manual_review"
+  ]).default("pending").notNull(),
+  
+  identifiedDrugName: varchar("identified_drug_name", { length: 255 }),
+  identifiedGenericName: varchar("identified_generic_name", { length: 255 }),
+  identifiedBrandName: varchar("identified_brand_name", { length: 255 }),
+  identifiedDosage: varchar("identified_dosage", { length: 100 }),
+  
+  // Confidence and verification
+  identificationConfidence: decimal("identification_confidence", { precision: 5, scale: 2 }), // 0-100%
+  verifiedByUser: boolean("verified_by_user").default(false).notNull(),
+  verifiedByClinician: boolean("verified_by_clinician").default(false).notNull(),
+  verifiedBy: int("verified_by"), // clinician user_id
+  
+  // OCR extracted text
+  extractedText: text("extracted_text"), // raw OCR output
+  
+  // Processing metadata
+  processingAttempts: int("processing_attempts").default(0).notNull(),
+  lastProcessedAt: timestamp("last_processed_at"),
+  errorMessage: text("error_message"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MedicineImage = typeof medicineImages.$inferSelect;
+export type InsertMedicineImage = typeof medicineImages.$inferInsert;
+
+/**
+ * Drug Interaction Checks - Log of all interaction checks performed
+ * Useful for analytics and improving the system
+ */
+export const drugInteractionChecks = mysqlTable("drug_interaction_checks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  performedBy: int("performed_by"), // clinician who ran the check, null if patient
+  
+  // Check details
+  medicationsChecked: text("medications_checked").notNull(), // JSON array of drug names
+  conditionsConsidered: text("conditions_considered"), // JSON array of conditions
+  
+  // Results
+  interactionsFound: int("interactions_found").default(0).notNull(),
+  highestSeverity: mysqlEnum("highest_severity", ["none", "minor", "moderate", "major", "contraindicated"]).default("none").notNull(),
+  overallRisk: mysqlEnum("overall_risk", ["low", "moderate", "high"]).default("low").notNull(),
+  
+  // Full results (for history/audit)
+  fullResults: text("full_results").notNull(), // JSON of complete interaction analysis
+  
+  // Action taken
+  actionTaken: text("action_taken"), // what did the clinician/patient do with this info
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type DrugInteractionCheck = typeof drugInteractionChecks.$inferSelect;
+export type InsertDrugInteractionCheck = typeof drugInteractionChecks.$inferInsert;

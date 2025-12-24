@@ -860,3 +860,47 @@
 - [x] Optimize medical imaging analysis for mobile (56px button, responsive interface)
 - [x] Optimize UserProfileDropdown for mobile (44px touch target, responsive width)
 - [x] Optimize LanguageSwitcher for mobile (44px button, 48px menu items)
+
+
+## NEW: PharmaGuard Enhancement - Medicine Image Recognition & Patient History Integration
+
+### Database Schema
+- [x] Add patientMedications table for tracking current medications
+- [x] Add medicalConditions table for patient health conditions
+- [x] Add medicationImages table for storing uploaded medicine photos
+- [x] Run database migration with pnpm db:push
+
+### Backend API (tRPC Procedures)
+- [x] Create addPatientMedication procedure
+- [x] Create removePatientMedication procedure
+- [x] Create getPatientMedications procedure
+- [x] Create addMedicalCondition procedure
+- [x] Create getMedicalConditions procedure
+- [x] Enhance checkDrugInteractions to include patient history
+- [x] Create identifyMedicineFromImage procedure (image recognition)
+- [x] Create checkPersonalizedInteraction procedure (considers patient conditions + current meds)
+
+### Frontend - Clinician PharmaGuard
+- [x] Add patient medication history view
+- [x] Add ability to add/remove medications from patient record
+- [x] Integrate personalized interaction checking
+- [x] Add image upload for medicine identification
+- [x] Show patient medical conditions in interaction analysis
+
+### Frontend - Patient Medication Management
+- [ ] Create PatientMedications.tsx page
+- [ ] Add medication list view for patients
+- [ ] Add image upload for medicine identification (patient side)
+- [ ] Add interaction checker for patients
+- [ ] Show warnings based on patient's conditions
+
+### Testing
+- [ ] Write vitest tests for medication CRUD operations
+- [ ] Write vitest tests for personalized interaction checking
+- [ ] Write vitest tests for image recognition integration
+- [ ] Test complete workflow end-to-end
+
+### Documentation
+- [ ] Document new API endpoints
+- [ ] Document image upload requirements
+- [ ] Document Iraqi medication context handling

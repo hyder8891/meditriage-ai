@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `drug_interaction_checks` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `performed_by` int NOT NULL,\n  `medications_checked` text NOT NULL,\n  `conditions_considered` text,\n  `interactions_found` int DEFAULT 0,\n  `highest_severity` enum('none','minor','moderate','major','contraindicated') DEFAULT 'none',\n  `overall_risk` enum('low','moderate','high') DEFAULT 'low',\n  `full_results` text,\n  `notes` text,\n  `created_at` timestamp DEFAULT (now()),\n  CONSTRAINT `drug_interaction_checks_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `drug_interaction_checks` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `performed_by` int NOT NULL,\n  `medications_checked` text NOT NULL,\n  `conditions_considered` text,\n  `interactions_found` int DEFAULT 0,\n  `highest_severity` enum('none','minor','moderate','major','contraindicated') DEFAULT 'none',\n  `overall_risk` enum('low','moderate','high') DEFAULT 'low',\n  `full_results` text,\n  `notes` text,\n  `created_at` timestamp DEFAULT (now()),\n  CONSTRAINT `drug_interaction_checks_id` PRIMARY KEY(`id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1715
+}

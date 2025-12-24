@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `patient_medications` CHANGE COLUMN `prescribing_doctor` `prescribed_by` int",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE `patient_medications` CHANGE COLUMN `prescribing_doctor` `prescribed_by` int",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1989
+}
