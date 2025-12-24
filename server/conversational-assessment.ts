@@ -182,13 +182,11 @@ async function generateFinalRecommendation(
       "triageLevel": "green" | "yellow" | "red",
       "triageReason": "Brief explanation",
       "recommendations": ["recommendation 1", "recommendation 2"],
-      "differentialDiagnosis": [
-        {
-          "condition": "Condition name",
-          "probability": 0.7,
-          "reasoning": "Why this is likely"
-        }
-      ],
+      "mostLikelyCondition": {
+        "condition": "Most likely condition name",
+        "probability": 0.85,
+        "reasoning": "Brief clinical reasoning focused on key symptoms and findings"
+      },
       "actionPlan": "Specific next steps for the patient"
     }
   `;
@@ -227,7 +225,7 @@ async function generateFinalRecommendation(
           "Monitor your symptoms",
           "Seek immediate care if symptoms worsen"
         ],
-        differentialDiagnosis: [],
+        mostLikelyCondition: null,
         actionPlan: "Please consult with a healthcare professional for proper diagnosis and treatment."
       };
     }
@@ -244,7 +242,7 @@ async function generateFinalRecommendation(
       triageReasonAr: data.triageReason, // TODO: Add Arabic translation
       recommendations: data.recommendations || [],
       recommendationsAr: data.recommendations || [], // TODO: Add Arabic translation
-      differentialDiagnosis: data.differentialDiagnosis || [],
+      mostLikelyCondition: data.mostLikelyCondition,
       showActions: true,
       context: vector.toJSON(),
       quickReplies: []
@@ -265,7 +263,7 @@ async function generateFinalRecommendation(
         "Monitor your symptoms",
         "Seek immediate care if symptoms worsen"
       ],
-      differentialDiagnosis: [],
+      mostLikelyCondition: null,
       showActions: true,
       context: vector.toJSON(),
       quickReplies: []

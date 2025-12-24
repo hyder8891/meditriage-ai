@@ -663,3 +663,6 @@
 
 ## Arabic Localization Issues
 - [x] Translate AI assessment outcome page to Arabic (section headers, diagnosis descriptions, warning signs, actions, tests, referrals, disclaimer)
+
+- [x] Update AI triage results to show only highest confidence recommendation
+- [x] Reduce content in triage results to focus on case details

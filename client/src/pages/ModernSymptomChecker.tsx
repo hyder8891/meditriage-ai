@@ -45,12 +45,11 @@ interface AssessmentResponse {
   triageReasonAr?: string;
   recommendations?: string[];
   recommendationsAr?: string[];
-  differentialDiagnosis?: Array<{
+  mostLikelyCondition?: {
     condition: string;
-    conditionAr?: string;
     probability: number;
     reasoning: string;
-  }>;
+  } | null;
   showActions?: boolean;
   conversationStage: "greeting" | "gathering" | "analyzing" | "complete";
   context?: any; // Context returned from backend
@@ -222,7 +221,7 @@ export default function ModernSymptomChecker() {
                 level={currentResponse.triageLevel}
                 reason={currentResponse.triageReason || ""}
                 recommendations={currentResponse.recommendations || []}
-                differentialDiagnosis={currentResponse.differentialDiagnosis || []}
+                mostLikelyCondition={currentResponse.mostLikelyCondition}
               />
             )}
 
@@ -348,14 +347,14 @@ interface TriageDisplayProps {
   level: "green" | "yellow" | "red";
   reason: string;
   recommendations: string[];
-  differentialDiagnosis: Array<{
+  mostLikelyCondition?: {
     condition: string;
     probability: number;
     reasoning: string;
-  }>;
+  } | null;
 }
 
-function TriageDisplay({ level, reason, recommendations, differentialDiagnosis }: TriageDisplayProps) {
+function TriageDisplay({ level, reason, recommendations, mostLikelyCondition }: TriageDisplayProps) {
   const { language } = useLanguage();
   const isArabic = language === 'ar';
   const triageConfig = {
@@ -401,22 +400,18 @@ function TriageDisplay({ level, reason, recommendations, differentialDiagnosis }
         </div>
       </div>
 
-      {/* Differential Diagnosis */}
-      {differentialDiagnosis.length > 0 && (
+      {/* Most Likely Condition */}
+      {mostLikelyCondition && (
         <div className="mb-4">
           <h4 className="font-semibold text-gray-900 mb-2">
-            {isArabic ? "الحالات المحتملة:" : "Possible Conditions:"}
+            {isArabic ? "التشخيص الأكثر احتمالاً:" : "Most Likely Condition:"}
           </h4>
-          <div className="space-y-2">
-            {differentialDiagnosis.map((dx, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-3 border border-gray-200">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-gray-900">{dx.condition}</span>
-                  <Badge variant="secondary">{Math.round(dx.probability * 100)}%</Badge>
-                </div>
-                <p className="text-sm text-gray-600">{dx.reasoning}</p>
-              </div>
-            ))}
+          <div className="bg-white rounded-lg p-4 border-2 border-gray-300">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold text-lg text-gray-900">{mostLikelyCondition.condition}</span>
+              <Badge variant="secondary" className="text-base">{Math.round(mostLikelyCondition.probability * 100)}%</Badge>
+            </div>
+            <p className="text-sm text-gray-700 leading-relaxed">{mostLikelyCondition.reasoning}</p>
           </div>
         </div>
       )}
