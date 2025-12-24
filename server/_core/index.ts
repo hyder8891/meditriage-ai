@@ -41,6 +41,9 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
+  // Trust proxy - Enable for accurate rate limiting behind proxies (Manus, Cloudflare, etc.)
+  app.set('trust proxy', 1);
+  
   // Security middleware - MUST be first
   app.use(securityHeaders);
   app.use(requestSizeLimiter);

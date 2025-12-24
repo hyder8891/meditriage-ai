@@ -127,7 +127,7 @@ export async function analyzeMedicalImage(
 ): Promise<MedicalImageAnalysisResult> {
   const prompt = getModalityPrompt(params);
 
-  // Use Manus built-in LLM with vision capabilities
+  // Use Manus built-in LLM with vision capabilities and structured JSON output
   const response = await invokeLLM({
     messages: [
       {
@@ -144,15 +144,74 @@ export async function analyzeMedicalImage(
         ],
       },
     ],
+    response_format: {
+      type: 'json_schema',
+      json_schema: {
+        name: 'medical_image_analysis',
+        strict: true,
+        schema: {
+          type: 'object',
+          properties: {
+            findings: { type: 'string', description: 'Detailed medical findings from the image' },
+            interpretation: { type: 'string', description: 'Clinical interpretation' },
+            recommendations: { type: 'string', description: 'Medical recommendations' },
+            abnormalities: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  type: { type: 'string' },
+                  location: { type: 'string' },
+                  severity: { type: 'string', enum: ['low', 'medium', 'high', 'critical'] },
+                  confidence: { type: 'number' },
+                  description: { type: 'string' }
+                },
+                required: ['type', 'location', 'severity', 'confidence', 'description'],
+                additionalProperties: false
+              }
+            },
+            overallAssessment: { type: 'string', description: 'Overall assessment' },
+            urgency: { type: 'string', enum: ['routine', 'semi-urgent', 'urgent', 'emergency'] },
+            technicalQuality: {
+              type: 'object',
+              properties: {
+                rating: { type: 'string', enum: ['poor', 'fair', 'good', 'excellent'] },
+                issues: { type: 'array', items: { type: 'string' } }
+              },
+              required: ['rating'],
+              additionalProperties: false
+            },
+            differentialDiagnosis: { type: 'array', items: { type: 'string' } }
+          },
+          required: ['findings', 'interpretation', 'recommendations', 'abnormalities', 'overallAssessment', 'urgency'],
+          additionalProperties: false
+        }
+      }
+    }
   });
 
   const content = response.choices[0]?.message?.content;
   const text = typeof content === 'string' ? content : JSON.stringify(content);
 
-  // Try to parse JSON response
+  // Try to parse JSON response with multiple strategies
   try {
-    const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    // Strategy 1: Remove markdown code blocks
+    let cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    // Strategy 2: Extract JSON object if embedded in text
+    if (!cleanText.startsWith('{')) {
+      const jsonMatch = cleanText.match(/({[\s\S]*"findings"[\s\S]*})/);
+      if (jsonMatch) {
+        cleanText = jsonMatch[1];
+      }
+    }
+    
     const parsed = JSON.parse(cleanText);
+    
+    // Validate that we have the expected structure
+    if (!parsed || typeof parsed !== 'object' || !('findings' in parsed)) {
+      throw new Error('Invalid structure');
+    }
     return {
       modality: params.modality,
       findings: parsed.findings || text,
@@ -164,15 +223,18 @@ export async function analyzeMedicalImage(
       technicalQuality: parsed.technicalQuality,
       differentialDiagnosis: parsed.differentialDiagnosis,
     };
-  } catch {
-    // Fallback if not JSON
+  } catch (error) {
+    console.error('Failed to parse medical imaging response:', error);
+    console.log('Raw response text (first 500 chars):', text.substring(0, 500));
+    
+    // Fallback: return raw text in findings field so UI can attempt to parse
     return {
       modality: params.modality,
       findings: text,
-      interpretation: text,
-      recommendations: text,
+      interpretation: '',
+      recommendations: '',
       abnormalities: [],
-      overallAssessment: text,
+      overallAssessment: '',
       urgency: 'routine' as const,
     };
   }

@@ -577,3 +577,32 @@
 - [ ] Add trust proxy setting to Express app
 - [ ] Verify triage endpoint routing (404 errors detected)
 - [ ] Re-run load tests after fixes to verify improvements
+
+## URGENT: Rate Limiting and Routing Issues (User Reported - Current)
+- [ ] Fix rate limiting configuration - increase limits to 1000 req/15min for public endpoints (currently blocking legitimate traffic)
+- [ ] Add trust proxy setting - enable app.set('trust proxy', 1) in Express for accurate rate limiting behind proxies
+- [ ] Verify triage endpoint routing - check if endpoint is named triageEnhanced.analyze instead of /triage to fix 404 errors
+
+
+## Breast Image Analysis Results Display Restructuring
+- [x] Restructure breast image analysis results display to improve clarity and organization
+  - [x] Remove duplicate content sections (currently repeating 4 times)
+  - [x] Parse and format JSON data into visual cards instead of raw code blocks
+  - [x] Create proper section hierarchy (Overview, Findings, Abnormalities, Recommendations)
+  - [x] Add visual indicators for severity levels and urgency
+  - [x] Improve bilingual display (Arabic content with English technical terms)
+  - [x] Add proper spacing and visual hierarchy between sections
+
+## X-Ray Analysis Results Display Improvement (User Request - COMPLETED)
+- [x] Fix raw JSON display in analysis results - currently showing unformatted JSON text
+- [x] Redesign results section with clean, formatted medical report layout
+- [x] Add proper section headers: النتائج (Results), التفسير (Interpretation), التوصيات (Recommendations)
+- [x] Format abnormalities as cards with severity badges and confidence scores
+- [x] Add visual urgency indicator (color-coded: routine=green, urgent=orange, emergency=red)
+- [x] Improve technical quality display with rating stars or visual indicator
+- [x] Format differential diagnosis as a clean list
+- [x] Ensure proper RTL text alignment and Arabic typography
+- [x] Add collapsible sections for better organization
+- [x] Implemented structured JSON output with json_schema to force pure JSON responses
+- [x] Added multi-tier parsing strategies in both backend and frontend
+- [x] Enhanced error logging for debugging parsing issues

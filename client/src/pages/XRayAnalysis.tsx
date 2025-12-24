@@ -702,72 +702,169 @@ function XRayAnalysisContent() {
       </div>
 
       {/* Analysis Results */}
-      {analysis && (
+      {analysis && (() => {
+        // Parse analysis if it contains JSON strings
+        let parsedAnalysis = analysis;
+        try {
+          // Check if findings/interpretation/recommendations contain JSON
+          if (typeof analysis.findings === 'string') {
+            // Try multiple parsing strategies
+            
+            // Strategy 1: Extract from ```json code blocks
+            let jsonMatch = analysis.findings.match(/```json\s*({[\s\S]*?})\s*```/);
+            if (jsonMatch) {
+              const parsed = JSON.parse(jsonMatch[1]);
+              parsedAnalysis = { ...analysis, ...parsed };
+            } else {
+              // Strategy 2: Extract raw JSON object from string
+              jsonMatch = analysis.findings.match(/({[\s\S]*"findings"[\s\S]*})/);  
+              if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[1]);
+                parsedAnalysis = { ...analysis, ...parsed };
+              } else {
+                // Strategy 3: Check if the entire findings string is JSON
+                const trimmed = analysis.findings.trim();
+                if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                  const parsed = JSON.parse(trimmed);
+                  parsedAnalysis = { ...analysis, ...parsed };
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse embedded JSON:', e);
+          // If parsing fails, keep the original analysis
+        }
+
+        return (
         <>
+          {/* Overall Assessment Card */}
+          {parsedAnalysis.overallAssessment && (
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                  {language === 'ar' ? 'التقييم العام' : 'Overall Assessment'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm leading-relaxed">{parsedAnalysis.overallAssessment}</p>
+                
+                {/* Urgency Level */}
+                {parsedAnalysis.urgency && (
+                  <div className="flex items-center gap-3 pt-2">
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {language === 'ar' ? 'مستوى الإلحاح:' : 'Urgency Level:'}
+                    </span>
+                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase ${
+                      parsedAnalysis.urgency === 'emergency' ? 'bg-red-100 text-red-800 border border-red-300' :
+                      parsedAnalysis.urgency === 'urgent' ? 'bg-orange-100 text-orange-800 border border-orange-300' :
+                      parsedAnalysis.urgency === 'semi-urgent' ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' :
+                      'bg-green-100 text-green-800 border border-green-300'
+                    }`}>
+                      {parsedAnalysis.urgency}
+                    </span>
+                  </div>
+                )}
+
+                {/* Technical Quality */}
+                {parsedAnalysis.technicalQuality && (
+                  <div className="pt-3 border-t">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase">
+                        {language === 'ar' ? 'جودة الصورة:' : 'Image Quality:'}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        parsedAnalysis.technicalQuality.rating === 'excellent' ? 'bg-green-100 text-green-800' :
+                        parsedAnalysis.technicalQuality.rating === 'good' ? 'bg-blue-100 text-blue-800' :
+                        parsedAnalysis.technicalQuality.rating === 'fair' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {parsedAnalysis.technicalQuality.rating.toUpperCase()}
+                      </span>
+                    </div>
+                    {parsedAnalysis.technicalQuality.issues && parsedAnalysis.technicalQuality.issues.length > 0 && (
+                      <ul className="text-xs text-muted-foreground space-y-1 mt-2">
+                        {parsedAnalysis.technicalQuality.issues.map((issue: string, idx: number) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-orange-500 mt-0.5">•</span>
+                            <span>{issue}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Findings, Interpretation, Recommendations */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                {language === 'ar' ? 'نتائج التحليل' : 'Analysis Results'}
+                <FileImage className="w-5 h-5 text-green-600" />
+                {language === 'ar' ? 'نتائج التحليل التفصيلية' : 'Detailed Analysis Results'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-sm text-muted-foreground">
+            <CardContent className="space-y-6">
+              {/* Findings */}
+              {parsedAnalysis.findings && (
+                <div className="space-y-3">
+                  <h3 className="font-bold text-sm text-foreground border-b pb-2">
                     {language === 'ar' ? 'النتائج' : 'Findings'}
                   </h3>
-                  <p className="text-sm whitespace-pre-line">{analysis.findings}</p>
-                </div>
-                {analysis.interpretation && (
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-sm text-muted-foreground">
-                      {language === 'ar' ? 'التفسير' : 'Interpretation'}
-                    </h3>
-                    <p className="text-sm whitespace-pre-line">{analysis.interpretation}</p>
+                  <div className="text-sm leading-relaxed whitespace-pre-line pl-3">
+                    {parsedAnalysis.findings}
                   </div>
-                )}
-                {analysis.recommendations && (
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-sm text-muted-foreground">
-                      {language === 'ar' ? 'التوصيات' : 'Recommendations'}
-                    </h3>
-                    <p className="text-sm whitespace-pre-line">{analysis.recommendations}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Overall Assessment */}
-              {analysis.overallAssessment && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h3 className="font-semibold text-sm text-blue-900 mb-2">
-                    {language === 'ar' ? 'التقييم العام' : 'Overall Assessment'}
-                  </h3>
-                  <p className="text-sm text-blue-800">{analysis.overallAssessment}</p>
                 </div>
               )}
 
-              {/* Urgency Level */}
-              {analysis.urgency && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">
-                    {language === 'ar' ? 'مستوى الإلحاح:' : 'Urgency Level:'}
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    analysis.urgency === 'emergency' ? 'bg-red-100 text-red-800' :
-                    analysis.urgency === 'urgent' ? 'bg-orange-100 text-orange-800' :
-                    analysis.urgency === 'semi-urgent' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
-                  }`}>
-                    {analysis.urgency.toUpperCase()}
-                  </span>
+              {/* Interpretation */}
+              {parsedAnalysis.interpretation && (
+                <div className="space-y-3">
+                  <h3 className="font-bold text-sm text-foreground border-b pb-2">
+                    {language === 'ar' ? 'التفسير' : 'Interpretation'}
+                  </h3>
+                  <div className="text-sm leading-relaxed whitespace-pre-line pl-3">
+                    {parsedAnalysis.interpretation}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendations */}
+              {parsedAnalysis.recommendations && (
+                <div className="space-y-3">
+                  <h3 className="font-bold text-sm text-foreground border-b pb-2">
+                    {language === 'ar' ? 'التوصيات' : 'Recommendations'}
+                  </h3>
+                  <div className="text-sm leading-relaxed whitespace-pre-line pl-3 bg-blue-50 p-4 rounded-lg">
+                    {parsedAnalysis.recommendations}
+                  </div>
+                </div>
+              )}
+
+              {/* Differential Diagnosis */}
+              {parsedAnalysis.differentialDiagnosis && parsedAnalysis.differentialDiagnosis.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-bold text-sm text-foreground border-b pb-2">
+                    {language === 'ar' ? 'التشخيص التفريقي' : 'Differential Diagnosis'}
+                  </h3>
+                  <ul className="text-sm space-y-2 pl-3">
+                    {parsedAnalysis.differentialDiagnosis.map((diagnosis: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-blue-500 font-bold mt-1">{idx + 1}.</span>
+                        <span className="leading-relaxed">{diagnosis}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Detected Abnormalities */}
-          {analysis.abnormalities && analysis.abnormalities.length > 0 && (
+          {parsedAnalysis.abnormalities && parsedAnalysis.abnormalities.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -782,7 +879,7 @@ function XRayAnalysisContent() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {analysis.abnormalities.map((abn: any, index: number) => (
+                  {parsedAnalysis.abnormalities.map((abn: any, index: number) => (
                     <div 
                       key={index} 
                       className="p-4 rounded-lg border-2 transition-all hover:shadow-md"
@@ -852,7 +949,8 @@ function XRayAnalysisContent() {
             </Card>
           )}
         </>
-      )}
+        );
+      })()}
 
       {/* Comparison View */}
       {comparisonMode && comparisonImages.length > 0 && (
