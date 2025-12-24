@@ -742,3 +742,6 @@
 
 ## NEW: Arabic Localization Issues
 - [x] Fix Arabic localization in AI assessment output - medical content showing in English despite Arabic being selected
+
+## NEW: Patient Dashboard Design Revert (User Request)
+- [x] Revert patient dashboard to simpler design - show doctor cards only in "Find a Doctor" section

@@ -13,13 +13,13 @@ import {
   TrendingUp,
   Calendar,
   Heart,
-  Stethoscope,
+
   ArrowRight,
   Zap,
   Clock,
   CheckCircle,
   AlertCircle,
-  Star,
+
   Plus,
   Menu,
 } from "lucide-react";
@@ -42,7 +42,7 @@ export default function PatientPortal() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const { data: usage } = trpc.b2b2c.subscription.getUsageStats.useQuery();
-  const { data: myDoctors } = trpc.b2b2c.patient.getMyDoctors.useQuery();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Patient Tools - Removed clinical tools (X-Ray, Lab Interpretation)
@@ -222,7 +222,7 @@ export default function PatientPortal() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
           {/* Start AI Assessment */}
-          <Card data-tour="symptom-checker" className="border-2 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer group" onClick={() => setLocation('/symptom-checker')}>
+          <Card data-tour="ai-assessment" className="border-2 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer group" onClick={() => setLocation('/symptom-checker')}>
             <CardContent className="p-4 sm:p-5 md:p-6">
               <div className="flex items-start justify-between mb-3 sm:mb-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -269,79 +269,6 @@ export default function PatientPortal() {
             </CardContent>
           </Card>
         </div>
-
-        {/* My Doctors */}
-        <Card data-tour="medical-history" className="mb-4 sm:mb-6 md:mb-8">
-          <CardHeader className="p-4 sm:p-5 md:p-6">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div>
-                <CardTitle className="text-xl sm:text-2xl">
-                  {language === 'ar' ? 'أطبائي' : 'My Doctors'}
-                </CardTitle>
-                <p className="text-slate-600 text-xs sm:text-sm mt-1">
-                  {language === 'ar' ? 'الأطباء المتصلون بك' : 'Your connected doctors'}
-                </p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => setLocation('/patient/my-doctors')}>
-                {language === 'ar' ? 'عرض الكل' : 'View All'}
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-5 md:p-6">
-            {myDoctors && myDoctors.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {myDoctors.slice(0, 3).map((connection: any) => (
-                  <Card key={connection.id} className="border hover:shadow-lg active:scale-[0.98] transition-all">
-                    <CardContent className="p-3 sm:p-4">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
-                          <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm sm:text-base font-semibold text-slate-900 truncate">
-                            {connection.doctor?.name || language === 'ar' ? 'د. أحمد' : 'Dr. Ahmed'}
-                          </h4>
-                          <p className="text-xs sm:text-sm text-slate-600 truncate">
-                            {connection.doctor?.specialty || language === 'ar' ? 'طب عام' : 'General Medicine'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-xs sm:text-sm font-medium">4.9</span>
-                        <Badge className="bg-green-100 text-green-700 text-xs">
-                          {language === 'ar' ? 'متاح' : 'Available'}
-                        </Badge>
-                      </div>
-                      <Button size="sm" className="w-full text-xs sm:text-sm" onClick={() => setLocation('/patient/messages')}>
-                        <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                        {language === 'ar' ? 'إرسال رسالة' : 'Send Message'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 sm:py-12">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <Users className="w-6 h-6 sm:w-8 sm:h-8 text-slate-400" />
-                </div>
-                <h3 className="text-sm sm:text-base font-semibold text-slate-900 mb-2">
-                  {language === 'ar' ? 'لا يوجد أطباء متصلون' : 'No Connected Doctors'}
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 mb-3 sm:mb-4">
-                  {language === 'ar' 
-                    ? 'ابحث عن طبيب وتواصل معه للحصول على استشارة'
-                    : 'Find and connect with a doctor to get consultation'}
-                </p>
-                <Button size="sm" onClick={() => setLocation('/patient/find-doctors')}>
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                  {language === 'ar' ? 'ابحث عن طبيب' : 'Find Doctor'}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
         {/* AI Tools Grid */}
         <Card>
