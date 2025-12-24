@@ -96,6 +96,10 @@ export function TriageRecommendation({
     close: language === "ar" ? "إغلاق" : "Close",
     symptomsMatch: language === "ar" ? "تطابق الأعراض" : "Symptoms Match",
     distinguishingFeatures: language === "ar" ? "الميزات المميزة" : "Distinguishing Features",
+    critical: language === "ar" ? "حرج" : "Critical",
+    severe: language === "ar" ? "شديد" : "Severe",
+    moderate: language === "ar" ? "متوسط" : "Moderate",
+    mild: language === "ar" ? "خفيف" : "Mild",
   };
 
   const urgencyConfig = {
@@ -264,7 +268,7 @@ export function TriageRecommendation({
                           variant={severity === 'critical' || severity === 'severe' ? 'destructive' : 'outline'}
                           className="text-xs"
                         >
-                          {severity}
+                          {severity === 'critical' ? t.critical : severity === 'severe' ? t.severe : severity === 'moderate' ? t.moderate : severity === 'mild' ? t.mild : severity}
                         </Badge>
                       )}
                       <Button
@@ -511,7 +515,7 @@ export function TriageRecommendation({
                           variant={severity === 'critical' || severity === 'severe' ? 'destructive' : 'outline'}
                           className="text-xs"
                         >
-                          {severity}
+                          {severity === 'critical' ? t.critical : severity === 'severe' ? t.severe : severity === 'moderate' ? t.moderate : severity === 'mild' ? t.mild : severity}
                         </Badge>
                       )}
                     </div>

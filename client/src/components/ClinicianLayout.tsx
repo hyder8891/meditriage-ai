@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ClinicianLayoutProps {
   children: ReactNode;
@@ -27,6 +28,7 @@ interface ClinicianLayoutProps {
 export function ClinicianLayout({ children }: ClinicianLayoutProps) {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated, clearAuth } = useAuth();
+  const { language } = useLanguage();
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Load collapsed state from localStorage
     const saved = localStorage.getItem('clinician-sidebar-collapsed');
@@ -60,7 +62,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100 transition-colors z-10 shadow-sm"
-            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={isCollapsed ? (language === 'ar' ? 'توسيع الشريط الجانبي' : 'Expand sidebar') : (language === 'ar' ? 'طي الشريط الجانبي' : 'Collapse sidebar')}
           >
             {isCollapsed ? (
               <ChevronRight className="w-4 h-4 text-gray-600" />
@@ -93,12 +95,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/dashboard")}
-              title={isCollapsed ? 'Dashboard' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'لوحة التحكم' : 'Dashboard') : ''}
             >
               <Activity className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Dashboard'}
+              {!isCollapsed && (language === 'ar' ? 'لوحة التحكم' : 'Dashboard')}
             </Button>
             <Button
               variant="ghost"
@@ -106,12 +108,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/reasoning")}
-              title={isCollapsed ? 'Clinical Reasoning' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'التشخيص السريري' : 'Clinical Reasoning') : ''}
             >
               <TrendingUp className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Clinical Reasoning'}
+              {!isCollapsed && (language === 'ar' ? 'التشخيص السريري' : 'Clinical Reasoning')}
             </Button>
             <Button
               variant="ghost"
@@ -119,12 +121,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/pharmaguard")}
-              title={isCollapsed ? 'PharmaGuard' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'حارس الأدوية' : 'PharmaGuard') : ''}
             >
               <Pill className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'PharmaGuard'}
+              {!isCollapsed && (language === 'ar' ? 'حارس الأدوية' : 'PharmaGuard')}
             </Button>
             <Button
               variant="ghost"
@@ -132,12 +134,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/live-scribe")}
-              title={isCollapsed ? 'Live Scribe' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'الكاتب الحي' : 'Live Scribe') : ''}
             >
               <Mic className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Live Scribe'}
+              {!isCollapsed && (language === 'ar' ? 'الكاتب الحي' : 'Live Scribe')}
             </Button>
             <Button
               variant="ghost"
@@ -145,12 +147,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/lab-results")}
-              title={isCollapsed ? 'Lab Results' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'نتائج التحاليل' : 'Lab Results') : ''}
             >
               <FileText className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Lab Results'}
+              {!isCollapsed && (language === 'ar' ? 'نتائج التحاليل' : 'Lab Results')}
             </Button>
             <Button
               variant="ghost"
@@ -158,12 +160,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/xray-analysis")}
-              title={isCollapsed ? 'Medical Imaging' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'التصوير الطبي' : 'Medical Imaging') : ''}
             >
               <FileImage className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Medical Imaging'}
+              {!isCollapsed && (language === 'ar' ? 'التصوير الطبي' : 'Medical Imaging')}
             </Button>
             <Button
               variant="ghost"
@@ -171,12 +173,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/medical-reports")}
-              title={isCollapsed ? 'Medical Reports' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'التقارير الطبية' : 'Medical Reports') : ''}
             >
               <FileText className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Medical Reports'}
+              {!isCollapsed && (language === 'ar' ? 'التقارير الطبية' : 'Medical Reports')}
             </Button>
             <Button
               variant="ghost"
@@ -184,12 +186,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/calendar")}
-              title={isCollapsed ? 'Calendar' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'التقويم' : 'Calendar') : ''}
             >
               <Calendar className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Calendar'}
+              {!isCollapsed && (language === 'ar' ? 'التقويم' : 'Calendar')}
             </Button>
             <Button
               variant="ghost"
@@ -197,12 +199,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/medications")}
-              title={isCollapsed ? 'Medications' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'الأدوية' : 'Medications') : ''}
             >
               <Pill className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Medications'}
+              {!isCollapsed && (language === 'ar' ? 'الأدوية' : 'Medications')}
             </Button>
             <Button
               variant="ghost"
@@ -210,12 +212,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/my-patients")}
-              title={isCollapsed ? 'Patients' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'المرضى' : 'Patients') : ''}
             >
               <Users className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Patients'}
+              {!isCollapsed && (language === 'ar' ? 'المرضى' : 'Patients')}
             </Button>
             <Button
               variant="ghost"
@@ -223,12 +225,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/messages")}
-              title={isCollapsed ? 'Messages' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'الرسائل' : 'Messages') : ''}
             >
               <MessageSquare className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Messages'}
+              {!isCollapsed && (language === 'ar' ? 'الرسائل' : 'Messages')}
               {unreadCount && unreadCount > 0 && (
                 <span className={`absolute bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${
                   isCollapsed ? 'top-1 right-1' : 'top-2 right-2'
@@ -243,12 +245,12 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
                 isCollapsed ? 'justify-center px-2' : 'justify-start'
               }`}
               onClick={() => setLocation("/clinician/subscription")}
-              title={isCollapsed ? 'Subscription' : ''}
+              title={isCollapsed ? (language === 'ar' ? 'الاشتراك' : 'Subscription') : ''}
             >
               <Crown className={`w-5 h-5 ${
                 isCollapsed ? '' : 'mr-3'
               }`} />
-              {!isCollapsed && 'Subscription'}
+              {!isCollapsed && (language === 'ar' ? 'الاشتراك' : 'Subscription')}
             </Button>
           </nav>
 
