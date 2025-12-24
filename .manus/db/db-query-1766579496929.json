@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, email, role FROM users WHERE role IN ('clinician', 'admin') LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, name, email, role FROM users WHERE role IN ('clinician', 'admin') LIMIT 5",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Hassan HJ",
+      "email": "haljanabi88@gmail.com",
+      "role": "admin"
+    },
+    {
+      "id": "900086",
+      "name": "admin",
+      "email": "admin@admin.com",
+      "role": "admin"
+    },
+    {
+      "id": "1440001",
+      "name": "Admin User",
+      "email": "admin@meditriage.ai",
+      "role": "admin"
+    },
+    {
+      "id": "3150029",
+      "name": "Dr. Test Doctor",
+      "email": "doctor.test@meditriage.com",
+      "role": "clinician"
+    },
+    {
+      "id": "4080002",
+      "name": "Dr. Test Doctor",
+      "email": "test.doctor@meditriage.iq",
+      "role": "clinician"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n1\tHassan HJ\thaljanabi88@gmail.com\tadmin\n900086\tadmin\tadmin@admin.com\tadmin\n1440001\tAdmin User\tadmin@meditriage.ai\tadmin\n3150029\tDr. Test Doctor\tdoctor.test@meditriage.com\tclinician\n4080002\tDr. Test Doctor\ttest.doctor@meditriage.iq\tclinician\n",
+  "stderr": "",
+  "execution_time_ms": 1562
+}

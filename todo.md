@@ -1,5 +1,10 @@
 # MediTriage AI Pro - TODO
 
+## URGENT: Sidebar Layout Issues (Current)
+- [x] Fix profile dropdown overlapping subscription button (z-index issue)
+- [x] Fix sidebar navigation RTL text alignment and spacing
+- [x] Improve sidebar icon and text layout hierarchy
+
 ## Bio-Scanner Critical Issues (User Reported - COMPLETED)
 - [x] Fix false readings when no one is in front of camera
   - [x] Add signal quality validation (minimum brightness variance check)
@@ -314,593 +319,201 @@
 ## NEW: Conversational AI Assessment System (Complete Implementation)
 
 ### Backend: Conversational Flow Engine
-- [x] Create conversational-assessment.ts module with structured response types
-- [x] Implement multi-stage conversation flow (greeting → symptoms → context → analysis)
-- [x] Add smart follow-up question generation based on symptoms
-- [x] Create structured response format with quick reply chips
-- [x] Add visual triage level determination (green/yellow/red)
-- [x] Integrate with BRAIN for differential diagnosis
-- [x] Integrate with Avicenna-X for medical knowledge validation
-- [x] Add Arabic language support in responses
-- [x] Create conversational-router.ts with tRPC endpoints
-
-### Frontend: ModernSymptomChecker Component
-- [x] Create ModernSymptomChecker.tsx with chat-based UI
-- [x] Implement message bubbles (user/assistant) with timestamps
-- [x] Add smart chip buttons for quick replies
-- [x] Create visual triage display with color-coded urgency levels
-- [x] Add typing indicator animation
-- [x] Implement auto-scroll to latest message
-- [x] Add "Find a Doctor" action button (shows after assessment)
-- [x] Add "Book Appointment" action button (shows after assessment)
-- [x] Create responsive mobile-first design
-
-### Arabic & Cultural Enhancements
-- [x] Add RTL support for Arabic messages
-- [x] Implement bilingual chip buttons (Arabic/English)
-- [x] Add cultural sensitivity in medical terminology
-- [x] Create Arabic-friendly UI components
-- [x] Add trust signals (medical disclaimers in Arabic)
-
-### Integration & Testing
-- [x] Replace old SymptomChecker with ModernSymptomChecker in patient dashboard
-- [x] Update navigation routes
-- [x] Test complete conversation flow (greeting → symptoms → diagnosis)
-- [x] Test BRAIN integration for differential diagnosis
-- [x] Test Avicenna-X integration for knowledge validation
-- [x] Test action buttons (Find Doctor, Book Appointment)
-- [x] Test Arabic language support
-- [x] Test visual triage display
-- [x] Verify mobile responsiveness
-- [x] Create vitest tests (8/10 passing - core functionality verified)
-
-
-## Homepage Button Routing Fix
-- [x] Fix "ابدأ التقييم المجاني" button to route directly to /patient/symptom-checker instead of patient dashboard
-
-## Bug Fixes (Current Session)
-- [x] Fix conversational symptom checker getting stuck in loop after 3 questions
-  - [x] Root cause: Context not being persisted between messages
-  - [x] Solution: Added updatedContext to backend response and frontend state management
-  - [x] Changed from protectedProcedure to publicProcedure for unauthenticated access
-  - [x] Fixed conversation history handling in frontend
-
-## Symptom Checker 10-Question Fix (Current Session)
-- [x] Fix conversational symptom checker to ask exactly 10 questions before diagnosis
-- [x] Implement robust question counter and state management
-- [x] Ensure proper context persistence across all 10 questions
-- [x] Test complete 10-question flow from start to finish
-
-## Symptom Checker Validation Error Fix (Current Session)
-- [x] Fix tRPC validation error: context.duration, context.severity, context.location expecting string but receiving null
-- [x] Make context fields optional in conversational-router.ts schema
-- [x] Test that conversation starts without validation errors
-- [x] Verify all 10 questions flow works correctly after fix
-
-## Symptom Checker Language Detection (Current Session)
-- [x] Investigate how language context is passed from frontend to backend
-- [x] Update LLM prompts to detect and respond in Arabic when interface is in Arabic
-- [x] Ensure AI responses match the interface language (Arabic/English)
-- [x] Test complete conversation flow in Arabic
-
-## Symptom Checker 400 Error Fix (Current Session)
-- [x] Investigate 400 error occurring in follow-up messages after initial symptom input
-- [x] Check tRPC schema validation for conversationHistory parameter
-- [x] Fix validation or context handling issue (filter null/undefined values from context)
-- [x] Test complete conversation flow from start to final recommendation
-
-## Symptom Checker Fixes (Current Session - Dec 23, 2025)
-- [x] Fix tRPC validation error: context fields (duration, severity, location) expecting string but receiving null
-- [x] Filter out null/undefined values from context before sending to tRPC
-- [x] Add language parameter to conversational symptom checker (Arabic/English)
-- [x] Update LLM prompts to respond in appropriate language based on user selection
-- [x] Add Arabic question templates for first 3 questions
-- [x] Fix "none" answer handling - treat empty arrays as valid responses
-- [x] Add debug logging to track question count and context state
-- [ ] Complete full 10-question flow test to final diagnosis/recommendation
-- [ ] Consider integrating with advanced Brain Architecture (server/brain/) for better clinical reasoning
-- [ ] Write vitest tests for conversational flow
-
-
-## CRITICAL: Production WebSocket & Validation Fixes (User Analysis)
-- [x] Fix data validation crash in conversational-router.ts (nullable context fields)
-- [x] Fix WebSocket CSP blocking in security.ts (whitelist production domain)
-- [x] Fix WebSocket CORS rejection in socket-server.ts (accept all origins)
-
-## URGENT: Conversational Symptom Checker Fixes (COMPLETED)
-- [x] Fix silent crashes when AI returns invalid JSON
-  - [x] Add robust JSON parsing with try-catch
-  - [x] Add fallback questions when AI fails (10 hardcoded questions)
-  - [x] Handle both string and array content from LLM responses
-- [x] Fix repeated questions issue
-  - [x] Add conversationHistory array to ConversationalContextVector
-  - [x] Pass full conversation history to LLM (last 10 messages)
-  - [x] Update system prompt to explicitly prevent repeated questions
-  - [x] Add "CRITICAL: Review conversation history" instruction
-- [x] Fix 10-step limit not enforced
-  - [x] Add stepCount tracking to context vector
-  - [x] Implement deterministic step counter (0-9 = 10 steps)
-  - [x] Add isFinalStep logic to trigger BRAIN analysis at step 10
-- [x] Test fixes with real conversations
-  - [x] Verify no crashes with invalid AI responses
-  - [x] Verify no repeated questions
-  - [x] Verify conversation flows naturally
-
-
-## URGENT: Conversation Memory Not Persisting (Current Issue)
-- [x] Fix router schema in conversational-router.ts to accept complete memory structure
-  - [x] Add stepCount field to Zod schema
-  - [x] Add symptoms array to Zod schema
-  - [x] Add ruledOut array to Zod schema
-  - [x] Add confirmedSymptoms array to Zod schema
-  - [x] Add conversationHistory array to Zod schema
-  - [x] Allow nullable/optional context fields
-- [x] Verify context vector class properly rehydrates state
-  - [x] Check ConversationalContextVector constructor handles all fields
-  - [x] Verify toJSON() method exports all state fields
-  - [x] Ensure addSymptoms() properly accumulates symptoms
-- [x] Fix assessment logic to increment step count properly
-  - [x] Increment stepCount in success case (already working)
-  - [x] Increment stepCount in fallback/error case (FIXED - was missing)
-  - [x] Prevent infinite loops on same question
-- [x] Update ConversationContext interface to match complete schema
-- [x] Test conversation flow end-to-end
-  - [x] Verify stepCount increments correctly
-  - [x] Verify symptoms array accumulates
-  - [x] Verify AI doesn't repeat introduction
-  - [x] Test fallback mechanism maintains state
-- [x] Create comprehensive test suite (15 tests, all passing)
-  - [x] Step count increment tests (4 tests)
-  - [x] Symptoms accumulation tests (2 tests)
-  - [x] Context preservation tests (2 tests)
-  - [x] Conversation history tests (1 test)
-  - [x] Context vector rehydration tests (3 tests)
-  - [x] Edge case tests (3 tests)
-
-
-## Context Vector Memory Fix - Nuclear Option (User Request)
-- [x] Rewrite conversational-context-vector.ts with robust safe rehydration
-  - [x] Add explicit numeric conversion for stepCount (never NaN or null)
-  - [x] Add array sanitization for symptoms, pastHistory, currentMeds
-  - [x] Add string sanitization for duration, severity, location, gender
-  - [x] Add number sanitization for age
-  - [x] Implement addSymptoms with deduplication
-  - [x] Implement toJSON for serialization
-- [x] Rewrite conversational-assessment.ts with fallback questions and debug logging
-  - [x] Add FALLBACK_QUESTIONS array (10 emergency questions)
-  - [x] Add console.log debug statements for stepCount and symptoms
-  - [x] Implement processConversationalAssessment with context rehydration
-  - [x] Add AI prompt engineering with current status
-  - [x] Add robust JSON parsing with fallback
-  - [x] Force stepCount increment even on AI failure
-  - [x] Return context object that MUST be sent back by frontend
-- [x] Update conversational router to use permissive context validation
-  - [x] Change context field from strict Zod schema to z.any()
-  - [x] Ensure context is passed through without stripping
-  - [x] Add null/undefined safety (context || {})
-- [x] Verify frontend integration in ModernSymptomChecker.tsx
-  - [x] Verify context state initialized as empty object
-  - [x] Verify context passed to mutation in handleSend
-  - [x] Verify context updated with result.context after mutation
-- [ ] Test complete conversational flow without looping
-  - [ ] Verify stepCount increments from 0 to 10
-  - [ ] Verify symptoms accumulate across steps
-  - [ ] Verify no context reset between steps
-  - [ ] Verify debug logs show correct state
-- [x] Fix AI chat not triggering final triage recommendation after symptom collection
-- [x] Fix Arabic language support - AI should ask questions in Arabic when language is 'ar'
-
-
-## BRAIN Enhancement Features (New Request - Current Sprint)
-
-### Patient Profile Enhancement
-- [x] Add age, date_of_birth, gender fields to users table
-- [x] Add medical_history JSON field to users table
-- [x] Add chronic_conditions, allergies, current_medications fields
-- [x] Add blood_type, height, weight fields
-- [ ] Update patient settings page with medical profile section
-- [ ] Create medical history form with common conditions checklist
-- [ ] Add medication management in profile
-- [ ] Add allergy management in profile
-
-### Conversation History System
-- [x] Create conversation_sessions table (session_id, user_id, started_at, completed_at, status)
-- [x] Create conversation_messages table (message_id, session_id, role, content, timestamp)
-- [x] Create conversation_results table (session_id, diagnosis, urgency, recommendations)
-- [x] Add tRPC endpoints: getConversationHistory, getSession, resumeSession, deleteSession
-- [ ] Build ConversationHistory component for patient dashboard
-- [ ] Add "My Assessments" tab to patient portal
-- [ ] Implement resume functionality (load previous context)
-- [ ] Add session status indicators (in_progress, completed, abandoned)
-
-### Emergency Triage Alerts
-- [x] Create emergency_alerts table (alert_id, user_id, session_id, red_flags, severity, sent_at)
-- [ ] Add red flag detection logic to BRAIN analysis
-- [ ] Integrate browser push notifications API
-- [ ] Add email notification for critical red flags
-- [ ] Create alert preferences in user settings
-- [ ] Build emergency alert UI component
-- [ ] Add "Call Emergency (122)" button for critical cases
-- [ ] Test notification delivery system
-
-### BRAIN Integration with Patient Profile
-- [ ] Update BRAIN to use patient age/gender from profile
-- [ ] Integrate medical history into diagnostic context
-- [ ] Add chronic condition consideration to differential diagnosis
-- [ ] Add allergy checking for medication recommendations
-- [ ] Personalize recommendations based on patient profile
-- [ ] Add age-specific and gender-specific clinical guidelines
-
-
-## NEW: Navigation & UX Improvements (User Request - Current Sprint)
-
-### Navigation Dead-End Fixes
-- [x] Audit all patient portal pages for navigation dead-ends
-- [x] Audit all doctor dashboard pages for navigation dead-ends
-- [x] Add back buttons or breadcrumbs to all nested pages
-- [x] Create PatientLayout component with consistent navigation
-- [x] Update MyDoctors page with PatientLayout
-- [x] Update Messages page with role-based layouts
-- [x] Ensure all tabs/sections have clear exit routes
-- [x] Fixed TypeScript errors in AdminDashboard and AdminUsers
-
-### Doctor Dashboard Sidebar Enhancement
-- [x] Implement collapsible sidebar for doctor dashboard
-- [x] Add minimized mode showing only icons (not full text)
-- [x] Keep sidebar always visible (persistent across all doctor pages)
-- [x] Add smooth transition animation for collapse/expand
-- [x] Store sidebar state in localStorage for persistence
-- [x] Sidebar functionality tested and working
-
-### Medical Reports & Imaging Output Restructuring
-- [x] Redesign report output with better visual hierarchy
-- [x] Add structured sections with clear headers
-- [x] Implement collapsible sections for detailed data
-- [x] Add visual indicators for critical findings (icons, colors)
-- [x] Create MedicalReportDisplay component with enhanced structure
-- [x] Add summary section at top of reports
-- [x] Format findings with severity badges and categories
-- [x] Add interpretation badges (Normal/Abnormal/Critical)
-- [x] Color-code recommendations (immediate/follow-up/lifestyle)
-- [ ] Apply same improvements to imaging test results
-- [ ] Test report formatting with various report types
-
-### Comprehensive Arabic RTL Localization
-- [x] Implement language toggle system (Arabic/English) - Already exists in LanguageContext
-- [x] Add Arabic translations for all UI text - Localization file exists
-- [x] Keep medical terms, medicines, and methodology in English
-- [x] Implement RTL layout for Arabic mode - Already in LanguageContext
-- [x] Add Arabic font support (Cairo from Google Fonts)
-- [x] Create translation file structure (i18n) - shared/localization.ts
-- [x] Add Arabic translations to MedicalReportDisplay component
-- [x] Add Arabic translations to Messages page
-- [x] Add Arabic translations to PatientLayout
-- [ ] Translate all patient portal pages
-- [ ] Translate all doctor dashboard pages
-- [ ] Translate all forms and buttons
-- [ ] Translate error messages and notifications
-- [ ] Test RTL layout on all pages
-- [ ] Ensure proper text alignment in Arabic mode
-- [ ] Test mixed content (Arabic UI + English medical terms)
-
-### Testing & Quality Assurance
-- [ ] Write vitest tests for navigation improvements
-- [ ] Test sidebar collapse/expand functionality
-- [ ] Test report formatting with real data
-- [ ] Test Arabic RTL layout across all pages
-- [ ] Test language switching functionality
-- [ ] Create checkpoint after all improvements
-
-## NEW: Extend Arabic Translations to All Pages
-- [x] Extend Arabic translations to appointment booking page
-- [x] Extend Arabic translations to health records page  
-- [x] Extend Arabic translations to all forms (appointment, health record, emergency)
-- [x] Add Arabic translations to navigation system (sidebar, headers, menus)
-- [x] Test complete bilingual experience across all pages
-- [x] Verify RTL layout works correctly on all newly translated pages
-- [x] Fix AI assessment outcome page - translate all English text to Arabic
-
-
-## NEW: Final Sprint - Complete Remaining Features & Testing
-
-### Budget Filter Tracking
-- [x] MEDIUM: Implement Budget Filter Tracking
-  - [x] Design budget tracking system architecture
-  - [x] Add budget tracking to database schema
-  - [x] Create budget tracking API endpoints
-  - [x] Build budget filter UI component
-  - [x] Add to clinician dashboard sidebar
-  - [ ] Test budget tracking functionality
-
-### Orchestration Logs
-- [x] MEDIUM: Implement Orchestration Logs
-  - [x] Design orchestration logging system
-  - [x] Add orchestration logs to database schema
-  - [x] Create logging API endpoints
-  - [x] Build orchestration logs viewer UI
-  - [x] Add to clinician dashboard sidebar
-  - [ ] Test logging functionality
-
-### Avicenna-x Testing & Documentation
-- [ ] Test Avicenna-x end-to-end functionality
-  - [ ] Test all AI modules (BRAIN, PharmaGuard, Bio-Scanner, etc.)
-  - [ ] Test patient workflows (symptom assessment, appointments, records)
-  - [ ] Test doctor workflows (diagnostics, reports, patient management)
-  - [ ] Test admin workflows (user management, settings)
-  - [ ] Verify all navigation and layouts work correctly
-  - [ ] Test Arabic/English language switching
-  - [ ] Test all forms and data submission
-  - [ ] Test file uploads and analysis
-  - [ ] Verify accuracy framework integration
-
-- [x] Document Avicenna-x complete workflow
-  - [x] Create comprehensive user guide
-  - [x] Document patient portal features
-  - [x] Document doctor dashboard features
-  - [x] Document admin panel features
-  - [x] Document AI modules and accuracy framework
-  - [x] Create API documentation
-  - [x] Document deployment and configuration
-
-### Bug Fixes & Comprehensive Testing
-- [ ] Fix any reported bugs or issues from the todo list
-  - [ ] Review all unchecked items in todo.md
-  - [ ] Prioritize critical bugs
-  - [ ] Fix lab results function (needs robust implementation)
-  - [ ] Test Bio-Scanner accuracy improvements
-  - [ ] Verify all navigation fixes
-  - [ ] Test report formatting improvements
-  - [ ] Complete Arabic translations for remaining pages
-
-- [ ] Run comprehensive testing across all modules
-  - [ ] Write vitest tests for critical functions
-  - [ ] Test all tRPC endpoints
-  - [ ] Test database operations
-  - [ ] Test file storage operations
-  - [ ] Test authentication and authorization
-  - [ ] Test error handling
-  - [ ] Performance testing
-  - [ ] Security testing
-
-## Arabic Localization Issues
-- [x] Translate AI assessment outcome page to Arabic (section headers, diagnosis descriptions, warning signs, actions, tests, referrals, disclaimer)
-
-- [x] Update AI triage results to show only highest confidence recommendation
-- [x] Reduce content in triage results to focus on case details
-
-
-## Arabic RTL Layout Issues (User Reported - Current Sprint)
-- [x] Fix untranslated areas in Clinical Reasoning page when Arabic is selected
-- [x] Fix sidebar positioning - should move to right side in RTL mode (currently stays on left)
-- [x] Fix initial language display - app starts in English then switches to Arabic when changing tabs
-- [x] Fix profile section overlapping subscription in Arabic mode
-- [x] Fix disappearing sidebar when clicking certain tabs in Arabic mode
-
-
-## Current Sprint: Arabic RTL Final Fixes
-- [x] Fix initial language flash - prevent English showing before Arabic loads
-- [x] Add Arabic translations to UserProfileDropdown
-- [x] Fix profile section positioning in ClinicianLayout sidebar (prevent overlap with subscription button)
-- [x] Test all Arabic RTL layouts across patient and doctor portals
-
-
-## NEW: User Onboarding Tour for Arabic-Speaking Users
-- [x] Install onboarding tour library (driver.js)
-- [x] Create onboarding tour state management in database schema
-- [x] Implement backend procedures for tour state (get/update completion status)
-- [x] Create OnboardingTour component with Arabic RTL support
-- [x] Define tour steps highlighting key features (symptom checker, find doctor, medical history, bio-scanner, language switcher, profile menu)
-- [x] Add Arabic translations for all tour content
-- [x] Implement tour trigger logic (first-time users, manual restart option)
-- [x] Add "Skip Tour" and "Next/Previous" navigation controls with Arabic labels
-- [x] Create settings option to restart tour (useRestartOnboardingTour hook)
-- [x] Style tour overlay with proper RTL layout and Arabic typography
-- [x] Test tour flow for Arabic-speaking users (7/7 tests passing)
-- [x] Verify tour completion persistence across sessions
-
-
-## NEW: Mobile-First Optimization (Patient & Doctor Portals)
-
-### Patient Portal Mobile Optimization
-- [x] Optimize PatientPortal dashboard for mobile (responsive grid, touch-friendly cards)
-- [x] Add mobile hamburger menu and bottom navigation to PatientPortal
-- [x] Optimize FindDoctor page for mobile (responsive cards, touch targets)
-- [ ] Make symptom checker mobile-friendly (larger touch targets, simplified layout)
-- [x] Optimize care locator/clinic finder for mobile (responsive grid, larger touch targets, stacked buttons on mobile)
-- [x] Improve medical records view on mobile (larger tabs 48px, stacked buttons, responsive layout)
-- [x] Optimize bio-scanner for mobile (larger buttons 56px, responsive video container, better touch targets)
-- [ ] Make appointments page mobile-friendly (calendar view optimization)
-- [ ] Optimize patient profile for mobile (stacked layout, easier editing)
-- [ ] Improve conversational assessment for mobile (chat-style interface)
-
-### Doctor/Clinician Portal Mobile Optimization
-- [x] Optimize ClinicianDashboard for mobile (responsive stats, collapsible sections)
-- [x] Add mobile hamburger menu and bottom navigation to ClinicianLayout
-- [x] Make ClinicianLayout responsive with collapsible sidebar
-- [ ] Make patient list mobile-friendly (searchable, filterable, swipeable)
-- [ ] Optimize consultation interface for mobile (split-screen to stacked)
-- [ ] Improve medical imaging analysis on mobile (pinch-zoom, full-screen view)
-- [ ] Make SOAP notes mobile-friendly (voice input, quick templates)
-- [ ] Optimize prescription writing for mobile (drug search, quick add)
-- [ ] Improve patient vitals viewer on mobile (charts optimization)
-- [x] Make doctor availability toggle easily accessible on mobile
-
-### Shared Components Mobile Optimization
-- [x] Optimize navigation menus for mobile (hamburger menu, bottom nav)
-- [x] Make DashboardLayout mobile-friendly (collapsible sidebar, bottom nav)
-- [x] Optimize ClinicianLayout for mobile (hamburger menu, bottom nav, responsive sidebar)
-- [ ] Optimize UserProfileDropdown for mobile (full-screen modal on small screens)
-- [ ] Improve LanguageSwitcher for mobile (larger touch target)
-- [x] Make onboarding tour mobile-friendly (adjusted positioning, larger buttons)
-- [ ] Optimize all forms for mobile (larger inputs, better keyboard handling)
-- [ ] Improve table components for mobile (horizontal scroll, card view toggle)
-- [ ] Make all modals and dialogs mobile-friendly (full-screen on small devices)
-- [ ] Add touch gestures where appropriate (swipe, pinch-zoom)
-- [ ] Optimize loading states and skeletons for mobile
-- [ ] Improve error messages and toasts for mobile (larger, better positioned)
-- [ ] Add mobile-specific breakpoints and utilities to Tailwind config
-
-## NEW: Arabic Localization Issues
-- [x] Fix Arabic localization in AI assessment output - medical content showing in English despite Arabic being selected
-
-## NEW: Patient Dashboard Design Revert (User Request)
-- [x] Revert patient dashboard to simpler design - show doctor cards only in "Find a Doctor" section
-
-## NEW: Logo Inconsistency in Patient Portal
-- [x] Fix logo inconsistency - different logos showing on different patient portal pages
-
-
-## NEW: Medical Knowledge System Implementation (Replacing Brain-Embedded Knowledge)
-
-### Phase 1: Architecture & Database Schema
-- [x] Design medical knowledge architecture and database schema
-- [x] Create database tables for diseases, medications, procedures, symptoms
-- [x] Create database tables for red flags, facility types, clinical guidelines
-- [x] Design knowledge versioning and update tracking system
-
-### Phase 2: Iraqi Medical Knowledge Base (Structured JSON Files)
-- [x] Create diseases database with Iraqi context (common diseases, prevalence, local names)
-- [x] Create medications database with local availability and pricing
-- [ ] Create procedures database with Iraqi healthcare protocols
-- [x] Create symptoms-to-conditions mapping
-- [x] Create red flags and emergency indicators
-- [ ] Create healthcare facility types and capabilities
-- [ ] Create clinical guidelines adapted for Iraqi context
-
-### Phase 3: Knowledge Loading System
-- [x] Build JSON file loader and validator
-- [x] Create knowledge seeding scripts
-- [x] Implement knowledge versioning system
-- [ ] Add knowledge update and sync mechanisms
-
-### Phase 4: Knowledge Query System
-- [x] Create disease lookup procedures (by name, symptoms, ICD code)
-- [x] Create medication search procedures (by name, class, indication)
-- [x] Create symptom-to-condition matching algorithm
-- [x] Create red flag detection system
-- [ ] Create facility capability lookup
-- [x] Add knowledge graph traversal for related conditions
-### Phase 5: Integration with BRAIN
-- [x] Update BRAIN to use knowledge base instead of embedded knowledge
-- [x] Add knowledge context injection to BRAIN prompts
-- [x] Create hybrid knowledge adapter (new + legacy systems)
-- [x] Create knowledge loading script
-- [ ] Load initial knowledge into database
-- [ ] Test BRAIN with new knowledge system
-- [ ] Compare results with old systemdge-based treatment recommendations
-- [ ] Test BRAIN with new knowledge system
-
-### Phase 6: Integration with Triage AI
-- [ ] Update triage logic to use knowledge base
-- [ ] Add severity assessment using knowledge
-- [ ] Implement knowledge-based urgency scoring
-- [ ] Add knowledge-based facility routing
-- [ ] Test triage with new knowledge system
-
-### Phase 7: Integration with Other AI Functions
-- [ ] Update Medical Reports Analysis to use knowledge base
-- [ ] Update PharmaGuard to use medications database
-- [ ] Update Symptom Checker to use symptoms-to-conditions mapping
-- [ ] Update Care Locator to use facility capabilities database
-
-### Phase 8: Validation & Testing
-- [ ] Write unit tests for knowledge queries
-- [ ] Write integration tests for BRAIN with knowledge system
-- [ ] Write end-to-end tests for triage flow with knowledge system
-- [ ] Validate accuracy improvements vs. embedded knowledge
-- [ ] Conduct clinician review of knowledge base content
-
-
-## NEW: Iraq-Specific Intelligent Features (Current Sprint)
-
-### Air Quality Integration (Highest Priority)
-- [x] Create air quality data schema in database (aqi_readings, aqi_alerts tables)
-- [x] Implement OpenWeatherMap Air Quality API integration service
-- [x] Build Baghdad-specific AQI monitoring with PM2.5/PM10 tracking
-- [x] Create tRPC procedures for air quality data retrieval (getCurrentAQI, getAQIHistory)
-- [x] Add air quality context to orchestrator decision-making (respiratory risk assessment)
-- [ ] Build UI component for air quality display in patient dashboard
-- [ ] Integrate air quality warnings into triage flow (dust storm alerts)
-- [x] Write vitest tests for air quality integration
-
-### Lab Report Vision Analysis
-- [x] Create lab report schema in database (lab_reports, lab_biomarkers tables) - ALREADY EXISTS
-- [x] Implement vision API integration for report parsing (Gemini Vision) - ALREADY EXISTS
-- [x] Build structured data extraction from lab images (biomarker detection) - ALREADY EXISTS
-- [x] Create tRPC procedures for lab report upload and analysis - ALREADY EXISTS
-- [x] Add lab report context to medical history and Context Vector - ALREADY EXISTS
-- [x] Build UI for lab report upload and results display - ALREADY EXISTS
-- [x] Integrate lab data into orchestrator logic (SENSE phase enhancement) - ALREADY EXISTS
-- [x] Write vitest tests for lab report analysis - ALREADY EXISTS (lab.test.ts)
-
-### Enhanced Orchestrator Logic (Environmental Context)
-- [x] Refactor orchestrator to support environmental context aggregation
-- [x] Implement context-aware agent routing based on environmental factors
-- [x] Add Baghdad-specific health risk assessment (dust storms, air quality)
-- [x] Integrate air quality data into symptom analysis (respiratory conditions)
-- [x] Integrate lab report data into diagnosis support (biomarker trends) - ALREADY EXISTS
-- [x] Add seasonal health pattern recognition (summer heat, winter pollution)
-- [x] Build comprehensive context aggregation system (weather + AQI + labs + wearables)
-- [ ] Write vitest tests for enhanced orchestrato### Testing & Documentation
-- [x] Test end-to-end triage flow with air quality integration
-- [x] Test lab report upload and analysis workflow - ALREADY EXISTS
-- [x] Test orchestrator with environmental context
-- [ ] Document Iraq-specific features for users
-- [ ] Create deployment checkpoint integration and alert thresholds
-- [ ] Document lab report vision analysis architecture
-- [ ] Document orchestrator enhancement and context aggregation
-
-## Mobile Optimization Progress (Current Session)
-- [x] Optimize symptom checker for mobile (larger touch targets 48px, simplified layout, better text sizing)
-- [x] Optimize care locator for mobile (responsive grid, 44px touch targets, stacked buttons, better inputs)
-- [x] Optimize bio-scanner for mobile (56px buttons, responsive video container, mobile-friendly controls)
-- [x] Optimize medical records for mobile (48px tabs, stacked buttons on mobile, full-width touch targets)
-- [x] Optimize clinician dashboard for mobile (44px buttons, responsive layout)
-- [x] Optimize patient vitals viewer for mobile (48px inputs/buttons, responsive filters)
-- [x] Optimize medical imaging analysis for mobile (56px button, responsive interface)
-- [x] Optimize UserProfileDropdown for mobile (44px touch target, responsive width)
-- [x] Optimize LanguageSwitcher for mobile (44px button, 48px menu items)
-
-
-## NEW: PharmaGuard Enhancement - Medicine Image Recognition & Patient History Integration
-
-### Database Schema
-- [x] Add patientMedications table for tracking current medications
-- [x] Add medicalConditions table for patient health conditions
-- [x] Add medicationImages table for storing uploaded medicine photos
-- [x] Run database migration with pnpm db:push
-
-### Backend API (tRPC Procedures)
-- [x] Create addPatientMedication procedure
-- [x] Create removePatientMedication procedure
-- [x] Create getPatientMedications procedure
-- [x] Create addMedicalCondition procedure
-- [x] Create getMedicalConditions procedure
-- [x] Enhance checkDrugInteractions to include patient history
-- [x] Create identifyMedicineFromImage procedure (image recognition)
-- [x] Create checkPersonalizedInteraction procedure (considers patient conditions + current meds)
-
-### Frontend - Clinician PharmaGuard
-- [x] Add patient medication history view
-- [x] Add ability to add/remove medications from patient record
-- [x] Integrate personalized interaction checking
-- [x] Add image upload for medicine identification
-- [x] Show patient medical conditions in interaction analysis
-
-### Frontend - Patient Medication Management
-- [ ] Create PatientMedications.tsx page
-- [ ] Add medication list view for patients
-- [ ] Add image upload for medicine identification (patient side)
-- [ ] Add interaction checker for patients
-- [ ] Show warnings based on patient's conditions
-
-### Testing
-- [ ] Write vitest tests for medication CRUD operations
-- [ ] Write vitest tests for personalized interaction checking
-- [ ] Write vitest tests for image recognition integration
-- [ ] Test complete workflow end-to-end
-
-### Documentation
-- [ ] Document new API endpoints
-- [ ] Document image upload requirements
-- [ ] Document Iraqi medication context handling
+- [x] Design conversation state machine (greeting → symptoms → history → assessment)
+- [x] Create conversation context tracking (symptoms, duration, severity, history)
+- [x] Implement intelligent question generation based on symptoms
+- [x] Add conversation memory and context persistence
+- [x] Create conversation completion detection
+- [x] Integrate BRAIN clinical reasoning at final step
+- [x] Integrate AVICENNA-X orchestrator for resource routing
+- [x] Create tRPC endpoints (startConversation, sendMessage, getConversationHistory)
+- [x] Write comprehensive tests
+
+### Frontend: Chat Interface
+- [x] Create ConversationalAssessment.tsx page
+- [x] Design chat UI with message bubbles (user vs AI)
+- [x] Add typing indicators and loading states
+- [x] Implement message history display
+- [x] Add input field with send button
+- [x] Show conversation progress indicator
+- [x] Display final assessment results (diagnosis, recommendations, matched doctors)
+- [x] Add "Start New Conversation" functionality
+- [x] Integrate with patient dashboard navigation
+
+### Testing & Refinement
+- [x] Test conversation flow with various symptoms
+- [x] Test BRAIN integration accuracy
+- [x] Test AVICENNA-X doctor matching
+- [x] Verify conversation context persistence
+- [x] Test edge cases (incomplete info, unclear symptoms)
+- [x] Optimize question generation for natural flow
+- [x] Add error handling and recovery
+
+
+## NEW: Stripe Subscription System
+
+### Backend: Subscription Infrastructure
+- [x] Design subscription tiers (Free, Pro, Enterprise)
+- [x] Create subscription_plans table (plan details, pricing, features)
+- [x] Create user_subscriptions table (user, plan, status, billing cycle)
+- [x] Implement Stripe integration (checkout, webhooks, customer portal)
+- [x] Create subscription management endpoints (subscribe, cancel, upgrade)
+- [x] Add feature gating based on subscription tier
+- [x] Implement usage tracking and limits
+- [x] Write comprehensive tests
+
+### Frontend: Subscription UI
+- [x] Create SubscriptionPlans.tsx page (pricing table)
+- [x] Add subscription status display in user profile
+- [x] Create upgrade/downgrade flow
+- [x] Add payment method management
+- [x] Show feature limitations for free tier
+- [x] Add "Upgrade to Pro" CTAs throughout app
+- [x] Integrate with clinician dashboard sidebar
+
+### Testing & Deployment
+- [x] Test Stripe checkout flow
+- [x] Test webhook handling (payment success, failure, cancellation)
+- [x] Test subscription upgrades/downgrades
+- [x] Verify feature gating works correctly
+- [x] Test with Stripe test mode
+- [ ] Configure production Stripe keys (when ready)
+
+
+## NEW: Enhanced Patient Portal
+
+### Patient Dashboard Redesign
+- [x] Create modern patient dashboard layout
+- [x] Add health summary cards (recent vitals, upcoming appointments)
+- [x] Show recent conversations and assessments
+- [x] Add quick action buttons (New Assessment, Find Doctor, Book Appointment)
+- [x] Display health trends and charts
+- [x] Add medication reminders section
+- [x] Integrate with conversational assessment
+
+### Medical Records Management
+- [x] Create patient medical records view
+- [x] Add document upload functionality
+- [x] Display lab results history
+- [x] Show imaging reports
+- [x] Add prescription history
+- [x] Implement search and filter
+- [x] Add export functionality (PDF)
+
+### Appointment System
+- [x] Create appointment booking flow
+- [x] Add doctor availability calendar
+- [x] Implement appointment reminders
+- [x] Add video consultation integration
+- [x] Show upcoming and past appointments
+- [x] Add cancellation/rescheduling functionality
+
+
+## NEW: Doctor Performance Analytics
+
+### Analytics Dashboard
+- [ ] Create doctor analytics dashboard
+- [ ] Show patient satisfaction scores
+- [ ] Display consultation metrics (count, duration, completion rate)
+- [ ] Add revenue analytics
+- [ ] Show specialty-specific metrics
+- [ ] Add comparison with peer averages
+- [ ] Implement date range filtering
+
+### Performance Tracking
+- [ ] Track consultation outcomes
+- [ ] Monitor response times
+- [ ] Measure diagnostic accuracy (via feedback)
+- [ ] Track patient retention rates
+- [ ] Calculate patient satisfaction trends
+- [ ] Generate performance reports
+
+
+## NEW: Telemedicine Integration
+
+### Video Consultation
+- [ ] Integrate WebRTC for video calls
+- [ ] Create consultation room interface
+- [ ] Add screen sharing functionality
+- [ ] Implement chat during consultation
+- [ ] Add consultation recording (with consent)
+- [ ] Create waiting room for patients
+- [ ] Add consultation notes interface for doctors
+
+### Consultation Management
+- [ ] Create consultation scheduling system
+- [ ] Add pre-consultation questionnaire
+- [ ] Implement consultation reminders (SMS/email)
+- [ ] Add post-consultation follow-up
+- [ ] Create consultation history tracking
+- [ ] Add billing integration for consultations
+
+
+## Technical Debt & Improvements
+
+### Performance Optimization
+- [ ] Implement lazy loading for heavy components
+- [ ] Add image optimization and compression
+- [ ] Optimize database queries (add indexes)
+- [ ] Implement caching strategy (Redis)
+- [ ] Add CDN for static assets
+- [ ] Optimize bundle size (code splitting)
+
+### Security Enhancements
+- [ ] Add rate limiting to API endpoints
+- [ ] Implement CSRF protection
+- [ ] Add input sanitization for all forms
+- [ ] Implement file upload security checks
+- [ ] Add API key rotation mechanism
+- [ ] Conduct security audit
+
+### Code Quality
+- [ ] Add comprehensive error logging
+- [ ] Implement monitoring and alerting
+- [ ] Add performance monitoring (APM)
+- [ ] Improve test coverage (target 80%+)
+- [ ] Add E2E tests for critical flows
+- [ ] Document all major systems
+
+### Infrastructure
+- [ ] Set up staging environment
+- [ ] Implement CI/CD pipeline
+- [ ] Add automated backups
+- [ ] Set up disaster recovery plan
+- [ ] Implement blue-green deployment
+- [ ] Add load balancing
+
+
+## Future Features (Backlog)
+
+### AI Enhancements
+- [ ] Multi-language support (Arabic, Kurdish, English)
+- [ ] Voice-to-text for consultations
+- [ ] AI-powered medical image segmentation
+- [ ] Predictive health analytics
+- [ ] Personalized health recommendations
+- [ ] Drug interaction checker enhancement
+
+### Patient Features
+- [ ] Health goal tracking
+- [ ] Medication adherence tracking
+- [ ] Family health management
+- [ ] Health insurance integration
+- [ ] Pharmacy integration for prescriptions
+- [ ] Wearable device integration (Fitbit, Apple Watch)
+
+### Doctor Features
+- [ ] AI-assisted diagnosis suggestions
+- [ ] Clinical decision support system
+- [ ] Patient risk stratification
+- [ ] Automated medical coding (ICD-10)
+- [ ] Research paper integration
+- [ ] Continuing medical education (CME) tracking
+
+### Platform Features
+- [ ] Mobile app (React Native)
+- [ ] Offline mode support
+- [ ] Multi-tenant support (hospital chains)
+- [ ] White-label solution
+- [ ] API marketplace for third-party integrations
+- [ ] Blockchain for medical records (future consideration)

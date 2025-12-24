@@ -1,0 +1,292 @@
+{
+  "query": "SHOW TABLES",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SHOW TABLES",
+  "rows": [
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "account_activity"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aec_config"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aec_detected_errors"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aec_diagnostics"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aec_health_checks"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aec_metrics"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aec_patches"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aec_thought_signatures"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "appointments"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aqi_alerts"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aqi_impact_logs"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aqi_readings"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "aqi_subscriptions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "audit_logs"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "bio_scanner_calibration"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_case_history"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_error_analysis"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_knowledge_concepts"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_knowledge_relationships"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_learned_patterns"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_learning_feedback"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_medical_literature"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_performance_metrics"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_training_notifications"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "brain_training_sessions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "budget_limits"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "budget_tracking"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "cases"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "clinic_employees"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "clinic_invitations"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "clinic_subscriptions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "clinical_notes"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "clinics"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "consultations"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "conversation_messages"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "conversation_results"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "conversation_sessions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "diagnoses"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "diseases"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "doctor_patient_relationships"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "doctor_performance_metrics"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "drug_interaction_checks"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "email_preferences"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "emergency_alerts"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "epidemiology_events"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "facilities"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "fhir_conditions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "fhir_medication_statements"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "fhir_observations"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "fhir_patients"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "knowledge_versions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "lab_reference_ranges"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "lab_reports"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "lab_results"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "medical_conditions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "medical_documents"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "medical_knowledge_base"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "medication_adherence"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "medications"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "medications_knowledge"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "medicine_images"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "messages"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "network_quality_logs"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "network_quality_metrics"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "orchestration_logs"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "patient_clinic_links"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "patient_invitations"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "patient_medications"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "patient_pressure_sensitivity"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "patient_vitals"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "prescriptions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "pressure_sensitive_conditions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "pressure_symptom_events"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "processed_webhooks"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "red_flags"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "shared_records"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "subscriptions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "symptoms"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "timeline_events"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "training_materials"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "training_sessions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "transcriptions"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "triage_records"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "triage_training_data"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "usage_tracking"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "user_settings"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "users"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "vitals"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "voice_recordings"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "wearable_connections"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "wearable_data_points"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "wearable_metrics_summary"
+    },
+    {
+      "Tables_in_hfH9ioTEzRzswFjESim83C": "weather_conditions"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_hfH9ioTEzRzswFjESim83C\n__drizzle_migrations\naccount_activity\naec_config\naec_detected_errors\naec_diagnostics\naec_health_checks\naec_metrics\naec_patches\naec_thought_signatures\nappointments\naqi_alerts\naqi_impact_logs\naqi_readings\naqi_subscriptions\naudit_logs\nbio_scanner_calibration\nbrain_case_history\nbrain_error_analysis\nbrain_knowledge_concepts\nbrain_knowledge_relationships\nbrain_learned_patterns\nbrain_learning_feedback\nbrain_medical_literature\nbrain_performance_metrics\nbrain_training_notifications\nbrain_training_sessions\nbudget_limits\nbudget_tracking\ncases\nclinic_employees\nclinic_invitations\nclinic_subscriptions\nclinical_notes\nclinics\nconsultations\nconversation_messages\nconversation_results\nconversation_sessions\ndiagnoses\ndiseases\ndoctor_patient_relationships\ndoctor_performance_metrics\ndrug_interaction_checks\nemail_preferences\nemergency_alerts\nepidemiology_events\nfacilities\nfhir_conditions\nfhir_medication_statements\nfhir_observations\nfhir_patients\nknowledge_versions\nlab_reference_ranges\nlab_reports\nlab_results\nmedical_conditions\nmedical_documents\nmedical_knowledge_base\nmedication_adherence\nmedications\nmedications_knowledge\nmedicine_images\nmessages\nnetwork_quality_logs\nnetwork_quality_metrics\norchestration_logs\npatient_clinic_links\npatient_invitations\npatient_medications\npatient_pressure_sensitivity\npatient_vitals\nprescriptions\npressure_sensitive_conditions\npressure_symptom_events\nprocessed_webhooks\nred_flags\nshared_records\nsubscriptions\nsymptoms\ntimeline_events\ntraining_materials\ntraining_sessions\ntranscriptions\ntriage_records\ntriage_training_data\nusage_tracking\nuser_settings\nusers\nvitals\nvoice_recordings\nwearable_connections\nwearable_data_points\nwearable_metrics_summary\nweather_conditions\n",
+  "stderr": "",
+  "execution_time_ms": 1586
+}

@@ -181,7 +181,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
             </div>
           </div>
 
-          <nav className="space-y-2">
+          <nav className="space-y-2 pb-24">
             {menuItems.map((item, idx) => (
               <Button
                 key={idx}
@@ -220,8 +220,8 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
             </Button>
           </nav>
 
-          <div className={`absolute bottom-4 px-4 ${
-            isCollapsed ? 'left-0 right-0' : (language === 'ar' ? 'left-4 right-4' : 'left-4 right-4')
+          <div className={`fixed bottom-4 bg-white pt-3 border-t ${
+            isCollapsed ? 'left-0 right-0 px-2' : (language === 'ar' ? 'right-0 left-auto w-64 px-4' : 'left-0 right-auto w-64 px-4')
           }`}>
             <UserProfileDropdown />
           </div>
