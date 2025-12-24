@@ -34,6 +34,7 @@
 - [x] Fix sidebar consistency - items disappear when navigating away from dashboard
 - [x] Fix profile dropdown - only shows logout, missing other options
 - [x] Fix doctor availability status toggle - user reports cannot change status
+- [x] Fix navigation bar disappearing when clicking "Find a Doctor" tab in patient dashboard
 
 ## Bio-Scanner V2 Revert (User Request - COMPLETED)
 - [x] User reported V4 not working as well as V2
