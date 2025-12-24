@@ -660,3 +660,6 @@
   - [ ] Test error handling
   - [ ] Performance testing
   - [ ] Security testing
+
+## Arabic Localization Issues
+- [x] Translate AI assessment outcome page to Arabic (section headers, diagnosis descriptions, warning signs, actions, tests, referrals, disclaimer)

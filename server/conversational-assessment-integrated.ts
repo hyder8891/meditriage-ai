@@ -211,31 +211,43 @@ async function generateComprehensiveDiagnosis(
       triageLevel = 'green';
     }
     
-    // Build comprehensive message
-    let message = `## 🩺 Comprehensive Medical Assessment\n\n`;
+    // Build comprehensive message (English and Arabic)
+    let messageEn = `## 🩺 Comprehensive Medical Assessment\n\n`;
+    let messageAr = `## 🩺 التقييم الطبي الشامل\n\n`;
     
     // Primary Diagnosis
     if (primaryDiagnosis) {
-      message += `### Primary Diagnosis\n**${primaryDiagnosis.condition}** (${Math.round(primaryDiagnosis.probability * 100)}% confidence)\n\n`;
-      message += `${primaryDiagnosis.reasoning}\n\n`;
+      messageEn += `### Primary Diagnosis\n**${primaryDiagnosis.condition}** (${Math.round(primaryDiagnosis.probability * 100)}% confidence)\n\n`;
+      messageEn += `${primaryDiagnosis.reasoning}\n\n`;
+      
+      messageAr += `### التشخيص الأساسي\n**${primaryDiagnosis.condition}** (${Math.round(primaryDiagnosis.probability * 100)}% ثقة)\n\n`;
+      messageAr += `${primaryDiagnosis.reasoning}\n\n`;
     }
     
     // Differential Diagnoses
     if (diagnosis.differentialDiagnosis.length > 1) {
-      message += `### Other Possible Conditions\n`;
+      messageEn += `### Other Possible Conditions\n`;
+      messageAr += `### الحالات المحتملة الأخرى\n`;
+      
       diagnosis.differentialDiagnosis.slice(1, 3).forEach((dd, idx) => {
-        message += `${idx + 2}. **${dd.condition}** (${Math.round(dd.probability * 100)}%)\n`;
+        messageEn += `${idx + 2}. **${dd.condition}** (${Math.round(dd.probability * 100)}%)\n`;
+        messageAr += `${idx + 2}. **${dd.condition}** (${Math.round(dd.probability * 100)}%)\n`;
       });
-      message += `\n`;
+      messageEn += `\n`;
+      messageAr += `\n`;
     }
     
     // Red Flags
     if (diagnosis.redFlags && diagnosis.redFlags.length > 0) {
-      message += `### ⚠️ Warning Signs\n`;
+      messageEn += `### ⚠️ Warning Signs\n`;
+      messageAr += `### ⚠️ علامات تحذيرية\n`;
+      
       diagnosis.redFlags.forEach(flag => {
-        message += `- ${flag}\n`;
+        messageEn += `- ${flag}\n`;
+        messageAr += `- ${flag}\n`;
       });
-      message += `\n`;
+      messageEn += `\n`;
+      messageAr += `\n`;
     }
     
     // Recommendations
@@ -243,73 +255,102 @@ async function generateComprehensiveDiagnosis(
       const recs = diagnosis.recommendations;
       
       if (recs.immediateActions && recs.immediateActions.length > 0) {
-        message += `### Immediate Actions\n`;
+        messageEn += `### Immediate Actions\n`;
+        messageAr += `### الإجراءات الفورية\n`;
+        
         recs.immediateActions.forEach(action => {
-          message += `- ${action}\n`;
+          messageEn += `- ${action}\n`;
+          messageAr += `- ${action}\n`;
         });
-        message += `\n`;
+        messageEn += `\n`;
+        messageAr += `\n`;
       }
       
       if (recs.tests && recs.tests.length > 0) {
-        message += `### Recommended Tests\n`;
+        messageEn += `### Recommended Tests\n`;
+        messageAr += `### الفحوصات الموصى بها\n`;
+        
         recs.tests.forEach(test => {
-          message += `- ${test}\n`;
+          messageEn += `- ${test}\n`;
+          messageAr += `- ${test}\n`;
         });
-        message += `\n`;
+        messageEn += `\n`;
+        messageAr += `\n`;
       }
       
       if (recs.referrals && recs.referrals.length > 0) {
-        message += `### Specialist Referrals\n`;
+        messageEn += `### Specialist Referrals\n`;
+        messageAr += `### التحويلات للمتخصصين\n`;
+        
         recs.referrals.forEach(ref => {
-          message += `- ${ref}\n`;
+          messageEn += `- ${ref}\n`;
+          messageAr += `- ${ref}\n`;
         });
-        message += `\n`;
+        messageEn += `\n`;
+        messageAr += `\n`;
       }
     }
     
     // Resource Matching from Avicenna-X
     if (orchestrationResult && orchestrationResult.target) {
       const target = orchestrationResult.target;
-      message += `### 🏥 Recommended Healthcare Provider\n`;
-      message += `**${target.metadata.name || 'Healthcare Provider'}**\n`;
+      messageEn += `### 🏥 Recommended Healthcare Provider\n`;
+      messageEn += `**${target.metadata.name || 'Healthcare Provider'}**\n`;
+      messageAr += `### 🏥 مقدم الرعاية الصحية الموصى به\n`;
+      messageAr += `**${target.metadata.name || 'مقدم الرعاية الصحية'}**\n`;
+      
       if (target.metadata.specialty) {
-        message += `Specialty: ${target.metadata.specialty}\n`;
+        messageEn += `Specialty: ${target.metadata.specialty}\n`;
+        messageAr += `التخصص: ${target.metadata.specialty}\n`;
       }
       if (target.metadata.location) {
-        message += `Location: ${target.metadata.location}\n`;
+        messageEn += `Location: ${target.metadata.location}\n`;
+        messageAr += `الموقع: ${target.metadata.location}\n`;
       }
       if (target.metadata.estimatedWaitTime) {
-        message += `Estimated Wait: ${target.metadata.estimatedWaitTime} minutes\n`;
+        messageEn += `Estimated Wait: ${target.metadata.estimatedWaitTime} minutes\n`;
+        messageAr += `وقت الانتظار المتوقع: ${target.metadata.estimatedWaitTime} دقيقة\n`;
       }
-      message += `Match Score: ${Math.round(target.score * 100)}%\n\n`;
+      messageEn += `Match Score: ${Math.round(target.score * 100)}%\n\n`;
+      messageAr += `درجة التطابق: ${Math.round(target.score * 100)}%\n\n`;
       
       // Deep links for navigation
       if (orchestrationResult.deepLinks) {
-        message += `**Get Directions:**\n`;
+        messageEn += `**Get Directions:**\n`;
+        messageAr += `**احصل على الاتجاهات:**\n`;
+        
         if (orchestrationResult.deepLinks.googleMapsLink) {
-          message += `- [Google Maps](${orchestrationResult.deepLinks.googleMapsLink})\n`;
+          messageEn += `- [Google Maps](${orchestrationResult.deepLinks.googleMapsLink})\n`;
+          messageAr += `- [خرائط جوجل](${orchestrationResult.deepLinks.googleMapsLink})\n`;
         }
         if (orchestrationResult.deepLinks.uberLink) {
-          message += `- [Book Uber](${orchestrationResult.deepLinks.uberLink})\n`;
+          messageEn += `- [Book Uber](${orchestrationResult.deepLinks.uberLink})\n`;
+          messageAr += `- [احجز أوبر](${orchestrationResult.deepLinks.uberLink})\n`;
         }
-        message += `\n`;
+        messageEn += `\n`;
+        messageAr += `\n`;
       }
     }
     
     // Evidence
     if (brainResult.evidence && brainResult.evidence.length > 0) {
-      message += `### 📚 Supporting Evidence\n`;
+      messageEn += `### 📚 Supporting Evidence\n`;
+      messageAr += `### 📚 الأدلة الداعمة\n`;
+      
       brainResult.evidence.slice(0, 3).forEach(ev => {
-        message += `- ${ev.title} (${ev.source})\n`;
+        messageEn += `- ${ev.title} (${ev.source})\n`;
+        messageAr += `- ${ev.title} (${ev.source})\n`;
       });
-      message += `\n`;
+      messageEn += `\n`;
+      messageAr += `\n`;
     }
     
-    message += `---\n*This assessment is generated by AI Doctor using advanced medical AI. It is not a substitute for professional medical advice. Please consult a healthcare provider for proper diagnosis and treatment.*`;
+    messageEn += `---\n*This assessment is generated by AI Doctor using advanced medical AI. It is not a substitute for professional medical advice. Please consult a healthcare provider for proper diagnosis and treatment.*`;
+    messageAr += `---\n*هذا التقييم تم إنشاؤه بواسطة AI Doctor باستخدام الذكاء الاصطناعي الطبي المتقدم. وهو ليس بديلاً عن الاستشارة الطبية المتخصصة. يرجى استشارة مقدم الرعاية الصحية للحصول على التشخيص والعلاج المناسب.*`;
     
     return {
-      message,
-      messageAr: message, // TODO: Add Arabic translation
+      message: language === 'ar' ? messageAr : messageEn,
+      messageAr: messageAr,
       conversationStage: "complete" as const,
       triageLevel,
       triageReason: primaryDiagnosis?.reasoning || "Based on symptom analysis",
