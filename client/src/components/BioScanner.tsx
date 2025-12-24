@@ -585,7 +585,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
   return (
     <Card className="p-6 space-y-6">
       {/* Camera Preview */}
-      <div className="relative mx-auto w-full max-w-md aspect-square bg-slate-900 rounded-2xl overflow-hidden border-4 border-emerald-500 shadow-2xl">
+      <div className="relative mx-auto w-full max-w-md aspect-square bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-emerald-500 shadow-2xl">
         <video 
           ref={videoRef} 
           className="w-full h-full object-cover" 
@@ -704,7 +704,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
           <Button 
             onClick={startCamera} 
             size="lg" 
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white min-h-[56px] text-lg md:min-h-[48px] md:text-base"
           >
             <Activity className="mr-2 w-5 h-5" /> 
             Start Scan
@@ -714,7 +714,7 @@ export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerP
             onClick={cancelScan} 
             size="lg" 
             variant="destructive"
-            className="w-full"
+            className="w-full min-h-[56px] text-lg md:min-h-[48px] md:text-base"
           >
             Cancel Scan
           </Button>

@@ -79,6 +79,7 @@ export function PatientVitalsViewer() {
                 placeholder="Enter patient ID"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
+                className="min-h-[48px] text-base md:min-h-[40px] md:text-sm"
               />
             </div>
             
@@ -89,6 +90,7 @@ export function PatientVitalsViewer() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
+                className="min-h-[48px] text-base md:min-h-[40px] md:text-sm"
               />
             </div>
             
@@ -99,6 +101,7 @@ export function PatientVitalsViewer() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                className="min-h-[48px] text-base md:min-h-[40px] md:text-sm"
               />
             </div>
 
@@ -117,11 +120,12 @@ export function PatientVitalsViewer() {
           </div>
 
           <div className="mt-4 flex gap-2">
-            <Button onClick={handleFilter}>
+            <Button onClick={handleFilter} className="min-h-[48px] text-base md:min-h-[40px] md:text-sm">
               Apply Filters
             </Button>
             <Button 
               variant="outline" 
+              className="min-h-[48px] text-base md:min-h-[40px] md:text-sm"
               onClick={() => {
                 setPatientId("");
                 setStartDate("");

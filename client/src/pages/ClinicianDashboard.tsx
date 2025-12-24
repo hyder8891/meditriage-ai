@@ -99,7 +99,7 @@ function ClinicianDashboardContent() {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <NotificationBadge />
-            <Button onClick={handleNewCase} className="bg-blue-600 hover:bg-blue-700" size="sm">
+            <Button onClick={handleNewCase} className="bg-blue-600 hover:bg-blue-700 min-h-[44px]" size="sm">
               <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">{language === 'ar' ? 'حالة جديدة' : 'New Case'}</span>
               <span className="sm:hidden">{language === 'ar' ? 'جديد' : 'New'}</span>
@@ -208,7 +208,7 @@ function ClinicianDashboardContent() {
                 <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
                   {language === 'ar' ? 'لا توجد حالات نشطة' : 'No active cases'}
                 </p>
-                <Button onClick={handleNewCase} size="sm">
+                <Button onClick={handleNewCase} size="sm" className="min-h-[44px] text-base md:text-sm">
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   {language === 'ar' ? 'إنشاء أول حالة' : 'Create First Case'}
                 </Button>
@@ -252,7 +252,7 @@ function ClinicianDashboardContent() {
                             <span className="hidden sm:inline">{new Date(caseItem.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm" className="hidden sm:flex flex-shrink-0">
+                        <Button variant="ghost" size="sm" className="hidden sm:flex flex-shrink-0 min-h-[40px]">
                           {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
                         </Button>
                       </div>

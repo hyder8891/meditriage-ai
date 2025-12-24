@@ -65,7 +65,7 @@ export function UserProfileDropdown() {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="flex items-center gap-2 h-auto py-2 px-3 hover:bg-slate-100"
+          className="flex items-center gap-2 h-auto min-h-[44px] py-2 px-3 hover:bg-slate-100"
         >
           <Avatar className="h-9 w-9">
             <AvatarFallback className={`${getAvatarColor()} text-white font-semibold`}>
@@ -85,7 +85,7 @@ export function UserProfileDropdown() {
         </Button>
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent align="end" className="w-64 md:w-72">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium">{user.name}</p>

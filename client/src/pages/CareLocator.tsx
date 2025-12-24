@@ -302,10 +302,10 @@ function CareLocatorContent() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Search Filters */}
           <div className="lg:col-span-1">
-            <Card className="card-modern sticky top-6">
+            <Card className="card-modern lg:sticky lg:top-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Search className="w-5 h-5" />
@@ -321,6 +321,7 @@ function CareLocatorContent() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    className="min-h-[48px] text-base md:min-h-[40px] md:text-sm"
                   />
                 </div>
 
@@ -368,7 +369,7 @@ function CareLocatorContent() {
 
                 <Button
                   onClick={handleSearch}
-                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 min-h-[48px] text-base md:min-h-[40px] md:text-sm"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -513,10 +514,10 @@ function CareLocatorContent() {
                       )}
 
                       {/* Action Buttons */}
-                      <div className="grid grid-cols-3 gap-2 mt-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
                         <Button
                           variant="default"
-                          className="w-full"
+                          className="w-full min-h-[44px] text-base md:text-sm"
                           onClick={() => getDirections(facility)}
                         >
                           <Navigation className="w-4 h-4 mr-2" />
@@ -524,7 +525,7 @@ function CareLocatorContent() {
                         </Button>
                         <Button
                           variant="outline"
-                          className="w-full"
+                          className="w-full min-h-[44px] text-base md:text-sm"
                           onClick={() => viewOnMap(facility)}
                         >
                           <MapPinned className="w-4 h-4 mr-2" />
@@ -533,7 +534,7 @@ function CareLocatorContent() {
                         {useRealData && typeof facility.id === 'string' && (
                           <Button
                             variant="outline"
-                            className="w-full"
+                            className="w-full min-h-[44px] text-base md:text-sm"
                             onClick={() => fetchFacilityDetails(facility.id as string)}
                           >
                             <ImageIcon className="w-4 h-4 mr-2" />

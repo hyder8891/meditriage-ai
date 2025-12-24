@@ -334,7 +334,7 @@ export default function MedicalReportsAnalysis() {
             <Button
               onClick={handleAnalyze}
               disabled={!selectedFile || !selectedReportType || uploadMutation.isPending}
-              className="w-full"
+              className="w-full min-h-[56px] text-lg md:min-h-[48px] md:text-base"
               size="lg"
             >
               {uploadMutation.isPending ? (

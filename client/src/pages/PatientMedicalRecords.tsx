@@ -63,16 +63,16 @@ export default function PatientMedicalRecords() {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="lab" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="lab">
+          <TabsList className="grid w-full max-w-md grid-cols-3 h-auto">
+            <TabsTrigger value="lab" className="min-h-[48px] text-sm md:min-h-[40px] py-2">
               <Microscope className="w-4 h-4 mr-2" />
               {language === 'ar' ? 'التحاليل' : 'Lab Results'}
             </TabsTrigger>
-            <TabsTrigger value="imaging">
+            <TabsTrigger value="imaging" className="min-h-[48px] text-sm md:min-h-[40px] py-2">
               <FileImage className="w-4 h-4 mr-2" />
               {language === 'ar' ? 'الأشعة' : 'Imaging'}
             </TabsTrigger>
-            <TabsTrigger value="prescriptions">
+            <TabsTrigger value="prescriptions" className="min-h-[48px] text-sm md:min-h-[40px] py-2">
               <Pill className="w-4 h-4 mr-2" />
               {language === 'ar' ? 'الوصفات' : 'Prescriptions'}
             </TabsTrigger>
@@ -135,11 +135,12 @@ export default function PatientMedicalRecords() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => setSelectedRecord(result)}
+                          className="min-h-[44px] text-base md:text-sm w-full sm:w-auto"
                         >
                           <Eye className="w-4 h-4 mr-2" />
                           {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
@@ -149,6 +150,7 @@ export default function PatientMedicalRecords() {
                             size="sm"
                             variant="outline"
                             onClick={() => window.open(result.fileUrl, '_blank')}
+                            className="min-h-[44px] text-base md:text-sm w-full sm:w-auto"
                           >
                             <Download className="w-4 h-4 mr-2" />
                             {language === 'ar' ? 'تحميل' : 'Download'}

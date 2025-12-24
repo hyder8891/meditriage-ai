@@ -202,13 +202,13 @@ export default function ModernSymptomChecker() {
             {currentResponse?.quickReplies && currentResponse.quickReplies.length > 0 && !isTyping && (
               <div className="flex flex-wrap gap-2 mt-4">
                 {currentResponse.quickReplies.map((chip, idx) => (
-                  <Button
-                    key={idx}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickReply(chip)}
-                    className="rounded-full"
-                  >
+              <Button
+                key={idx}
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuickReply(chip)}
+                className="rounded-full min-h-[44px] px-4 text-base md:text-sm md:min-h-[36px]"
+              >
                     {isArabic && chip.textAr ? chip.textAr : chip.text}
                   </Button>
                 ))}
@@ -230,7 +230,7 @@ export default function ModernSymptomChecker() {
               <div className="flex gap-3 mt-6">
                 <Button
                   onClick={() => setLocation("/patient/care-locator")}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 min-h-[48px] text-base md:min-h-[40px] md:text-sm"
                 >
                   <Stethoscope className="w-4 h-4 mr-2" />
                   {isArabic ? "ابحث عن طبيب" : "Find a Doctor"}
@@ -238,7 +238,7 @@ export default function ModernSymptomChecker() {
                 <Button
                   onClick={() => setLocation("/patient/appointments")}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 min-h-[48px] text-base md:min-h-[40px] md:text-sm"
                 >
                   <Calendar className="w-4 h-4 mr-2" />
                   {isArabic ? "احجز موعد" : "Book Appointment"}
@@ -256,14 +256,15 @@ export default function ModernSymptomChecker() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={isArabic ? "اكتب رسالتك..." : "Type your message..."}
+                placeholder={isArabic ? "اكتب أعراضك هنا..." : "Type your symptoms here..."}
                 disabled={isTyping}
-                className="flex-1"
+                className="flex-1 min-h-[48px] text-base md:min-h-[40px] md:text-sm"
               />
               <Button
                 onClick={() => handleSendMessage(inputValue)}
                 disabled={isTyping || !inputValue.trim()}
                 size="icon"
+                className="min-h-[48px] min-w-[48px] md:min-h-[40px] md:min-w-[40px]"
               >
                 {isTyping ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
