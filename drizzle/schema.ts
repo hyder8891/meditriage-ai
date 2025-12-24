@@ -3455,3 +3455,131 @@ export const drugInteractionChecks = mysqlTable("drug_interaction_checks", {
 
 export type DrugInteractionCheck = typeof drugInteractionChecks.$inferSelect;
 export type InsertDrugInteractionCheck = typeof drugInteractionChecks.$inferInsert;
+
+/**
+ * SOAP Note Templates - Pre-built templates for common medical scenarios
+ * Optimized for Iraqi healthcare context
+ */
+export const soapNoteTemplates = mysqlTable("soap_note_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Template identification
+  name: varchar("name", { length: 255 }).notNull(),
+  nameAr: varchar("name_ar", { length: 255 }).notNull(), // Arabic name
+  category: mysqlEnum("category", [
+    "chest_pain",
+    "fever",
+    "trauma",
+    "pediatric",
+    "respiratory",
+    "gastrointestinal",
+    "neurological",
+    "general"
+  ]).notNull(),
+  
+  // Template content structure
+  subjectiveTemplate: text("subjective_template").notNull(), // JSON structure with prompts
+  objectiveTemplate: text("objective_template").notNull(), // JSON structure with common findings
+  assessmentTemplate: text("assessment_template").notNull(), // JSON structure with differential diagnoses
+  planTemplate: text("plan_template").notNull(), // JSON structure with treatment options
+  
+  // Template metadata
+  description: text("description").notNull(),
+  descriptionAr: text("description_ar").notNull(),
+  keywords: text("keywords"), // JSON array for search
+  keywordsAr: text("keywords_ar"), // Arabic keywords
+  
+  // Clinical context
+  commonSymptoms: text("common_symptoms"), // JSON array
+  redFlags: text("red_flags"), // JSON array of warning signs
+  typicalDiagnoses: text("typical_diagnoses"), // JSON array
+  
+  // Usage tracking
+  usageCount: int("usage_count").default(0).notNull(),
+  lastUsed: timestamp("last_used"),
+  
+  // Template management
+  isActive: boolean("is_active").default(true).notNull(),
+  isSystemTemplate: boolean("is_system_template").default(true).notNull(), // vs custom
+  createdBy: int("created_by"), // user_id of creator (null for system templates)
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SoapNoteTemplate = typeof soapNoteTemplates.$inferSelect;
+export type InsertSoapNoteTemplate = typeof soapNoteTemplates.$inferInsert;
+
+/**
+ * SOAP Export Logs - Tracks all EMR exports for audit and compliance
+ */
+export const soapExportLogs = mysqlTable("soap_export_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Export identification
+  exportId: varchar("export_id", { length: 64 }).unique().notNull(), // UUID for tracking
+  
+  // SOAP note reference
+  patientId: int("patient_id").notNull(),
+  clinicianId: int("clinician_id").notNull(),
+  encounterDate: timestamp("encounter_date").notNull(),
+  
+  // SOAP content snapshot (for audit trail)
+  soapContent: text("soap_content").notNull(), // JSON snapshot of complete SOAP note
+  
+  // Export details
+  exportFormat: mysqlEnum("export_format", [
+    "pdf_with_qr",
+    "pdf_simple",
+    "hl7_v2",
+    "hl7_v3",
+    "fhir_json",
+    "fhir_xml"
+  ]).notNull(),
+  
+  // File storage
+  fileKey: varchar("file_key", { length: 512 }), // S3 key for exported file
+  fileUrl: varchar("file_url", { length: 1024 }), // S3 URL
+  fileSize: int("file_size"), // in bytes
+  
+  // QR code details (for PDF exports)
+  qrCodeData: text("qr_code_data"), // JSON with verification URL and metadata
+  qrCodeImageKey: varchar("qr_code_image_key", { length: 512 }), // S3 key for QR image
+  
+  // HL7 message details (for HL7 exports)
+  hl7MessageType: varchar("hl7_message_type", { length: 50 }), // e.g., "ADT^A01", "ORU^R01"
+  hl7Version: varchar("hl7_version", { length: 20 }), // e.g., "2.5", "2.7"
+  hl7MessageId: varchar("hl7_message_id", { length: 255 }), // unique message control ID
+  
+  // Destination system
+  destinationSystem: varchar("destination_system", { length: 255 }), // hospital/EMR system name
+  destinationFacilityId: varchar("destination_facility_id", { length: 100 }), // facility identifier
+  
+  // Export status
+  status: mysqlEnum("status", [
+    "pending",
+    "generated",
+    "delivered",
+    "failed",
+    "expired"
+  ]).default("pending").notNull(),
+  
+  errorMessage: text("error_message"),
+  
+  // Audit and compliance
+  exportedBy: int("exported_by").notNull(), // user_id who initiated export
+  exportPurpose: varchar("export_purpose", { length: 255 }), // reason for export
+  accessedCount: int("accessed_count").default(0).notNull(), // how many times downloaded/viewed
+  lastAccessedAt: timestamp("last_accessed_at"),
+  expiresAt: timestamp("expires_at"), // for temporary access links
+  
+  // Verification and security
+  verificationCode: varchar("verification_code", { length: 64 }), // for QR code verification
+  checksumMd5: varchar("checksum_md5", { length: 32 }), // file integrity check
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SoapExportLog = typeof soapExportLogs.$inferSelect;
+export type InsertSoapExportLog = typeof soapExportLogs.$inferInsert;

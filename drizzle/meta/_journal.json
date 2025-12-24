@@ -15,6 +15,13 @@
       "when": 1766577294879,
       "tag": "0001_cold_red_shift",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1766616644097,
+      "tag": "0002_spotty_mephistopheles",
+      "breakpoints": true
     }
   ]
 }

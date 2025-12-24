@@ -673,5 +673,34 @@
 - [x] Add confidence scoring display
 - [x] Update frontend UI to display improved SOAP notes with Streamdown
 - [x] Force LTR direction for English medical terminology
-- [ ] Test with sample patient data
-- [ ] Create checkpoint with improvements
+- [x] Create checkpoint with improvements
+
+
+## NEW: SOAP Note Templates for Common Iraqi Medical Scenarios
+- [x] Design database schema for template storage (soap_note_templates table)
+- [x] Create pre-built templates for common Iraqi medical scenarios:
+  - [x] Chest pain template (cardiac-focused)
+  - [x] Fever template (infectious disease-focused)
+  - [x] Trauma template (emergency/injury-focused)
+  - [x] Pediatric visits template (child-specific)
+- [x] Implement backend procedures to fetch and manage templates
+- [x] Build template selection UI in SOAP Notes page
+- [x] Add template preview functionality
+- [x] Implement template application to SOAP note generation
+- [ ] Test templates with AI-powered SOAP generation
+
+## NEW: EMR Export System
+- [x] Design database schema for export logs (soap_export_logs table)
+- [x] Implement PDF export with QR code functionality
+  - [x] Generate professional medical PDF format
+  - [x] Add QR code with SOAP note ID and verification URL
+  - [x] Include hospital branding support
+- [x] Implement HL7 format export
+  - [x] Create HL7 v2.x message builder
+  - [x] Support common HL7 segments (PID, PV1, OBX, etc.)
+  - [x] Add HL7 validation
+- [x] Create backend procedures for export operations
+- [x] Build export UI with format selection (PDF/HL7)
+- [x] Add export history tracking and audit log
+- [x] Implement download functionality for exported files
+- [x] Write comprehensive vitest tests for export functions

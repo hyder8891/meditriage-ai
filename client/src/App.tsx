@@ -48,6 +48,7 @@ import LabResults from "./pages/LabResults";
 import CaseTimeline from "./pages/CaseTimeline";
 import XRayAnalysis from "./pages/XRayAnalysis";
 import MedicalReportsAnalysis from "./pages/clinician/MedicalReportsAnalysis";
+import SOAPTemplates from "./pages/SOAPTemplates";
 import ClinicianCalendar from "./pages/ClinicianCalendar";
 import MedicationManagement from "./pages/MedicationManagement";
 import PatientMedications from "./pages/PatientMedications";
@@ -128,6 +129,9 @@ function Router() {
       </Route>
       <Route path={"/clinician/xray-analysis"}>
         {() => <ProtectedRoute requiredRole="clinician"><XRayAnalysis /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/soap-templates"}>
+        {() => <ProtectedRoute requiredRole="clinician"><SOAPTemplates /></ProtectedRoute>}
       </Route>
       <Route path={"/clinician/medical-reports"}>
         {() => <ProtectedRoute requiredRole="clinician"><MedicalReportsAnalysis /></ProtectedRoute>}

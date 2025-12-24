@@ -30,6 +30,7 @@ import { budgetRouter } from "./budget-router";
 import { orchestrationRouter } from "./orchestration-router";
 import { onboardingRouter } from "./onboarding-router";
 import { loadTestRouter } from "./load-test-router";
+import { soapRouter } from "./soap-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -96,6 +97,7 @@ export const appRouter = router({
   orchestration: orchestrationRouter,
   onboarding: onboardingRouter,
   loadTest: loadTestRouter,
+  soap: soapRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
