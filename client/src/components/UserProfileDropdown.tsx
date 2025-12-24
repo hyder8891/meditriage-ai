@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,7 @@ import {
 export function UserProfileDropdown() {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
+  const { language } = useLanguage();
 
   if (!user) return null;
 
@@ -72,7 +74,12 @@ export function UserProfileDropdown() {
           </Avatar>
           <div className="hidden md:flex flex-col items-start">
             <span className="text-sm font-medium text-slate-900">{user.name}</span>
-            <span className="text-xs text-slate-500 capitalize">{user.role}</span>
+            <span className="text-xs text-slate-500 capitalize">
+              {language === 'ar' 
+                ? (user.role === 'admin' ? 'مدير' : user.role === 'clinician' ? 'طبيب' : 'مريض')
+                : user.role
+              }
+            </span>
           </div>
           <ChevronDown className="h-4 w-4 text-slate-500" />
         </Button>
@@ -84,7 +91,7 @@ export function UserProfileDropdown() {
             <p className="text-sm font-medium">{user.name}</p>
             <p className="text-xs text-muted-foreground">{user.email}</p>
             <p className="text-xs text-muted-foreground">
-              ID: <span className="font-mono">{user.id}</span>
+              {language === 'ar' ? 'المعرف' : 'ID'}: <span className="font-mono">{user.id}</span>
             </p>
           </div>
         </DropdownMenuLabel>
@@ -94,20 +101,20 @@ export function UserProfileDropdown() {
         {user.role === "patient" && (
           <>
             <DropdownMenuItem onClick={() => setLocation("/patient/portal")}>
-              <User className="mr-2 h-4 w-4" />
-              <span>My Portal</span>
+              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'بوابتي' : 'My Portal'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/patient/messages")}>
-              <MessageSquare className="mr-2 h-4 w-4" />
-              <span>Messages</span>
+              <MessageSquare className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'الرسائل' : 'Messages'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/patient/my-doctors")}>
-              <FileText className="mr-2 h-4 w-4" />
-              <span>My Doctors</span>
+              <FileText className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'أطبائي' : 'My Doctors'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/patient/subscription")}>
-              <CreditCard className="mr-2 h-4 w-4" />
-              <span>Subscription</span>
+              <CreditCard className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'الاشتراك' : 'Subscription'}</span>
             </DropdownMenuItem>
           </>
         )}
@@ -115,20 +122,20 @@ export function UserProfileDropdown() {
         {user.role === "clinician" && (
           <>
             <DropdownMenuItem onClick={() => setLocation("/clinician/dashboard")}>
-              <User className="mr-2 h-4 w-4" />
-              <span>Dashboard</span>
+              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/clinician/patients")}>
-              <FileText className="mr-2 h-4 w-4" />
-              <span>My Patients</span>
+              <FileText className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'مرضاي' : 'My Patients'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/clinician/messages")}>
-              <MessageSquare className="mr-2 h-4 w-4" />
-              <span>Messages</span>
+              <MessageSquare className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'الرسائل' : 'Messages'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/clinician/subscription")}>
-              <CreditCard className="mr-2 h-4 w-4" />
-              <span>Subscription</span>
+              <CreditCard className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'الاشتراك' : 'Subscription'}</span>
             </DropdownMenuItem>
           </>
         )}
@@ -136,12 +143,12 @@ export function UserProfileDropdown() {
         {user.role === "admin" && (
           <>
             <DropdownMenuItem onClick={() => setLocation("/admin/dashboard")}>
-              <User className="mr-2 h-4 w-4" />
-              <span>Admin Dashboard</span>
+              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'لوحة المدير' : 'Admin Dashboard'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/admin/users")}>
-              <FileText className="mr-2 h-4 w-4" />
-              <span>Manage Users</span>
+              <FileText className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'إدارة المستخدمين' : 'Manage Users'}</span>
             </DropdownMenuItem>
           </>
         )}
@@ -149,8 +156,8 @@ export function UserProfileDropdown() {
         <DropdownMenuSeparator />
         
         <DropdownMenuItem onClick={() => setLocation("/settings")}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <Settings className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+          <span>{language === 'ar' ? 'الإعدادات' : 'Settings'}</span>
         </DropdownMenuItem>
         
         <DropdownMenuSeparator />
@@ -159,8 +166,8 @@ export function UserProfileDropdown() {
           onClick={handleLogout}
           className="text-red-600 focus:text-red-600 focus:bg-red-50"
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <LogOut className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+          <span>{language === 'ar' ? 'تسجيل الخروج' : 'Log out'}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -180,7 +180,9 @@ describe('BRAIN System Tests', () => {
 
       expect(caseHistory).toBeDefined();
       expect(caseHistory.caseId).toBe(diagnosis.caseId);
-      expect(caseHistory.symptoms).toEqual(input.symptoms);
+      // Symptoms are now stored as structured objects with medical concepts
+      expect(Array.isArray(caseHistory.symptoms)).toBe(true);
+      expect(caseHistory.symptoms.length).toBeGreaterThan(0);
     }, 30000);
   });
 

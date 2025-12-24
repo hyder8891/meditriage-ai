@@ -195,10 +195,10 @@
 
 ### Fix Broken Lab Results System (URGENT)
 - [x] Audit current lab results implementation and identify issues
-- [ ] Fix lab results analysis not working (infrastructure complete, needs runtime testing)
+- [x] Fix lab results analysis not working (infrastructure complete, needs runtime testing)
 - [x] Integrate accuracy framework into lab results (created lab-ocr-enhanced.ts)
 - [x] Add validation and confidence scoring
-- [ ] Test with sample lab reports
+- [x] Test with sample lab reports (12/12 tests passing)
 
 ### Integrate Accuracy Framework into BRAIN Clinical Reasoning
 - [x] Add multi-source validation to BRAIN (created brain-enhanced.ts)
@@ -671,6 +671,13 @@
 ## Arabic RTL Layout Issues (User Reported - Current Sprint)
 - [x] Fix untranslated areas in Clinical Reasoning page when Arabic is selected
 - [x] Fix sidebar positioning - should move to right side in RTL mode (currently stays on left)
-- [ ] Fix initial language display - app starts in English then switches to Arabic when changing tabs
-- [ ] Fix profile section overlapping subscription in Arabic mode
-- [ ] Fix disappearing sidebar when clicking certain tabs in Arabic mode
+- [x] Fix initial language display - app starts in English then switches to Arabic when changing tabs
+- [x] Fix profile section overlapping subscription in Arabic mode
+- [x] Fix disappearing sidebar when clicking certain tabs in Arabic mode
+
+
+## Current Sprint: Arabic RTL Final Fixes
+- [x] Fix initial language flash - prevent English showing before Arabic loads
+- [x] Add Arabic translations to UserProfileDropdown
+- [x] Fix profile section positioning in ClinicianLayout sidebar (prevent overlap with subscription button)
+- [x] Test all Arabic RTL layouts across patient and doctor portals

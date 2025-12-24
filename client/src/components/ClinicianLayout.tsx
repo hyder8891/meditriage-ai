@@ -254,7 +254,9 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
             </Button>
           </nav>
 
-          <div className="absolute bottom-4 left-0 right-0 px-4">
+          <div className={`absolute bottom-4 px-4 ${
+            isCollapsed ? 'left-0 right-0' : (language === 'ar' ? 'left-4 right-4' : 'left-4 right-4')
+          }`}>
             <UserProfileDropdown />
           </div>
         </div>
