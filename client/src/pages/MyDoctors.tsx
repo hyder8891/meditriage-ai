@@ -4,24 +4,30 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, User, Circle, MessageCircle, Calendar, FileText, Plus } from "lucide-react";
 import { Link } from "wouter";
+import { PatientLayout } from "@/components/PatientLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-export default function MyDoctors() {
+function MyDoctorsContent() {
+  const { language } = useLanguage();
+  const isArabic = language === 'ar';
   const { data: doctors, isLoading } = trpc.b2b2c.patient.getMyDoctors.useQuery();
 
   return (
-    <div className="container max-w-6xl py-8 space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">My Doctors</h1>
+          <h1 className="text-3xl font-bold">
+            {isArabic ? 'أطبائي' : 'My Doctors'}
+          </h1>
           <p className="text-muted-foreground">
-            Doctors you're connected with for consultations
+            {isArabic ? 'الأطباء المتصلون معك للاستشارات' : 'Doctors you\'re connected with for consultations'}
           </p>
         </div>
         
-        <Link href="/patient/find-doctor">
+        <Link href="/patient/find-doctors">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
-            Find New Doctor
+            {isArabic ? 'ابحث عن طبيب جديد' : 'Find New Doctor'}
           </Button>
         </Link>
       </div>
@@ -35,15 +41,17 @@ export default function MyDoctors() {
           <div className="text-center space-y-4">
             <User className="h-16 w-16 mx-auto text-muted-foreground" />
             <div className="space-y-2">
-              <h3 className="font-semibold text-lg">No Connected Doctors</h3>
+              <h3 className="font-semibold text-lg">
+                {isArabic ? 'لا يوجد أطباء متصلون' : 'No Connected Doctors'}
+              </h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                You haven't connected with any doctors yet. Find available doctors to start consultations.
+                {isArabic ? 'لم تتصل بأي طبيب بعد. ابحث عن الأطباء المتاحين لبدء الاستشارات.' : 'You haven\'t connected with any doctors yet. Find available doctors to start consultations.'}
               </p>
             </div>
-            <Link href="/patient/find-doctor">
+            <Link href="/patient/find-doctors">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Find a Doctor
+                {isArabic ? 'ابحث عن طبيب' : 'Find a Doctor'}
               </Button>
             </Link>
           </div>
@@ -130,10 +138,24 @@ export default function MyDoctors() {
 
       {doctors && doctors.length > 0 && (
         <div className="text-center text-sm text-muted-foreground">
-          Connected with {doctors.length} doctor{doctors.length !== 1 ? 's' : ''}
+          {isArabic 
+            ? `متصل مع ${doctors.length} ${doctors.length === 1 ? 'طبيب' : 'أطباء'}`
+            : `Connected with ${doctors.length} doctor${doctors.length !== 1 ? 's' : ''}`
+          }
         </div>
       )}
     </div>
+  );
+}
+
+export default function MyDoctors() {
+  const { language } = useLanguage();
+  const isArabic = language === 'ar';
+  
+  return (
+    <PatientLayout title={isArabic ? 'أطبائي' : 'My Doctors'}>
+      <MyDoctorsContent />
+    </PatientLayout>
   );
 }
 

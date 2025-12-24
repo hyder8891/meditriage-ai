@@ -529,3 +529,63 @@
 - [ ] Add allergy checking for medication recommendations
 - [ ] Personalize recommendations based on patient profile
 - [ ] Add age-specific and gender-specific clinical guidelines
+
+
+## NEW: Navigation & UX Improvements (User Request - Current Sprint)
+
+### Navigation Dead-End Fixes
+- [x] Audit all patient portal pages for navigation dead-ends
+- [x] Audit all doctor dashboard pages for navigation dead-ends
+- [x] Add back buttons or breadcrumbs to all nested pages
+- [x] Create PatientLayout component with consistent navigation
+- [x] Update MyDoctors page with PatientLayout
+- [x] Update Messages page with role-based layouts
+- [x] Ensure all tabs/sections have clear exit routes
+- [x] Fixed TypeScript errors in AdminDashboard and AdminUsers
+
+### Doctor Dashboard Sidebar Enhancement
+- [x] Implement collapsible sidebar for doctor dashboard
+- [x] Add minimized mode showing only icons (not full text)
+- [x] Keep sidebar always visible (persistent across all doctor pages)
+- [x] Add smooth transition animation for collapse/expand
+- [x] Store sidebar state in localStorage for persistence
+- [x] Sidebar functionality tested and working
+
+### Medical Reports & Imaging Output Restructuring
+- [x] Redesign report output with better visual hierarchy
+- [x] Add structured sections with clear headers
+- [x] Implement collapsible sections for detailed data
+- [x] Add visual indicators for critical findings (icons, colors)
+- [x] Create MedicalReportDisplay component with enhanced structure
+- [x] Add summary section at top of reports
+- [x] Format findings with severity badges and categories
+- [x] Add interpretation badges (Normal/Abnormal/Critical)
+- [x] Color-code recommendations (immediate/follow-up/lifestyle)
+- [ ] Apply same improvements to imaging test results
+- [ ] Test report formatting with various report types
+
+### Comprehensive Arabic RTL Localization
+- [x] Implement language toggle system (Arabic/English) - Already exists in LanguageContext
+- [x] Add Arabic translations for all UI text - Localization file exists
+- [x] Keep medical terms, medicines, and methodology in English
+- [x] Implement RTL layout for Arabic mode - Already in LanguageContext
+- [x] Add Arabic font support (Cairo from Google Fonts)
+- [x] Create translation file structure (i18n) - shared/localization.ts
+- [x] Add Arabic translations to MedicalReportDisplay component
+- [x] Add Arabic translations to Messages page
+- [x] Add Arabic translations to PatientLayout
+- [ ] Translate all patient portal pages
+- [ ] Translate all doctor dashboard pages
+- [ ] Translate all forms and buttons
+- [ ] Translate error messages and notifications
+- [ ] Test RTL layout on all pages
+- [ ] Ensure proper text alignment in Arabic mode
+- [ ] Test mixed content (Arabic UI + English medical terms)
+
+### Testing & Quality Assurance
+- [ ] Write vitest tests for navigation improvements
+- [ ] Test sidebar collapse/expand functionality
+- [ ] Test report formatting with real data
+- [ ] Test Arabic RTL layout across all pages
+- [ ] Test language switching functionality
+- [ ] Create checkpoint after all improvements

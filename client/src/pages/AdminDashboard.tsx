@@ -290,7 +290,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 {usersLoading ? (
-                  <TableSkeleton rows={10} columns={5} />
+                  <TableSkeleton rows={10} />
                 ) : (
                   <Table>
                     <TableHeader>

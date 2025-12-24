@@ -7,8 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Send, User, Circle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { PatientLayout } from "@/components/PatientLayout";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-export default function Messages() {
+function MessagesContent() {
+  const { language } = useLanguage();
+  const isArabic = language === 'ar';
   const { user } = useAuth();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [messageContent, setMessageContent] = useState("");
@@ -91,18 +96,25 @@ export default function Messages() {
   };
 
   return (
-    <div className="container max-w-7xl py-8">
+    <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Messages</h1>
+        <h1 className="text-3xl font-bold">
+          {isArabic ? 'الرسائل' : 'Messages'}
+        </h1>
         <p className="text-muted-foreground">
-          Secure messaging with your {user?.role === "patient" ? "doctors" : "patients"}
+          {isArabic 
+            ? `مراسلة آمنة مع ${user?.role === "patient" ? "أطبائك" : "مرضاك"}`
+            : `Secure messaging with your ${user?.role === "patient" ? "doctors" : "patients"}`
+          }
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-200px)]">
         {/* Conversations List */}
         <Card className="p-4 overflow-y-auto">
-          <h2 className="font-semibold mb-4">Conversations</h2>
+          <h2 className="font-semibold mb-4">
+            {isArabic ? 'المحادثات' : 'Conversations'}
+          </h2>
           
           {conversationsLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -115,7 +127,7 @@ export default function Messages() {
             </div>
           ) : !conversations || conversations.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              No conversations yet
+              {isArabic ? 'لا توجد محادثات بعد' : 'No conversations yet'}
             </div>
           ) : (
             <div className="space-y-2">
@@ -179,7 +191,7 @@ export default function Messages() {
         <Card className="md:col-span-2 flex flex-col">
           {!selectedUserId ? (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              Select a conversation to start messaging
+              {isArabic ? 'اختر محادثة لبدء المراسلة' : 'Select a conversation to start messaging'}
             </div>
           ) : (
             <>
@@ -191,7 +203,7 @@ export default function Messages() {
                   </div>
                 ) : !messages || messages.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground text-sm">
-                    No messages yet. Start the conversation!
+                    {isArabic ? 'لا توجد رسائل بعد. ابدأ المحادثة!' : 'No messages yet. Start the conversation!'}
                   </div>
                 ) : (
                   messages.map((message) => {
@@ -237,7 +249,7 @@ export default function Messages() {
               <div className="border-t p-4">
                 <div className="flex gap-2">
                   <Textarea
-                    placeholder="Type your message..."
+                    placeholder={isArabic ? 'اكتب رسالتك...' : 'Type your message...'}
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
                     onKeyDown={handleKeyPress}
@@ -258,7 +270,10 @@ export default function Messages() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Press Enter to send, Shift+Enter for new line
+                  {isArabic 
+                    ? 'اضغط Enter للإرسال، Shift+Enter لسطر جديد'
+                    : 'Press Enter to send, Shift+Enter for new line'
+                  }
                 </p>
               </div>
             </>
@@ -266,5 +281,26 @@ export default function Messages() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function Messages() {
+  const { user } = useAuth();
+  const { language } = useLanguage();
+  const isArabic = language === 'ar';
+  
+  // Wrap with appropriate layout based on user role
+  if (user?.role === 'clinician' || user?.role === 'admin') {
+    return (
+      <ClinicianLayout>
+        <MessagesContent />
+      </ClinicianLayout>
+    );
+  }
+  
+  return (
+    <PatientLayout title={isArabic ? 'الرسائل' : 'Messages'}>
+      <MessagesContent />
+    </PatientLayout>
   );
 }

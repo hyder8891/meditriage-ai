@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Streamdown } from "streamdown";
+import { MedicalReportDisplay } from "@/components/MedicalReportDisplay";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Upload,
   FileText,
@@ -173,6 +173,7 @@ const REPORT_TYPES: ReportTypeOption[] = [
 ];
 
 export default function MedicalReportsAnalysis() {
+  const { language } = useLanguage();
   const [selectedReportType, setSelectedReportType] = useState<ReportType | "">("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -359,240 +360,15 @@ export default function MedicalReportsAnalysis() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6">
-          {/* Header with urgency and actions */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Badge variant={getUrgencyColor(analysisResult.urgency)} className="text-sm">
-                {analysisResult.urgency.toUpperCase()}
-              </Badge>
-              <span className="text-sm text-muted-foreground">
-                Report Type: {REPORT_TYPES.find((t) => t.value === analysisResult.reportType)?.label}
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setAnalysisResult(null);
-                setSelectedFile(null);
-                setSelectedReportType("");
-              }}
-            >
-              Analyze Another Report
-            </Button>
-          </div>
-
-          {/* Critical Flags Alert */}
-          {analysisResult.criticalFlags && analysisResult.criticalFlags.length > 0 && (
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Critical Findings Detected</AlertTitle>
-              <AlertDescription>
-                <ul className="list-disc list-inside space-y-1 mt-2">
-                  {analysisResult.criticalFlags.map((flag: string, idx: number) => (
-                    <li key={idx}>{flag}</li>
-                  ))}
-                </ul>
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Summary Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-base leading-relaxed">{analysisResult.summary}</p>
-            </CardContent>
-          </Card>
-
-          {/* Tabbed Content */}
-          <Tabs defaultValue="findings" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="findings">Findings</TabsTrigger>
-              <TabsTrigger value="diagnosis">Diagnosis</TabsTrigger>
-              <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
-              <TabsTrigger value="quality">Report Quality</TabsTrigger>
-            </TabsList>
-
-            {/* Findings Tab */}
-            <TabsContent value="findings" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Clinical Findings</CardTitle>
-                  <CardDescription>
-                    {analysisResult.findings.length} finding(s) identified
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {analysisResult.findings.map((finding: any, idx: number) => (
-                      <div key={idx} className="border-l-4 border-l-primary pl-4 py-2">
-                        <div className="flex items-start gap-3">
-                          {getSeverityIcon(finding.severity)}
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge variant="outline">{finding.category}</Badge>
-                              {finding.location && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {finding.location}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm">{finding.finding}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Diagnosis Tab */}
-            <TabsContent value="diagnosis" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Diagnostic Impression</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-base font-semibold">Primary Diagnosis</Label>
-                    <p className="mt-2 text-base">{analysisResult.diagnosis.primary}</p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm">Confidence:</Label>
-                    <Badge variant="secondary">{analysisResult.diagnosis.confidence}%</Badge>
-                  </div>
-
-                  {analysisResult.diagnosis.differential.length > 0 && (
-                    <div>
-                      <Label className="text-base font-semibold">Differential Diagnoses</Label>
-                      <ul className="mt-2 space-y-1">
-                        {analysisResult.diagnosis.differential.map((diff: string, idx: number) => (
-                          <li key={idx} className="text-sm flex items-start gap-2">
-                            <span className="text-muted-foreground">•</span>
-                            <span>{diff}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Recommendations Tab */}
-            <TabsContent value="recommendations" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-3">
-                {/* Immediate Actions */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-red-500" />
-                      Immediate Actions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {analysisResult.recommendations.immediate.length > 0 ? (
-                      <ul className="space-y-2">
-                        {analysisResult.recommendations.immediate.map((rec: string, idx: number) => (
-                          <li key={idx} className="text-sm flex items-start gap-2">
-                            <span className="text-red-500">•</span>
-                            <span>{rec}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">No immediate actions required</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Follow-up */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-blue-500" />
-                      Follow-up
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {analysisResult.recommendations.followUp.length > 0 ? (
-                      <ul className="space-y-2">
-                        {analysisResult.recommendations.followUp.map((rec: string, idx: number) => (
-                          <li key={idx} className="text-sm flex items-start gap-2">
-                            <span className="text-blue-500">•</span>
-                            <span>{rec}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">No follow-up required</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Lifestyle */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Heart className="h-4 w-4 text-green-500" />
-                      Lifestyle
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {analysisResult.recommendations.lifestyle.length > 0 ? (
-                      <ul className="space-y-2">
-                        {analysisResult.recommendations.lifestyle.map((rec: string, idx: number) => (
-                          <li key={idx} className="text-sm flex items-start gap-2">
-                            <span className="text-green-500">•</span>
-                            <span>{rec}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">No lifestyle changes suggested</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Quality Tab */}
-            <TabsContent value="quality" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Report Quality Assessment</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm">Completeness</Label>
-                      <Badge variant="outline" className="mt-1">
-                        {analysisResult.technicalQuality.completeness}
-                      </Badge>
-                    </div>
-                    <div>
-                      <Label className="text-sm">Readability</Label>
-                      <Badge variant="outline" className="mt-1">
-                        {analysisResult.technicalQuality.readability}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-sm">Quality Notes</Label>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {analysisResult.technicalQuality.notes}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+        <MedicalReportDisplay
+          data={analysisResult}
+          reportTypeName={REPORT_TYPES.find((t) => t.value === analysisResult.reportType)?.label || "Unknown Report"}
+          onAnalyzeAnother={() => {
+            setAnalysisResult(null);
+            setSelectedFile(null);
+            setSelectedReportType("");
+          }}
+        />
       )}
     </div>
   );

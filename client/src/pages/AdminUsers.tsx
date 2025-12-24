@@ -135,7 +135,7 @@ export default function AdminUsers() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <TableSkeleton rows={5} columns={6} />
+              <TableSkeleton rows={5} />
             ) : (
               <Table>
                 <TableHeader>
