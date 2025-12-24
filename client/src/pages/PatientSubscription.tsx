@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { Check, Crown, Zap, AlertCircle, CreditCard } from "lucide-react";
+import { Check, Crown, Zap, AlertCircle, CreditCard, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 
 const PATIENT_PLANS = [
   {
@@ -74,6 +75,7 @@ const PATIENT_PLANS = [
 
 export default function PatientSubscription() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [language, setLanguage] = useState<"ar" | "en">("ar");
   
   const { data: subscription, isLoading: subLoading } = trpc.b2b2c.subscription.getCurrent.useQuery();
@@ -137,16 +139,25 @@ export default function PatientSubscription() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50" dir={language === "ar" ? "rtl" : "ltr"}>
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-slate-800">
-            {language === "ar" ? "إدارة الاشتراك" : "Subscription Management"}
-          </h1>
-          <button
-            onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
-            className="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
-          >
-            {language === "ar" ? "English" : "العربية"}
-          </button>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-3 mb-3">
+            <button
+              onClick={() => setLocation("/patient/portal")}
+              className="p-2 hover:bg-slate-100 rounded-lg transition"
+              aria-label={language === "ar" ? "رجوع" : "Back"}
+            >
+              <ArrowLeft className="w-5 h-5 text-slate-700" />
+            </button>
+            <h1 className="text-2xl font-bold text-slate-800 flex-1">
+              {language === "ar" ? "إدارة الاشتراك" : "Subscription Management"}
+            </h1>
+            <button
+              onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
+              className="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
+            >
+              {language === "ar" ? "English" : "العربية"}
+            </button>
+          </div>
         </div>
       </div>
 

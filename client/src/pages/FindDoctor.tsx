@@ -13,14 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Search, User, Circle, Check, MessageCircle } from "lucide-react";
+import { Loader2, Search, User, Circle, Check, MessageCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 type AvailabilityStatus = "available" | "busy" | "offline" | "all";
 
 export default function FindDoctor() {
   const { toast } = useToast();
   const utils = trpc.useUtils();
+  const [, setLocation] = useLocation();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<AvailabilityStatus>("available");
@@ -86,7 +88,16 @@ export default function FindDoctor() {
   return (
     <div className="container max-w-6xl py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6 px-3 sm:px-4">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">Find a Doctor</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <button
+            onClick={() => setLocation("/patient/portal")}
+            className="p-2 hover:bg-accent rounded-lg transition"
+            aria-label="Back"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-2xl sm:text-3xl font-bold">Find a Doctor</h1>
+        </div>
         <p className="text-sm sm:text-base text-muted-foreground">
           Connect with available doctors instantly for consultation
         </p>

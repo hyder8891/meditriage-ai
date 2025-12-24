@@ -68,14 +68,15 @@ function MyDoctorsContent() {
             const isBusy = doctor.availabilityStatus === "busy";
 
             return (
-              <Card key={relationship.id} className="p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
+              <Card key={relationship.id} className="p-4 sm:p-6 hover:shadow-md transition-shadow">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                  {/* Doctor Info Section */}
                   <div className="flex gap-4 flex-1">
                     <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <User className="h-8 w-8 text-primary" />
                     </div>
                     
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-2 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-semibold text-lg">{doctor.name || "Dr. Unknown"}</h3>
                         <AvailabilityBadge status={doctor.availabilityStatus || "offline"} />
@@ -108,23 +109,25 @@ function MyDoctorsContent() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2 ml-4">
-                    <Link href="/patient/messages">
+                  {/* Action Buttons Section - Stack on mobile, column on desktop */}
+                  <div className="flex flex-col gap-2 sm:ml-4 w-full sm:w-auto sm:min-w-[140px]">
+                    <Link href="/patient/messages" className="w-full">
                       <Button
                         disabled={!isAvailable}
                         className={isAvailable ? "bg-green-600 hover:bg-green-700 w-full" : "w-full"}
+                        size="sm"
                       >
                         <MessageCircle className="h-4 w-4 mr-2" />
                         {isAvailable ? "Message Now" : isBusy ? "Doctor Busy" : "Offline"}
                       </Button>
                     </Link>
                     
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="w-full">
                       <Calendar className="h-4 w-4 mr-2" />
                       Schedule
                     </Button>
                     
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="w-full">
                       <FileText className="h-4 w-4 mr-2" />
                       My Records
                     </Button>
