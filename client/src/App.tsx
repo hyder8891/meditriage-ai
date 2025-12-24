@@ -75,6 +75,7 @@ import PatientMedicalRecords from "./pages/PatientMedicalRecords";
 import BioScannerPage from "./pages/patient/BioScannerPage";
 import { PatientVitalsViewer } from "./pages/clinician/PatientVitalsViewer";
 import VitalsTrends from "./pages/VitalsTrends";
+import LoadTestDashboard from "./pages/LoadTestDashboard";
 import PatientAppointments from "./pages/PatientAppointments";
 import { Redirect } from "wouter";
 
@@ -210,6 +211,11 @@ function Router() {
       <Route path={"/admin/users"}>
         <ProtectedRoute requiredRole="admin">
           <AdminUsers />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/admin/load-test"}>
+        <ProtectedRoute requiredRole="admin">
+          <LoadTestDashboard />
         </ProtectedRoute>
       </Route>
       <Route path={"/settings"} component={Settings} />

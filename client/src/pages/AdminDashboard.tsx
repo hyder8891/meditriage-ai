@@ -106,12 +106,20 @@ export default function AdminDashboard() {
               </p>
             </div>
           </div>
-          <Link href="/admin/users">
-            <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
-              <Users className="w-4 h-4 mr-2" />
-              Manage All Users
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link href="/admin/load-test">
+              <Button variant="outline" className="border-purple-300 hover:bg-purple-50">
+                <Activity className="w-4 h-4 mr-2" />
+                Load Testing
+              </Button>
+            </Link>
+            <Link href="/admin/users">
+              <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
+                <Users className="w-4 h-4 mr-2" />
+                Manage All Users
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Alerts */}
