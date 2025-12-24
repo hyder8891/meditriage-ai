@@ -218,8 +218,8 @@ export default function Home() {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Users className="w-4 h-4 inline mr-3" />
-                  {language === 'ar' ? 'للمرضى' : 'For Patients'}
+                  <Users className="w-4 h-4 inline" />
+                  <span className="mr-2">{language === 'ar' ? 'للمرضى' : 'For Patients'}</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('doctor')}
@@ -229,8 +229,8 @@ export default function Home() {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Stethoscope className="w-4 h-4 inline mr-3" />
-                  {language === 'ar' ? 'للأطباء' : 'For Doctors'}
+                  <Stethoscope className="w-4 h-4 inline" />
+                  <span className="mr-2">{language === 'ar' ? 'للأطباء' : 'For Doctors'}</span>
                 </button>
               </div>
 
@@ -1279,12 +1279,12 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" onClick={() => setLocation("/patient-login")} className="bg-white text-rose-600 hover:bg-slate-100 px-8 py-6 text-lg">
-              <Activity className="w-5 h-5 mr-2" />
-              {language === 'ar' ? 'للمرضى - ابدأ الآن' : 'For Patients - Get Started'}
+              <Activity className="w-5 h-5" />
+              <span className="mr-2">{language === 'ar' ? 'للمرضى - ابدأ الآن' : 'For Patients - Get Started'}</span>
             </Button>
             <Button size="lg" onClick={() => setLocation("/clinician-login")} className="bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white/20 px-8 py-6 text-lg">
-              <Stethoscope className="w-5 h-5 mr-2" />
-              {language === 'ar' ? 'للأطباء - انضم الآن' : 'For Doctors - Join Now'}
+              <Stethoscope className="w-5 h-5" />
+              <span className="mr-2">{language === 'ar' ? 'للأطباء - انضم الآن' : 'For Doctors - Join Now'}</span>
             </Button>
           </div>
         </div>

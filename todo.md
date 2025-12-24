@@ -517,3 +517,7 @@
 - [ ] White-label solution
 - [ ] API marketplace for third-party integrations
 - [ ] Blockchain for medical records (future consideration)
+
+
+## Homepage UI Spacing Issues (Current)
+- [x] Fix spacing between icons and Arabic text in homepage buttons
