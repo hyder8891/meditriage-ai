@@ -32,6 +32,19 @@ export const users = mysqlTable("users", {
   lastStatusChange: timestamp("last_status_change"),
   autoOfflineMinutes: int("auto_offline_minutes").default(15), // Auto-offline after inactivity
   
+  // Patient medical profile fields (for BRAIN diagnostic accuracy)
+  dateOfBirth: date("date_of_birth"),
+  gender: mysqlEnum("gender", ["male", "female", "other", "prefer_not_to_say"]),
+  bloodType: varchar("blood_type", { length: 10 }),
+  height: int("height"), // in cm
+  weight: decimal("weight", { precision: 5, scale: 2 }), // in kg
+  chronicConditions: text("chronic_conditions"), // JSON array of conditions
+  allergies: text("allergies"), // JSON array of allergies
+  currentMedications: text("current_medications"), // JSON array of medications
+  medicalHistory: text("medical_history"), // JSON object with detailed history
+  emergencyContact: varchar("emergency_contact", { length: 20 }),
+  emergencyContactName: varchar("emergency_contact_name", { length: 255 }),
+  
   // Email verification
   emailVerified: boolean("email_verified").default(false).notNull(),
   verificationToken: varchar("verification_token", { length: 255 }),
@@ -2592,3 +2605,127 @@ export const pressureSymptomEvents = mysqlTable("pressure_symptom_events", {
 
 export type PressureSymptomEvent = typeof pressureSymptomEvents.$inferSelect;
 export type InsertPressureSymptomEvent = typeof pressureSymptomEvents.$inferInsert;
+
+/**
+ * Conversation sessions - stores symptom assessment conversations
+ * Allows patients to view and resume previous assessments
+ */
+export const conversationSessions = mysqlTable("conversation_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  
+  // Session metadata
+  sessionId: varchar("session_id", { length: 100 }).unique().notNull(),
+  language: varchar("language", { length: 10 }).default("en").notNull(),
+  
+  // Status tracking
+  status: mysqlEnum("status", ["in_progress", "completed", "abandoned"]).default("in_progress").notNull(),
+  
+  // Timestamps
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+  lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(),
+  
+  // Context preservation
+  contextVector: text("context_vector"), // JSON serialized ConversationalContextVector
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ConversationSession = typeof conversationSessions.$inferSelect;
+export type InsertConversationSession = typeof conversationSessions.$inferInsert;
+
+/**
+ * Conversation messages - stores individual messages in a conversation
+ */
+export const conversationMessages = mysqlTable("conversation_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: int("session_id").notNull(), // FK to conversation_sessions
+  
+  // Message content
+  role: mysqlEnum("role", ["user", "assistant", "system"]).notNull(),
+  content: text("content").notNull(),
+  contentAr: text("content_ar"), // Arabic translation if applicable
+  
+  // Metadata
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  tokenCount: int("token_count"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ConversationMessage = typeof conversationMessages.$inferSelect;
+export type InsertConversationMessage = typeof conversationMessages.$inferInsert;
+
+/**
+ * Conversation results - stores final BRAIN assessment results
+ */
+export const conversationResults = mysqlTable("conversation_results", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: int("session_id").notNull().unique(), // FK to conversation_sessions
+  
+  // BRAIN assessment results
+  brainCaseId: varchar("brain_case_id", { length: 100 }),
+  triageLevel: mysqlEnum("triage_level", ["green", "yellow", "red"]).notNull(),
+  urgency: varchar("urgency", { length: 50 }).notNull(),
+  
+  // Diagnosis
+  primaryDiagnosis: varchar("primary_diagnosis", { length: 255 }),
+  diagnosisProbability: decimal("diagnosis_probability", { precision: 5, scale: 4 }),
+  differentialDiagnosis: text("differential_diagnosis"), // JSON array
+  
+  // Recommendations
+  recommendations: text("recommendations"), // JSON array
+  redFlags: text("red_flags"), // JSON array
+  immediateActions: text("immediate_actions"), // JSON array
+  specialistReferral: varchar("specialist_referral", { length: 255 }),
+  
+  // Avicenna-X resource matching
+  matchedDoctorId: int("matched_doctor_id"),
+  matchedClinicId: int("matched_clinic_id"),
+  matchScore: decimal("match_score", { precision: 5, scale: 4 }),
+  estimatedWaitTime: int("estimated_wait_time"), // minutes
+  
+  // Deep links
+  googleMapsLink: varchar("google_maps_link", { length: 512 }),
+  uberLink: varchar("uber_link", { length: 512 }),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ConversationResult = typeof conversationResults.$inferSelect;
+export type InsertConversationResult = typeof conversationResults.$inferInsert;
+
+/**
+ * Emergency alerts - stores critical red flag notifications
+ */
+export const emergencyAlerts = mysqlTable("emergency_alerts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  sessionId: int("session_id"), // FK to conversation_sessions (optional)
+  
+  // Alert details
+  severity: mysqlEnum("severity", ["critical", "high", "medium"]).default("high").notNull(),
+  alertType: varchar("alert_type", { length: 100 }).notNull(), // e.g., "chest_pain", "stroke_symptoms"
+  redFlags: text("red_flags").notNull(), // JSON array of detected red flags
+  
+  // Notification status
+  notificationSent: boolean("notification_sent").default(false).notNull(),
+  notificationMethod: varchar("notification_method", { length: 50 }), // "push", "email", "sms"
+  notificationSentAt: timestamp("notification_sent_at"),
+  
+  // User response
+  userAcknowledged: boolean("user_acknowledged").default(false).notNull(),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  userAction: varchar("user_action", { length: 255 }), // "called_emergency", "went_to_hospital", "dismissed"
+  
+  // Follow-up
+  followUpRequired: boolean("follow_up_required").default(false).notNull(),
+  followUpCompletedAt: timestamp("follow_up_completed_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type EmergencyAlert = typeof emergencyAlerts.$inferSelect;
+export type InsertEmergencyAlert = typeof emergencyAlerts.$inferInsert;

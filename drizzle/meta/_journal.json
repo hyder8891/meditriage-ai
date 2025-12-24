@@ -218,6 +218,20 @@
       "when": 1766491059646,
       "tag": "0030_petite_mysterio",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1766537765484,
+      "tag": "0031_sweet_lifeguard",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1766538061579,
+      "tag": "0032_rare_black_panther",
+      "breakpoints": true
     }
   ]
 }

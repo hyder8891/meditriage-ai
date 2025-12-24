@@ -488,3 +488,44 @@
   - [ ] Verify debug logs show correct state
 - [ ] Fix AI chat not triggering final triage recommendation after symptom collection
 - [ ] Fix Arabic language support - AI should ask questions in Arabic when language is 'ar'
+
+
+## BRAIN Enhancement Features (New Request - Current Sprint)
+
+### Patient Profile Enhancement
+- [x] Add age, date_of_birth, gender fields to users table
+- [x] Add medical_history JSON field to users table
+- [x] Add chronic_conditions, allergies, current_medications fields
+- [x] Add blood_type, height, weight fields
+- [ ] Update patient settings page with medical profile section
+- [ ] Create medical history form with common conditions checklist
+- [ ] Add medication management in profile
+- [ ] Add allergy management in profile
+
+### Conversation History System
+- [x] Create conversation_sessions table (session_id, user_id, started_at, completed_at, status)
+- [x] Create conversation_messages table (message_id, session_id, role, content, timestamp)
+- [x] Create conversation_results table (session_id, diagnosis, urgency, recommendations)
+- [x] Add tRPC endpoints: getConversationHistory, getSession, resumeSession, deleteSession
+- [ ] Build ConversationHistory component for patient dashboard
+- [ ] Add "My Assessments" tab to patient portal
+- [ ] Implement resume functionality (load previous context)
+- [ ] Add session status indicators (in_progress, completed, abandoned)
+
+### Emergency Triage Alerts
+- [x] Create emergency_alerts table (alert_id, user_id, session_id, red_flags, severity, sent_at)
+- [ ] Add red flag detection logic to BRAIN analysis
+- [ ] Integrate browser push notifications API
+- [ ] Add email notification for critical red flags
+- [ ] Create alert preferences in user settings
+- [ ] Build emergency alert UI component
+- [ ] Add "Call Emergency (122)" button for critical cases
+- [ ] Test notification delivery system
+
+### BRAIN Integration with Patient Profile
+- [ ] Update BRAIN to use patient age/gender from profile
+- [ ] Integrate medical history into diagnostic context
+- [ ] Add chronic condition consideration to differential diagnosis
+- [ ] Add allergy checking for medication recommendations
+- [ ] Personalize recommendations based on patient profile
+- [ ] Add age-specific and gender-specific clinical guidelines

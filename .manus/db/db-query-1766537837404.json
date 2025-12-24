@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users \nADD COLUMN date_of_birth DATE,\nADD COLUMN gender ENUM('male', 'female', 'other', 'prefer_not_to_say'),\nADD COLUMN blood_type VARCHAR(10),\nADD COLUMN height INT COMMENT 'in cm',\nADD COLUMN weight DECIMAL(5,2) COMMENT 'in kg',\nADD COLUMN chronic_conditions TEXT COMMENT 'JSON array',\nADD COLUMN allergies TEXT COMMENT 'JSON array',\nADD COLUMN current_medications TEXT COMMENT 'JSON array',\nADD COLUMN medical_history TEXT COMMENT 'JSON object',\nADD COLUMN emergency_contact VARCHAR(20),\nADD COLUMN emergency_contact_name VARCHAR(255);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute ALTER TABLE users \nADD COLUMN date_of_birth DATE,\nADD COLUMN gender ENUM('male', 'female', 'other', 'prefer_not_to_say'),\nADD COLUMN blood_type VARCHAR(10),\nADD COLUMN height INT COMMENT 'in cm',\nADD COLUMN weight DECIMAL(5,2) COMMENT 'in kg',\nADD COLUMN chronic_conditions TEXT COMMENT 'JSON array',\nADD COLUMN allergies TEXT COMMENT 'JSON array',\nADD COLUMN current_medications TEXT COMMENT 'JSON array',\nADD COLUMN medical_history TEXT COMMENT 'JSON object',\nADD COLUMN emergency_contact VARCHAR(20),\nADD COLUMN emergency_contact_name VARCHAR(255);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4724
+}

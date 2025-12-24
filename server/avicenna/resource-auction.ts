@@ -13,8 +13,6 @@
 
 import { getDb } from '../db';
 import { users, consultations } from '../../drizzle/schema';
-
-const db = await getDb();
 import { eq, and, gte, sql } from 'drizzle-orm';
 
 // ============================================================================
@@ -382,6 +380,9 @@ export function calculatePerformanceScore(
 export async function runResourceAuction(
   params: AuctionParams
 ): Promise<DoctorScore[]> {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
   // Fetch available doctors with required specialty
   const doctors = await db
     .select({
@@ -497,6 +498,15 @@ export async function runResourceAuction(
     else if (totalScore >= 40) recommendation = 'AVAILABLE';
     else recommendation = 'NOT_RECOMMENDED';
 
+    // Calculate metadata values outside object literal to avoid TypeScript narrowing issues
+    const avgResponseTime: number = (performanceMetrics as DoctorPerformanceMetrics | null)?.avgResponseTime ?? 180;
+    const successRate: number =
+      performanceMetrics !== null && (performanceMetrics as DoctorPerformanceMetrics).totalConsultations > 0
+        ? (performanceMetrics as DoctorPerformanceMetrics).successfulConsultations / (performanceMetrics as DoctorPerformanceMetrics).totalConsultations
+        : 0.85;
+    const patientRating: number = (performanceMetrics as DoctorPerformanceMetrics | null)?.patientSatisfactionAvg ?? 4.2;
+    const connectionStability: number = networkMetrics !== null ? 1 - (networkMetrics as NetworkQualityMetrics).connectionDropRate : 0.9;
+
     scoredDoctors.push({
       doctorId: doctor.id,
       doctorName: doctor.name || 'Unknown',
@@ -512,12 +522,10 @@ export async function runResourceAuction(
       metadata: {
         distance: Math.round(distance * 10) / 10,
         estimatedCost,
-        avgResponseTime: performanceMetrics?.avgResponseTime || 180,
-        successRate: performanceMetrics
-          ? performanceMetrics.successfulConsultations / performanceMetrics.totalConsultations
-          : 0.85,
-        patientRating: performanceMetrics?.patientSatisfactionAvg || 4.2,
-        connectionStability: networkMetrics ? 1 - networkMetrics.connectionDropRate : 0.9,
+        avgResponseTime,
+        successRate,
+        patientRating,
+        connectionStability,
       },
       recommendation,
     });

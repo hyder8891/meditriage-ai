@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS emergency_alerts (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  session_id INT,\n  severity ENUM('critical', 'high', 'medium') DEFAULT 'high' NOT NULL,\n  alert_type VARCHAR(100) NOT NULL,\n  red_flags TEXT NOT NULL,\n  notification_sent BOOLEAN DEFAULT FALSE NOT NULL,\n  notification_method VARCHAR(50),\n  notification_sent_at TIMESTAMP NULL,\n  user_acknowledged BOOLEAN DEFAULT FALSE NOT NULL,\n  acknowledged_at TIMESTAMP NULL,\n  user_action VARCHAR(255),\n  follow_up_required BOOLEAN DEFAULT FALSE NOT NULL,\n  follow_up_completed_at TIMESTAMP NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS emergency_alerts (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  session_id INT,\n  severity ENUM('critical', 'high', 'medium') DEFAULT 'high' NOT NULL,\n  alert_type VARCHAR(100) NOT NULL,\n  red_flags TEXT NOT NULL,\n  notification_sent BOOLEAN DEFAULT FALSE NOT NULL,\n  notification_method VARCHAR(50),\n  notification_sent_at TIMESTAMP NULL,\n  user_acknowledged BOOLEAN DEFAULT FALSE NOT NULL,\n  acknowledged_at TIMESTAMP NULL,\n  user_action VARCHAR(255),\n  follow_up_required BOOLEAN DEFAULT FALSE NOT NULL,\n  follow_up_completed_at TIMESTAMP NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1642
+}

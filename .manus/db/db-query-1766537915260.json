@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS conversation_results (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  session_id INT NOT NULL UNIQUE,\n  brain_case_id VARCHAR(100),\n  triage_level ENUM('green', 'yellow', 'red') NOT NULL,\n  urgency VARCHAR(50) NOT NULL,\n  primary_diagnosis VARCHAR(255),\n  diagnosis_probability DECIMAL(5,4),\n  differential_diagnosis TEXT,\n  recommendations TEXT,\n  red_flags TEXT,\n  immediate_actions TEXT,\n  specialist_referral VARCHAR(255),\n  matched_doctor_id INT,\n  matched_clinic_id INT,\n  match_score DECIMAL(5,4),\n  estimated_wait_time INT,\n  google_maps_link VARCHAR(512),\n  uber_link VARCHAR(512),\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS conversation_results (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  session_id INT NOT NULL UNIQUE,\n  brain_case_id VARCHAR(100),\n  triage_level ENUM('green', 'yellow', 'red') NOT NULL,\n  urgency VARCHAR(50) NOT NULL,\n  primary_diagnosis VARCHAR(255),\n  diagnosis_probability DECIMAL(5,4),\n  differential_diagnosis TEXT,\n  recommendations TEXT,\n  red_flags TEXT,\n  immediate_actions TEXT,\n  specialist_referral VARCHAR(255),\n  matched_doctor_id INT,\n  matched_clinic_id INT,\n  match_score DECIMAL(5,4),\n  estimated_wait_time INT,\n  google_maps_link VARCHAR(512),\n  uber_link VARCHAR(512),\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1655
+}

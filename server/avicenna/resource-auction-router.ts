@@ -7,8 +7,6 @@ import { router, publicProcedure, protectedProcedure } from '../_core/trpc';
 import { runResourceAuction, type AuctionParams } from './resource-auction';
 import { getDb } from '../db';
 import { doctorPerformanceMetrics, networkQualityMetrics, networkQualityLogs } from '../../drizzle/schema';
-
-const db = await getDb();
 import { eq } from 'drizzle-orm';
 
 export const resourceAuctionRouter = router({
@@ -59,6 +57,9 @@ export const resourceAuctionRouter = router({
   getDoctorPerformance: protectedProcedure
     .input(z.object({ doctorId: z.number() }))
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
       const metrics = await db
         .select()
         .from(doctorPerformanceMetrics)
@@ -74,6 +75,9 @@ export const resourceAuctionRouter = router({
   getDoctorNetworkQuality: protectedProcedure
     .input(z.object({ doctorId: z.number() }))
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
       const metrics = await db
         .select()
         .from(networkQualityMetrics)
@@ -103,6 +107,9 @@ export const resourceAuctionRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
       // Insert log
       await db.insert(networkQualityLogs).values({
         doctorId: input.doctorId,
@@ -139,6 +146,9 @@ export const resourceAuctionRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
       // Fetch existing metrics
       const existing = await db
         .select()

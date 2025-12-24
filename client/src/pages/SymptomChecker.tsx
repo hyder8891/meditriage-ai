@@ -26,7 +26,7 @@ interface Message {
 }
 
 interface Recommendations {
-  urgencyLevel: "emergency" | "urgent" | "routine" | "self_care";
+  urgencyLevel: "emergency" | "urgent" | "routine" | "self-care";
   urgencyDescription: string;
   possibleConditions: string[];
   recommendedActions: string[];
@@ -85,20 +85,21 @@ export default function SymptomChecker() {
       setContext(data.context);
       
       // Handle final triage result
-      if (data.triageResult) {
+      if (data.conversationStage === "complete" && data.differentialDiagnosis) {
+        const urgency = data.triageLevel === "red" ? "emergency" : data.triageLevel === "yellow" ? "urgent" : "routine";
         const recommendations: Recommendations = {
-          urgencyLevel: data.triageResult.urgency,
-          urgencyDescription: `Assessment complete - ${data.triageResult.urgency} priority`,
-          possibleConditions: data.triageResult.possibleConditions.map(c => c.name),
-          recommendedActions: data.triageResult.recommendations,
-          redFlagSymptoms: data.triageResult.redFlags,
+          urgencyLevel: urgency,
+          urgencyDescription: `Assessment complete - ${urgency} priority`,
+          possibleConditions: data.differentialDiagnosis.map((d: any) => d.condition),
+          recommendedActions: data.recommendations || [],
+          redFlagSymptoms: [],
           selfCareInstructions: [],
-          timelineForCare: data.triageResult.urgency === "emergency" 
+          timelineForCare: urgency === "emergency" 
             ? "Seek immediate emergency care" 
-            : data.triageResult.urgency === "urgent"
+            : urgency === "urgent"
             ? "Seek care within 24 hours"
             : "Schedule appointment within a week",
-          emergencyWarning: data.triageResult.urgency === "emergency" 
+          emergencyWarning: urgency === "emergency" 
             ? "This appears to be a medical emergency. Please seek immediate care." 
             : undefined,
         };
