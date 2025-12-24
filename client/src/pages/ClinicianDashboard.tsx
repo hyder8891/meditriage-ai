@@ -20,7 +20,9 @@ import {
   Pill,
   MessageSquare,
   Bell,
-  Crown
+  Crown,
+  DollarSign,
+  Database
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -174,6 +176,22 @@ export default function ClinicianDashboard() {
             >
               <MessageSquare className="w-5 h-5 mr-3" />
               Messages
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/budget-tracking")}
+            >
+              <DollarSign className="w-5 h-5 mr-3" />
+              Budget Tracking
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation("/clinician/orchestration-logs")}
+            >
+              <Database className="w-5 h-5 mr-3" />
+              Orchestration Logs
             </Button>
             <Button
               variant="ghost"

@@ -607,7 +607,8 @@
   - [x] Design budget tracking system architecture
   - [x] Add budget tracking to database schema
   - [x] Create budget tracking API endpoints
-  - [ ] Build budget filter UI component
+  - [x] Build budget filter UI component
+  - [x] Add to clinician dashboard sidebar
   - [ ] Test budget tracking functionality
 
 ### Orchestration Logs
@@ -615,7 +616,8 @@
   - [x] Design orchestration logging system
   - [x] Add orchestration logs to database schema
   - [x] Create logging API endpoints
-  - [ ] Build orchestration logs viewer UI
+  - [x] Build orchestration logs viewer UI
+  - [x] Add to clinician dashboard sidebar
   - [ ] Test logging functionality
 
 ### Avicenna-x Testing & Documentation

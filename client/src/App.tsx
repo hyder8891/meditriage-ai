@@ -30,8 +30,9 @@ import Advice from "./pages/Advice";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
-import AdminTraining from "./pages/AdminTraining";
 import AdminLoginTraditional from "./pages/AdminLoginTraditional";
+import BudgetTracking from "./pages/BudgetTracking";
+import OrchestrationLogs from "./pages/OrchestrationLogs";
 import PortalSelection from "./pages/PortalSelection";
 import ClinicianLogin from "./pages/ClinicianLogin";
 import ClinicianDashboard from "./pages/ClinicianDashboard";
@@ -181,8 +182,14 @@ function Router() {
       <Route path="/clinician/profile">
         {() => <ProtectedRoute requiredRole="clinician"><DoctorProfile /></ProtectedRoute>}
       </Route>
-      <Route path="/clinician/patient-vitals">
+      <Route path={"/clinician/patient-vitals"}>
         {() => <ProtectedRoute requiredRole="clinician"><PatientVitalsViewer /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/budget-tracking"}>
+        {() => <ProtectedRoute requiredRole="clinician"><BudgetTracking /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/orchestration-logs"}>
+        {() => <ProtectedRoute requiredRole="clinician"><OrchestrationLogs /></ProtectedRoute>}
       </Route>
       <Route path={"/triage"} component={Triage} />
       <Route path={"/advice"} component={Advice} />
@@ -195,7 +202,7 @@ function Router() {
       </Route>
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/login/traditional"} component={AdminLoginTraditional} />
-      <Route path={"/admin/training"} component={AdminTraining} />
+      {/* <Route path={"/admin/training"} component={AdminTraining} /> */}
       <Route path={"/admin/users"}>
         <ProtectedRoute requiredRole="admin">
           <AdminUsers />
