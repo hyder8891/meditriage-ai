@@ -60,6 +60,61 @@ export interface LocalizationStrings {
       };
     };
   };
+  // Clinician Portal
+  clinicianPortal: {
+    clinicalReasoning: {
+      title: string;
+      subtitle: string;
+      backToDashboard: string;
+      poweredBy: string;
+      patientInfo: {
+        title: string;
+        subtitle: string;
+      };
+      input: {
+        chiefComplaint: string;
+        chiefComplaintPlaceholder: string;
+        symptoms: string;
+        symptomsPlaceholder: string;
+        textMode: string;
+        voiceMode: string;
+        startRecording: string;
+        recording: string;
+        stopRecording: string;
+        recordedAudio: string;
+        deleteRecording: string;
+        reRecord: string;
+        patientAge: string;
+        patientAgePlaceholder: string;
+        patientGender: string;
+        genderMale: string;
+        genderFemale: string;
+        genderOther: string;
+        bloodPressure: string;
+        bloodPressurePlaceholder: string;
+        heartRate: string;
+        heartRatePlaceholder: string;
+        temperature: string;
+        temperaturePlaceholder: string;
+        oxygenSaturation: string;
+        oxygenSaturationPlaceholder: string;
+      };
+      buttons: {
+        generate: string;
+        analyzing: string;
+      };
+      results: {
+        differentialDiagnosis: string;
+        clinicalReasoning: string;
+        recommendations: string;
+        redFlags: string;
+        guidelines: string;
+        confidence: string;
+        noAnalysis: string;
+        enterInfo: string;
+      };
+    };
+  };
   // Patient Portal
   patientPortal: {
     symptomChecker: {
@@ -286,6 +341,60 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
             desc: 'Comprehensive patient history with visual progression tracking',
             features: ['Event Tracking', 'Vital Trends', 'Treatment History'],
           },
+        },
+      },
+    },
+    clinicianPortal: {
+      clinicalReasoning: {
+        title: 'Clinical Reasoning',
+        subtitle: 'Advanced AI diagnostic system with 20,000+ medical concepts & PubMed integration',
+        backToDashboard: 'Back to Dashboard',
+        poweredBy: 'Powered by BRAIN',
+        patientInfo: {
+          title: 'Patient Information',
+          subtitle: 'Enter clinical data for AI analysis',
+        },
+        input: {
+          chiefComplaint: 'Chief Complaint *',
+          chiefComplaintPlaceholder: 'e.g., Chest pain, Headache, Abdominal pain',
+          symptoms: 'Symptoms *',
+          symptomsPlaceholder: 'e.g., fever, cough, shortness of breath, fatigue',
+          textMode: 'Text',
+          voiceMode: 'Voice',
+          startRecording: 'Start Recording (Arabic)',
+          recording: 'Recording...',
+          stopRecording: 'Stop Recording',
+          recordedAudio: 'Audio recorded successfully',
+          deleteRecording: 'Delete',
+          reRecord: 'Re-record',
+          patientAge: 'Patient Age',
+          patientAgePlaceholder: 'e.g., 45',
+          patientGender: 'Patient Gender',
+          genderMale: 'Male',
+          genderFemale: 'Female',
+          genderOther: 'Other',
+          bloodPressure: 'Blood Pressure',
+          bloodPressurePlaceholder: 'e.g., 120/80',
+          heartRate: 'Heart Rate (bpm)',
+          heartRatePlaceholder: 'e.g., 72',
+          temperature: 'Temperature',
+          temperaturePlaceholder: 'e.g., 37.5°C',
+          oxygenSaturation: 'Oxygen Saturation (%)',
+          oxygenSaturationPlaceholder: 'e.g., 98',
+        },
+        buttons: {
+          generate: 'Generate Differential Diagnosis',
+          analyzing: 'Analyzing with AI...',
+        },
+        results: {
+          differentialDiagnosis: 'Differential Diagnosis',
+          clinicalReasoning: 'Clinical Reasoning',
+          recommendations: 'Recommendations',
+          redFlags: 'Red Flags',
+          guidelines: 'Clinical Guidelines',
+          confidence: 'Confidence',
+          noAnalysis: 'No analysis yet',
+          enterInfo: 'Enter patient information and click "Generate Differential Diagnosis"',
         },
       },
     },
@@ -518,6 +627,60 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
             desc: 'تاريخ شامل للمريض مع تتبع التقدم المرئي',
             features: ['تتبع الأحداث', 'اتجاهات العلامات الحيوية', 'تاريخ العلاج'],
           },
+        },
+      },
+    },
+    clinicianPortal: {
+      clinicalReasoning: {
+        title: 'التفكير السريري',
+        subtitle: 'نظام تشخيص ذكي متقدم مع أكثر من 20,000 مفهوم طبي وتكامل PubMed',
+        backToDashboard: 'العودة إلى لوحة التحكم',
+        poweredBy: 'مدعوم بـ BRAIN',
+        patientInfo: {
+          title: 'معلومات المريض',
+          subtitle: 'أدخل البيانات السريرية لتحليل الذكاء الاصطناعي',
+        },
+        input: {
+          chiefComplaint: 'الشكوى الرئيسية *',
+          chiefComplaintPlaceholder: 'مثال: ألم في الصدر، صداع، ألم في البطن',
+          symptoms: 'الأعراض *',
+          symptomsPlaceholder: 'مثال: حمى، سعال، ضيق في التنفس، إرهاق',
+          textMode: 'نص',
+          voiceMode: 'صوت',
+          startRecording: 'بدء التسجيل (عربي)',
+          recording: 'جاري التسجيل...',
+          stopRecording: 'إيقاف التسجيل',
+          recordedAudio: 'تم تسجيل الصوت بنجاح',
+          deleteRecording: 'حذف',
+          reRecord: 'إعادة التسجيل',
+          patientAge: 'عمر المريض',
+          patientAgePlaceholder: 'مثال: 45',
+          patientGender: 'جنس المريض',
+          genderMale: 'ذكر',
+          genderFemale: 'أنثى',
+          genderOther: 'آخر',
+          bloodPressure: 'ضغط الدم',
+          bloodPressurePlaceholder: 'مثال: 120/80',
+          heartRate: 'معدل ضربات القلب (نبضة/دقيقة)',
+          heartRatePlaceholder: 'مثال: 72',
+          temperature: 'درجة الحرارة',
+          temperaturePlaceholder: 'مثال: 37.5°م',
+          oxygenSaturation: 'تشبع الأكسجين (%)',
+          oxygenSaturationPlaceholder: 'مثال: 98',
+        },
+        buttons: {
+          generate: 'إنشاء التشخيص التفاضلي',
+          analyzing: 'جاري التحليل بالذكاء الاصطناعي...',
+        },
+        results: {
+          differentialDiagnosis: 'التشخيص التفاضلي',
+          clinicalReasoning: 'التفكير السريري',
+          recommendations: 'التوصيات',
+          redFlags: 'العلامات الحمراء',
+          guidelines: 'الإرشادات السريرية',
+          confidence: 'الثقة',
+          noAnalysis: 'لا يوجد تحليل بعد',
+          enterInfo: 'أدخل معلومات المريض وانقر على "إنشاء التشخيص التفاضلي"',
         },
       },
     },

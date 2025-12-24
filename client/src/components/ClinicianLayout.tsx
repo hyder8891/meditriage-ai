@@ -54,20 +54,20 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Sidebar - Collapsible with icon-only mode */}
-      <aside className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-50 overflow-y-auto transition-all duration-300 ${
+      <aside className={`fixed ${language === 'ar' ? 'right-0 border-l' : 'left-0 border-r'} top-0 h-full bg-white border-gray-200 z-50 overflow-y-auto transition-all duration-300 ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}>
         <div className="p-4 relative">
           {/* Collapse/Expand Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100 transition-colors z-10 shadow-sm"
+            className={`absolute ${language === 'ar' ? '-left-3' : '-right-3'} top-6 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100 transition-colors z-10 shadow-sm`}
             title={isCollapsed ? (language === 'ar' ? 'توسيع الشريط الجانبي' : 'Expand sidebar') : (language === 'ar' ? 'طي الشريط الجانبي' : 'Collapse sidebar')}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-gray-600" />
+              language === 'ar' ? <ChevronLeft className="w-4 h-4 text-gray-600" /> : <ChevronRight className="w-4 h-4 text-gray-600" />
             ) : (
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
+              language === 'ar' ? <ChevronRight className="w-4 h-4 text-gray-600" /> : <ChevronLeft className="w-4 h-4 text-gray-600" />
             )}
           </button>
 
@@ -98,7 +98,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'لوحة التحكم' : 'Dashboard') : ''}
             >
               <Activity className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'لوحة التحكم' : 'Dashboard')}
             </Button>
@@ -111,7 +111,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'التشخيص السريري' : 'Clinical Reasoning') : ''}
             >
               <TrendingUp className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'التشخيص السريري' : 'Clinical Reasoning')}
             </Button>
@@ -124,7 +124,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'حارس الأدوية' : 'PharmaGuard') : ''}
             >
               <Pill className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'حارس الأدوية' : 'PharmaGuard')}
             </Button>
@@ -137,7 +137,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'الكاتب الحي' : 'Live Scribe') : ''}
             >
               <Mic className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'الكاتب الحي' : 'Live Scribe')}
             </Button>
@@ -150,7 +150,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'نتائج التحاليل' : 'Lab Results') : ''}
             >
               <FileText className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'نتائج التحاليل' : 'Lab Results')}
             </Button>
@@ -163,7 +163,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'التصوير الطبي' : 'Medical Imaging') : ''}
             >
               <FileImage className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'التصوير الطبي' : 'Medical Imaging')}
             </Button>
@@ -176,7 +176,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'التقارير الطبية' : 'Medical Reports') : ''}
             >
               <FileText className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'التقارير الطبية' : 'Medical Reports')}
             </Button>
@@ -189,7 +189,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'التقويم' : 'Calendar') : ''}
             >
               <Calendar className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'التقويم' : 'Calendar')}
             </Button>
@@ -202,7 +202,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'الأدوية' : 'Medications') : ''}
             >
               <Pill className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'الأدوية' : 'Medications')}
             </Button>
@@ -215,7 +215,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'المرضى' : 'Patients') : ''}
             >
               <Users className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'المرضى' : 'Patients')}
             </Button>
@@ -228,7 +228,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'الرسائل' : 'Messages') : ''}
             >
               <MessageSquare className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'الرسائل' : 'Messages')}
               {unreadCount && unreadCount > 0 && (
@@ -248,7 +248,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               title={isCollapsed ? (language === 'ar' ? 'الاشتراك' : 'Subscription') : ''}
             >
               <Crown className={`w-5 h-5 ${
-                isCollapsed ? '' : 'mr-3'
+                isCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')
               }`} />
               {!isCollapsed && (language === 'ar' ? 'الاشتراك' : 'Subscription')}
             </Button>
@@ -262,7 +262,9 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
 
       {/* Main Content */}
       <main className={`transition-all duration-300 ${
-        isCollapsed ? 'ml-20' : 'ml-64'
+        language === 'ar' 
+          ? (isCollapsed ? 'mr-20' : 'mr-64')
+          : (isCollapsed ? 'ml-20' : 'ml-64')
       }`}>
         {children}
       </main>

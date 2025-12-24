@@ -666,3 +666,11 @@
 
 - [x] Update AI triage results to show only highest confidence recommendation
 - [x] Reduce content in triage results to focus on case details
+
+
+## Arabic RTL Layout Issues (User Reported - Current Sprint)
+- [x] Fix untranslated areas in Clinical Reasoning page when Arabic is selected
+- [x] Fix sidebar positioning - should move to right side in RTL mode (currently stays on left)
+- [ ] Fix initial language display - app starts in English then switches to Arabic when changing tabs
+- [ ] Fix profile section overlapping subscription in Arabic mode
+- [ ] Fix disappearing sidebar when clicking certain tabs in Arabic mode

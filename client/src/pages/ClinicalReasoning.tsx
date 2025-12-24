@@ -28,9 +28,11 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 function ClinicalReasoningContent() {
   const [, setLocation] = useLocation();
+  const { strings } = useLanguage();
   const [chiefComplaint, setChiefComplaint] = useState("");
   const [symptoms, setSymptoms] = useState("");
   const [patientAge, setPatientAge] = useState("");
@@ -209,15 +211,15 @@ function ClinicalReasoningContent() {
               onClick={() => setLocation("/clinician/dashboard")}
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Dashboard
+              {strings.clinicianPortal.clinicalReasoning.backToDashboard}
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <Brain className="w-8 h-8 text-purple-600" />
-                Clinical Reasoning
-                <Badge variant="default" className="bg-purple-600">Powered by BRAIN</Badge>
+                {strings.clinicianPortal.clinicalReasoning.title}
+                <Badge variant="default" className="bg-purple-600">{strings.clinicianPortal.clinicalReasoning.poweredBy}</Badge>
               </h1>
-              <p className="text-gray-600 mt-1">Advanced AI diagnostic system with 20,000+ medical concepts & PubMed integration</p>
+              <p className="text-gray-600 mt-1">{strings.clinicianPortal.clinicalReasoning.subtitle}</p>
             </div>
           </div>
         </div>
@@ -228,24 +230,24 @@ function ClinicalReasoningContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                Patient Information
+                {strings.clinicianPortal.clinicalReasoning.patientInfo.title}
               </CardTitle>
-              <CardDescription>Enter clinical data for AI analysis</CardDescription>
+              <CardDescription>{strings.clinicianPortal.clinicalReasoning.patientInfo.subtitle}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="complaint">Chief Complaint *</Label>
+                <Label htmlFor="complaint">{strings.clinicianPortal.clinicalReasoning.input.chiefComplaint}</Label>
                 <Input
                   id="complaint"
                   value={chiefComplaint}
                   onChange={(e) => setChiefComplaint(e.target.value)}
-                  placeholder="e.g., Chest pain, Headache, Abdominal pain"
+                  placeholder={strings.clinicianPortal.clinicalReasoning.input.chiefComplaintPlaceholder}
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="symptoms">Symptoms *</Label>
+                  <Label htmlFor="symptoms">{strings.clinicianPortal.clinicalReasoning.input.symptoms}</Label>
                   <div className="flex gap-2">
                     <Button
                       variant={!useAudioInput ? "default" : "outline"}
@@ -254,7 +256,7 @@ function ClinicalReasoningContent() {
                       type="button"
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
-                      Text
+                      {strings.clinicianPortal.clinicalReasoning.input.textMode}
                     </Button>
                     <Button
                       variant={useAudioInput ? "default" : "outline"}
@@ -263,7 +265,7 @@ function ClinicalReasoningContent() {
                       type="button"
                     >
                       <Mic className="h-4 w-4 mr-2" />
-                      Voice
+                      {strings.clinicianPortal.clinicalReasoning.input.voiceMode}
                     </Button>
                   </div>
                 </div>
@@ -272,7 +274,7 @@ function ClinicalReasoningContent() {
                     id="symptoms"
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
-                    placeholder="e.g., fever, cough, shortness of breath, fatigue"
+                    placeholder={strings.clinicianPortal.clinicalReasoning.input.symptomsPlaceholder}
                     rows={3}
                   />
                 ) : (
@@ -286,7 +288,7 @@ function ClinicalReasoningContent() {
                         type="button"
                       >
                         <Mic className="w-5 h-5 mr-2" />
-                        Start Recording (Arabic)
+                        {strings.clinicianPortal.clinicalReasoning.input.startRecording}
                       </Button>
                     )}
                     
@@ -294,7 +296,7 @@ function ClinicalReasoningContent() {
                       <div className="space-y-3">
                         <div className="flex items-center justify-center gap-3 p-4 bg-red-50 rounded-lg">
                           <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                          <span className="text-lg font-medium">Recording... {recordingTime}s</span>
+                          <span className="text-lg font-medium">{strings.clinicianPortal.clinicalReasoning.input.recording} {recordingTime}s</span>
                         </div>
                         <Button
                           onClick={stopRecording}
@@ -303,7 +305,7 @@ function ClinicalReasoningContent() {
                           type="button"
                         >
                           <Square className="w-5 h-5 mr-2" />
-                          Stop Recording
+                          {strings.clinicianPortal.clinicalReasoning.input.stopRecording}
                         </Button>
                       </div>
                     )}
@@ -324,7 +326,7 @@ function ClinicalReasoningContent() {
                             type="button"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
+                            {strings.clinicianPortal.clinicalReasoning.input.deleteRecording}
                           </Button>
                           <Button
                             onClick={startRecording}
@@ -333,7 +335,7 @@ function ClinicalReasoningContent() {
                             type="button"
                           >
                             <Mic className="w-4 h-4 mr-2" />
-                            Re-record
+                            {strings.clinicianPortal.clinicalReasoning.input.reRecord}
                           </Button>
                         </div>
                       </div>
@@ -344,17 +346,17 @@ function ClinicalReasoningContent() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="age">Age</Label>
+                  <Label htmlFor="age">{strings.clinicianPortal.clinicalReasoning.input.patientAge}</Label>
                   <Input
                     id="age"
                     type="number"
                     value={patientAge}
                     onChange={(e) => setPatientAge(e.target.value)}
-                    placeholder="Years"
+                    placeholder={strings.clinicianPortal.clinicalReasoning.input.patientAgePlaceholder}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="gender">Gender</Label>
+                  <Label htmlFor="gender">{strings.clinicianPortal.clinicalReasoning.input.patientGender}</Label>
                   <select
                     id="gender"
                     value={patientGender}
@@ -362,9 +364,9 @@ function ClinicalReasoningContent() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">Select</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="male">{strings.clinicianPortal.clinicalReasoning.input.genderMale}</option>
+                    <option value="female">{strings.clinicianPortal.clinicalReasoning.input.genderFemale}</option>
+                    <option value="other">{strings.clinicianPortal.clinicalReasoning.input.genderOther}</option>
                   </select>
                 </div>
               </div>
@@ -376,41 +378,41 @@ function ClinicalReasoningContent() {
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="bp">Blood Pressure</Label>
+                    <Label htmlFor="bp">{strings.clinicianPortal.clinicalReasoning.input.bloodPressure}</Label>
                     <Input
                       id="bp"
                       value={bloodPressure}
                       onChange={(e) => setBloodPressure(e.target.value)}
-                      placeholder="120/80"
+                      placeholder={strings.clinicianPortal.clinicalReasoning.input.bloodPressurePlaceholder}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="hr">Heart Rate</Label>
+                    <Label htmlFor="hr">{strings.clinicianPortal.clinicalReasoning.input.heartRate}</Label>
                     <Input
                       id="hr"
                       type="number"
                       value={heartRate}
                       onChange={(e) => setHeartRate(e.target.value)}
-                      placeholder="bpm"
+                      placeholder={strings.clinicianPortal.clinicalReasoning.input.heartRatePlaceholder}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="temp">Temperature</Label>
+                    <Label htmlFor="temp">{strings.clinicianPortal.clinicalReasoning.input.temperature}</Label>
                     <Input
                       id="temp"
                       value={temperature}
                       onChange={(e) => setTemperature(e.target.value)}
-                      placeholder="37.0°C"
+                      placeholder={strings.clinicianPortal.clinicalReasoning.input.temperaturePlaceholder}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="spo2">SpO2</Label>
+                    <Label htmlFor="spo2">{strings.clinicianPortal.clinicalReasoning.input.oxygenSaturation}</Label>
                     <Input
                       id="spo2"
                       type="number"
                       value={oxygenSaturation}
                       onChange={(e) => setOxygenSaturation(e.target.value)}
-                      placeholder="%"
+                      placeholder={strings.clinicianPortal.clinicalReasoning.input.oxygenSaturationPlaceholder}
                     />
                   </div>
                 </div>
@@ -425,12 +427,12 @@ function ClinicalReasoningContent() {
                 {generateDiagnosisMutation.isPending ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Analyzing with AI...
+                    {strings.clinicianPortal.clinicalReasoning.buttons.analyzing}
                   </>
                 ) : (
                   <>
                     <Brain className="w-5 h-5 mr-2" />
-                    Generate Differential Diagnosis
+                    {strings.clinicianPortal.clinicalReasoning.buttons.generate}
                   </>
                 )}
               </Button>
@@ -446,7 +448,7 @@ function ClinicalReasoningContent() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-purple-700">
                       <TrendingUp className="w-5 h-5" />
-                      Differential Diagnosis
+                      {strings.clinicianPortal.clinicalReasoning.results.differentialDiagnosis}
                     </CardTitle>
                     <CardDescription>Ranked by likelihood</CardDescription>
                   </CardHeader>
@@ -518,7 +520,7 @@ function ClinicalReasoningContent() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Brain className="w-5 h-5" />
-                      Clinical Reasoning
+                      {strings.clinicianPortal.clinicalReasoning.results.clinicalReasoning}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -625,9 +627,9 @@ function ClinicalReasoningContent() {
               <Card className="card-modern">
                 <CardContent className="py-12 text-center">
                   <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-2">No analysis yet</p>
+                  <p className="text-gray-500 mb-2">{strings.clinicianPortal.clinicalReasoning.results.noAnalysis}</p>
                   <p className="text-sm text-gray-400">
-                    Enter patient information and click "Generate Differential Diagnosis"
+                    {strings.clinicianPortal.clinicalReasoning.results.enterInfo}
                   </p>
                 </CardContent>
               </Card>
