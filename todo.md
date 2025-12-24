@@ -451,3 +451,34 @@
   - [x] Conversation history tests (1 test)
   - [x] Context vector rehydration tests (3 tests)
   - [x] Edge case tests (3 tests)
+
+
+## Context Vector Memory Fix - Nuclear Option (User Request)
+- [x] Rewrite conversational-context-vector.ts with robust safe rehydration
+  - [x] Add explicit numeric conversion for stepCount (never NaN or null)
+  - [x] Add array sanitization for symptoms, pastHistory, currentMeds
+  - [x] Add string sanitization for duration, severity, location, gender
+  - [x] Add number sanitization for age
+  - [x] Implement addSymptoms with deduplication
+  - [x] Implement toJSON for serialization
+- [x] Rewrite conversational-assessment.ts with fallback questions and debug logging
+  - [x] Add FALLBACK_QUESTIONS array (10 emergency questions)
+  - [x] Add console.log debug statements for stepCount and symptoms
+  - [x] Implement processConversationalAssessment with context rehydration
+  - [x] Add AI prompt engineering with current status
+  - [x] Add robust JSON parsing with fallback
+  - [x] Force stepCount increment even on AI failure
+  - [x] Return context object that MUST be sent back by frontend
+- [x] Update conversational router to use permissive context validation
+  - [x] Change context field from strict Zod schema to z.any()
+  - [x] Ensure context is passed through without stripping
+  - [x] Add null/undefined safety (context || {})
+- [x] Verify frontend integration in ModernSymptomChecker.tsx
+  - [x] Verify context state initialized as empty object
+  - [x] Verify context passed to mutation in handleSend
+  - [x] Verify context updated with result.context after mutation
+- [ ] Test complete conversational flow without looping
+  - [ ] Verify stepCount increments from 0 to 10
+  - [ ] Verify symptoms accumulate across steps
+  - [ ] Verify no context reset between steps
+  - [ ] Verify debug logs show correct state

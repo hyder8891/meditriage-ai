@@ -53,7 +53,7 @@ interface AssessmentResponse {
   }>;
   showActions?: boolean;
   conversationStage: "greeting" | "gathering" | "analyzing" | "complete";
-  updatedContext?: any; // Context returned from backend
+  context?: any; // Context returned from backend
 }
 
 // ============================================================================
@@ -97,8 +97,8 @@ export default function ModernSymptomChecker() {
       }]);
 
       // Initialize context if returned
-      if (response.updatedContext) {
-        setContext(response.updatedContext);
+      if (response.context) {
+        setContext(response.context);
       }
     } catch (error) {
       console.error("Failed to start conversation:", error);
@@ -144,8 +144,9 @@ export default function ModernSymptomChecker() {
       setCurrentResponse(response);
 
       // Update context with the returned context from backend
-      if (response.updatedContext) {
-        setContext(response.updatedContext);
+      // 🟢 CRITICAL: Must update state with NEW context from server
+      if (response.context) {
+        setContext(response.context);
       }
     } catch (error) {
       console.error("Failed to send message:", error);

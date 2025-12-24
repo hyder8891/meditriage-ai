@@ -132,8 +132,7 @@ export default function SymptomChecker() {
     // Send to conversational router with context
     sendMessage.mutate({
       message: messageToSend,
-      context: context,
-      language: language === "ar" ? "ar" : "en"
+      context: context
     });
   };
 
