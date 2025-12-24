@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, date, decimal, time } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, date, decimal, time, float } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -2876,3 +2876,420 @@ export const orchestrationLogs = mysqlTable("orchestration_logs", {
 
 export type OrchestrationLog = typeof orchestrationLogs.$inferSelect;
 export type InsertOrchestrationLog = typeof orchestrationLogs.$inferInsert;
+
+/**
+ * ============================================================================
+ * MEDICAL KNOWLEDGE SYSTEM
+ * ============================================================================
+ * Comprehensive medical knowledge database adapted for Iraqi healthcare context.
+ * Replaces brain-embedded knowledge with maintainable, auditable, and scalable
+ * database-backed knowledge.
+ */
+
+/**
+ * Diseases Database
+ * Comprehensive disease information with Iraqi context
+ */
+export const diseases = mysqlTable("diseases", {
+  id: int("id").autoincrement().primaryKey(),
+  icdCode: varchar("icd_code", { length: 20 }).notNull().unique(), // ICD-10 or ICD-11 code
+  nameEn: varchar("name_en", { length: 500 }).notNull(),
+  nameAr: varchar("name_ar", { length: 500 }).notNull(),
+  localName: varchar("local_name", { length: 500 }), // Common Iraqi/Arabic colloquial name
+  category: varchar("category", { length: 100 }).notNull(), // infectious, chronic, acute, etc.
+  prevalenceIraq: mysqlEnum("prevalence_iraq", ["high", "medium", "low", "rare"]),
+  description: text("description").notNull(),
+  symptoms: text("symptoms").notNull(), // JSON array of symptom IDs
+  riskFactors: text("risk_factors"), // JSON array
+  complications: text("complications"), // JSON array
+  differentialDiagnosis: text("differential_diagnosis"), // JSON array of disease IDs
+  redFlags: text("red_flags"), // JSON array of red flag IDs
+  treatmentProtocol: text("treatment_protocol"), // JSON object
+  prognosis: text("prognosis"),
+  preventionMeasures: text("prevention_measures"), // JSON array
+  specialConsiderations: text("special_considerations"), // Iraqi-specific considerations
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  version: int("version").notNull().default(1),
+});
+
+export type Disease = typeof diseases.$inferSelect;
+export type InsertDisease = typeof diseases.$inferInsert;
+
+/**
+ * Medications Knowledge Database
+ * Comprehensive medication information with Iraqi availability
+ * Extends the basic medications table with detailed clinical information
+ */
+export const medicationsKnowledge = mysqlTable("medications_knowledge", {
+  id: int("id").autoincrement().primaryKey(),
+  genericName: varchar("generic_name", { length: 500 }).notNull(),
+  brandNames: text("brand_names"), // JSON array of brand names available in Iraq
+  nameAr: varchar("name_ar", { length: 500 }).notNull(),
+  drugClass: varchar("drug_class", { length: 200 }).notNull(),
+  mechanism: text("mechanism"),
+  indications: text("indications").notNull(), // JSON array
+  contraindications: text("contraindications"), // JSON array
+  sideEffects: text("side_effects"), // JSON array
+  interactions: text("interactions"), // JSON array of drug IDs
+  dosageAdult: text("dosage_adult"),
+  dosagePediatric: text("dosage_pediatric"),
+  dosageElderly: text("dosage_elderly"),
+  routeOfAdministration: varchar("route_of_administration", { length: 100 }), // oral, IV, IM, etc.
+  availabilityIraq: mysqlEnum("availability_iraq", ["widely_available", "limited", "rare", "not_available"]).notNull(),
+  approximateCost: varchar("approximate_cost", { length: 200 }), // price range in IQD
+  requiresPrescription: boolean("requires_prescription").notNull(),
+  pregnancyCategory: varchar("pregnancy_category", { length: 10 }),
+  lactationSafety: varchar("lactation_safety", { length: 100 }),
+  renalAdjustment: text("renal_adjustment"),
+  hepaticAdjustment: text("hepatic_adjustment"),
+  monitoringRequired: text("monitoring_required"), // JSON array
+  specialInstructions: text("special_instructions"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  version: int("version").notNull().default(1),
+});
+
+export type MedicationKnowledge = typeof medicationsKnowledge.$inferSelect;
+export type InsertMedicationKnowledge = typeof medicationsKnowledge.$inferInsert;
+
+/**
+ * Symptoms Database
+ * Comprehensive symptom catalog with severity indicators
+ */
+export const symptoms = mysqlTable("symptoms", {
+  id: int("id").autoincrement().primaryKey(),
+  nameEn: varchar("name_en", { length: 500 }).notNull().unique(),
+  nameAr: varchar("name_ar", { length: 500 }).notNull(),
+  localName: varchar("local_name", { length: 500 }), // Common Iraqi description
+  category: varchar("category", { length: 100 }).notNull(), // pain, respiratory, neurological, etc.
+  description: text("description"),
+  severityIndicators: text("severity_indicators"), // JSON object: mild, moderate, severe
+  associatedConditions: text("associated_conditions"), // JSON array of disease IDs
+  redFlagSymptom: boolean("red_flag_symptom").notNull().default(false),
+  urgencyLevel: mysqlEnum("urgency_level", ["routine", "urgent", "emergency"]),
+  commonInIraq: boolean("common_in_iraq").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Symptom = typeof symptoms.$inferSelect;
+export type InsertSymptom = typeof symptoms.$inferInsert;
+
+/**
+ * Medical Procedures Database
+ * Procedures available in Iraqi healthcare system
+ */
+export const procedures = mysqlTable("procedures", {
+  id: int("id").autoincrement().primaryKey(),
+  cptCode: varchar("cpt_code", { length: 20 }), // CPT code if applicable
+  nameEn: varchar("name_en", { length: 500 }).notNull(),
+  nameAr: varchar("name_ar", { length: 500 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // diagnostic, therapeutic, surgical, etc.
+  description: text("description").notNull(),
+  indications: text("indications"), // JSON array
+  contraindications: text("contraindications"), // JSON array
+  complications: text("complications"), // JSON array
+  preparationRequired: text("preparation_required"),
+  procedureSteps: text("procedure_steps"), // JSON array
+  postProcedureCare: text("post_procedure_care"),
+  recoveryTime: varchar("recovery_time", { length: 200 }),
+  availabilityIraq: mysqlEnum("availability_iraq", ["widely_available", "major_cities", "baghdad_only", "not_available"]).notNull(),
+  facilityRequirements: text("facility_requirements"), // JSON array of facility type IDs
+  approximateCost: varchar("approximate_cost", { length: 200 }), // price range in IQD
+  insuranceCoverage: mysqlEnum("insurance_coverage", ["typically_covered", "partial", "not_covered"]),
+  specialConsiderations: text("special_considerations"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  version: int("version").notNull().default(1),
+});
+
+export type Procedure = typeof procedures.$inferSelect;
+export type InsertProcedure = typeof procedures.$inferInsert;
+
+/**
+ * Red Flags Database
+ * Critical warning signs requiring immediate attention
+ */
+export const redFlags = mysqlTable("red_flags", {
+  id: int("id").autoincrement().primaryKey(),
+  nameEn: varchar("name_en", { length: 500 }).notNull(),
+  nameAr: varchar("name_ar", { length: 500 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // cardiovascular, neurological, respiratory, etc.
+  description: text("description").notNull(),
+  clinicalSignificance: text("clinical_significance").notNull(),
+  associatedConditions: text("associated_conditions"), // JSON array of disease IDs
+  urgencyLevel: mysqlEnum("urgency_level", ["immediate", "urgent", "semi_urgent"]).notNull(),
+  recommendedAction: text("recommended_action").notNull(),
+  timeToTreatment: varchar("time_to_treatment", { length: 100 }), // minutes, hours
+  facilityRequired: varchar("facility_required", { length: 200 }), // emergency_room, hospital, specialist
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RedFlag = typeof redFlags.$inferSelect;
+export type InsertRedFlag = typeof redFlags.$inferInsert;
+
+/**
+ * Healthcare Facility Types
+ * Types of healthcare facilities in Iraqi system
+ */
+export const facilityTypes = mysqlTable("facility_types", {
+  id: int("id").autoincrement().primaryKey(),
+  nameEn: varchar("name_en", { length: 200 }).notNull().unique(),
+  nameAr: varchar("name_ar", { length: 200 }).notNull(),
+  description: text("description"),
+  capabilities: text("capabilities"), // JSON array of services/procedures
+  typicalEquipment: text("typical_equipment"), // JSON array
+  staffingRequirements: text("staffing_requirements"), // JSON array
+  emergencyCapable: boolean("emergency_capable").notNull(),
+  icuCapable: boolean("icu_capable").notNull(),
+  surgeryCapable: boolean("surgery_capable").notNull(),
+  diagnosticCapabilities: text("diagnostic_capabilities"), // JSON array
+  commonInIraq: boolean("common_in_iraq").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FacilityType = typeof facilityTypes.$inferSelect;
+export type InsertFacilityType = typeof facilityTypes.$inferInsert;
+
+/**
+ * Clinical Guidelines
+ * Evidence-based clinical guidelines adapted for Iraqi context
+ */
+export const clinicalGuidelines = mysqlTable("clinical_guidelines", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 1000 }).notNull(),
+  titleAr: varchar("title_ar", { length: 1000 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // diagnosis, treatment, prevention, etc.
+  diseaseIds: text("disease_ids"), // JSON array of related disease IDs
+  source: varchar("source", { length: 500 }).notNull(), // WHO, ACC/AHA, Iraqi MOH, etc.
+  evidenceLevel: mysqlEnum("evidence_level", ["A", "B", "C"]).notNull(),
+  recommendation: text("recommendation").notNull(),
+  recommendationAr: text("recommendation_ar").notNull(),
+  rationale: text("rationale"),
+  iraqiAdaptations: text("iraqi_adaptations"), // Modifications for Iraqi context
+  implementationConsiderations: text("implementation_considerations"),
+  references: text("references"), // JSON array
+  lastReviewed: timestamp("last_reviewed"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  version: int("version").notNull().default(1),
+});
+
+export type ClinicalGuideline = typeof clinicalGuidelines.$inferSelect;
+export type InsertClinicalGuideline = typeof clinicalGuidelines.$inferInsert;
+
+/**
+ * Symptom-Disease Associations
+ * Mapping between symptoms and diseases with probability weights
+ */
+export const symptomDiseaseAssociations = mysqlTable("symptom_disease_associations", {
+  id: int("id").autoincrement().primaryKey(),
+  symptomId: int("symptom_id").notNull(),
+  diseaseId: int("disease_id").notNull(),
+  associationStrength: float("association_strength").notNull(), // 0.0 to 1.0
+  specificity: mysqlEnum("specificity", ["high", "medium", "low"]).notNull(),
+  sensitivity: mysqlEnum("sensitivity", ["high", "medium", "low"]).notNull(),
+  typicalPresentation: boolean("typical_presentation").notNull().default(true),
+  atypicalPresentation: boolean("atypical_presentation").notNull().default(false),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type SymptomDiseaseAssociation = typeof symptomDiseaseAssociations.$inferSelect;
+export type InsertSymptomDiseaseAssociation = typeof symptomDiseaseAssociations.$inferInsert;
+
+/**
+ * Drug Interactions
+ * Comprehensive drug-drug interaction database
+ */
+export const drugInteractions = mysqlTable("drug_interactions", {
+  id: int("id").autoincrement().primaryKey(),
+  drug1Id: int("drug1_id").notNull(),
+  drug2Id: int("drug2_id").notNull(),
+  severityLevel: mysqlEnum("severity_level", ["major", "moderate", "minor"]).notNull(),
+  interactionType: varchar("interaction_type", { length: 200 }).notNull(), // pharmacokinetic, pharmacodynamic
+  mechanism: text("mechanism"),
+  clinicalEffect: text("clinical_effect").notNull(),
+  management: text("management").notNull(),
+  references: text("references"), // JSON array
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DrugInteraction = typeof drugInteractions.$inferSelect;
+export type InsertDrugInteraction = typeof drugInteractions.$inferInsert;
+
+/**
+ * Knowledge Version Tracking
+ * Track updates and versions of medical knowledge
+ */
+export const knowledgeVersions = mysqlTable("knowledge_versions", {
+  id: int("id").autoincrement().primaryKey(),
+  entityType: varchar("entity_type", { length: 100 }).notNull(), // disease, medication, procedure, etc.
+  entityId: int("entity_id").notNull(),
+  version: int("version").notNull(),
+  changeType: mysqlEnum("change_type", ["created", "updated", "deprecated"]).notNull(),
+  changeDescription: text("change_description"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  reviewedBy: varchar("reviewed_by", { length: 255 }),
+  approvedBy: varchar("approved_by", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type KnowledgeVersion = typeof knowledgeVersions.$inferSelect;
+export type InsertKnowledgeVersion = typeof knowledgeVersions.$inferInsert;
+
+/**
+ * Air Quality Readings
+ * Stores real-time and historical air quality data for Iraqi cities
+ */
+export const aqiReadings = mysqlTable("aqi_readings", {
+  id: int("id").autoincrement().primaryKey(),
+  city: varchar("city", { length: 100 }).notNull(), // Baghdad, Basra, Erbil, Mosul, etc.
+  latitude: decimal("latitude", { precision: 10, scale: 7 }).notNull(),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }).notNull(),
+  
+  // Air Quality Index (AQI) - US EPA standard
+  aqi: int("aqi").notNull(), // 0-500 scale
+  aqiCategory: mysqlEnum("aqi_category", [
+    "good",           // 0-50
+    "moderate",       // 51-100
+    "unhealthy_sensitive", // 101-150
+    "unhealthy",      // 151-200
+    "very_unhealthy", // 201-300
+    "hazardous"       // 301-500
+  ]).notNull(),
+  
+  // Pollutant concentrations (μg/m³)
+  pm25: decimal("pm25", { precision: 8, scale: 2 }), // Fine particulate matter
+  pm10: decimal("pm10", { precision: 8, scale: 2 }), // Coarse particulate matter
+  o3: decimal("o3", { precision: 8, scale: 2 }),    // Ozone
+  no2: decimal("no2", { precision: 8, scale: 2 }),  // Nitrogen dioxide
+  so2: decimal("so2", { precision: 8, scale: 2 }),  // Sulfur dioxide
+  co: decimal("co", { precision: 8, scale: 2 }),    // Carbon monoxide
+  
+  // Dominant pollutant
+  dominantPollutant: varchar("dominant_pollutant", { length: 20 }), // pm25, pm10, o3, etc.
+  
+  // Weather context
+  temperature: decimal("temperature", { precision: 5, scale: 2 }), // Celsius
+  humidity: int("humidity"), // Percentage
+  windSpeed: decimal("wind_speed", { precision: 5, scale: 2 }), // m/s
+  
+  // Data source and quality
+  dataSource: varchar("data_source", { length: 100 }).notNull().default("OpenWeatherMap"),
+  dataQuality: mysqlEnum("data_quality", ["high", "medium", "low"]).default("high"),
+  
+  timestamp: timestamp("timestamp").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type AQIReading = typeof aqiReadings.$inferSelect;
+export type InsertAQIReading = typeof aqiReadings.$inferInsert;
+
+/**
+ * Air Quality Alerts
+ * Stores health alerts triggered by poor air quality
+ */
+export const aqiAlerts = mysqlTable("aqi_alerts", {
+  id: int("id").autoincrement().primaryKey(),
+  city: varchar("city", { length: 100 }).notNull(),
+  
+  // Alert details
+  alertType: mysqlEnum("alert_type", [
+    "dust_storm",
+    "high_pm25",
+    "high_pm10",
+    "ozone_warning",
+    "general_pollution"
+  ]).notNull(),
+  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).notNull(),
+  
+  // Triggering conditions
+  triggerAQI: int("trigger_aqi").notNull(),
+  triggerPollutant: varchar("trigger_pollutant", { length: 20 }),
+  triggerValue: decimal("trigger_value", { precision: 8, scale: 2 }),
+  
+  // Alert message
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  healthRecommendations: text("health_recommendations").notNull(), // JSON array
+  
+  // Affected populations
+  affectedGroups: text("affected_groups").notNull(), // JSON array: respiratory, cardiac, children, elderly
+  
+  // Alert lifecycle
+  isActive: boolean("is_active").default(true).notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AQIAlert = typeof aqiAlerts.$inferSelect;
+export type InsertAQIAlert = typeof aqiAlerts.$inferInsert;
+
+/**
+ * User Air Quality Subscriptions
+ * Tracks which users want air quality alerts for specific cities
+ */
+export const aqiSubscriptions = mysqlTable("aqi_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  city: varchar("city", { length: 100 }).notNull(),
+  
+  // Alert preferences
+  minAlertSeverity: mysqlEnum("min_alert_severity", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+  notifyViaEmail: boolean("notify_via_email").default(false).notNull(),
+  notifyViaPush: boolean("notify_via_push").default(true).notNull(),
+  
+  // Health conditions (for personalized alerts)
+  hasRespiratoryCondition: boolean("has_respiratory_condition").default(false).notNull(),
+  hasCardiacCondition: boolean("has_cardiac_condition").default(false).notNull(),
+  isPregnant: boolean("is_pregnant").default(false).notNull(),
+  
+  isActive: boolean("is_active").default(true).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AQISubscription = typeof aqiSubscriptions.$inferSelect;
+export type InsertAQISubscription = typeof aqiSubscriptions.$inferInsert;
+
+/**
+ * Air Quality Impact Logs
+ * Tracks correlation between air quality and patient symptoms
+ */
+export const aqiImpactLogs = mysqlTable("aqi_impact_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  triageRecordId: int("triage_record_id"),
+  
+  // Air quality at time of symptoms
+  aqiAtSymptomOnset: int("aqi_at_symptom_onset"),
+  pm25AtSymptomOnset: decimal("pm25_at_symptom_onset", { precision: 8, scale: 2 }),
+  pm10AtSymptomOnset: decimal("pm10_at_symptom_onset", { precision: 8, scale: 2 }),
+  
+  // Symptom details
+  symptoms: text("symptoms").notNull(), // JSON array
+  symptomSeverity: mysqlEnum("symptom_severity", ["mild", "moderate", "severe"]).notNull(),
+  
+  // Correlation analysis
+  likelyAQIRelated: boolean("likely_aqi_related").default(false).notNull(),
+  correlationConfidence: decimal("correlation_confidence", { precision: 5, scale: 2 }), // 0-100%
+  
+  // Outcome tracking
+  symptomResolved: boolean("symptom_resolved").default(false).notNull(),
+  resolutionTime: timestamp("resolution_time"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AQIImpactLog = typeof aqiImpactLogs.$inferSelect;
+export type InsertAQIImpactLog = typeof aqiImpactLogs.$inferInsert;

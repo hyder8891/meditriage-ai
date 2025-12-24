@@ -8,6 +8,7 @@ import { invokeLLM } from '../_core/llm';
 import { invokeGeminiPro } from '../_core/gemini-dual';
 import mysql from 'mysql2/promise';
 import { searchAndCachePubMed, formatCitation, generatePubMedQuery } from './knowledge/pubmed-client';
+import { hybridKnowledgeLookup, generateEnhancedContext } from './knowledge-adapter';
 
 let _connection: mysql.Connection | null = null;
 
@@ -90,14 +91,16 @@ export class BRAIN {
     }
 
     try {
-      // Step 1: Normalize symptoms using medical knowledge base
-      const normalizedSymptoms = await this.normalizeSymptoms(input.symptoms);
+      // Step 1: Use hybrid knowledge lookup (new structured knowledge + legacy)
+      const hybridResult = await hybridKnowledgeLookup(input.symptoms, input.patientInfo);
+      const normalizedSymptoms = hybridResult.normalizedSymptoms;
       console.log(`✓ Symptoms normalized: ${normalizedSymptoms.length} concepts identified`);
+      console.log(`✓ Using ${hybridResult.usingNewKnowledge ? 'new structured' : 'legacy'} knowledge system`);
 
       // Steps 2-4: Run knowledge base, historical cases, and literature search in parallel
       const [knowledgeBaseDiagnoses, similarCases, literature] = await Promise.all([
-        // Step 2: Find possible diagnoses from knowledge base
-        this.findDiagnosesFromKnowledge(normalizedSymptoms),
+        // Step 2: Use hybrid diagnoses (prefer new knowledge if available)
+        Promise.resolve(hybridResult.diagnoses.length > 0 ? hybridResult.diagnoses : this.findDiagnosesFromKnowledge(normalizedSymptoms)),
         
         // Step 3: Find similar historical cases
         this.findSimilarCases(normalizedSymptoms, input.patientInfo),
@@ -117,6 +120,7 @@ export class BRAIN {
       console.log(`✓ Found ${literature.length} relevant medical articles`);
 
       // Step 5: Generate differential diagnosis using LLM with all context
+      // Include enhanced knowledge context if available
       const diagnosis = await this.generateDifferentialDiagnosis({
         symptoms: normalizedSymptoms,
         knowledgeBaseDiagnoses,
@@ -124,7 +128,9 @@ export class BRAIN {
         literature,
         patientInfo: input.patientInfo,
         vitalSigns: input.vitalSigns,
-        language: input.language
+        language: input.language,
+        enhancedKnowledgeContext: hybridResult.enhancedContext.knowledgeContext,
+        redFlagCheck: hybridResult.redFlagCheck
       });
       console.log('✓ Differential diagnosis generated');
 
@@ -260,6 +266,8 @@ export class BRAIN {
     patientInfo: PatientInfo;
     vitalSigns?: Record<string, number>;
     language: 'en' | 'ar';
+    enhancedKnowledgeContext?: string;
+    redFlagCheck?: any;
   }): Promise<{
     differentialDiagnosis: DifferentialDiagnosis[];
     redFlags: string[];
@@ -285,6 +293,10 @@ ${context.symptoms.map((s: any) => `- ${s.standardTerm}`).join('\n')}
 ${context.vitalSigns ? `**Vitals:** ${Object.entries(context.vitalSigns).map(([k, v]) => `${k}: ${v}`).join(', ')}` : ''}
 
 ${context.knowledgeBaseDiagnoses.length > 0 ? `**KB Matches:** ${context.knowledgeBaseDiagnoses.slice(0, 3).map((d: any) => d.diagnosis.conceptName).join(', ')}` : ''}
+
+${context.enhancedKnowledgeContext ? `\n---\n${context.enhancedKnowledgeContext}\n---\n` : ''}
+
+${context.redFlagCheck && context.redFlagCheck.hasRedFlags ? `\n⚠️ **RED FLAGS DETECTED - Urgency: ${context.redFlagCheck.urgencyLevel.toUpperCase()}**\n${context.redFlagCheck.redFlags.join(', ')}\n` : ''}
 
 **Task:** Generate top 5 differential diagnoses with probabilities (sum ≤100%), brief reasoning, red flags, and key recommendations. Consider Iraqi context (common: diabetes, HTN, infectious diseases).
 

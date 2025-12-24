@@ -116,6 +116,84 @@ CREATE TABLE `appointments` (
 	CONSTRAINT `appointments_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `aqi_alerts` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`city` varchar(100) NOT NULL,
+	`alert_type` enum('dust_storm','high_pm25','high_pm10','ozone_warning','general_pollution') NOT NULL,
+	`severity` enum('low','medium','high','critical') NOT NULL,
+	`trigger_aqi` int NOT NULL,
+	`trigger_pollutant` varchar(20),
+	`trigger_value` decimal(8,2),
+	`title` varchar(255) NOT NULL,
+	`message` text NOT NULL,
+	`health_recommendations` text NOT NULL,
+	`affected_groups` text NOT NULL,
+	`is_active` boolean NOT NULL DEFAULT true,
+	`start_time` timestamp NOT NULL,
+	`end_time` timestamp,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `aqi_alerts_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `aqi_impact_logs` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`user_id` int NOT NULL,
+	`triage_record_id` int,
+	`aqi_at_symptom_onset` int,
+	`pm25_at_symptom_onset` decimal(8,2),
+	`pm10_at_symptom_onset` decimal(8,2),
+	`symptoms` text NOT NULL,
+	`symptom_severity` enum('mild','moderate','severe') NOT NULL,
+	`likely_aqi_related` boolean NOT NULL DEFAULT false,
+	`correlation_confidence` decimal(5,2),
+	`symptom_resolved` boolean NOT NULL DEFAULT false,
+	`resolution_time` timestamp,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `aqi_impact_logs_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `aqi_readings` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`city` varchar(100) NOT NULL,
+	`latitude` decimal(10,7) NOT NULL,
+	`longitude` decimal(10,7) NOT NULL,
+	`aqi` int NOT NULL,
+	`aqi_category` enum('good','moderate','unhealthy_sensitive','unhealthy','very_unhealthy','hazardous') NOT NULL,
+	`pm25` decimal(8,2),
+	`pm10` decimal(8,2),
+	`o3` decimal(8,2),
+	`no2` decimal(8,2),
+	`so2` decimal(8,2),
+	`co` decimal(8,2),
+	`dominant_pollutant` varchar(20),
+	`temperature` decimal(5,2),
+	`humidity` int,
+	`wind_speed` decimal(5,2),
+	`data_source` varchar(100) NOT NULL DEFAULT 'OpenWeatherMap',
+	`data_quality` enum('high','medium','low') DEFAULT 'high',
+	`timestamp` timestamp NOT NULL,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `aqi_readings_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `aqi_subscriptions` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`user_id` int NOT NULL,
+	`city` varchar(100) NOT NULL,
+	`min_alert_severity` enum('low','medium','high','critical') NOT NULL DEFAULT 'medium',
+	`notify_via_email` boolean NOT NULL DEFAULT false,
+	`notify_via_push` boolean NOT NULL DEFAULT true,
+	`has_respiratory_condition` boolean NOT NULL DEFAULT false,
+	`has_cardiac_condition` boolean NOT NULL DEFAULT false,
+	`is_pregnant` boolean NOT NULL DEFAULT false,
+	`is_active` boolean NOT NULL DEFAULT true,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `aqi_subscriptions_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `audit_logs` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`user_id` int,
@@ -378,6 +456,27 @@ CREATE TABLE `clinic_subscriptions` (
 	CONSTRAINT `clinic_subscriptions_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `clinical_guidelines` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`title` varchar(1000) NOT NULL,
+	`title_ar` varchar(1000) NOT NULL,
+	`category` varchar(100) NOT NULL,
+	`disease_ids` text,
+	`source` varchar(500) NOT NULL,
+	`evidence_level` enum('A','B','C') NOT NULL,
+	`recommendation` text NOT NULL,
+	`recommendation_ar` text NOT NULL,
+	`rationale` text,
+	`iraqi_adaptations` text,
+	`implementation_considerations` text,
+	`references` text,
+	`last_reviewed` timestamp,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`version` int NOT NULL DEFAULT 1,
+	CONSTRAINT `clinical_guidelines_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `clinical_notes` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`case_id` int NOT NULL,
@@ -509,6 +608,31 @@ CREATE TABLE `diagnoses` (
 	CONSTRAINT `diagnoses_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `diseases` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`icd_code` varchar(20) NOT NULL,
+	`name_en` varchar(500) NOT NULL,
+	`name_ar` varchar(500) NOT NULL,
+	`local_name` varchar(500),
+	`category` varchar(100) NOT NULL,
+	`prevalence_iraq` enum('high','medium','low','rare'),
+	`description` text NOT NULL,
+	`symptoms` text NOT NULL,
+	`risk_factors` text,
+	`complications` text,
+	`differential_diagnosis` text,
+	`red_flags` text,
+	`treatment_protocol` text,
+	`prognosis` text,
+	`prevention_measures` text,
+	`special_considerations` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`version` int NOT NULL DEFAULT 1,
+	CONSTRAINT `diseases_id` PRIMARY KEY(`id`),
+	CONSTRAINT `diseases_icd_code_unique` UNIQUE(`icd_code`)
+);
+--> statement-breakpoint
 CREATE TABLE `doctor_patient_relationships` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`doctor_id` int NOT NULL,
@@ -548,6 +672,21 @@ CREATE TABLE `doctor_performance_metrics` (
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `doctor_performance_metrics_id` PRIMARY KEY(`id`),
 	CONSTRAINT `doctor_performance_metrics_doctor_id_unique` UNIQUE(`doctor_id`)
+);
+--> statement-breakpoint
+CREATE TABLE `drug_interactions` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`drug1_id` int NOT NULL,
+	`drug2_id` int NOT NULL,
+	`severity_level` enum('major','moderate','minor') NOT NULL,
+	`interaction_type` varchar(200) NOT NULL,
+	`mechanism` text,
+	`clinical_effect` text NOT NULL,
+	`management` text NOT NULL,
+	`references` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `drug_interactions_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `email_preferences` (
@@ -639,6 +778,25 @@ CREATE TABLE `facilities` (
 	`emergency_services` int DEFAULT 0,
 	`website` varchar(512),
 	CONSTRAINT `facilities_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `facility_types` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`name_en` varchar(200) NOT NULL,
+	`name_ar` varchar(200) NOT NULL,
+	`description` text,
+	`capabilities` text,
+	`typical_equipment` text,
+	`staffing_requirements` text,
+	`emergency_capable` boolean NOT NULL,
+	`icu_capable` boolean NOT NULL,
+	`surgery_capable` boolean NOT NULL,
+	`diagnostic_capabilities` text,
+	`common_in_iraq` boolean NOT NULL DEFAULT true,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `facility_types_id` PRIMARY KEY(`id`),
+	CONSTRAINT `facility_types_name_en_unique` UNIQUE(`name_en`)
 );
 --> statement-breakpoint
 CREATE TABLE `fhir_conditions` (
@@ -760,6 +918,20 @@ CREATE TABLE `fhir_patients` (
 	`last_updated` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `fhir_patients_id` PRIMARY KEY(`id`),
 	CONSTRAINT `fhir_patients_fhir_id_unique` UNIQUE(`fhir_id`)
+);
+--> statement-breakpoint
+CREATE TABLE `knowledge_versions` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`entity_type` varchar(100) NOT NULL,
+	`entity_id` int NOT NULL,
+	`version` int NOT NULL,
+	`change_type` enum('created','updated','deprecated') NOT NULL,
+	`change_description` text,
+	`changed_by` varchar(255),
+	`reviewed_by` varchar(255),
+	`approved_by` varchar(255),
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `knowledge_versions_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `lab_reference_ranges` (
@@ -906,6 +1078,36 @@ CREATE TABLE `medications` (
 	`contraindications` text,
 	`side_effects` text,
 	CONSTRAINT `medications_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `medications_knowledge` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`generic_name` varchar(500) NOT NULL,
+	`brand_names` text,
+	`name_ar` varchar(500) NOT NULL,
+	`drug_class` varchar(200) NOT NULL,
+	`mechanism` text,
+	`indications` text NOT NULL,
+	`contraindications` text,
+	`side_effects` text,
+	`interactions` text,
+	`dosage_adult` text,
+	`dosage_pediatric` text,
+	`dosage_elderly` text,
+	`route_of_administration` varchar(100),
+	`availability_iraq` enum('widely_available','limited','rare','not_available') NOT NULL,
+	`approximate_cost` varchar(200),
+	`requires_prescription` boolean NOT NULL,
+	`pregnancy_category` varchar(10),
+	`lactation_safety` varchar(100),
+	`renal_adjustment` text,
+	`hepatic_adjustment` text,
+	`monitoring_required` text,
+	`special_instructions` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`version` int NOT NULL DEFAULT 1,
+	CONSTRAINT `medications_knowledge_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `messages` (
@@ -1131,6 +1333,31 @@ CREATE TABLE `pressure_symptom_events` (
 	CONSTRAINT `pressure_symptom_events_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `procedures` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`cpt_code` varchar(20),
+	`name_en` varchar(500) NOT NULL,
+	`name_ar` varchar(500) NOT NULL,
+	`category` varchar(100) NOT NULL,
+	`description` text NOT NULL,
+	`indications` text,
+	`contraindications` text,
+	`complications` text,
+	`preparation_required` text,
+	`procedure_steps` text,
+	`post_procedure_care` text,
+	`recovery_time` varchar(200),
+	`availability_iraq` enum('widely_available','major_cities','baghdad_only','not_available') NOT NULL,
+	`facility_requirements` text,
+	`approximate_cost` varchar(200),
+	`insurance_coverage` enum('typically_covered','partial','not_covered'),
+	`special_considerations` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`version` int NOT NULL DEFAULT 1,
+	CONSTRAINT `procedures_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `processed_webhooks` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`event_id` varchar(255) NOT NULL,
@@ -1142,6 +1369,23 @@ CREATE TABLE `processed_webhooks` (
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `processed_webhooks_id` PRIMARY KEY(`id`),
 	CONSTRAINT `processed_webhooks_event_id_unique` UNIQUE(`event_id`)
+);
+--> statement-breakpoint
+CREATE TABLE `red_flags` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`name_en` varchar(500) NOT NULL,
+	`name_ar` varchar(500) NOT NULL,
+	`category` varchar(100) NOT NULL,
+	`description` text NOT NULL,
+	`clinical_significance` text NOT NULL,
+	`associated_conditions` text,
+	`urgency_level` enum('immediate','urgent','semi_urgent') NOT NULL,
+	`recommended_action` text NOT NULL,
+	`time_to_treatment` varchar(100),
+	`facility_required` varchar(200),
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `red_flags_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `shared_records` (
@@ -1196,6 +1440,38 @@ CREATE TABLE `subscriptions` (
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `subscriptions_id` PRIMARY KEY(`id`),
 	CONSTRAINT `subscriptions_user_id_unique` UNIQUE(`user_id`)
+);
+--> statement-breakpoint
+CREATE TABLE `symptom_disease_associations` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`symptom_id` int NOT NULL,
+	`disease_id` int NOT NULL,
+	`association_strength` float NOT NULL,
+	`specificity` enum('high','medium','low') NOT NULL,
+	`sensitivity` enum('high','medium','low') NOT NULL,
+	`typical_presentation` boolean NOT NULL DEFAULT true,
+	`atypical_presentation` boolean NOT NULL DEFAULT false,
+	`notes` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `symptom_disease_associations_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `symptoms` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`name_en` varchar(500) NOT NULL,
+	`name_ar` varchar(500) NOT NULL,
+	`local_name` varchar(500),
+	`category` varchar(100) NOT NULL,
+	`description` text,
+	`severity_indicators` text,
+	`associated_conditions` text,
+	`red_flag_symptom` boolean NOT NULL DEFAULT false,
+	`urgency_level` enum('routine','urgent','emergency'),
+	`common_in_iraq` boolean NOT NULL DEFAULT true,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `symptoms_id` PRIMARY KEY(`id`),
+	CONSTRAINT `symptoms_name_en_unique` UNIQUE(`name_en`)
 );
 --> statement-breakpoint
 CREATE TABLE `timeline_events` (

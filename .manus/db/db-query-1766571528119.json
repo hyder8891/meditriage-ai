@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `knowledge_versions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `entity_type` varchar(50) NOT NULL,\n  `entity_id` int NOT NULL,\n  `version` int NOT NULL,\n  `change_type` enum('created','updated','deprecated') NOT NULL,\n  `change_description` text,\n  `changed_by` varchar(255),\n  `reviewed_by` varchar(255),\n  `approved_by` varchar(255),\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `knowledge_versions_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `knowledge_versions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `entity_type` varchar(50) NOT NULL,\n  `entity_id` int NOT NULL,\n  `version` int NOT NULL,\n  `change_type` enum('created','updated','deprecated') NOT NULL,\n  `change_description` text,\n  `changed_by` varchar(255),\n  `reviewed_by` varchar(255),\n  `approved_by` varchar(255),\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `knowledge_versions_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1735
+}

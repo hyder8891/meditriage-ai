@@ -22,6 +22,7 @@ import { medicalReportsRouter } from "./routers/medical-reports-router";
 import { resourceAuctionRouter } from "./avicenna/resource-auction-router";
 import { wearableRouter } from "./avicenna/wearable-router";
 import { weatherRouter } from "./routers/weather-router";
+import { airQualityRouter } from "./routers/air-quality-router";
 import { conversationalRouter } from "./conversational-router";
 import { conversationHistoryRouter } from "./conversation-history-router";
 import { budgetRouter } from "./budget-router";
@@ -86,6 +87,7 @@ export const appRouter = router({
   resourceAuction: resourceAuctionRouter,
   wearable: wearableRouter,
   weather: weatherRouter,
+  airQuality: airQualityRouter,
   conversational: conversationalRouter,
   conversationHistory: conversationHistoryRouter,
   budget: budgetRouter,

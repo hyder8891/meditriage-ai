@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `symptoms` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name_en` varchar(255) NOT NULL,\n  `name_ar` varchar(255),\n  `local_name` varchar(255),\n  `category` varchar(100),\n  `description` text,\n  `severity_indicators` text,\n  `associated_conditions` text,\n  `red_flag_symptom` boolean DEFAULT false,\n  `urgency_level` enum('immediate','urgent','routine'),\n  `common_in_iraq` boolean DEFAULT true,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `symptoms_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `symptoms` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name_en` varchar(255) NOT NULL,\n  `name_ar` varchar(255),\n  `local_name` varchar(255),\n  `category` varchar(100),\n  `description` text,\n  `severity_indicators` text,\n  `associated_conditions` text,\n  `red_flag_symptom` boolean DEFAULT false,\n  `urgency_level` enum('immediate','urgent','routine'),\n  `common_in_iraq` boolean DEFAULT true,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `symptoms_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1793
+}

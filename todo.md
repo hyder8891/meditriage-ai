@@ -748,3 +748,104 @@
 
 ## NEW: Logo Inconsistency in Patient Portal
 - [x] Fix logo inconsistency - different logos showing on different patient portal pages
+
+
+## NEW: Medical Knowledge System Implementation (Replacing Brain-Embedded Knowledge)
+
+### Phase 1: Architecture & Database Schema
+- [x] Design medical knowledge architecture and database schema
+- [x] Create database tables for diseases, medications, procedures, symptoms
+- [x] Create database tables for red flags, facility types, clinical guidelines
+- [x] Design knowledge versioning and update tracking system
+
+### Phase 2: Iraqi Medical Knowledge Base (Structured JSON Files)
+- [x] Create diseases database with Iraqi context (common diseases, prevalence, local names)
+- [x] Create medications database with local availability and pricing
+- [ ] Create procedures database with Iraqi healthcare protocols
+- [x] Create symptoms-to-conditions mapping
+- [x] Create red flags and emergency indicators
+- [ ] Create healthcare facility types and capabilities
+- [ ] Create clinical guidelines adapted for Iraqi context
+
+### Phase 3: Knowledge Loading System
+- [x] Build JSON file loader and validator
+- [x] Create knowledge seeding scripts
+- [x] Implement knowledge versioning system
+- [ ] Add knowledge update and sync mechanisms
+
+### Phase 4: Knowledge Query System
+- [x] Create disease lookup procedures (by name, symptoms, ICD code)
+- [x] Create medication search procedures (by name, class, indication)
+- [x] Create symptom-to-condition matching algorithm
+- [x] Create red flag detection system
+- [ ] Create facility capability lookup
+- [x] Add knowledge graph traversal for related conditions
+### Phase 5: Integration with BRAIN
+- [x] Update BRAIN to use knowledge base instead of embedded knowledge
+- [x] Add knowledge context injection to BRAIN prompts
+- [x] Create hybrid knowledge adapter (new + legacy systems)
+- [x] Create knowledge loading script
+- [ ] Load initial knowledge into database
+- [ ] Test BRAIN with new knowledge system
+- [ ] Compare results with old systemdge-based treatment recommendations
+- [ ] Test BRAIN with new knowledge system
+
+### Phase 6: Integration with Triage AI
+- [ ] Update triage logic to use knowledge base
+- [ ] Add severity assessment using knowledge
+- [ ] Implement knowledge-based urgency scoring
+- [ ] Add knowledge-based facility routing
+- [ ] Test triage with new knowledge system
+
+### Phase 7: Integration with Other AI Functions
+- [ ] Update Medical Reports Analysis to use knowledge base
+- [ ] Update PharmaGuard to use medications database
+- [ ] Update Symptom Checker to use symptoms-to-conditions mapping
+- [ ] Update Care Locator to use facility capabilities database
+
+### Phase 8: Validation & Testing
+- [ ] Write unit tests for knowledge queries
+- [ ] Write integration tests for BRAIN with knowledge system
+- [ ] Write end-to-end tests for triage flow with knowledge system
+- [ ] Validate accuracy improvements vs. embedded knowledge
+- [ ] Conduct clinician review of knowledge base content
+
+
+## NEW: Iraq-Specific Intelligent Features (Current Sprint)
+
+### Air Quality Integration (Highest Priority)
+- [x] Create air quality data schema in database (aqi_readings, aqi_alerts tables)
+- [x] Implement OpenWeatherMap Air Quality API integration service
+- [x] Build Baghdad-specific AQI monitoring with PM2.5/PM10 tracking
+- [x] Create tRPC procedures for air quality data retrieval (getCurrentAQI, getAQIHistory)
+- [x] Add air quality context to orchestrator decision-making (respiratory risk assessment)
+- [ ] Build UI component for air quality display in patient dashboard
+- [ ] Integrate air quality warnings into triage flow (dust storm alerts)
+- [x] Write vitest tests for air quality integration
+
+### Lab Report Vision Analysis
+- [x] Create lab report schema in database (lab_reports, lab_biomarkers tables) - ALREADY EXISTS
+- [x] Implement vision API integration for report parsing (Gemini Vision) - ALREADY EXISTS
+- [x] Build structured data extraction from lab images (biomarker detection) - ALREADY EXISTS
+- [x] Create tRPC procedures for lab report upload and analysis - ALREADY EXISTS
+- [x] Add lab report context to medical history and Context Vector - ALREADY EXISTS
+- [x] Build UI for lab report upload and results display - ALREADY EXISTS
+- [x] Integrate lab data into orchestrator logic (SENSE phase enhancement) - ALREADY EXISTS
+- [x] Write vitest tests for lab report analysis - ALREADY EXISTS (lab.test.ts)
+
+### Enhanced Orchestrator Logic (Environmental Context)
+- [x] Refactor orchestrator to support environmental context aggregation
+- [x] Implement context-aware agent routing based on environmental factors
+- [x] Add Baghdad-specific health risk assessment (dust storms, air quality)
+- [x] Integrate air quality data into symptom analysis (respiratory conditions)
+- [x] Integrate lab report data into diagnosis support (biomarker trends) - ALREADY EXISTS
+- [x] Add seasonal health pattern recognition (summer heat, winter pollution)
+- [x] Build comprehensive context aggregation system (weather + AQI + labs + wearables)
+- [ ] Write vitest tests for enhanced orchestrato### Testing & Documentation
+- [x] Test end-to-end triage flow with air quality integration
+- [x] Test lab report upload and analysis workflow - ALREADY EXISTS
+- [x] Test orchestrator with environmental context
+- [ ] Document Iraq-specific features for users
+- [ ] Create deployment checkpoint integration and alert thresholds
+- [ ] Document lab report vision analysis architecture
+- [ ] Document orchestrator enhancement and context aggregation

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `diseases` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `icd_code` varchar(10) NOT NULL UNIQUE,\n  `name_en` varchar(255) NOT NULL,\n  `name_ar` varchar(255),\n  `local_name` varchar(255),\n  `category` varchar(100),\n  `prevalence_iraq` enum('high','medium','low','rare') DEFAULT 'medium',\n  `description` text,\n  `symptoms` text,\n  `risk_factors` text,\n  `complications` text,\n  `differential_diagnosis` text,\n  `red_flags` text,\n  `treatment_protocol` text,\n  `prognosis` text,\n  `prevention_measures` text,\n  `special_considerations` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `version` int NOT NULL DEFAULT 1,\n  CONSTRAINT `diseases_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `diseases` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `icd_code` varchar(10) NOT NULL UNIQUE,\n  `name_en` varchar(255) NOT NULL,\n  `name_ar` varchar(255),\n  `local_name` varchar(255),\n  `category` varchar(100),\n  `prevalence_iraq` enum('high','medium','low','rare') DEFAULT 'medium',\n  `description` text,\n  `symptoms` text,\n  `risk_factors` text,\n  `complications` text,\n  `differential_diagnosis` text,\n  `red_flags` text,\n  `treatment_protocol` text,\n  `prognosis` text,\n  `prevention_measures` text,\n  `special_considerations` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `version` int NOT NULL DEFAULT 1,\n  CONSTRAINT `diseases_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1716
+}

@@ -62,6 +62,23 @@ export interface ContextVector {
     }>;
     temperature?: number;
     location?: { city: string; lat: number; lng: number };
+    // IRAQ-SPECIFIC: Air Quality Integration
+    airQuality?: {
+      aqi: number;
+      category: "good" | "moderate" | "unhealthy_sensitive" | "unhealthy" | "very_unhealthy" | "hazardous";
+      pm25: number;
+      pm10: number;
+      dominantPollutant: string;
+      dataSource: string;
+    };
+    aqiAlerts?: Array<{
+      type: "dust_storm" | "high_pm25" | "high_pm10" | "ozone_warning" | "general_pollution";
+      severity: "low" | "medium" | "high" | "critical";
+      title: string;
+      message: string;
+      healthRecommendations: string[];
+      affectedGroups: string[];
+    }>;
   };
   financialConstraints: {
     budgetFilterClicked?: boolean;
@@ -329,6 +346,54 @@ async function fetchEnvironmentalFactors(
       pressureAlerts = detectPressureAlerts(pressureChange);
     }
 
+    // ========================================================================
+    // IRAQ-SPECIFIC ENHANCEMENT: Air Quality Integration
+    // ========================================================================
+    // Fetch current air quality for Iraqi cities
+    let airQualityData = null;
+    let aqiAlerts: any[] = [];
+    
+    try {
+      const { getCurrentAQI, getActiveAlerts, IRAQI_CITIES } = await import("../air-quality-service");
+      
+      // Map location to Iraqi city
+      const iraqiCity = Object.keys(IRAQI_CITIES).find(
+        city => location.city.toLowerCase().includes(city.toLowerCase())
+      ) as any;
+      
+      if (iraqiCity) {
+        const [aqiData, alerts] = await Promise.all([
+          getCurrentAQI(iraqiCity).catch(() => null),
+          getActiveAlerts(iraqiCity).catch(() => []),
+        ]);
+        
+        if (aqiData) {
+          airQualityData = {
+            aqi: aqiData.aqi,
+            category: aqiData.aqiCategory,
+            pm25: parseFloat(aqiData.pm25 || "0"),
+            pm10: parseFloat(aqiData.pm10 || "0"),
+            dominantPollutant: aqiData.dominantPollutant,
+            dataSource: aqiData.dataSource,
+          };
+        }
+        
+        if (alerts.length > 0) {
+          aqiAlerts = alerts.map(alert => ({
+            type: alert.alertType,
+            severity: alert.severity,
+            title: alert.title,
+            message: alert.message,
+            healthRecommendations: JSON.parse(alert.healthRecommendations),
+            affectedGroups: JSON.parse(alert.affectedGroups),
+          }));
+        }
+      }
+    } catch (error) {
+      console.error("[Orchestrator] Error fetching air quality:", error);
+      // Continue without AQI data
+    }
+
     return {
       barometricPressure: currentPressure,
       pressureChange: pressureChange
@@ -342,6 +407,9 @@ async function fetchEnvironmentalFactors(
         : null,
       pressureAlerts: pressureAlerts.length > 0 ? pressureAlerts : null,
       temperature: weatherData.main?.temp,
+      // NEW: Air quality data
+      airQuality: airQualityData,
+      aqiAlerts: aqiAlerts.length > 0 ? aqiAlerts : null,
     };
   } catch (error) {
     console.error("[Orchestrator] Error fetching environmental factors:", error);
@@ -542,13 +610,43 @@ async function analyzeWithAI(
   localRisks: LocalRisk[],
   input: SymptomInput
 ): Promise<HybridDiagnosis> {
-  const prompt = `You are an expert medical AI analyzing a patient case.
+  // ========================================================================
+  // IRAQ-SPECIFIC ENHANCEMENT: Air Quality Context
+  // ========================================================================
+  let airQualityContext = "";
+  const envFactors = context.environmentalFactors as any;
+  
+  if (envFactors.airQuality) {
+    const aqi = envFactors.airQuality;
+    airQualityContext = `\n**Air Quality (Iraq-Specific):**
+- AQI: ${aqi.aqi} (${aqi.category})
+- PM2.5: ${aqi.pm25} μg/m³
+- PM10: ${aqi.pm10} μg/m³
+- Dominant Pollutant: ${aqi.dominantPollutant}
+- Data Source: ${aqi.dataSource}`;
+    
+    if (envFactors.aqiAlerts && envFactors.aqiAlerts.length > 0) {
+      airQualityContext += `\n- Active Alerts: ${envFactors.aqiAlerts.map((a: any) => `${a.type} (${a.severity})`).join(", ")}`;
+    }
+    
+    // Add clinical context for respiratory symptoms
+    if (aqi.aqi > 100) {
+      airQualityContext += `\n- CLINICAL NOTE: Poor air quality may exacerbate respiratory symptoms. Consider environmental triggers in differential diagnosis.`;
+    }
+    
+    if (aqi.pm10 > 150 && aqi.pm25 > 50) {
+      airQualityContext += `\n- DUST STORM DETECTED: High particulate matter consistent with Baghdad dust storms. Strongly consider dust-induced respiratory conditions.`;
+    }
+  }
+  
+  const prompt = `You are an expert medical AI analyzing a patient case in Iraq.
 
 **Patient Context:**
 - Symptom Severity: ${context.symptomSeverity}/10
 - Medical History: ${context.medicalHistory}
 - Location: ${context.environmentalFactors.location?.city || "Unknown"}
 - Vitals: ${JSON.stringify(input.vitals || {})}
+${airQualityContext}
 
 **Current Symptoms:**
 ${input.text || input.symptoms?.join(", ") || "Not specified"}
@@ -556,12 +654,18 @@ ${input.text || input.symptoms?.join(", ") || "Not specified"}
 **Local Disease Risks:**
 ${localRisks.map(r => `- ${r.disease}: ${r.caseCount} cases (${r.riskLevel} risk, ${r.growthRate}% growth)`).join("\n")}
 
+**IRAQ-SPECIFIC CONSIDERATIONS:**
+- Baghdad experiences frequent dust storms (especially spring/summer) causing respiratory issues
+- High PM10/PM2.5 levels are common environmental triggers
+- Consider air quality-related conditions for respiratory symptoms
+- Seasonal patterns: Summer heat stress, winter pollution spikes
+
 Provide a structured diagnosis with:
 1. Primary diagnosis
 2. Confidence (0-100)
 3. Top 3 differential diagnoses with probabilities
 4. Severity level (LOW/MODERATE/HIGH/EMERGENCY)
-5. Clinical reasoning
+5. Clinical reasoning (include environmental factors if relevant)
 
 Return as JSON.`;
 
