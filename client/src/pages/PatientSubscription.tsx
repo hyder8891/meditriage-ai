@@ -3,6 +3,9 @@ import { trpc } from "@/lib/trpc";
 import { Check, Crown, Zap, AlertCircle, CreditCard, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { AppLogo } from "@/components/AppLogo";
+import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 const PATIENT_PLANS = [
   {
@@ -137,29 +140,37 @@ export default function PatientSubscription() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50" dir={language === "ar" ? "rtl" : "ltr"}>
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 mb-3">
-            <button
-              onClick={() => setLocation("/patient/portal")}
-              className="p-2 hover:bg-slate-100 rounded-lg transition"
-              aria-label={language === "ar" ? "رجوع" : "Back"}
-            >
-              <ArrowLeft className="w-5 h-5 text-slate-700" />
-            </button>
-            <h1 className="text-2xl font-bold text-slate-800 flex-1">
-              {language === "ar" ? "إدارة الاشتراك" : "Subscription Management"}
-            </h1>
-            <button
-              onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
-              className="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
-            >
-              {language === "ar" ? "English" : "العربية"}
-            </button>
+      {/* Header with consistent logo */}
+      <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation("/patient/portal")}
+                className="gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                {language === "ar" ? "رجوع" : "Back"}
+              </Button>
+              <AppLogo href="/patient/portal" size="md" showText={true} />
+              <h1 className="text-xl font-semibold text-gray-800 hidden md:block">
+                {language === "ar" ? "إدارة الاشتراك" : "Subscription Management"}
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
+                className="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition text-sm hidden sm:block"
+              >
+                {language === "ar" ? "English" : "العربية"}
+              </button>
+              <UserProfileDropdown />
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
 
       <div className="container mx-auto px-4 py-8">
         {/* Current Plan Status */}

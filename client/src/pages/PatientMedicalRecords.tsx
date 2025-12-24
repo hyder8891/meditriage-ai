@@ -14,12 +14,15 @@ import {
   Pill,
   FileImage,
   ChevronLeft,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
+import { AppLogo } from "@/components/AppLogo";
+import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 export default function PatientMedicalRecords() {
   const [, setLocation] = useLocation();
@@ -34,31 +37,29 @@ export default function PatientMedicalRecords() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+      {/* Header with consistent logo */}
+      <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setLocation("/patient/portal")}
+                className="gap-2"
               >
-                <ChevronLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="w-4 h-4" />
                 {language === 'ar' ? 'رجوع' : 'Back'}
               </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {language === 'ar' ? 'سجلاتي الطبية' : 'My Medical Records'}
-                </h1>
-                <p className="text-sm text-slate-600">
-                  {language === 'ar' ? 'عرض نتائج الفحوصات والتقارير الطبية' : 'View your test results and medical reports'}
-                </p>
-              </div>
+              <AppLogo href="/patient/portal" size="md" showText={true} />
+              <h1 className="text-xl font-semibold text-gray-800 hidden md:block">
+                {language === 'ar' ? 'سجلاتي الطبية' : 'My Medical Records'}
+              </h1>
             </div>
+            <UserProfileDropdown />
           </div>
         </div>
-      </header>
+      </nav>
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="lab" className="space-y-6">

@@ -745,3 +745,6 @@
 
 ## NEW: Patient Dashboard Design Revert (User Request)
 - [x] Revert patient dashboard to simpler design - show doctor cards only in "Find a Doctor" section
+
+## NEW: Logo Inconsistency in Patient Portal
+- [x] Fix logo inconsistency - different logos showing on different patient portal pages

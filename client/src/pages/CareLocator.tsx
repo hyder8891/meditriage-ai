@@ -34,6 +34,8 @@ import { ArrowLeft as ArrowLeftIcon } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { AppLogo } from "@/components/AppLogo";
+import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 interface FacilityWithDistance {
   id: string | number;
@@ -662,23 +664,29 @@ export default function CareLocator() {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Simple header with back button */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Header with consistent logo */}
+      <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <Button
-              variant="ghost"
-              onClick={() => setLocation("/patient/portal")}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeftIcon className="w-4 h-4" />
-              Back to Portal
-            </Button>
-            <h1 className="text-xl font-semibold text-gray-900">Find Healthcare Facilities</h1>
-            <div className="w-32" /> {/* Spacer for centering */}
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation("/patient/portal")}
+                className="gap-2"
+              >
+                <ArrowLeftIcon className="w-4 h-4" />
+                Back
+              </Button>
+              <AppLogo href="/patient/portal" size="md" showText={true} />
+              <h1 className="text-xl font-semibold text-gray-800 hidden md:block">
+                Find Healthcare Facilities
+              </h1>
+            </div>
+            <UserProfileDropdown />
           </div>
         </div>
-      </div>
+      </nav>
       <CareLocatorContent />
     </div>
   );

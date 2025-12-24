@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, User, Video, Phone, Plus, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, User, Video, Phone, Plus, CheckCircle, XCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { AppLogo } from "@/components/AppLogo";
+import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 export default function PatientAppointments() {
   const { language } = useLanguage();
@@ -66,34 +68,35 @@ export default function PatientAppointments() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+      {/* Header with consistent logo */}
+      <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setLocation('/patient/portal')}
+                className="gap-2"
               >
-                {language === 'ar' ? '← رجوع' : '← Back'}
+                <ArrowLeft className="w-4 h-4" />
+                {language === 'ar' ? 'رجوع' : 'Back'}
               </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {language === 'ar' ? 'مواعيدي' : 'My Appointments'}
-                </h1>
-                <p className="text-sm text-slate-600">
-                  {language === 'ar' ? 'إدارة المواعيد الطبية' : 'Manage your medical appointments'}
-                </p>
-              </div>
+              <AppLogo href="/patient/portal" size="md" showText={true} />
+              <h1 className="text-xl font-semibold text-gray-800 hidden md:block">
+                {language === 'ar' ? 'مواعيدي' : 'My Appointments'}
+              </h1>
             </div>
-            <Button onClick={() => toast.info(language === 'ar' ? 'قريباً: حجز موعد جديد' : 'Coming soon: Book new appointment')}>
-              <Plus className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'موعد جديد' : 'New Appointment'}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => toast.info(language === 'ar' ? 'قريباً: حجز موعد جديد' : 'Coming soon: Book new appointment')} className="hidden sm:flex">
+                <Plus className="w-4 h-4 mr-2" />
+                {language === 'ar' ? 'موعد جديد' : 'New Appointment'}
+              </Button>
+              <UserProfileDropdown />
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
