@@ -214,9 +214,13 @@
 - [x] Add multi-model ensemble approach (AI-powered enhancement)
 - [x] Integrate red flag detection for critical findings
 - [ ] Test with various imaging types
+- [ ] Integrate Accuracy Framework into Medical Reports
 
-### Integrate Accuracy Framework into Medical Reports
-- [ ] Add report-type-specific validation rules
+### NEW: Integrate BRAIN + Avicenna-X into Conversational Assessment
+- [x] Integrate BRAIN system for comprehensive diagnosis at final step
+- [x] Integrate Avicenna-X orchestrator for resource routing and doctor matching
+- [x] Change doctor name from 'Dr. Avicenna' to 'AI Doctor' throughout system
+- [x] Test complete flow: Chat → BRAIN → AVICENNA-X → Final recommendation- [ ] Add report-type-specific validation rules
 - [ ] Implement confidence scoring for interpretations
 - [ ] Add cross-referencing with medical databases
 - [ ] Integrate clinical guideline compliance
@@ -482,3 +486,5 @@
   - [ ] Verify symptoms accumulate across steps
   - [ ] Verify no context reset between steps
   - [ ] Verify debug logs show correct state
+- [ ] Fix AI chat not triggering final triage recommendation after symptom collection
+- [ ] Fix Arabic language support - AI should ask questions in Arabic when language is 'ar'

@@ -89,10 +89,10 @@ export default function ModernSymptomChecker() {
       const response = await startConversationMutation.mutateAsync({ language });
       setCurrentResponse(response);
       
-      // Add assistant greeting to messages
+      // Add assistant greeting to messages (use Arabic if available)
       setMessages([{
         role: "assistant",
-        content: response.message,
+        content: isArabic && response.messageAr ? response.messageAr : response.message,
         timestamp: Date.now()
       }]);
 
@@ -134,10 +134,10 @@ export default function ModernSymptomChecker() {
         language
       });
 
-      // Add assistant response to chat
+      // Add assistant response to chat (use Arabic if available)
       const assistantMessage: ConversationMessage = {
         role: "assistant",
-        content: response.message,
+        content: isArabic && response.messageAr ? response.messageAr : response.message,
         timestamp: Date.now()
       };
       setMessages(prev => [...prev, assistantMessage]);

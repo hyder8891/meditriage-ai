@@ -15,7 +15,31 @@ const FALLBACK_QUESTIONS = [
   "Is there anything else I should know?",
 ];
 
-export async function processConversationalAssessment(message: string, contextData: any) {
+// Greeting messages
+const GREETING_EN = "Hello. I am AI Doctor, your intelligent medical assistant. Please tell me, what symptoms are you experiencing today?";
+const GREETING_AR = "مرحباً. أنا AI Doctor، مساعدك الطبي الذكي. من فضلك أخبرني، ما هي الأعراض التي تعاني منها اليوم؟";
+
+/**
+ * Start a new conversation
+ */
+export async function startConversation(language: string = 'en') {
+  const greeting = language === 'ar' ? GREETING_AR : GREETING_EN;
+  
+  return {
+    message: greeting,
+    messageAr: GREETING_AR,
+    conversationStage: "greeting" as const,
+    context: new ConversationalContextVector({}).toJSON(),
+    quickReplies: []
+  };
+}
+
+export async function processConversationalAssessment(
+  message: string, 
+  contextData: any,
+  conversationHistory: any[] = [],
+  language: string = 'en'
+) {
   // 1. Rehydrate
   const vector = new ConversationalContextVector(contextData);
   
@@ -25,15 +49,20 @@ export async function processConversationalAssessment(message: string, contextDa
 
   // 2. Identify Current State
   const currentStep = vector.stepCount;
-  const isFinalStep = currentStep >= 10;
+  const isFinalStep = currentStep >= 7; // Trigger after 8 questions (step 0-7)
 
-  // 3. Prompt Engineering
+  // 3. If final step, generate comprehensive triage recommendation
+  if (isFinalStep) {
+    return await generateFinalRecommendation(vector, message, language);
+  }
+
+  // 4. Prompt Engineering for symptom gathering
   const systemPrompt = `
-    ROLE: Dr. Avicenna (AI Diagnostic Tool).
+    ROLE: AI Doctor (Intelligent Medical Assistant).
     TASK: Step-by-step medical intake.
     
     CURRENT STATUS:
-    - Step: ${currentStep + 1}/10
+    - Step: ${currentStep + 1}/8 (will finalize at step 8)
     - Known Symptoms: ${JSON.stringify(vector.symptoms)}
     - Duration: ${vector.duration || "Unknown"}
     - Severity: ${vector.severity || "Unknown"}
@@ -41,8 +70,8 @@ export async function processConversationalAssessment(message: string, contextDa
 
     GOAL:
     1. Extract new information from the patient's message.
-    2. Decide the NEXT best question to narrow down the diagnosis.
-    3. If Step is 10, provide a Triage Decision.
+    2. Ask ONE focused follow-up question to gather critical details.
+    3. Be conversational and empathetic.
 
     OUTPUT FORMAT (JSON ONLY):
     {
@@ -52,8 +81,7 @@ export async function processConversationalAssessment(message: string, contextDa
         "severity": "string or null",
         "location": "string or null"
       },
-      "nextQuestion": "Your question here",
-      "triage": "ROUTINE" | "URGENT" | "EMERGENCY" (only for final step)
+      "nextQuestion": "Your question here"
     }
   `;
 
@@ -94,8 +122,10 @@ export async function processConversationalAssessment(message: string, contextDa
 
     return {
       message: data.nextQuestion,
-      context: vector.toJSON(), // 🟢 THIS OBJECT MUST BE SENT BACK BY FRONTEND NEXT TIME
-      isFinal: isFinalStep
+      messageAr: data.nextQuestion, // TODO: Add Arabic translation
+      conversationStage: "gathering" as const,
+      context: vector.toJSON(),
+      quickReplies: []
     };
 
   } catch (error) {
@@ -103,12 +133,142 @@ export async function processConversationalAssessment(message: string, contextDa
     
     // Auto-Recovery
     vector.stepCount = currentStep + 1;
-    const nextQ = FALLBACK_QUESTIONS[Math.min(vector.stepCount, 9)];
+    const nextQ = FALLBACK_QUESTIONS[Math.min(vector.stepCount, 7)];
 
     return {
       message: nextQ,
+      messageAr: nextQ, // TODO: Add Arabic translation
+      conversationStage: "gathering" as const,
       context: vector.toJSON(),
-      isFinal: false
+      quickReplies: []
+    };
+  }
+}
+
+/**
+ * Generate final comprehensive diagnosis using BRAIN + Avicenna-X
+ */
+async function generateFinalRecommendation(
+  vector: ConversationalContextVector,
+  lastMessage: string,
+  language: string
+) {
+  console.log('[AI DOCTOR] Generating comprehensive diagnosis using BRAIN + Avicenna-X...');
+  
+  const systemPrompt = `
+    ROLE: AI Doctor (Intelligent Medical Assistant)
+    TASK: Generate comprehensive diagnosis using BRAIN system
+    
+    PATIENT DATA:
+    - Symptoms: ${JSON.stringify(vector.symptoms)}
+    - Duration: ${vector.duration || "Unknown"}
+    - Severity: ${vector.severity || "Unknown"}
+    - Location: ${vector.location || "Unknown"}
+    - Last Message: "${lastMessage}"
+    
+    INSTRUCTIONS:
+    1. Analyze all symptoms and determine triage level (green/yellow/red)
+    2. Provide differential diagnosis with probabilities
+    3. Give clear recommendations and next steps
+    4. Be empathetic but direct
+    
+    TRIAGE LEVELS:
+    - green: Non-urgent, can wait for routine appointment
+    - yellow: Urgent, should see doctor within 24 hours
+    - red: Emergency, seek immediate medical attention
+    
+    OUTPUT FORMAT (JSON ONLY):
+    {
+      "triageLevel": "green" | "yellow" | "red",
+      "triageReason": "Brief explanation",
+      "recommendations": ["recommendation 1", "recommendation 2"],
+      "differentialDiagnosis": [
+        {
+          "condition": "Condition name",
+          "probability": 0.7,
+          "reasoning": "Why this is likely"
+        }
+      ],
+      "actionPlan": "Specific next steps for the patient"
+    }
+  `;
+  
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: "Please provide the final triage recommendation." }
+      ]
+    });
+    
+    // Parse response
+    let content = response.choices[0]?.message?.content || "";
+    if (Array.isArray(content)) {
+      const textContent = content.find(c => c.type === "text");
+      content = textContent?.text || "";
+    }
+    const cleanJson = typeof content === "string" ? content.replace(/```json|```/g, '').trim() : "";
+    
+    let data;
+    try {
+      data = cleanJson ? JSON.parse(cleanJson) : null;
+    } catch (e) {
+      console.error('[AVICENNA] Failed to parse final recommendation:', e);
+      data = null;
+    }
+    
+    if (!data) {
+      // Fallback recommendation
+      data = {
+        triageLevel: "yellow",
+        triageReason: "Based on your symptoms, you should consult a healthcare provider.",
+        recommendations: [
+          "Schedule an appointment with your doctor",
+          "Monitor your symptoms",
+          "Seek immediate care if symptoms worsen"
+        ],
+        differentialDiagnosis: [],
+        actionPlan: "Please consult with a healthcare professional for proper diagnosis and treatment."
+      };
+    }
+    
+    // Map triage level to color
+    const triageLevel = data.triageLevel || "yellow";
+    
+    return {
+      message: `Based on your symptoms, here is my assessment:\n\n${data.actionPlan}`,
+      messageAr: data.actionPlan, // TODO: Add Arabic translation
+      conversationStage: "complete" as const,
+      triageLevel,
+      triageReason: data.triageReason,
+      triageReasonAr: data.triageReason, // TODO: Add Arabic translation
+      recommendations: data.recommendations || [],
+      recommendationsAr: data.recommendations || [], // TODO: Add Arabic translation
+      differentialDiagnosis: data.differentialDiagnosis || [],
+      showActions: true,
+      context: vector.toJSON(),
+      quickReplies: []
+    };
+    
+  } catch (error) {
+    console.error('[AVICENNA] Error generating final recommendation:', error);
+    
+    // Fallback response
+    return {
+      message: "Based on your symptoms, I recommend consulting with a healthcare professional for proper evaluation and treatment.",
+      messageAr: "بناءً على أعراضك، أوصي بالتشاور مع أخصائي رعاية صحية للتقييم والعلاج المناسب.",
+      conversationStage: "complete" as const,
+      triageLevel: "yellow" as const,
+      triageReason: "Unable to complete full assessment",
+      recommendations: [
+        "Consult a healthcare provider",
+        "Monitor your symptoms",
+        "Seek immediate care if symptoms worsen"
+      ],
+      differentialDiagnosis: [],
+      showActions: true,
+      context: vector.toJSON(),
+      quickReplies: []
     };
   }
 }
