@@ -50,6 +50,8 @@ import XRayAnalysis from "./pages/XRayAnalysis";
 import MedicalReportsAnalysis from "./pages/clinician/MedicalReportsAnalysis";
 import SOAPTemplates from "./pages/SOAPTemplates";
 import ClinicianCalendar from "./pages/ClinicianCalendar";
+import DoctorCalendar from "./pages/DoctorCalendar";
+import PatientBooking from "./pages/PatientBooking";
 import MedicationManagement from "./pages/MedicationManagement";
 import PatientMedications from "./pages/PatientMedications";
 import PatientPortal from "./pages/PatientPortal";
@@ -142,7 +144,10 @@ function Router() {
         {() => <ProtectedRoute requiredRole="clinician"><MedicalReportsAnalysis /></ProtectedRoute>}
       </Route>
       <Route path={"/clinician/calendar"}>
-        {() => <ProtectedRoute requiredRole="clinician"><ClinicianCalendar /></ProtectedRoute>}
+        {() => <ProtectedRoute requiredRole="clinician"><DoctorCalendar /></ProtectedRoute>}
+      </Route>
+      <Route path={"/patient/booking/:doctorId"}>
+        {(params) => <ProtectedRoute><PatientBooking doctorId={parseInt(params.doctorId)} /></ProtectedRoute>}
       </Route>
       <Route path={"/clinician/medications"}>
         {() => <ProtectedRoute requiredRole="clinician"><MedicationManagement /></ProtectedRoute>}

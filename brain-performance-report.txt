@@ -1,0 +1,55 @@
+
+╔══════════════════════════════════════════════════════════════════╗
+║           BRAIN PERFORMANCE TEST REPORT                          ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📊 OVERALL METRICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total Cases Tested:        100
+  Top-1 Accuracy:            77/100 (77.00%)
+  Top-3 Accuracy:            79/100 (79.00%)
+  Urgency Accuracy:          23/100 (23.00%)
+  Average Execution Time:    16780ms
+
+📁 CATEGORY BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  emergency: 11/20 (55.00%)
+  common: 26/30 (86.67%)
+  complex: 17/20 (85.00%)
+  pediatric: 9/10 (90.00%)
+  geriatric: 8/10 (80.00%)
+  iraqi-specific: 6/10 (60.00%)
+
+🎯 DIFFICULTY BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  easy: 17/23 (73.91%)
+  medium: 31/39 (79.49%)
+  hard: 29/38 (76.32%)
+
+❌ FAILED CASES (Top 10)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  EMG-001: Expected "Acute Myocardial Infarction", Got "ERROR: Failed query: select `id`, `name_en`, `name_ar`, `local_name`, `category`, `description`, `severity_indicators`, `associated_conditions`, `red_flag_symptom`, `urgency_level`, `common_in_iraq`, `created_at`, `updated_at` from `symptoms` where (`symptoms`.`name_en` like ? or `symptoms`.`name_ar` like ? or `symptoms`.`local_name` like ?) limit ?
+params: %Severe crushing chest pain%,%Severe crushing chest pain%,%Severe crushing chest pain%,20"
+  EMG-002: Expected "Acute Ischemic Stroke", Got "ERROR: Failed query: select `id`, `name_en`, `name_ar`, `local_name`, `category`, `description`, `severity_indicators`, `associated_conditions`, `red_flag_symptom`, `urgency_level`, `common_in_iraq`, `created_at`, `updated_at` from `symptoms` where (`symptoms`.`name_en` like ? or `symptoms`.`name_ar` like ? or `symptoms`.`local_name` like ?) limit ?
+params: %Sudden weakness on right side%,%Sudden weakness on right side%,%Sudden weakness on right side%,20"
+  EMG-003: Expected "Acute Severe Asthma Exacerbation", Got "ERROR: Failed query: select `id`, `name_en`, `name_ar`, `local_name`, `category`, `description`, `severity_indicators`, `associated_conditions`, `red_flag_symptom`, `urgency_level`, `common_in_iraq`, `created_at`, `updated_at` from `symptoms` where (`symptoms`.`name_en` like ? or `symptoms`.`name_ar` like ? or `symptoms`.`local_name` like ?) limit ?
+params: %Severe difficulty breathing%,%Severe difficulty breathing%,%Severe difficulty breathing%,20"
+  EMG-004: Expected "Acute Appendicitis", Got "ERROR: Failed query: select `id`, `name_en`, `name_ar`, `local_name`, `category`, `description`, `severity_indicators`, `associated_conditions`, `red_flag_symptom`, `urgency_level`, `common_in_iraq`, `created_at`, `updated_at` from `symptoms` where (`symptoms`.`name_en` like ? or `symptoms`.`name_ar` like ? or `symptoms`.`local_name` like ?) limit ?
+params: %Severe abdominal pain%,%Severe abdominal pain%,%Severe abdominal pain%,20"
+  EMG-005: Expected "Diabetic Ketoacidosis", Got "ERROR: Failed query: select `id`, `name_en`, `name_ar`, `local_name`, `category`, `description`, `severity_indicators`, `associated_conditions`, `red_flag_symptom`, `urgency_level`, `common_in_iraq`, `created_at`, `updated_at` from `symptoms` where (`symptoms`.`name_en` like ? or `symptoms`.`name_ar` like ? or `symptoms`.`local_name` like ?) limit ?
+params: %Confusion and excessive urination%,%Confusion and excessive urination%,%Confusion and excessive urination%,20"
+  EMG-006: Expected "Subarachnoid Hemorrhage", Got "ERROR: Failed query: select `id`, `name_en`, `name_ar`, `local_name`, `category`, `description`, `severity_indicators`, `associated_conditions`, `red_flag_symptom`, `urgency_level`, `common_in_iraq`, `created_at`, `updated_at` from `symptoms` where (`symptoms`.`name_en` like ? or `symptoms`.`name_ar` like ? or `symptoms`.`local_name` like ?) limit ?
+params: %Sudden severe headache%,%Sudden severe headache%,%Sudden severe headache%,20"
+  EMG-007: Expected "Pulmonary Embolism", Got "ERROR: Failed query: select `id`, `name_en`, `name_ar`, `local_name`, `category`, `description`, `severity_indicators`, `associated_conditions`, `red_flag_symptom`, `urgency_level`, `common_in_iraq`, `created_at`, `updated_at` from `symptoms` where (`symptoms`.`name_en` like ? or `symptoms`.`name_ar` like ? or `symptoms`.`local_name` like ?) limit ?
+params: %Sudden leg swelling and chest pain%,%Sudden leg swelling and chest pain%,%Sudden leg swelling and chest pain%,20"
+  EMG-013: Expected "Ruptured Ectopic Pregnancy", Got "Ectopic Pregnancy (Ruptured)"
+  EMG-014: Expected "Esophageal Variceal Bleeding", Got "Esophageal Variceal Hemorrhage"
+  COM-008: Expected "Streptococcal Pharyngitis", Got "Group A Streptococcus Pharyngitis (Strep Throat)"
+
+✅ PERFORMANCE TARGETS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Target Top-1 Accuracy:     ≥85% ✗
+  Target Top-3 Accuracy:     ≥95% ✗
+  Target Urgency Accuracy:   ≥90% ✗
+  Target Execution Time:     <3000ms ✗
+

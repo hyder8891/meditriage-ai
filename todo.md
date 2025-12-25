@@ -910,3 +910,68 @@
 ## 📋 Consultation System - Priority 3 (Enhancements)
 - [x] Consultation history and transcripts
 - [x] Notifications and reminders (using existing notification system)
+
+
+## NEW: Enhanced Calendar & Appointment Management System
+
+### Doctor Availability Management
+- [x] Create doctor working hours configuration interface
+- [x] Allow doctors to set recurring weekly schedules (e.g., Mon-Fri 9AM-5PM)
+- [x] Add ability to set custom availability for specific dates
+- [x] Implement slot duration configuration (15min, 30min, 60min slots)
+- [x] Add bulk slot creation based on working hours
+- [x] Allow doctors to block/unblock specific time slots manually
+
+### Automatic Slot Booking & Management
+- [x] Implement automatic slot blocking when patient books appointment
+- [x] Ensure booked slots are unavailable to other patients in real-time
+- [x] Add slot status tracking (available/booked/blocked/past)
+- [x] Prevent double-booking through database constraints
+- [x] Add concurrent booking prevention with optimistic locking
+- [x] Implement slot release when appointment is cancelled
+
+### Booking Status Workflow
+- [x] Create appointment status flow: Pending → Confirmed/Rejected
+- [x] Add doctor confirmation interface for pending appointments
+- [x] Implement appointment rejection with reason/notes
+- [ ] Send notifications when appointment status changes
+- [ ] Add patient notification for confirmation/rejection
+- [x] Allow patients to view appointment status in real-time
+- [x] Add appointment history with status tracking
+
+### Visual Calendar Interface
+- [x] Build doctor calendar view with weekly/monthly grid
+- [x] Create patient calendar view showing their appointments
+- [x] Add color-coding for appointment statuses (pending/confirmed/rejected)
+- [ ] Implement drag-and-drop rescheduling for doctors
+- [x] Add time slot selection interface for patients
+- [x] Show available vs booked slots with visual indicators
+- [ ] Add calendar export functionality (iCal/Google Calendar)
+- [ ] Implement timezone handling for appointments
+
+### Slot-Based Booking System
+- [x] Display only available slots to patients during booking
+- [x] Filter slots by doctor availability and existing bookings
+- [x] Show real-time slot availability updates
+- [x] Add slot search by date range and time preferences
+- [x] Implement "next available slot" finder
+- [x] Add buffer time between appointments (configurable)
+- [x] Handle slot conflicts and overlapping appointments
+
+### Database Schema for Calendar System
+- [x] Create doctor_working_hours table (working hours, recurring schedules)
+- [x] Create calendar_slots table (individual time slots with status)
+- [x] Create appointment_booking_requests table with status workflow (pending/confirmed/rejected)
+- [x] Create doctor_availability_exceptions table for special dates
+- [x] Create slot_generation_history table for tracking
+- [x] Add indexes for efficient slot queries
+- [x] Implement database constraints to prevent double-booking
+- [x] Add audit logging for slot changes and bookings
+
+### Testing & Validation
+- [ ] Test concurrent booking scenarios (race conditions)
+- [ ] Verify automatic slot blocking works correctly
+- [ ] Test appointment status workflow end-to-end
+- [ ] Validate calendar views show correct data
+- [ ] Test timezone handling across different regions
+- [ ] Verify notification delivery for status changes

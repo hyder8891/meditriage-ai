@@ -29,6 +29,13 @@
       "when": 1766620317340,
       "tag": "0003_blue_donald_blake",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1766635675765,
+      "tag": "0004_sudden_blue_blade",
+      "breakpoints": true
     }
   ]
 }

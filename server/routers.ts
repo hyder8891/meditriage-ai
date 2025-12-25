@@ -32,6 +32,7 @@ import { onboardingRouter } from "./onboarding-router";
 import { loadTestRouter } from "./load-test-router";
 import { soapRouter } from "./soap-router";
 import { clinicalReasoningRouter } from "./routers/clinical-reasoning-router";
+import { calendarRouter } from "./calendar-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -98,6 +99,7 @@ export const appRouter = router({
   orchestration: orchestrationRouter,
   onboarding: onboardingRouter,
   loadTest: loadTestRouter,
+  calendar: calendarRouter,
   soap: soapRouter,
   clinicalReasoning: clinicalReasoningRouter,
   auth: router({

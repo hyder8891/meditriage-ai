@@ -3623,3 +3623,238 @@ export const soapExportLogs = mysqlTable("soap_export_logs", {
 
 export type SoapExportLog = typeof soapExportLogs.$inferSelect;
 export type InsertSoapExportLog = typeof soapExportLogs.$inferInsert;
+
+/**
+ * Doctor Working Hours - Recurring weekly schedule
+ * Defines when doctors are generally available each week
+ */
+export const doctorWorkingHours = mysqlTable("doctor_working_hours", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  doctorId: int("doctor_id").notNull(),
+  
+  // Day of week (0 = Sunday, 6 = Saturday)
+  dayOfWeek: int("day_of_week").notNull(), // 0-6
+  
+  // Time range
+  startTime: time("start_time").notNull(), // e.g., "09:00:00"
+  endTime: time("end_time").notNull(), // e.g., "17:00:00"
+  
+  // Slot configuration
+  slotDuration: int("slot_duration").notNull().default(30), // in minutes (15, 30, 60)
+  bufferTime: int("buffer_time").default(0), // minutes between appointments
+  
+  // Status
+  isActive: boolean("is_active").default(true).notNull(),
+  
+  // Effective date range (for temporary schedule changes)
+  effectiveFrom: date("effective_from"),
+  effectiveTo: date("effective_to"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorWorkingHours = typeof doctorWorkingHours.$inferSelect;
+export type InsertDoctorWorkingHours = typeof doctorWorkingHours.$inferInsert;
+
+/**
+ * Calendar Slots - Individual time slots for booking
+ * Generated from working hours or manually created/blocked by doctors
+ */
+export const calendarSlots = mysqlTable("calendar_slots", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  doctorId: int("doctor_id").notNull(),
+  
+  // Slot timing
+  slotDate: date("slot_date").notNull(),
+  startTime: time("start_time").notNull(),
+  endTime: time("end_time").notNull(),
+  
+  // Full timestamp for easier querying
+  slotStart: timestamp("slot_start").notNull(),
+  slotEnd: timestamp("slot_end").notNull(),
+  
+  // Slot status
+  status: mysqlEnum("status", [
+    "available",      // Open for booking
+    "booked",        // Patient has booked
+    "blocked",       // Manually blocked by doctor
+    "completed",     // Appointment completed
+    "cancelled",     // Appointment was cancelled
+    "no_show",       // Patient didn't show up
+    "past"           // Slot time has passed
+  ]).default("available").notNull(),
+  
+  // Linked appointment (when booked)
+  appointmentId: int("appointment_id").unique(),
+  patientId: int("patient_id"),
+  
+  // Slot metadata
+  slotType: mysqlEnum("slot_type", [
+    "regular",       // Normal consultation
+    "emergency",     // Emergency slot
+    "follow_up",     // Follow-up appointment
+    "break",         // Doctor's break time
+    "personal"       // Personal time off
+  ]).default("regular").notNull(),
+  
+  // Blocking information (for manually blocked slots)
+  blockedBy: int("blocked_by"), // doctor_id who blocked it
+  blockReason: varchar("block_reason", { length: 255 }),
+  
+  // Notes
+  notes: text("notes"),
+  
+  // Automatic generation tracking
+  generatedFrom: int("generated_from"), // working_hours_id if auto-generated
+  isManual: boolean("is_manual").default(false), // true if manually created
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CalendarSlot = typeof calendarSlots.$inferSelect;
+export type InsertCalendarSlot = typeof calendarSlots.$inferInsert;
+
+/**
+ * Doctor Availability Exceptions - Special dates when schedule differs
+ * Overrides regular working hours for specific dates
+ */
+export const doctorAvailabilityExceptions = mysqlTable("doctor_availability_exceptions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  doctorId: int("doctor_id").notNull(),
+  
+  // Exception date
+  exceptionDate: date("exception_date").notNull(),
+  
+  // Exception type
+  exceptionType: mysqlEnum("exception_type", [
+    "unavailable",   // Doctor is completely unavailable
+    "custom_hours",  // Different working hours
+    "holiday",       // Public holiday
+    "vacation",      // Personal vacation
+    "conference",    // Medical conference
+    "emergency"      // Emergency leave
+  ]).notNull(),
+  
+  // Custom hours (if exception_type = 'custom_hours')
+  customStartTime: time("custom_start_time"),
+  customEndTime: time("custom_end_time"),
+  
+  // Reason and notes
+  reason: varchar("reason", { length: 255 }),
+  notes: text("notes"),
+  
+  // Whether to cancel existing appointments
+  cancelExistingAppointments: boolean("cancel_existing_appointments").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorAvailabilityException = typeof doctorAvailabilityExceptions.$inferSelect;
+export type InsertDoctorAvailabilityException = typeof doctorAvailabilityExceptions.$inferInsert;
+
+/**
+ * Appointment Booking Requests - Tracks booking workflow
+ * Manages the Pending → Confirmed/Rejected flow
+ */
+export const appointmentBookingRequests = mysqlTable("appointment_booking_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Participants
+  patientId: int("patient_id").notNull(),
+  doctorId: int("doctor_id").notNull(),
+  
+  // Requested slot
+  slotId: int("slot_id").notNull(),
+  
+  // Booking status
+  status: mysqlEnum("status", [
+    "pending",       // Waiting for doctor confirmation
+    "confirmed",     // Doctor confirmed
+    "rejected",      // Doctor rejected
+    "cancelled",     // Patient cancelled
+    "expired"        // Request expired (no response)
+  ]).default("pending").notNull(),
+  
+  // Patient information
+  chiefComplaint: text("chief_complaint"),
+  symptoms: text("symptoms"), // JSON array
+  urgencyLevel: varchar("urgency_level", { length: 50 }),
+  
+  // Triage link
+  triageRecordId: int("triage_record_id"),
+  
+  // Doctor response
+  confirmedBy: int("confirmed_by"), // doctor_id
+  confirmedAt: timestamp("confirmed_at"),
+  rejectedBy: int("rejected_by"), // doctor_id
+  rejectedAt: timestamp("rejected_at"),
+  rejectionReason: text("rejection_reason"),
+  
+  // Alternative slot suggestions (if rejected)
+  suggestedSlots: text("suggested_slots"), // JSON array of slot_ids
+  
+  // Linked appointment (when confirmed)
+  appointmentId: int("appointment_id").unique(),
+  
+  // Expiration
+  expiresAt: timestamp("expires_at"), // Auto-reject if no response
+  
+  // Notifications
+  patientNotified: boolean("patient_notified").default(false),
+  doctorNotified: boolean("doctor_notified").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AppointmentBookingRequest = typeof appointmentBookingRequests.$inferSelect;
+export type InsertAppointmentBookingRequest = typeof appointmentBookingRequests.$inferInsert;
+
+/**
+ * Slot Generation History - Tracks automatic slot generation
+ * Helps prevent duplicate generation and tracks changes
+ */
+export const slotGenerationHistory = mysqlTable("slot_generation_history", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  doctorId: int("doctor_id").notNull(),
+  
+  // Generation parameters
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  
+  // Results
+  slotsGenerated: int("slots_generated").notNull(),
+  workingHoursUsed: text("working_hours_used"), // JSON array of working_hours_ids
+  
+  // Generation type
+  generationType: mysqlEnum("generation_type", [
+    "manual",        // Manually triggered by doctor
+    "automatic",     // System auto-generation
+    "bulk",          // Bulk generation for date range
+    "recurring"      // Recurring schedule setup
+  ]).notNull(),
+  
+  // Triggered by
+  triggeredBy: int("triggered_by"), // user_id
+  
+  // Status
+  status: mysqlEnum("status", [
+    "success",
+    "partial",
+    "failed"
+  ]).notNull(),
+  
+  errorMessage: text("error_message"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type SlotGenerationHistory = typeof slotGenerationHistory.$inferSelect;
+export type InsertSlotGenerationHistory = typeof slotGenerationHistory.$inferInsert;
