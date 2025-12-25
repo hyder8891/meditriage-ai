@@ -19,8 +19,20 @@ import {
   Play,
   Square,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  Target,
+  BarChart3,
+  Clock,
+  Zap
 } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function LoadTestDashboard() {
   const [totalUsers, setTotalUsers] = useState(100);
@@ -28,6 +40,7 @@ export default function LoadTestDashboard() {
   const [durationSeconds, setDurationSeconds] = useState(300);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [testCaseFilter, setTestCaseFilter] = useState<'all' | 'success' | 'failed' | 'running' | 'pending'>('all');
 
   const startTestMutation = trpc.loadTest.startTest.useMutation();
   const stopTestMutation = trpc.loadTest.stopTest.useMutation();
@@ -40,6 +53,18 @@ export default function LoadTestDashboard() {
     { 
       enabled: !!activeSessionId,
       refetchInterval: activeSessionId ? 1000 : false,
+    }
+  );
+  const testCasesQuery = trpc.loadTest.getTestCases.useQuery(
+    { 
+      sessionId: activeSessionId!, 
+      limit: 50,
+      offset: 0,
+      filter: testCaseFilter 
+    },
+    { 
+      enabled: !!activeSessionId,
+      refetchInterval: activeSessionId ? 2000 : false,
     }
   );
 
@@ -94,7 +119,7 @@ export default function LoadTestDashboard() {
         <div>
           <h1 className="text-3xl font-bold">Load Testing Dashboard</h1>
           <p className="text-muted-foreground mt-1">
-            Simulate concurrent users to test system performance
+            Simulate concurrent users to test system performance and accuracy
           </p>
         </div>
         <Button
@@ -109,9 +134,10 @@ export default function LoadTestDashboard() {
       </div>
 
       <Tabs defaultValue="configure" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="configure">Configure Test</TabsTrigger>
           <TabsTrigger value="monitor">Live Monitor</TabsTrigger>
+          <TabsTrigger value="details">Test Details</TabsTrigger>
           <TabsTrigger value="history">Test History</TabsTrigger>
         </TabsList>
 
@@ -251,6 +277,28 @@ export default function LoadTestDashboard() {
             </Card>
           ) : (
             <>
+              {/* Progress Bar */}
+              {isRunning && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-yellow-500 animate-pulse" />
+                      Test Progress
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Completion</span>
+                      <span className="text-2xl font-bold text-primary">{currentTest.progress.toFixed(1)}%</span>
+                    </div>
+                    <Progress value={currentTest.progress} className="h-3" />
+                    <p className="text-sm text-muted-foreground text-center">
+                      {currentTest.metrics.totalRequests} requests completed • {currentTest.metrics.activeUsers} active users
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Status Overview */}
               <div className="grid gap-4 md:grid-cols-4">
                 <Card>
@@ -323,10 +371,81 @@ export default function LoadTestDashboard() {
                 </Card>
               </div>
 
+              {/* Accuracy Metrics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-purple-500" />
+                    Accuracy Metrics
+                  </CardTitle>
+                  <CardDescription>
+                    AI response validation and accuracy statistics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-4">
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Overall Accuracy</p>
+                      <p className="text-3xl font-bold text-purple-600">
+                        {(currentTest.accuracyMetrics.accuracy * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Precision</p>
+                      <p className="text-2xl font-bold">
+                        {(currentTest.accuracyMetrics.precision * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Recall</p>
+                      <p className="text-2xl font-bold">
+                        {(currentTest.accuracyMetrics.recall * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">F1 Score</p>
+                      <p className="text-2xl font-bold">
+                        {(currentTest.accuracyMetrics.f1Score * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 md:grid-cols-2 pt-4 border-t">
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                      <span className="text-sm font-medium text-green-900">True Positives</span>
+                      <span className="text-xl font-bold text-green-700">
+                        {currentTest.accuracyMetrics.truePositives}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                      <span className="text-sm font-medium text-blue-900">True Negatives</span>
+                      <span className="text-xl font-bold text-blue-700">
+                        {currentTest.accuracyMetrics.trueNegatives}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                      <span className="text-sm font-medium text-orange-900">False Positives</span>
+                      <span className="text-xl font-bold text-orange-700">
+                        {currentTest.accuracyMetrics.falsePositives}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                      <span className="text-sm font-medium text-red-900">False Negatives</span>
+                      <span className="text-xl font-bold text-red-700">
+                        {currentTest.accuracyMetrics.falseNegatives}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Response Time Metrics */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Response Time Metrics</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-blue-500" />
+                    Response Time Metrics
+                  </CardTitle>
                   <CardDescription>
                     Performance statistics for all requests
                   </CardDescription>
@@ -362,8 +481,65 @@ export default function LoadTestDashboard() {
                       value={Math.min(100, (currentTest.metrics.stats.avgResponseTime / 10000) * 100)} 
                     />
                   </div>
+
+                  {/* Response Time Distribution */}
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="font-semibold text-sm">Response Time Distribution</h4>
+                    {Object.entries(currentTest.metrics.responseTimeDistribution).map(([range, count]) => {
+                      const total = Object.values(currentTest.metrics.responseTimeDistribution).reduce((a, b) => a + b, 0);
+                      const percentage = total > 0 ? (count / total) * 100 : 0;
+                      return (
+                        <div key={range} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">{range}</span>
+                            <span className="font-medium">{count} ({percentage.toFixed(1)}%)</span>
+                          </div>
+                          <Progress value={percentage} className="h-2" />
+                        </div>
+                      );
+                    })}
+                  </div>
                 </CardContent>
               </Card>
+
+              {/* Test Execution Timeline */}
+              {currentTest.milestones && currentTest.milestones.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5 text-indigo-500" />
+                      Test Execution Timeline
+                    </CardTitle>
+                    <CardDescription>
+                      Key milestones during test execution
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {currentTest.milestones.map((milestone, idx) => (
+                        <div key={idx} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                          <div className={`mt-1 h-3 w-3 rounded-full ${
+                            milestone.type === 'start' ? 'bg-blue-500' :
+                            milestone.type === 'wave' ? 'bg-purple-500' :
+                            milestone.type === 'halfway' ? 'bg-yellow-500' :
+                            milestone.type === 'complete' ? 'bg-green-500' :
+                            'bg-red-500'
+                          }`} />
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <p className="font-medium text-sm">{milestone.message}</p>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(milestone.timestamp).toLocaleTimeString()}
+                              </span>
+                            </div>
+                            <Progress value={milestone.progress} className="h-1 mt-2" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Error Metrics */}
               {currentTest.metrics.failedRequests > 0 && (
@@ -423,6 +599,163 @@ export default function LoadTestDashboard() {
                       ))
                     )}
                   </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </TabsContent>
+
+        <TabsContent value="details" className="space-y-6">
+          {!currentTest ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">
+                  No active test. Start a test from the Configure tab.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Test Case Details</CardTitle>
+                      <CardDescription>
+                        Individual test case results and accuracy validation
+                      </CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={testCaseFilter === 'all' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTestCaseFilter('all')}
+                      >
+                        All
+                      </Button>
+                      <Button
+                        variant={testCaseFilter === 'success' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTestCaseFilter('success')}
+                      >
+                        Success
+                      </Button>
+                      <Button
+                        variant={testCaseFilter === 'failed' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTestCaseFilter('failed')}
+                      >
+                        Failed
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {testCasesQuery.isLoading ? (
+                    <div className="py-12 text-center">
+                      <RefreshCw className="h-8 w-8 mx-auto animate-spin text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Loading test cases...</p>
+                    </div>
+                  ) : testCasesQuery.data?.cases.length === 0 ? (
+                    <div className="py-12 text-center">
+                      <p className="text-muted-foreground">No test cases yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-[100px]">ID</TableHead>
+                              <TableHead>Type</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Response Time</TableHead>
+                              <TableHead>Accuracy</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {testCasesQuery.data?.cases.map((testCase) => (
+                              <TableRow key={testCase.id}>
+                                <TableCell className="font-mono text-xs">
+                                  {testCase.id.substring(0, 12)}...
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className={
+                                    testCase.type === 'patient' 
+                                      ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                                      : 'bg-green-50 text-green-700 border-green-200'
+                                  }>
+                                    {testCase.type === 'patient' ? '👤 Patient' : '👨‍⚕️ Doctor'}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  {testCase.status === 'success' && (
+                                    <Badge variant="default" className="bg-green-500">
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                      Success
+                                    </Badge>
+                                  )}
+                                  {testCase.status === 'failed' && (
+                                    <Badge variant="destructive">
+                                      <XCircle className="h-3 w-3 mr-1" />
+                                      Failed
+                                    </Badge>
+                                  )}
+                                  {testCase.status === 'running' && (
+                                    <Badge variant="default" className="bg-blue-500">
+                                      <Activity className="h-3 w-3 mr-1 animate-pulse" />
+                                      Running
+                                    </Badge>
+                                  )}
+                                  {testCase.status === 'pending' && (
+                                    <Badge variant="outline">
+                                      Pending
+                                    </Badge>
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  {testCase.responseTime ? (
+                                    <span className="font-medium">{testCase.responseTime.toFixed(0)}ms</span>
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  {testCase.isCorrect !== undefined ? (
+                                    testCase.isCorrect ? (
+                                      <Badge variant="default" className="bg-green-500">
+                                        ✓ Correct
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="destructive">
+                                        ✗ Incorrect
+                                      </Badge>
+                                    )
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="sm">
+                                    View
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                      {testCasesQuery.data?.hasMore && (
+                        <div className="text-center">
+                          <Button variant="outline" size="sm">
+                            Load More ({testCasesQuery.data.total - testCasesQuery.data.cases.length} remaining)
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </>
@@ -499,7 +832,7 @@ export default function LoadTestDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4 md:grid-cols-4">
+                    <div className="grid gap-4 md:grid-cols-5">
                       <div>
                         <p className="text-sm text-muted-foreground">Total Requests</p>
                         <p className="text-xl font-bold">{test.totalRequests}</p>
@@ -508,6 +841,12 @@ export default function LoadTestDashboard() {
                         <p className="text-sm text-muted-foreground">Success Rate</p>
                         <p className="text-xl font-bold text-green-600">
                           {test.successRate.toFixed(1)}%
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Accuracy</p>
+                        <p className="text-xl font-bold text-purple-600">
+                          {(test.accuracyMetrics.accuracy * 100).toFixed(1)}%
                         </p>
                       </div>
                       <div>

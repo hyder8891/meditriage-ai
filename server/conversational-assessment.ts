@@ -17,7 +17,7 @@ const FALLBACK_QUESTIONS = [
 
 // Greeting messages
 const GREETING_EN = "Hello. I am AI Doctor, your intelligent medical assistant. Please tell me, what symptoms are you experiencing today?";
-const GREETING_AR = "مرحباً. أنا AI Doctor، مساعدك الطبي الذكي. من فضلك أخبرني، ما هي الأعراض التي تعاني منها اليوم؟";
+const GREETING_AR = "مرحباً. أنا طبيبك الافتراضي، مساعدك الطبي الذكي. من فضلك أخبرني، ما هي الأعراض التي تعاني منها اليوم؟";
 
 /**
  * Start a new conversation

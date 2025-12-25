@@ -80,7 +80,7 @@ describe("Conversational Assessment - Arabic Translations", () => {
   it("should start conversation with Arabic greeting when language is 'ar'", async () => {
     const result = await startConversation("ar");
     
-    expect(result.messageAr).toBe("مرحباً. أنا AI Doctor، مساعدك الطبي الذكي. من فضلك أخبرني، ما هي الأعراض التي تعاني منها اليوم؟");
+    expect(result.messageAr).toBe("مرحباً. أنا طبيبك الافتراضي، مساعدك الطبي الذكي. من فضلك أخبرني، ما هي الأعراض التي تعاني منها اليوم؟");
     expect(result.conversationStage).toBe("greeting");
   });
 
@@ -117,7 +117,7 @@ describe("Conversational Assessment - Arabic Translations", () => {
     expect(result.messageAr).toContain("الأدلة الداعمة");
     
     // Verify disclaimer is in Arabic
-    expect(result.messageAr).toContain("هذا التقييم تم إنشاؤه بواسطة AI Doctor");
+    expect(result.messageAr).toContain("هذا التقييم تم إنشاؤه بواسطة طبيبك الافتراضي");
     expect(result.messageAr).toContain("وهو ليس بديلاً عن الاستشارة الطبية المتخصصة");
   });
 
