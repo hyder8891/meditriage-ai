@@ -1,5 +1,5 @@
 import { getDb } from "./db";
-import { consultations } from "../drizzle/schema";
+import { consultations, users } from "../drizzle/schema";
 import { eq, and, or, gte, desc } from "drizzle-orm";
 import { randomBytes } from "crypto";
 
@@ -44,20 +44,84 @@ export async function getConsultationByRoomId(roomId: string) {
 
 export async function getConsultationsByPatient(patientId: number) {
   const db = await getDb();
-  return await db!
-    .select()
+  const results = await db!
+    .select({
+      id: consultations.id,
+      patientId: consultations.patientId,
+      clinicianId: consultations.clinicianId,
+      appointmentId: consultations.appointmentId,
+      scheduledTime: consultations.scheduledTime,
+      startTime: consultations.startTime,
+      endTime: consultations.endTime,
+      duration: consultations.duration,
+      status: consultations.status,
+      roomId: consultations.roomId,
+      chiefComplaint: consultations.chiefComplaint,
+      notes: consultations.notes,
+      diagnosis: consultations.diagnosis,
+      prescriptionGenerated: consultations.prescriptionGenerated,
+      recordingUrl: consultations.recordingUrl,
+      recordingEnabled: consultations.recordingEnabled,
+      chatTranscript: consultations.chatTranscript,
+      paymentStatus: consultations.paymentStatus,
+      amount: consultations.amount,
+      patientRating: consultations.patientRating,
+      patientFeedback: consultations.patientFeedback,
+      createdAt: consultations.createdAt,
+      updatedAt: consultations.updatedAt,
+      doctor: {
+        id: users.id,
+        name: users.name,
+        specialty: users.specialty,
+        licenseNumber: users.licenseNumber,
+      },
+    })
     .from(consultations)
+    .leftJoin(users, eq(consultations.clinicianId, users.id))
     .where(eq(consultations.patientId, patientId))
     .orderBy(desc(consultations.scheduledTime));
+  
+  return results;
 }
 
 export async function getConsultationsByClinician(clinicianId: number) {
   const db = await getDb();
-  return await db!
-    .select()
+  const results = await db!
+    .select({
+      id: consultations.id,
+      patientId: consultations.patientId,
+      clinicianId: consultations.clinicianId,
+      appointmentId: consultations.appointmentId,
+      scheduledTime: consultations.scheduledTime,
+      startTime: consultations.startTime,
+      endTime: consultations.endTime,
+      duration: consultations.duration,
+      status: consultations.status,
+      roomId: consultations.roomId,
+      chiefComplaint: consultations.chiefComplaint,
+      notes: consultations.notes,
+      diagnosis: consultations.diagnosis,
+      prescriptionGenerated: consultations.prescriptionGenerated,
+      recordingUrl: consultations.recordingUrl,
+      recordingEnabled: consultations.recordingEnabled,
+      chatTranscript: consultations.chatTranscript,
+      paymentStatus: consultations.paymentStatus,
+      amount: consultations.amount,
+      patientRating: consultations.patientRating,
+      patientFeedback: consultations.patientFeedback,
+      createdAt: consultations.createdAt,
+      updatedAt: consultations.updatedAt,
+      patient: {
+        id: users.id,
+        name: users.name,
+      },
+    })
     .from(consultations)
+    .leftJoin(users, eq(consultations.patientId, users.id))
     .where(eq(consultations.clinicianId, clinicianId))
     .orderBy(desc(consultations.scheduledTime));
+  
+  return results;
 }
 
 export async function getUpcomingConsultations(userId: number, role: 'patient' | 'clinician') {

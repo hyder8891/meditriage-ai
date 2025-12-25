@@ -78,6 +78,8 @@ import { PatientVitalsViewer } from "./pages/clinician/PatientVitalsViewer";
 import VitalsTrends from "./pages/VitalsTrends";
 import LoadTestDashboard from "./pages/LoadTestDashboard";
 import PatientAppointments from "./pages/PatientAppointments";
+import ConsultationRoom from "./pages/ConsultationRoom";
+import ConsultationHistory from "./pages/ConsultationHistory";
 import MediTriage from "./pages/MediTriage";
 import { Redirect } from "wouter";
 
@@ -187,6 +189,13 @@ function Router() {
       </Route>
       <Route path="/patient/appointments">
         {() => <ProtectedRoute requiredRole="patient"><PatientAppointments /></ProtectedRoute>}
+      </Route>
+      <Route path="/consultation/:id" component={ConsultationRoom} />
+      <Route path="/patient/consultation-history">
+        {() => <ProtectedRoute requiredRole="patient"><ConsultationHistory /></ProtectedRoute>}
+      </Route>
+      <Route path="/clinician/consultations">
+        {() => <ProtectedRoute requiredRole="clinician"><ConsultationHistory /></ProtectedRoute>}
       </Route>
       <Route path="/patient/profile">
         {() => <ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>}

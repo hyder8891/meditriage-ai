@@ -35,6 +35,110 @@ import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle"
 import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+function UpcomingConsultations() {
+  const { language } = useLanguage();
+  const [, setLocation] = useLocation();
+  const { data: consultations, isLoading } = trpc.consultation.getMy.useQuery();
+
+  const upcomingConsultations = consultations?.filter(
+    c => c.status === 'scheduled' || c.status === 'waiting'
+  ).slice(0, 3) || [];
+
+  if (isLoading) {
+    return (
+      <Card className="card-modern mb-6">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl">
+            {language === 'ar' ? 'الاستشارات القادمة' : 'Upcoming Consultations'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <div className="text-center py-4 text-gray-500">
+            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (upcomingConsultations.length === 0) {
+    return null;
+  }
+
+  return (
+    <Card className="card-modern mb-6">
+      <CardHeader className="p-4 sm:p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg sm:text-xl">
+              {language === 'ar' ? 'الاستشارات القادمة' : 'Upcoming Consultations'}
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              {language === 'ar' ? 'استشارات الفيديو المجدولة' : 'Scheduled video consultations'}
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setLocation('/clinician/consultations')}
+          >
+            {language === 'ar' ? 'عرض الكل' : 'View All'}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="p-4 sm:p-6 pt-0">
+        <div className="space-y-3">
+          {upcomingConsultations.map((consultation) => {
+            const scheduledDate = new Date(consultation.scheduledTime);
+            const patientInfo = 'patient' in consultation ? consultation.patient : null;
+            const patientName = patientInfo?.name || (language === 'ar' ? 'مريض غير معروف' : 'Unknown Patient');
+
+            return (
+              <div
+                key={consultation.id}
+                className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer"
+                onClick={() => setLocation(`/consultation/${consultation.id}`)}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-semibold text-sm">{patientName}</h4>
+                      <Badge className="bg-blue-100 text-blue-700 text-xs">
+                        {consultation.status === 'scheduled' 
+                          ? (language === 'ar' ? 'مجدول' : 'Scheduled')
+                          : (language === 'ar' ? 'قيد الانتظار' : 'Waiting')
+                        }
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {scheduledDate.toLocaleDateString(language === 'ar' ? 'ar-IQ' : 'en-US')}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {scheduledDate.toLocaleTimeString(language === 'ar' ? 'ar-IQ' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    {consultation.chiefComplaint && (
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-1">
+                        {consultation.chiefComplaint}
+                      </p>
+                    )}
+                  </div>
+                  <Button size="sm" variant="outline">
+                    {language === 'ar' ? 'انضم' : 'Join'}
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ClinicianDashboardContent() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated } = useAuth();
@@ -172,6 +276,9 @@ function ClinicianDashboardContent() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Upcoming Consultations */}
+        <UpcomingConsultations />
 
         {/* Search Bar */}
         <div className="mb-4 sm:mb-6">

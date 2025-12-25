@@ -1,8 +1,8 @@
-import { router, protectedProcedure } from "./_core/trpc";
+import { protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { sendAppointmentConfirmation } from "./services/email";
 import { getDb } from "./db";
-import { users } from "../drizzle/schema";
+import { users, consultations } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import {
   createConsultation,
@@ -19,7 +19,90 @@ import {
 } from "./consultation-db";
 
 export const consultationRouter = router({
-  // Create new consultation
+  // Book consultation (patient-facing)
+  book: protectedProcedure
+    .input(z.object({
+      doctorId: z.number(),
+      scheduledAt: z.date(),
+      consultationType: z.enum(["video", "in-person"]),
+      reason: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const result = await createConsultation({
+        patientId: ctx.user.id,
+        clinicianId: input.doctorId,
+        scheduledTime: input.scheduledAt,
+        chiefComplaint: input.reason,
+      });
+      
+      // Send appointment confirmation email
+      try {
+        const db = await getDb();
+        
+        const [patient] = await db!
+          .select()
+          .from(users)
+          .where(eq(users.id, ctx.user.id))
+          .limit(1);
+        
+        const [clinician] = await db!
+          .select()
+          .from(users)
+          .where(eq(users.id, input.doctorId))
+          .limit(1);
+        
+        if (patient && clinician && patient.email) {
+          sendAppointmentConfirmation({
+            patientName: patient.name || "Patient",
+            patientEmail: patient.email,
+            doctorName: clinician.name || "Doctor",
+            appointmentDate: input.scheduledAt.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }),
+            appointmentTime: input.scheduledAt.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            appointmentType: input.reason || "General Consultation",
+            language: "ar",
+          }).catch(err => console.error("[Consultation] Failed to send confirmation:", err));
+        }
+      } catch (err) {
+        console.error("[Consultation] Error sending confirmation:", err);
+      }
+      
+      return result;
+    }),
+
+  // Cancel consultation
+  cancel: protectedProcedure
+    .input(z.object({
+      consultationId: z.number(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.consultationId);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+      
+      // Check authorization
+      if (
+        ctx.user.role !== 'admin' &&
+        consultation.patientId !== ctx.user.id &&
+        consultation.clinicianId !== ctx.user.id
+      ) {
+        throw new Error('Unauthorized');
+      }
+      
+      await updateConsultationStatus(input.consultationId, 'cancelled');
+      
+      return { success: true };
+    }),
+
+  // Create new consultation (admin/clinician-facing)
   create: protectedProcedure
     .input(z.object({
       patientId: z.number(),
@@ -206,6 +289,33 @@ export const consultationRouter = router({
         diagnosis: input.diagnosis,
         prescriptionGenerated: input.prescriptionGenerated,
       });
+      
+      return { success: true };
+    }),
+
+  // Save notes (clinician only)
+  saveNotes: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      notes: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const consultation = await getConsultationById(input.id);
+      
+      if (!consultation) {
+        throw new Error('Consultation not found');
+      }
+
+      // Only clinician can save notes
+      if (ctx.user.role !== 'admin' && consultation.clinicianId !== ctx.user.id) {
+        throw new Error('Unauthorized');
+      }
+
+      const db = await getDb();
+      await db!
+        .update(consultations)
+        .set({ notes: input.notes })
+        .where(eq(consultations.id, input.id));
       
       return { success: true };
     }),

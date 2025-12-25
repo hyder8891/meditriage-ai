@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +15,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Search, User, Circle, Check, MessageCircle, ArrowLeft } from "lucide-react";
+import { Loader2, Search, User, Circle, Check, MessageCircle, ArrowLeft, Calendar, Video } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { toast as sonnerToast } from "sonner";
 
 type AvailabilityStatus = "available" | "busy" | "offline" | "all";
 
@@ -29,6 +32,11 @@ export default function FindDoctor() {
   const [selectedDoctor, setSelectedDoctor] = useState<number | null>(null);
   const [connectionReason, setConnectionReason] = useState("");
   const [showConnectDialog, setShowConnectDialog] = useState(false);
+  const [showBookingDialog, setShowBookingDialog] = useState(false);
+  const [bookingType, setBookingType] = useState<"video" | "in-person">("video");
+  const [bookingDate, setBookingDate] = useState("");
+  const [bookingTime, setBookingTime] = useState("");
+  const [bookingReason, setBookingReason] = useState("");
 
   const { data: doctors, isLoading } = trpc.b2b2c.patient.searchDoctors.useQuery({
     availabilityStatus: statusFilter,
@@ -58,9 +66,46 @@ export default function FindDoctor() {
     },
   });
 
+  const bookConsultationMutation = trpc.consultation.book.useMutation({
+    onSuccess: () => {
+      sonnerToast.success("Consultation booked successfully!");
+      setShowBookingDialog(false);
+      setBookingDate("");
+      setBookingTime("");
+      setBookingReason("");
+      utils.consultation.getMy.invalidate();
+    },
+    onError: (error) => {
+      sonnerToast.error("Failed to book consultation", {
+        description: error.message,
+      });
+    },
+  });
+
   const handleConnect = (doctorId: number) => {
     setSelectedDoctor(doctorId);
     setShowConnectDialog(true);
+  };
+
+  const handleBookConsultation = (doctorId: number) => {
+    setSelectedDoctor(doctorId);
+    setShowBookingDialog(true);
+  };
+
+  const confirmBooking = () => {
+    if (!selectedDoctor || !bookingDate || !bookingTime) {
+      sonnerToast.error("Please fill in all required fields");
+      return;
+    }
+
+    const scheduledAt = new Date(`${bookingDate}T${bookingTime}`);
+    
+    bookConsultationMutation.mutate({
+      doctorId: selectedDoctor,
+      scheduledAt,
+      consultationType: bookingType,
+      reason: bookingReason || undefined,
+    });
   };
 
   const confirmConnect = () => {
@@ -224,10 +269,18 @@ export default function FindDoctor() {
                   </div>
 
                   <div className="flex flex-col gap-2">
+                    <Button
+                      onClick={() => handleBookConsultation(doctor.id)}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Book Appointment
+                    </Button>
                     {isAvailable ? (
                       <Button
                         onClick={() => handleConnect(doctor.id)}
-                        className="bg-green-600 hover:bg-green-700"
+                        variant="outline"
+                        className="border-green-600 text-green-600 hover:bg-green-50"
                       >
                         <MessageCircle className="h-4 w-4 mr-2" />
                         Connect Now
@@ -238,10 +291,6 @@ export default function FindDoctor() {
                         {isBusy ? "Busy" : "Offline"}
                       </Button>
                     )}
-                    
-                    <Button variant="outline" size="sm">
-                      View Profile
-                    </Button>
                   </div>
                 </div>
               </Card>
@@ -255,6 +304,91 @@ export default function FindDoctor() {
           Showing {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? 's' : ''}
         </div>
       )}
+
+      {/* Booking Dialog */}
+      <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Book Consultation</DialogTitle>
+            <DialogDescription>
+              Schedule an appointment with the doctor
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Consultation Type</Label>
+              <RadioGroup value={bookingType} onValueChange={(v) => setBookingType(v as "video" | "in-person")}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="video" id="video" />
+                  <Label htmlFor="video" className="flex items-center gap-2 cursor-pointer">
+                    <Video className="h-4 w-4" />
+                    Video Consultation
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="in-person" id="in-person" />
+                  <Label htmlFor="in-person" className="flex items-center gap-2 cursor-pointer">
+                    <User className="h-4 w-4" />
+                    In-Person Visit
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="booking-date">Date *</Label>
+              <Input
+                id="booking-date"
+                type="date"
+                value={bookingDate}
+                onChange={(e) => setBookingDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="booking-time">Time *</Label>
+              <Input
+                id="booking-time"
+                type="time"
+                value={bookingTime}
+                onChange={(e) => setBookingTime(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="booking-reason">Reason for consultation (optional)</Label>
+              <Textarea
+                id="booking-reason"
+                placeholder="E.g., Chest pain, Follow-up appointment, Prescription refill..."
+                value={bookingReason}
+                onChange={(e) => setBookingReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowBookingDialog(false)}
+              disabled={bookConsultationMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmBooking}
+              disabled={bookConsultationMutation.isPending}
+            >
+              {bookConsultationMutation.isPending && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
+              Book Appointment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Connect Dialog */}
       <Dialog open={showConnectDialog} onOpenChange={setShowConnectDialog}>

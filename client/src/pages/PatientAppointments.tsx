@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, User, Video, Phone, Plus, CheckCircle, XCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, MapPin, User, Video, Phone, Plus, CheckCircle, XCircle, AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -14,44 +14,43 @@ export default function PatientAppointments() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
 
-  // Mock appointments data - replace with real tRPC query when backend is ready
-  const appointments = [
-    {
-      id: 1,
-      doctorName: language === 'ar' ? 'د. أحمد محمد' : 'Dr. Ahmed Mohamed',
-      specialty: language === 'ar' ? 'طبيب عام' : 'General Practitioner',
-      date: '2025-01-15',
-      time: '10:00 AM',
-      type: 'video' as const,
-      status: 'confirmed' as const,
-      location: language === 'ar' ? 'استشارة عبر الفيديو' : 'Video Consultation',
+  // Fetch consultations from backend
+  const { data: consultations, isLoading } = trpc.consultation.getMy.useQuery();
+  const utils = trpc.useUtils();
+  
+  const cancelMutation = trpc.consultation.cancel.useMutation({
+    onSuccess: () => {
+      utils.consultation.getMy.invalidate();
+      toast.success(language === 'ar' ? 'تم إلغاء الموعد بنجاح' : 'Consultation cancelled successfully');
     },
-    {
-      id: 2,
-      doctorName: language === 'ar' ? 'د. فاطمة علي' : 'Dr. Fatima Ali',
-      specialty: language === 'ar' ? 'طبيب قلب' : 'Cardiologist',
-      date: '2025-01-20',
-      time: '2:30 PM',
-      type: 'in-person' as const,
-      status: 'pending' as const,
-      location: language === 'ar' ? 'عيادة القلب - الطابق الثالث' : 'Cardiology Clinic - 3rd Floor',
+    onError: (error) => {
+      toast.error(language === 'ar' ? 'فشل إلغاء الموعد' : 'Failed to cancel consultation', {
+        description: error.message,
+      });
     },
-  ];
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'confirmed':
+      case 'scheduled':
         return (
-          <Badge className="bg-green-100 text-green-700 border-green-200">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            {language === 'ar' ? 'مؤكد' : 'Confirmed'}
+          <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+            <AlertCircle className="w-3 h-3 mr-1" />
+            {language === 'ar' ? 'مجدول' : 'Scheduled'}
           </Badge>
         );
-      case 'pending':
+      case 'waiting':
         return (
           <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
             <AlertCircle className="w-3 h-3 mr-1" />
-            {language === 'ar' ? 'قيد الانتظار' : 'Pending'}
+            {language === 'ar' ? 'قيد الانتظار' : 'Waiting'}
+          </Badge>
+        );
+      case 'in_progress':
+        return (
+          <Badge className="bg-green-100 text-green-700 border-green-200">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            {language === 'ar' ? 'جاري' : 'In Progress'}
           </Badge>
         );
       case 'cancelled':
@@ -59,6 +58,20 @@ export default function PatientAppointments() {
           <Badge className="bg-red-100 text-red-700 border-red-200">
             <XCircle className="w-3 h-3 mr-1" />
             {language === 'ar' ? 'ملغى' : 'Cancelled'}
+          </Badge>
+        );
+      case 'completed':
+        return (
+          <Badge className="bg-gray-100 text-gray-700 border-gray-200">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            {language === 'ar' ? 'مكتمل' : 'Completed'}
+          </Badge>
+        );
+      case 'no_show':
+        return (
+          <Badge className="bg-orange-100 text-orange-700 border-orange-200">
+            <XCircle className="w-3 h-3 mr-1" />
+            {language === 'ar' ? 'لم يحضر' : 'No Show'}
           </Badge>
         );
       default:
@@ -88,7 +101,7 @@ export default function PatientAppointments() {
               </h1>
             </div>
             <div className="flex items-center gap-3">
-              <Button onClick={() => toast.info(language === 'ar' ? 'قريباً: حجز موعد جديد' : 'Coming soon: Book new appointment')} className="hidden sm:flex">
+              <Button onClick={() => setLocation('/patient/find-doctors')} className="hidden sm:flex">
                 <Plus className="w-4 h-4 mr-2" />
                 {language === 'ar' ? 'موعد جديد' : 'New Appointment'}
               </Button>
@@ -100,71 +113,94 @@ export default function PatientAppointments() {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Upcoming Appointments */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">
-            {language === 'ar' ? 'المواعيد القادمة' : 'Upcoming Appointments'}
-          </h2>
-          <div className="grid gap-4">
-            {appointments.map((appointment) => (
-              <Card key={appointment.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
-                        {appointment.doctorName.charAt(0)}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-slate-900">{appointment.doctorName}</h3>
-                          {getStatusBadge(appointment.status)}
-                        </div>
-                        <p className="text-sm text-slate-600 mb-3">{appointment.specialty}</p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                          <div className="flex items-center gap-2 text-slate-700">
-                            <Calendar className="w-4 h-4 text-slate-400" />
-                            <span>{appointment.date}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-700">
-                            <Clock className="w-4 h-4 text-slate-400" />
-                            <span>{appointment.time}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-700">
-                            {appointment.type === 'video' ? (
-                              <Video className="w-4 h-4 text-slate-400" />
-                            ) : (
-                              <MapPin className="w-4 h-4 text-slate-400" />
-                            )}
-                            <span>{appointment.location}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      {appointment.type === 'video' && appointment.status === 'confirmed' && (
-                        <Button size="sm" onClick={() => toast.info(language === 'ar' ? 'قريباً: الانضمام للمكالمة' : 'Coming soon: Join video call')}>
-                          <Video className="w-4 h-4 mr-2" />
-                          {language === 'ar' ? 'انضم' : 'Join'}
-                        </Button>
-                      )}
-                      <Button variant="outline" size="sm" onClick={() => toast.info(language === 'ar' ? 'قريباً: إعادة الجدولة' : 'Coming soon: Reschedule')}>
-                        {language === 'ar' ? 'إعادة جدولة' : 'Reschedule'}
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => toast.info(language === 'ar' ? 'قريباً: إلغاء الموعد' : 'Coming soon: Cancel appointment')}>
-                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
           </div>
-        </div>
+        )}
+
+        {/* Appointments List */}
+        {!isLoading && consultations && consultations.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-slate-900 mb-4">
+              {language === 'ar' ? 'المواعيد القادمة' : 'Upcoming Appointments'}
+            </h2>
+            <div className="grid gap-4">
+              {consultations.map((consultation) => {
+                const scheduledDate = new Date(consultation.scheduledTime);
+                const doctorInfo = 'doctor' in consultation ? consultation.doctor : null;
+                const doctorName = doctorInfo?.name || (language === 'ar' ? 'طبيب غير معروف' : 'Unknown Doctor');
+                const specialty = doctorInfo?.specialty || (language === 'ar' ? 'طب عام' : 'General Medicine');
+                
+                return (
+                  <Card key={consultation.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-4 flex-1">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
+                            {doctorName.charAt(0)}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-slate-900">{doctorName}</h3>
+                              {getStatusBadge(consultation.status)}
+                            </div>
+                            <p className="text-sm text-slate-600 mb-3">{specialty}</p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                              <div className="flex items-center gap-2 text-slate-700">
+                                <Calendar className="w-4 h-4 text-slate-400" />
+                                <span>{scheduledDate.toLocaleDateString(language === 'ar' ? 'ar-IQ' : 'en-US')}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-slate-700">
+                                <Clock className="w-4 h-4 text-slate-400" />
+                                <span>{scheduledDate.toLocaleTimeString(language === 'ar' ? 'ar-IQ' : 'en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-slate-700">
+                                <Video className="w-4 h-4 text-slate-400" />
+                                <span>{language === 'ar' ? 'استشارة عبر الفيديو' : 'Video Consultation'}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          {(consultation.status === 'scheduled' || consultation.status === 'waiting') && (
+                            <Button 
+                              size="sm" 
+                              onClick={() => setLocation(`/consultation/${consultation.id}`)}
+                            >
+                              <Video className="w-4 h-4 mr-2" />
+                              {language === 'ar' ? 'انضم' : 'Join'}
+                            </Button>
+                          )}
+                          {(consultation.status === 'scheduled' || consultation.status === 'waiting') && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => cancelMutation.mutate({ consultationId: consultation.id })}
+                              disabled={cancelMutation.isPending}
+                            >
+                              {cancelMutation.isPending ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                language === 'ar' ? 'إلغاء' : 'Cancel'
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Empty State */}
-        {appointments.length === 0 && (
+        {!isLoading && (!consultations || consultations.length === 0) && (
           <Card>
             <CardContent className="p-12 text-center">
               <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
@@ -174,7 +210,7 @@ export default function PatientAppointments() {
               <p className="text-slate-600 mb-4">
                 {language === 'ar' ? 'ليس لديك أي مواعيد قادمة' : "You don't have any upcoming appointments"}
               </p>
-              <Button onClick={() => toast.info(language === 'ar' ? 'قريباً: حجز موعد' : 'Coming soon: Book appointment')}>
+              <Button onClick={() => setLocation('/patient/find-doctors')}>
                 <Plus className="w-4 h-4 mr-2" />
                 {language === 'ar' ? 'احجز موعدك الأول' : 'Book Your First Appointment'}
               </Button>
