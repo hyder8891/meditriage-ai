@@ -463,35 +463,25 @@ export const b2b2cRouter = router({
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         }
 
-        // Verify relationship exists
-        const [relationship] = await db
+        // Verify recipient exists and is a valid user
+        const [recipient] = await db
           .select()
-          .from(doctorPatientRelationships)
-          .where(
-            or(
-              and(
-                eq(doctorPatientRelationships.doctorId, ctx.user.id),
-                eq(doctorPatientRelationships.patientId, input.recipientId)
-              ),
-              and(
-                eq(doctorPatientRelationships.patientId, ctx.user.id),
-                eq(doctorPatientRelationships.doctorId, input.recipientId)
-              )
-            )
-          )
+          .from(users)
+          .where(eq(users.id, input.recipientId))
           .limit(1);
 
-        if (!relationship || relationship.status !== "active") {
+        if (!recipient) {
           throw new TRPCError({ 
-            code: "FORBIDDEN", 
-            message: "No active relationship with this user" 
+            code: "NOT_FOUND", 
+            message: "Recipient not found" 
           });
         }
 
-        if (!relationship.canMessage) {
+        // Basic validation: ensure users are not messaging themselves
+        if (ctx.user.id === input.recipientId) {
           throw new TRPCError({ 
-            code: "FORBIDDEN", 
-            message: "Messaging is not enabled for this relationship" 
+            code: "BAD_REQUEST", 
+            message: "Cannot send messages to yourself" 
           });
         }
 

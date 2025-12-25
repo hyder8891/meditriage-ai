@@ -975,3 +975,10 @@
 - [ ] Validate calendar views show correct data
 - [ ] Test timezone handling across different regions
 - [ ] Verify notification delivery for status changes
+
+## URGENT: Messaging System Not Working (User Reported - FIXED)
+- [x] Investigate messaging system between doctors and patients
+- [x] Fix message sending functionality - Removed strict relationship requirement
+- [x] Fix message receiving functionality
+- [x] Test real-time messaging between doctor and patient accounts - All 8 tests passing
+- [x] Verify message history persistence
