@@ -709,3 +709,17 @@
 
 ## SOAP Note Dialog Width Fix (Current)
 - [x] Fix SOAP note dialog width - make dialog wider or content narrower to avoid horizontal scrolling
+
+
+## NEW: MediTriage Clinical Reasoning Enhancement (User Request - Current)
+- [x] Enhance BRAIN system to match MediTriage screenshot requirements
+- [x] Add structured patient information form (complaints, chief complaint, age, gender)
+- [x] Implement voice input for Arabic complaints using voice transcription API
+- [x] Add comprehensive vital signs input (heart rate, blood pressure, temperature, oxygen saturation)
+- [x] Generate differential diagnoses ranked by likelihood with percentage scores
+- [x] Display clinical reasoning for each diagnosis (symptoms matching, risk factors)
+- [x] Generate recommended diagnostic tests section
+- [x] Implement red flags detection and warning display
+- [x] Add urgency assessment with clear categorization
+- [x] Create bilingual UI (Arabic/English) matching screenshot design
+- [x] Write vitest tests for all new clinical reasoning features (8/9 tests passing)

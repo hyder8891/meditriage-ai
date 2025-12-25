@@ -298,6 +298,46 @@ export type Vitals = typeof vitals.$inferSelect;
 export type InsertVitals = typeof vitals.$inferInsert;
 
 /**
+ * Differential diagnoses table - stores AI-generated diagnoses with likelihood scores
+ */
+export const differentialDiagnoses = mysqlTable("differential_diagnoses", {
+  id: int("id").autoincrement().primaryKey(),
+  triageRecordId: int("triage_record_id").notNull(),
+  caseId: int("case_id"),
+  
+  // Diagnosis information
+  diagnosisName: varchar("diagnosis_name", { length: 500 }).notNull(),
+  diagnosisNameAr: varchar("diagnosis_name_ar", { length: 500 }),
+  likelihoodScore: int("likelihood_score").notNull(), // 0-100 percentage
+  
+  // Clinical reasoning
+  clinicalReasoning: text("clinical_reasoning").notNull(),
+  clinicalReasoningAr: text("clinical_reasoning_ar"),
+  
+  // Supporting evidence
+  matchingSymptoms: text("matching_symptoms"), // JSON array
+  riskFactors: text("risk_factors"), // JSON array
+  
+  // Recommended actions
+  recommendedTests: text("recommended_tests"), // JSON array
+  recommendedTestsAr: text("recommended_tests_ar"), // JSON array
+  
+  // Red flags
+  redFlags: text("red_flags"), // JSON array
+  redFlagsAr: text("red_flags_ar"), // JSON array
+  
+  // Urgency assessment
+  urgencyLevel: mysqlEnum("urgency_level", ["emergency", "urgent", "semi-urgent", "non-urgent", "routine"]).notNull(),
+  urgencyReasoning: text("urgency_reasoning"),
+  urgencyReasoningAr: text("urgency_reasoning_ar"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type DifferentialDiagnosis = typeof differentialDiagnoses.$inferSelect;
+export type InsertDifferentialDiagnosis = typeof differentialDiagnoses.$inferInsert;
+
+/**
  * Differential diagnoses table
  */
 export const diagnoses = mysqlTable("diagnoses", {

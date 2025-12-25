@@ -78,6 +78,7 @@ import { PatientVitalsViewer } from "./pages/clinician/PatientVitalsViewer";
 import VitalsTrends from "./pages/VitalsTrends";
 import LoadTestDashboard from "./pages/LoadTestDashboard";
 import PatientAppointments from "./pages/PatientAppointments";
+import MediTriage from "./pages/MediTriage";
 import { Redirect } from "wouter";
 
 function Router() {
@@ -102,9 +103,11 @@ function Router() {
       <Route path={"/clinician/login"} component={ClinicianLogin} />
       <Route path={"/clinician/dashboard"}>
         {() => <ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>}
-      </Route>
-      <Route path={"/clinician/reasoning"}>
+      </Route>      <Route path={"/clinician/reasoning"}>
         {() => <ProtectedRoute requiredRole="clinician"><ClinicalReasoning /></ProtectedRoute>}
+      </Route>
+      <Route path={"/clinician/meditriage"}>
+        {() => <ProtectedRoute requiredRole="clinician"><MediTriage /></ProtectedRoute>}
       </Route>
       <Route path={"/patient/symptom-checker"} component={ModernSymptomChecker} />
       <Route path={"/patient/symptom-checker-old"} component={PatientSymptomChecker} />

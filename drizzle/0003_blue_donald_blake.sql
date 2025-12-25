@@ -1,0 +1,21 @@
+CREATE TABLE `differential_diagnoses` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`triage_record_id` int NOT NULL,
+	`case_id` int,
+	`diagnosis_name` varchar(500) NOT NULL,
+	`diagnosis_name_ar` varchar(500),
+	`likelihood_score` int NOT NULL,
+	`clinical_reasoning` text NOT NULL,
+	`clinical_reasoning_ar` text,
+	`matching_symptoms` text,
+	`risk_factors` text,
+	`recommended_tests` text,
+	`recommended_tests_ar` text,
+	`red_flags` text,
+	`red_flags_ar` text,
+	`urgency_level` enum('emergency','urgent','semi-urgent','non-urgent','routine') NOT NULL,
+	`urgency_reasoning` text,
+	`urgency_reasoning_ar` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `differential_diagnoses_id` PRIMARY KEY(`id`)
+);
