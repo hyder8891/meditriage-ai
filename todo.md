@@ -731,3 +731,157 @@
 - [x] Add urgency assessment with clear categorization
 - [x] Create bilingual UI (Arabic/English) matching screenshot design
 - [x] Write vitest tests for all new clinical reasoning features (8/9 tests passing)
+
+
+## Homepage Redesign - Modern Medical AI Platform (Mediktor-Inspired)
+
+### Core Infrastructure
+- [ ] Set up i18n with react-i18next for bilingual support (Arabic/English)
+- [ ] Configure RTL layout support for Arabic
+- [ ] Add Google Fonts (Inter for English, Cairo for Arabic)
+- [ ] Set up language switcher component with persistent preference
+- [ ] Configure Tailwind with custom medical color palette (Teal #06B6D4, Deep Blue #0F172A)
+
+### Hero Section
+- [ ] Create hero section with split layout design
+- [ ] Add animated gradient background (teal to deep blue)
+- [ ] Implement primary and secondary CTAs
+- [ ] Add floating statistics cards (60s triage, 95% accuracy, 40% wait reduction)
+- [ ] Create trust badge banner component (ISO 13485, HIPAA, certifications)
+
+### Content Sections
+- [ ] Build problem statement section (ED overcrowding challenges)
+- [ ] Create 3-card solution overview with icons (AI Assessment, Evidence-Based Protocols, EMR Integration)
+- [ ] Implement 4-card target industries grid (Emergency Departments, Urgent Care, Healthcare Systems, Telemedicine)
+- [ ] Design how-it-works timeline component (4-step process)
+- [ ] Build 6-feature key features grid (Multi-language NLP, Vital Signs Integration, Pediatric Protocols, etc.)
+- [ ] Create clinical validation statistics bar (95.3% accuracy, 50+ facilities, 500K+ patients, 12 countries)
+- [ ] Add certification badges display (ISO 13485, CE Mark, HIPAA, GDPR, Saudi FDA, UAE MOH)
+
+### Trust & Social Proof
+- [ ] Implement partner logo grid with hover effects (healthcare systems, tech partners, academic validation)
+- [ ] Create testimonials carousel component (3 medical professionals with Arabic translations)
+- [ ] Build case study highlight section (42% wait time reduction example)
+- [ ] Add FAQ accordion component (8 common questions)
+
+### Call-to-Action & Forms
+- [ ] Design main CTA section with gradient background
+- [ ] Create demo request form
+- [ ] Add newsletter signup component
+- [ ] Implement contact form with validation
+
+### Navigation & Footer
+- [ ] Build responsive navigation with language toggle
+- [ ] Create mobile hamburger menu
+- [ ] Design multi-column footer (Company, Solutions, Resources, Legal, Newsletter)
+- [ ] Add social media links (LinkedIn, Twitter, YouTube)
+
+### Bilingual Content
+- [ ] Create English translation JSON with all homepage content
+- [ ] Create Arabic translation JSON with all homepage content
+- [ ] Implement language detection and routing (/en/ and /ar/ routes)
+- [ ] Add hreflang tags for SEO
+
+### Assets & Media
+- [ ] Source/create hero section medical imagery (emergency department with AI overlay)
+- [ ] Design feature icons set (consistent line icons, teal color)
+- [ ] Gather certification badge images (ISO, CE, HIPAA, GDPR, regional)
+- [ ] Create placeholder partner logos (grayscale with color hover)
+- [ ] Add testimonial placeholder photos (professional headshots)
+
+### Polish & Optimization
+- [ ] Add animations and transitions (card hover effects, parallax hero)
+- [ ] Optimize for mobile responsiveness (single column layouts, touch-friendly buttons)
+- [ ] Implement lazy loading for images
+- [ ] Add loading states and skeletons
+- [ ] Test cross-browser compatibility (Chrome, Safari, Firefox, Edge)
+- [ ] Verify accessibility (WCAG AA, keyboard navigation, screen reader)
+- [ ] Optimize performance (Lighthouse > 90, FCP < 1.5s, TTI < 3.5s)
+
+
+## URGENT: Homepage Visualizations and Animations (User Request - Current)
+- [x] Fix TypeScript errors in localization.ts (missing properties)
+- [ ] Replace low-quality background images with high-resolution medical imagery
+- [ ] Source professional medical/healthcare stock images
+- [ ] Add smooth entrance animations for hero section
+- [ ] Implement animated statistics counters (count-up effect)
+- [ ] Add hover effects and micro-interactions to buttons and cards
+- [ ] Implement parallax scrolling effects
+- [ ] Add fade-in animations for sections as they scroll into view
+- [ ] Improve mockup/dashboard images with higher quality versions
+- [ ] Remove or fix numbered badges in navigation (2, 3, 4, 5)
+- [ ] Add loading animations and transitions
+- [ ] Optimize all images for web (high quality but compressed)
+- [ ] Test animations on mobile devices
+- [ ] Ensure animations respect prefers-reduced-motion accessibility setting
+
+
+## Website Visual Enhancements (User Request - Current)
+
+### Images & Visual Assets
+- [ ] Add high-quality medical images throughout the website
+- [ ] Include Middle Eastern family healthcare images for cultural relevance
+- [ ] Add emergency room and triage system imagery
+- [ ] Include AI healthcare dashboard visualizations
+- [ ] Add patient monitoring system graphics
+
+### Animations & Interactions
+- [ ] Implement smooth scroll animations
+- [ ] Add fade-in effects for content sections
+- [ ] Create animated statistics counters
+- [ ] Add hover effects on cards and buttons
+- [ ] Implement smooth transitions between sections
+
+### Data Visualizations
+- [ ] Add Chart.js visualizations for AI performance metrics
+- [ ] Create animated charts showing wait time reductions
+- [ ] Add triage accuracy improvement graphs
+- [ ] Display ROI timeline visualization
+- [ ] Show adoption statistics with animated counters
+
+### Content Improvements
+- [ ] Expand homepage with detailed problem statement
+- [ ] Add comprehensive features section with icons
+- [ ] Include detailed statistics and research data
+- [ ] Add case studies and success stories section
+- [ ] Create detailed pricing/ROI section
+
+### Arabic Language Support
+- [ ] Implement i18n (internationalization) framework
+- [ ] Add Arabic translations for all content
+- [ ] Support RTL (right-to-left) layout for Arabic
+- [ ] Add language switcher in navigation
+- [ ] Use Arabic-friendly fonts (Droid Arabic Naskh)
+
+### Certifications & Partnerships
+- [ ] Add certifications section (HIPAA, ISO 27001, FDA)
+- [ ] Display technology partner logos (AWS, Azure, Google Cloud)
+- [ ] Add healthcare partnership badges
+- [ ] Include trust indicators and compliance badges
+
+### Additional Features
+- [ ] Improve responsive design for mobile devices
+- [ ] Add testimonials section with provider quotes
+- [ ] Create interactive demo/contact form
+- [ ] Add footer with contact information
+- [ ] Implement smooth navigation with anchor links
+
+
+## Code Cleanup and Branding Update (COMPLETED)
+- [x] Update all "MediTriage" references to "My Doctor" in documentation files
+- [x] Update all "MediTriage" references to "My Doctor" in user-facing text
+- [x] Remove unused test files and scripts (brain-*.txt, load-test-results.txt, etc.)
+- [x] Remove unused documentation files (old test reports, audit findings, etc.)
+- [x] Clean up test account creation scripts (consolidate or remove duplicates)
+- [x] Remove DeepSeek references from documentation (no longer used)
+- [x] Update API_KEYS_REQUIRED.md to remove DeepSeek references
+- [x] Remove obsolete .mjs test scripts from project root
+- [x] Verify all email addresses in seed scripts use correct domain
+- [x] Remove brain test output files
+- [x] Clean up homepage test result files
+- [x] Update FEATURES_COMPREHENSIVE.md branding
+- [x] Update SECURITY.md branding
+- [x] Update OnboardingTour.tsx branding
+- [x] Update HomeEnhanced.tsx branding
+- [x] Update MediTriage.tsx page title
+- [x] Fix TypeScript error in HomeEnhanced.tsx

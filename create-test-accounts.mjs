@@ -30,7 +30,7 @@ async function createTestAccounts() {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // 1. Create test patient account
-    const patientEmail = 'patient.test@meditriage.com';
+    const patientEmail = 'patient.test@mydoctor.iq';
     await connection.execute(
       `INSERT INTO users (email, name, role, password_hash, openId, createdAt, updatedAt, lastSignedIn)
        VALUES (?, ?, ?, ?, ?, NOW(), NOW(), NOW())
@@ -42,12 +42,12 @@ async function createTestAccounts() {
     );
 
     console.log('✅ Patient Account Created:');
-    console.log('   Email: patient.test@meditriage.com');
+    console.log('   Email: patient.test@mydoctor.iq');
     console.log('   Password: test123');
     console.log('   Role: patient\n');
 
     // 2. Create test doctor account
-    const doctorEmail = 'doctor.test@meditriage.com';
+    const doctorEmail = 'doctor.test@mydoctor.iq';
     await connection.execute(
       `INSERT INTO users (email, name, role, password_hash, openId, createdAt, updatedAt, lastSignedIn)
        VALUES (?, ?, ?, ?, ?, NOW(), NOW(), NOW())
@@ -59,7 +59,7 @@ async function createTestAccounts() {
     );
 
     console.log('✅ Doctor Account Created:');
-    console.log('   Email: doctor.test@meditriage.com');
+    console.log('   Email: doctor.test@mydoctor.iq');
     console.log('   Password: test123');
     console.log('   Role: clinician\n');
 
@@ -69,8 +69,8 @@ async function createTestAccounts() {
     
     console.log('📝 How to test messaging:');
     console.log('1. Open two browser windows (or use incognito mode)');
-    console.log('2. Window 1: Login as patient (patient.test@meditriage.com / test123)');
-    console.log('3. Window 2: Login as doctor (doctor.test@meditriage.com / test123)');
+    console.log('2. Window 1: Login as patient (patient.test@mydoctor.iq / test123)');
+    console.log('3. Window 2: Login as doctor (doctor.test@mydoctor.iq / test123)');
     console.log('4. Go to /test-notifications in both windows');
     console.log('5. Send test notifications and watch them appear in real-time!');
     console.log('6. Verify Redis is distributing messages correctly\n');

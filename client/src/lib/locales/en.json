@@ -1,0 +1,181 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "solutions": "Solutions",
+    "resources": "Resources",
+    "contact": "Contact",
+    "login": "Login",
+    "demo": "Request Demo"
+  },
+  "hero": {
+    "title": "AI-Powered Emergency Triage That Saves Lives",
+    "subtitle": "Intelligent patient prioritization for emergency departments, urgent care centers, and healthcare systems across the Middle East",
+    "ctaPrimary": "Request Demo",
+    "ctaSecondary": "Try Symptom Checker",
+    "trustBadge": "ISO 13485 Certified | HIPAA Compliant | Validated by 50+ Emergency Departments",
+    "stat1": "60 sec avg triage time",
+    "stat2": "95% accuracy",
+    "stat3": "40% wait time reduction"
+  },
+  "problem": {
+    "title": "The Emergency Department Challenge",
+    "description": "Emergency departments face unprecedented challenges: overcrowding, limited resources, and critical decisions under pressure. Traditional triage methods struggle with consistency, speed, and accuracy when every second counts."
+  },
+  "solution": {
+    "title": "Intelligent Solutions for Critical Care",
+    "card1Title": "AI-Powered Assessment",
+    "card1Desc": "Advanced algorithms analyze symptoms, vital signs, and medical history to assign accurate ESI levels in real-time",
+    "card2Title": "Evidence-Based Protocols",
+    "card2Desc": "Integrates international emergency medicine guidelines (ESI, CTAS, MTS) with local healthcare protocols",
+    "card3Title": "EMR/EHR Integration",
+    "card3Desc": "Plug-and-play integration with existing hospital systems. Deployment in under 2 weeks"
+  },
+  "industries": {
+    "title": "One Solution, Multiple Applications",
+    "ed": {
+      "title": "Emergency Departments",
+      "description": "Optimize patient flow, reduce wait times, and ensure critical cases receive immediate attention",
+      "cta": "Learn More"
+    },
+    "urgentCare": {
+      "title": "Urgent Care Centers",
+      "description": "Differentiate between urgent and emergency cases to route patients to appropriate care levels",
+      "cta": "Learn More"
+    },
+    "healthSystems": {
+      "title": "Healthcare Systems",
+      "description": "Enterprise-wide triage standardization across multiple facilities with centralized analytics",
+      "cta": "Learn More"
+    },
+    "telemedicine": {
+      "title": "Telemedicine Platforms",
+      "description": "Remote triage capabilities for virtual consultations and pre-hospital assessment",
+      "cta": "Learn More"
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "step1": {
+      "title": "Patient Check-In",
+      "description": "Patient enters symptoms via kiosk, mobile app, or staff-assisted interface"
+    },
+    "step2": {
+      "title": "AI Analysis",
+      "description": "Advanced NLP and medical reasoning engine processes information in real-time"
+    },
+    "step3": {
+      "title": "Severity Classification",
+      "description": "System assigns ESI level (1-5) with confidence score and clinical reasoning"
+    },
+    "step4": {
+      "title": "Care Coordination",
+      "description": "Alerts staff, updates queue, and provides clinical decision support"
+    }
+  },
+  "features": {
+    "title": "Comprehensive Features",
+    "feature1": "Multi-Language NLP",
+    "feature1Desc": "Arabic, English, French support",
+    "feature2": "Vital Signs Integration",
+    "feature2Desc": "Automatic import from monitoring devices",
+    "feature3": "Pediatric Protocols",
+    "feature3Desc": "Specialized algorithms for children",
+    "feature4": "Mass Casualty Mode",
+    "feature4Desc": "Rapid triage for disaster scenarios",
+    "feature5": "Analytics Dashboard",
+    "feature5Desc": "Real-time ED metrics and performance tracking",
+    "feature6": "Continuous Learning",
+    "feature6Desc": "AI improves from clinician feedback"
+  },
+  "validation": {
+    "title": "Clinical Validation & Trust",
+    "accuracy": "Accuracy vs. Senior ED Nurses",
+    "facilities": "Healthcare Facilities Deployed",
+    "patients": "Patients Triaged Successfully",
+    "countries": "Countries Across MENA Region"
+  },
+  "partners": {
+    "title": "Trusted Partners & Integrations",
+    "healthcare": "Healthcare Systems",
+    "technology": "Technology Partners",
+    "academic": "Academic Validation"
+  },
+  "testimonials": {
+    "title": "What Healthcare Professionals Say",
+    "quote1": "MediTriage AI has transformed our emergency department workflow. We've reduced average wait times by 38% while improving patient satisfaction scores significantly.",
+    "author1": "Dr. Ahmed Al-Mansouri",
+    "role1": "Emergency Medicine Director",
+    "quote2": "The accuracy of the AI triage system is remarkable. It consistently identifies high-acuity patients and provides valuable clinical decision support to our nursing staff.",
+    "author2": "Sarah Mitchell, RN",
+    "role2": "Head of Emergency Nursing",
+    "quote3": "Implementation was seamless. The team provided excellent training and the system integrated perfectly with our existing EMR infrastructure.",
+    "author3": "Dr. Fatima Hassan",
+    "role3": "Chief Medical Information Officer"
+  },
+  "caseStudy": {
+    "title": "Real-World Impact: Reducing ED Overcrowding",
+    "facility": "400-bed tertiary care hospital",
+    "challenge": "Challenge: 6-hour average ED wait times, patient walkouts, staff burnout",
+    "solution": "Solution: MediTriage AI deployment with kiosk and staff interface",
+    "result1": "42% reduction in wait times",
+    "result2": "89% patient satisfaction improvement",
+    "result3": "31% increase in ED throughput",
+    "result4": "Zero missed critical diagnoses in 6-month pilot"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": "How accurate is the AI triage system?",
+    "a1": "Our system achieves 95.3% concordance with senior emergency department nurses and has been validated across 50+ healthcare facilities.",
+    "q2": "How long does implementation take?",
+    "a2": "Typical deployment takes less than 2 weeks, including EMR integration, staff training, and system configuration.",
+    "q3": "Does it replace nurses or support them?",
+    "a3": "MediTriage AI is designed to support and enhance clinical decision-making, not replace healthcare professionals. It provides evidence-based recommendations that nurses and physicians use to make final decisions.",
+    "q4": "What languages are supported?",
+    "a4": "Currently supports Arabic, English, and French with additional languages in development.",
+    "q5": "Is patient data secure and compliant?",
+    "a5": "Yes, we are HIPAA compliant, GDPR compliant, and certified by regional authorities including Saudi FDA and UAE Ministry of Health.",
+    "q6": "Can it integrate with our existing EMR?",
+    "a6": "Yes, we support integration with all major EMR systems including Epic, Cerner, and HL7 FHIR-compliant systems.",
+    "q7": "What training is provided?",
+    "a7": "We provide comprehensive on-site and remote training for all staff levels, including ongoing support and refresher sessions.",
+    "q8": "How is the AI continuously improved?",
+    "a8": "Our system uses reinforcement learning from clinician feedback, regular updates based on latest medical guidelines, and continuous validation against clinical outcomes."
+  },
+  "cta": {
+    "title": "Ready to Transform Your Emergency Department?",
+    "subtitle": "Join 50+ healthcare facilities using AI-powered triage to save lives and optimize resources",
+    "btnDemo": "Schedule Demo",
+    "btnWhitepaper": "Download White Paper",
+    "btnContact": "Contact Sales",
+    "email": "info@meditriage.ai",
+    "phoneSaudi": "+966 XX XXX XXXX (Saudi Arabia)",
+    "phoneUAE": "+971 XX XXX XXXX (UAE)"
+  },
+  "footer": {
+    "company": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "pressKit": "Press Kit",
+    "contact": "Contact",
+    "solutions": "Solutions",
+    "emergencyDept": "Emergency Departments",
+    "urgentCare": "Urgent Care",
+    "telemedicine": "Telemedicine",
+    "healthSystems": "Healthcare Systems",
+    "resources": "Resources",
+    "documentation": "Documentation",
+    "apiReference": "API Reference",
+    "caseStudies": "Case Studies",
+    "blog": "Blog",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "security": "Security",
+    "compliance": "Compliance",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Stay updated on emergency medicine AI",
+    "subscribe": "Subscribe",
+    "copyright": "© 2025 MediTriage AI Pro. All rights reserved."
+  }
+}

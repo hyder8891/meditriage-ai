@@ -162,7 +162,7 @@ export default function MediTriage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              {language === "ar" ? "MediTriage AI Pro" : "MediTriage AI Pro"}
+              {language === "ar" ? "طبيبي My Doctor" : "My Doctor طبيبي"}
             </h1>
             <p className="text-gray-600 mt-2">
               {language === "ar"

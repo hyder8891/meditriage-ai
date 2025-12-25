@@ -2,7 +2,7 @@
 
 ## Overview
 
-The MediTriage AI Pro platform now includes a comprehensive email notification system that automatically sends bilingual (Arabic/English) emails to patients and doctors for various events throughout the platform.
+The My Doctor طبيبي platform now includes a comprehensive email notification system that automatically sends bilingual (Arabic/English) emails to patients and doctors for various events throughout the platform.
 
 ## Architecture
 

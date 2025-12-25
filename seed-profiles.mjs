@@ -27,7 +27,7 @@ try {
   const doctors = [
     {
       name: 'Dr. Ahmed Al-Husseini',
-      email: 'ahmed.husseini@meditriage.iq',
+      email: 'ahmed.husseini@mydoctor.iq',
       passwordHash: await hashPassword('doctor123'),
       loginMethod: 'email',
       role: 'doctor',
@@ -42,7 +42,7 @@ try {
     },
     {
       name: 'Dr. Fatima Al-Najjar',
-      email: 'fatima.najjar@meditriage.iq',
+      email: 'fatima.najjar@mydoctor.iq',
       passwordHash: await hashPassword('doctor123'),
       loginMethod: 'email',
       role: 'doctor',
@@ -57,7 +57,7 @@ try {
     },
     {
       name: 'Dr. Omar Al-Jubouri',
-      email: 'omar.jubouri@meditriage.iq',
+      email: 'omar.jubouri@mydoctor.iq',
       passwordHash: await hashPassword('doctor123'),
       loginMethod: 'email',
       role: 'doctor',
@@ -72,7 +72,7 @@ try {
     },
     {
       name: 'Dr. Layla Hassan',
-      email: 'layla.hassan@meditriage.iq',
+      email: 'layla.hassan@mydoctor.iq',
       passwordHash: await hashPassword('doctor123'),
       loginMethod: 'email',
       role: 'doctor',
@@ -87,7 +87,7 @@ try {
     },
     {
       name: 'Dr. Karim Al-Baghdadi',
-      email: 'karim.baghdadi@meditriage.iq',
+      email: 'karim.baghdadi@mydoctor.iq',
       passwordHash: await hashPassword('doctor123'),
       loginMethod: 'email',
       role: 'doctor',

@@ -1,7 +1,7 @@
 # Iraqi Healthcare Facilities Data Population Summary
 
 ## Overview
-Successfully populated the MediTriage AI CareLocator with **63 real healthcare facilities** across Iraq, providing comprehensive coverage of major cities and medical services.
+Successfully populated the My Doctor طبيبي CareLocator with **63 real healthcare facilities** across Iraq, providing comprehensive coverage of major cities and medical services.
 
 ## Data Sources
 - Wikipedia List of Hospitals in Iraq
@@ -162,7 +162,7 @@ For each facility, the following information was collected:
 
 ## Conclusion
 
-The CareLocator is now populated with a comprehensive, verified dataset of Iraqi healthcare facilities covering all major cities and medical specialties. This provides MediTriage AI users with reliable information for finding appropriate medical care across Iraq.
+The CareLocator is now populated with a comprehensive, verified dataset of Iraqi healthcare facilities covering all major cities and medical specialties. This provides My Doctor طبيبي users with reliable information for finding appropriate medical care across Iraq.
 
 ---
 

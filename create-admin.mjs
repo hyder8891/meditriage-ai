@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 const db = drizzle(process.env.DATABASE_URL);
 
 async function createAdminUser() {
-  const email = 'admin@meditriage.ai';
+  const email = 'admin@mydoctor.iq';
   const password = 'Admin123!';
   const passwordHash = await bcrypt.hash(password, 10);
   

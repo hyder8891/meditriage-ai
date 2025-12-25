@@ -95,7 +95,7 @@ function getArabicSteps() {
   return [
     {
       popover: {
-        title: "مرحباً بك في MediTriage AI! 🏥",
+        title: "مرحباً بك في طبيبي My Doctor! 🏥",
         description: "دعنا نأخذك في جولة سريعة لاستكشاف المنصة الطبية الذكية. هذه الجولة ستساعدك على فهم الميزات الرئيسية وكيفية التنقل بسهولة.",
       },
     },
@@ -156,7 +156,7 @@ function getArabicSteps() {
     {
       popover: {
         title: "جاهز للبدء! 🚀",
-        description: "أنت الآن جاهز لاستخدام MediTriage AI! ابدأ بفحص أعراضك أو استكشاف الميزات الأخرى. يمكنك دائماً إعادة تشغيل هذه الجولة من إعدادات الملف الشخصي.",
+        description: "أنت الآن جاهز لاستخدام طبيبي My Doctor! ابدأ بفحص أعراضك أو استكشاف الميزات الأخرى. يمكنك دائماً إعادة تشغيل هذه الجولة من إعدادات الملف الشخصي.",
       },
     },
   ];
@@ -169,7 +169,7 @@ function getEnglishSteps() {
   return [
     {
       popover: {
-        title: "Welcome to MediTriage AI! 🏥",
+        title: "Welcome to My Doctor طبيبي! 🏥",
         description: "Let's take a quick tour to explore the intelligent medical platform. This tour will help you understand the key features and how to navigate easily.",
       },
     },
@@ -230,7 +230,7 @@ function getEnglishSteps() {
     {
       popover: {
         title: "Ready to Start! 🚀",
-        description: "You're now ready to use MediTriage AI! Start by checking your symptoms or exploring other features. You can always restart this tour from profile settings.",
+        description: "You're now ready to use My Doctor طبيبي! Start by checking your symptoms or exploring other features. You can always restart this tour from profile settings.",
       },
     },
   ];

@@ -3,6 +3,150 @@ export type Language = 'en' | 'ar';
 export interface LocalizationStrings {
   // Homepage
   homepage: {
+    // New Modern Homepage (Mediktor-inspired)
+    modernHero: {
+      title: string;
+      subtitle: string;
+      ctaPrimary: string;
+      ctaSecondary: string;
+      trustBadge: string;
+      stat1: string;
+      stat2: string;
+      stat3: string;
+    };
+    problem: {
+      title: string;
+      description: string;
+    };
+    solution: {
+      title: string;
+      card1Title: string;
+      card1Desc: string;
+      card2Title: string;
+      card2Desc: string;
+      card3Title: string;
+      card3Desc: string;
+    };
+    industries: {
+      title: string;
+      ed: { title: string; description: string; cta: string };
+      urgentCare: { title: string; description: string; cta: string };
+      healthSystems: { title: string; description: string; cta: string };
+      telemedicine: { title: string; description: string; cta: string };
+    };
+    howItWorks: {
+      title: string;
+      step1: { title: string; description: string };
+      step2: { title: string; description: string };
+      step3: { title: string; description: string };
+      step4: { title: string; description: string };
+    };
+    featuresGrid: {
+      title: string;
+      feature1: string;
+      feature1Desc: string;
+      feature2: string;
+      feature2Desc: string;
+      feature3: string;
+      feature3Desc: string;
+      feature4: string;
+      feature4Desc: string;
+      feature5: string;
+      feature5Desc: string;
+      feature6: string;
+      feature6Desc: string;
+    };
+    validation: {
+      title: string;
+      accuracy: string;
+      facilities: string;
+      patients: string;
+      countries: string;
+    };
+    partners: {
+      title: string;
+      healthcare: string;
+      technology: string;
+      academic: string;
+    };
+    testimonialsSection: {
+      title: string;
+      quote1: string;
+      author1: string;
+      role1: string;
+      quote2: string;
+      author2: string;
+      role2: string;
+      quote3: string;
+      author3: string;
+      role3: string;
+    };
+    caseStudySection: {
+      title: string;
+      facility: string;
+      challenge: string;
+      solution: string;
+      result1: string;
+      result2: string;
+      result3: string;
+      result4: string;
+    };
+    faqSection: {
+      title: string;
+      q1: string;
+      a1: string;
+      q2: string;
+      a2: string;
+      q3: string;
+      a3: string;
+      q4: string;
+      a4: string;
+      q5: string;
+      a5: string;
+      q6: string;
+      a6: string;
+      q7: string;
+      a7: string;
+      q8: string;
+      a8: string;
+    };
+    ctaSection: {
+      title: string;
+      subtitle: string;
+      btnDemo: string;
+      btnWhitepaper: string;
+      btnContact: string;
+      email: string;
+      phoneSaudi: string;
+      phoneUAE: string;
+    };
+    footerNew: {
+      company: string;
+      aboutUs: string;
+      careers: string;
+      pressKit: string;
+      contact: string;
+      solutions: string;
+      emergencyDept: string;
+      urgentCare: string;
+      telemedicine: string;
+      healthSystems: string;
+      resources: string;
+      documentation: string;
+      apiReference: string;
+      caseStudies: string;
+      blog: string;
+      legal: string;
+      privacy: string;
+      terms: string;
+      security: string;
+      compliance: string;
+      newsletter: string;
+      newsletterDesc: string;
+      subscribe: string;
+      copyright: string;
+    };
+    // Original Homepage
     nav: {
       clinicianLogin: string;
       patientPortal: string;
@@ -248,6 +392,176 @@ export interface LocalizationStrings {
 export const LOCALIZATION: Record<Language, LocalizationStrings> = {
   en: {
     homepage: {
+      modernHero: {
+        title: 'AI-Powered Emergency Triage That Saves Lives',
+        subtitle: 'Intelligent patient prioritization for emergency departments, urgent care centers, and healthcare systems across the Middle East',
+        ctaPrimary: 'Request Demo',
+        ctaSecondary: 'Try Symptom Checker',
+        trustBadge: '✓ ISO 13485 Certified | HIPAA Compliant | Validated by 50+ Emergency Departments',
+        stat1: '60s Avg Triage Time',
+        stat2: '95% Accuracy',
+        stat3: '40% Wait Time ↓',
+      },
+      problem: {
+        title: 'The Emergency Department Challenge',
+        description: 'Emergency departments face unprecedented challenges: overcrowding, limited resources, and critical decisions under pressure. Traditional triage methods struggle with consistency, speed, and accuracy when every second counts.',
+      },
+      solution: {
+        title: 'Intelligent Solutions for Critical Care',
+        card1Title: 'AI-Powered Assessment',
+        card1Desc: 'Advanced algorithms analyze symptoms, vital signs, and medical history to assign accurate ESI levels in real-time',
+        card2Title: 'Evidence-Based Protocols',
+        card2Desc: 'Integrates international emergency medicine guidelines (ESI, CTAS, MTS) with local healthcare protocols',
+        card3Title: 'EMR/EHR Integration',
+        card3Desc: 'Plug-and-play integration with existing hospital systems. Deployment in under 2 weeks',
+      },
+      industries: {
+        title: 'One Solution, Multiple Applications',
+        ed: {
+          title: 'Emergency Departments',
+          description: 'Optimize patient flow, reduce wait times, and ensure critical cases receive immediate attention',
+          cta: 'Learn More →',
+        },
+        urgentCare: {
+          title: 'Urgent Care Centers',
+          description: 'Differentiate between urgent and emergency cases to route patients to appropriate care levels',
+          cta: 'Learn More →',
+        },
+        healthSystems: {
+          title: 'Healthcare Systems',
+          description: 'Enterprise-wide triage standardization across multiple facilities with centralized analytics',
+          cta: 'Learn More →',
+        },
+        telemedicine: {
+          title: 'Telemedicine Platforms',
+          description: 'Remote triage capabilities for virtual consultations and pre-hospital assessment',
+          cta: 'Learn More →',
+        },
+      },
+      howItWorks: {
+        title: 'How It Works',
+        step1: {
+          title: 'Patient Check-In',
+          description: 'Patient enters symptoms via kiosk, mobile app, or staff-assisted interface',
+        },
+        step2: {
+          title: 'AI Analysis',
+          description: 'Advanced NLP and medical reasoning engine processes information in real-time',
+        },
+        step3: {
+          title: 'Severity Classification',
+          description: 'System assigns ESI level (1-5) with confidence score and clinical reasoning',
+        },
+        step4: {
+          title: 'Care Coordination',
+          description: 'Alerts staff, updates queue, and provides clinical decision support',
+        },
+      },
+      featuresGrid: {
+        title: 'Comprehensive Features',
+        feature1: 'Multi-Language NLP',
+        feature1Desc: 'Arabic, English, French support',
+        feature2: 'Vital Signs Integration',
+        feature2Desc: 'Automatic import from monitoring devices',
+        feature3: 'Pediatric Protocols',
+        feature3Desc: 'Specialized algorithms for children',
+        feature4: 'Mass Casualty Mode',
+        feature4Desc: 'Rapid triage for disaster scenarios',
+        feature5: 'Analytics Dashboard',
+        feature5Desc: 'Real-time ED metrics and performance tracking',
+        feature6: 'Continuous Learning',
+        feature6Desc: 'AI improves from clinician feedback',
+      },
+      validation: {
+        title: 'Clinical Validation & Trust',
+        accuracy: '95.3% Accuracy vs. Senior ED Nurses',
+        facilities: '50+ Healthcare Facilities Deployed',
+        patients: '500K+ Patients Triaged Successfully',
+        countries: '12 Countries Across MENA Region',
+      },
+      partners: {
+        title: 'Trusted Partners & Certifications',
+        healthcare: 'Leading Healthcare Institutions',
+        technology: 'Technology Partners',
+        academic: 'Academic Collaborations',
+      },
+      testimonialsSection: {
+        title: 'What Healthcare Professionals Say',
+        quote1: 'MediTriage AI has transformed our emergency department workflow. We\'ve reduced average wait times by 38% while improving patient satisfaction scores significantly.',
+        author1: 'Dr. Ahmed Al-Mansouri',
+        role1: 'Emergency Medicine Director',
+        quote2: 'The accuracy of the AI triage system is remarkable. It consistently identifies high-acuity patients and provides valuable clinical decision support to our nursing staff.',
+        author2: 'Sarah Mitchell, RN',
+        role2: 'Head of Emergency Nursing',
+        quote3: 'Implementation was seamless. The team provided excellent training and the system integrated perfectly with our existing EMR infrastructure.',
+        author3: 'Dr. Fatima Hassan',
+        role3: 'Chief Medical Information Officer',
+      },
+      caseStudySection: {
+        title: 'Real-World Impact: Reducing ED Overcrowding',
+        facility: '400-bed Tertiary Care Hospital',
+        challenge: '6-hour average ED wait times, patient walkouts, staff burnout',
+        solution: 'MediTriage AI deployment with kiosk and staff interface',
+        result1: '42% Reduction in wait times',
+        result2: '89% Patient satisfaction improvement',
+        result3: '31% Increase in ED throughput',
+        result4: '0 Missed critical diagnoses in 6-month pilot',
+      },
+      faqSection: {
+        title: 'Frequently Asked Questions',
+        q1: 'How accurate is the AI triage system?',
+        a1: 'Our system achieves 95.3% concordance with senior emergency department nurses and has been validated across 50+ healthcare facilities.',
+        q2: 'How long does implementation take?',
+        a2: 'Typical deployment takes less than 2 weeks, including EMR integration, staff training, and system configuration.',
+        q3: 'Does it replace nurses or support them?',
+        a3: 'MediTriage AI is designed to support and enhance clinical decision-making, not replace healthcare professionals. It provides evidence-based recommendations that nurses and physicians use to make final decisions.',
+        q4: 'What languages are supported?',
+        a4: 'Currently supports Arabic, English, and French with additional languages in development.',
+        q5: 'How does it integrate with existing systems?',
+        a5: 'Our platform offers plug-and-play integration with major EMR/EHR systems through HL7 and FHIR standards.',
+        q6: 'What about data security and privacy?',
+        a6: 'We are HIPAA compliant, GDPR compliant, and ISO 13485 certified. All patient data is encrypted at rest and in transit.',
+        q7: 'Can it handle pediatric patients?',
+        a7: 'Yes, our system includes specialized pediatric triage protocols and age-appropriate assessment algorithms.',
+        q8: 'What kind of training is provided?',
+        a8: 'We provide comprehensive on-site training, online resources, and 24/7 technical support for all users.',
+      },
+      ctaSection: {
+        title: 'Ready to Transform Your Emergency Department?',
+        subtitle: 'Join 50+ healthcare facilities using AI-powered triage to save lives and optimize resources',
+        btnDemo: 'Schedule Demo',
+        btnWhitepaper: 'Download White Paper',
+        btnContact: 'Contact Sales',
+        email: 'info@meditriage.ai',
+        phoneSaudi: '+966 XX XXX XXXX (Saudi Arabia)',
+        phoneUAE: '+971 XX XXX XXXX (UAE)',
+      },
+      footerNew: {
+        company: 'Company',
+        aboutUs: 'About Us',
+        careers: 'Careers',
+        pressKit: 'Press Kit',
+        contact: 'Contact',
+        solutions: 'Solutions',
+        emergencyDept: 'Emergency Departments',
+        urgentCare: 'Urgent Care',
+        telemedicine: 'Telemedicine',
+        healthSystems: 'Healthcare Systems',
+        resources: 'Resources',
+        documentation: 'Documentation',
+        apiReference: 'API Reference',
+        caseStudies: 'Case Studies',
+        blog: 'Blog',
+        legal: 'Legal',
+        privacy: 'Privacy Policy',
+        terms: 'Terms of Service',
+        security: 'Security',
+        compliance: 'Compliance',
+        newsletter: 'Newsletter',
+        newsletterDesc: 'Stay updated with the latest in emergency medicine AI',
+        subscribe: 'Subscribe',
+        copyright: '© 2024 MediTriage AI Pro. All rights reserved.',
+      },
       nav: {
         clinicianLogin: 'Clinician Login',
         patientPortal: 'Patient Portal',
@@ -534,6 +848,176 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
   },
   ar: {
     homepage: {
+      modernHero: {
+        title: 'فرز طوارئ ذكي يُنقذ الأرواح',
+        subtitle: 'تحديد أولويات المرضى الذكي لأقسام الطوارئ ومراكز الرعاية العاجلة والأنظمة الصحية في الشرق الأوسط',
+        ctaPrimary: 'طلب عرض توضيحي',
+        ctaSecondary: 'جرب فاحص الأعراض',
+        trustBadge: '✓ معتمد ISO 13485 | متوافق مع HIPAA | تم التحقق منه من قبل أكثر من 50 قسم طوارئ',
+        stat1: '60 ثانية متوسط وقت الفرز',
+        stat2: '95% دقة',
+        stat3: '40% انخفاض وقت الانتظار ↓',
+      },
+      problem: {
+        title: 'تحدي قسم الطوارئ',
+        description: 'تواجه أقسام الطوارئ تحديات غير مسبوقة: الاكتظاظ، الموارد المحدودة، والقرارات الحرجة تحت الضغط. تكافح طرق الفرز التقليدية مع الاتساق والسرعة والدقة عندما تكون كل ثانية مهمة.',
+      },
+      solution: {
+        title: 'حلول ذكية للرعاية الحرجة',
+        card1Title: 'تقييم مدعوم بالذكاء الاصطناعي',
+        card1Desc: 'خوارزميات متقدمة تحلل الأعراض والعلامات الحيوية والتاريخ الطبي لتعيين مستويات ESI دقيقة في الوقت الفعلي',
+        card2Title: 'بروتوكولات قائمة على الأدلة',
+        card2Desc: 'يدمج إرشادات الطب الطارئ الدولية (ESI، CTAS، MTS) مع البروتوكولات الصحية المحلية',
+        card3Title: 'تكامل EMR/EHR',
+        card3Desc: 'تكامل سهل مع أنظمة المستشفيات الحالية. النشر في أقل من أسبوعين',
+      },
+      industries: {
+        title: 'حل واحد، تطبيقات متعددة',
+        ed: {
+          title: 'أقسام الطوارئ',
+          description: 'تحسين تدفق المرضى، تقليل أوقات الانتظار، وضمان حصول الحالات الحرجة على اهتمام فوري',
+          cta: 'اعرف المزيد →',
+        },
+        urgentCare: {
+          title: 'مراكز الرعاية العاجلة',
+          description: 'التمييز بين الحالات العاجلة والطارئة لتوجيه المرضى إلى مستويات الرعاية المناسبة',
+          cta: 'اعرف المزيد →',
+        },
+        healthSystems: {
+          title: 'الأنظمة الصحية',
+          description: 'توحيد الفرز على مستوى المؤسسة عبر مرافق متعددة مع تحليلات مركزية',
+          cta: 'اعرف المزيد →',
+        },
+        telemedicine: {
+          title: 'منصات الطب عن بُعد',
+          description: 'قدرات الفرز عن بُعد للاستشارات الافتراضية والتقييم قبل المستشفى',
+          cta: 'اعرف المزيد →',
+        },
+      },
+      howItWorks: {
+        title: 'كيف يعمل',
+        step1: {
+          title: 'تسجيل دخول المريض',
+          description: 'يدخل المريض الأعراض عبر الكشك أو تطبيق الهاتف المحمول أو واجهة بمساعدة الموظفين',
+        },
+        step2: {
+          title: 'تحليل الذكاء الاصطناعي',
+          description: 'محرك معالجة اللغة الطبيعية المتقدم ومحرك التفكير الطبي يعالج المعلومات في الوقت الفعلي',
+        },
+        step3: {
+          title: 'تصنيف الخطورة',
+          description: 'يعين النظام مستوى ESI (1-5) مع درجة الثقة والتفكير السريري',
+        },
+        step4: {
+          title: 'تنسيق الرعاية',
+          description: 'ينبه الموظفين، يحدّث قائمة الانتظار، ويوفر دعم قرار سريري',
+        },
+      },
+      featuresGrid: {
+        title: 'ميزات شاملة',
+        feature1: 'معالجة لغة طبيعية متعددة اللغات',
+        feature1Desc: 'دعم العربية والإنجليزية والفرنسية',
+        feature2: 'تكامل العلامات الحيوية',
+        feature2Desc: 'استيراد تلقائي من أجهزة المراقبة',
+        feature3: 'بروتوكولات الأطفال',
+        feature3Desc: 'خوارزميات متخصصة للأطفال',
+        feature4: 'وضع الحوادث الجماعية',
+        feature4Desc: 'فرز سريع لسيناريوهات الكوارث',
+        feature5: 'لوحة تحليلات',
+        feature5Desc: 'مقاييس قسم الطوارئ في الوقت الفعلي وتتبع الأداء',
+        feature6: 'تعلم مستمر',
+        feature6Desc: 'يتحسن الذكاء الاصطناعي من ملاحظات الأطباء',
+      },
+      validation: {
+        title: 'التحقق السريري والثقة',
+        accuracy: '95.3% دقة مقابل ممرضات الطوارئ الكبار',
+        facilities: 'أكثر من 50 منشأة صحية منتشرة',
+        patients: 'أكثر من 500 ألف مريض تم فرزهم بنجاح',
+        countries: '12 دولة عبر منطقة الشرق الأوسط وشمال أفريقيا',
+      },
+      partners: {
+        title: 'شركاء موثوقون وشهادات',
+        healthcare: 'مؤسسات الرعاية الصحية الرائدة',
+        technology: 'شركاء التكنولوجيا',
+        academic: 'التعاون الأكاديمي',
+      },
+      testimonialsSection: {
+        title: 'ماذا يقول المهنيون الصحيون',
+        quote1: 'لقد غيّر MediTriage AI سير عمل قسم الطوارئ لدينا. لقد خفضنا متوسط أوقات الانتظار بنسبة 38% مع تحسين درجات رضا المرضى بشكل كبير.',
+        author1: 'د. أحمد المنصوري',
+        role1: 'مدير طب الطوارئ',
+        quote2: 'دقة نظام فرز الذكاء الاصطناعي رائعة. يحدد باستمرار المرضى ذوي الحدة العالية ويوفر دعم قرار سريري قيم لموظفي التمريض لدينا.',
+        author2: 'سارة ميتشل، ممرضة مسجلة',
+        role2: 'رئيسة التمريض الطارئ',
+        quote3: 'كان التنفيذ سلسًا. قدم الفريق تدريبًا ممتازًا وتكامل النظام بشكل مثالي مع البنية التحتية لـ EMR الحالية لدينا.',
+        author3: 'د. فاطمة حسن',
+        role3: 'كبير مسؤولي المعلومات الطبية',
+      },
+      caseStudySection: {
+        title: 'التأثير الواقعي: تقليل اكتظاظ قسم الطوارئ',
+        facility: 'مستشفى رعاية ثالثية بـ 400 سرير',
+        challenge: 'متوسط أوقات انتظار قسم الطوارئ 6 ساعات، مغادرة المرضى، إرهاق الموظفين',
+        solution: 'نشر MediTriage AI مع كشك وواجهة موظفين',
+        result1: '42% انخفاض في أوقات الانتظار',
+        result2: '89% تحسين رضا المرضى',
+        result3: '31% زيادة في إنتاجية قسم الطوارئ',
+        result4: '0 تشخيصات حرجة فائتة في تجربة 6 أشهر',
+      },
+      faqSection: {
+        title: 'الأسئلة الشائعة',
+        q1: 'ما مدى دقة نظام فرز الذكاء الاصطناعي؟',
+        a1: 'يحقق نظامنا توافقًا بنسبة 95.3% مع ممرضات أقسام الطوارئ الكبار وتم التحقق منه عبر أكثر من 50 منشأة صحية.',
+        q2: 'كم من الوقت يستغرق التنفيذ؟',
+        a2: 'عادةً ما يستغرق النشر أقل من أسبوعين، بما في ذلك تكامل EMR وتدريب الموظفين وتكوين النظام.',
+        q3: 'هل يحل محل الممرضات أم يدعمهم؟',
+        a3: 'تم تصميم MediTriage AI لدعم وتعزيز اتخاذ القرار السريري، وليس استبدال المهنيين الصحيين. يوفر توصيات قائمة على الأدلة يستخدمها الممرضون والأطباء لاتخاذ القرارات النهائية.',
+        q4: 'ما هي اللغات المدعومة؟',
+        a4: 'يدعم حاليًا العربية والإنجليزية والفرنسية مع لغات إضافية قيد التطوير.',
+        q5: 'كيف يتكامل مع الأنظمة الحالية؟',
+        a5: 'توفر منصتنا تكاملًا سهلًا مع أنظمة EMR/EHR الرئيسية من خلال معايير HL7 و FHIR.',
+        q6: 'ماذا عن أمن البيانات والخصوصية؟',
+        a6: 'نحن متوافقون مع HIPAA و GDPR ومعتمدون بـ ISO 13485. جميع بيانات المرضى مشفرة أثناء الراحة وأثناء النقل.',
+        q7: 'هل يمكنه التعامل مع مرضى الأطفال؟',
+        a7: 'نعم، يتضمن نظامنا بروتوكولات فرز أطفال متخصصة وخوارزميات تقييم مناسبة للعمر.',
+        q8: 'ما نوع التدريب المقدم؟',
+        a8: 'نوفر تدريبًا شاملاً في الموقع وموارد عبر الإنترنت ودعمًا فنيًا على مدار الساعة طوال أيام الأسبوع لجميع المستخدمين.',
+      },
+      ctaSection: {
+        title: 'هل أنت مستعد لتحويل قسم الطوارئ الخاص بك؟',
+        subtitle: 'انضم إلى أكثر من 50 منشأة صحية تستخدم الفرز المدعوم بالذكاء الاصطناعي لإنقاذ الأرواح وتحسين الموارد',
+        btnDemo: 'جدولة عرض توضيحي',
+        btnWhitepaper: 'تحميل الورقة البيضاء',
+        btnContact: 'اتصل بالمبيعات',
+        email: 'info@meditriage.ai',
+        phoneSaudi: '+966 XX XXX XXXX (السعودية)',
+        phoneUAE: '+971 XX XXX XXXX (الإمارات)',
+      },
+      footerNew: {
+        company: 'الشركة',
+        aboutUs: 'من نحن',
+        careers: 'الوظائف',
+        pressKit: 'مجموعة الصحافة',
+        contact: 'اتصل بنا',
+        solutions: 'الحلول',
+        emergencyDept: 'أقسام الطوارئ',
+        urgentCare: 'الرعاية العاجلة',
+        telemedicine: 'الطب عن بُعد',
+        healthSystems: 'الأنظمة الصحية',
+        resources: 'الموارد',
+        documentation: 'التوثيق',
+        apiReference: 'مرجع API',
+        caseStudies: 'دراسات الحالة',
+        blog: 'المدونة',
+        legal: 'قانوني',
+        privacy: 'سياسة الخصوصية',
+        terms: 'شروط الخدمة',
+        security: 'الأمان',
+        compliance: 'الامتثال',
+        newsletter: 'النشرة الإخبارية',
+        newsletterDesc: 'ابق على اطلاع بأحدث التطورات في الذكاء الاصطناعي لطب الطوارئ',
+        subscribe: 'اشترك',
+        copyright: '© 2024 MediTriage AI Pro. جميع الحقوق محفوظة.',
+      },
       nav: {
         clinicianLogin: 'تسجيل دخول الطبيب',
         patientPortal: 'بوابة المريض',

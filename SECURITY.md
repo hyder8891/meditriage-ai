@@ -1,4 +1,4 @@
-# MediTriage AI Pro - Security Documentation
+# My Doctor طبيبي - Security Documentation
 
 **Last Updated:** December 20, 2025  
 **Version:** 1.0
@@ -7,7 +7,7 @@
 
 ## Overview
 
-This document outlines the comprehensive security measures implemented in MediTriage AI Pro to protect patient data, ensure HIPAA compliance readiness, and maintain system integrity.
+This document outlines the comprehensive security measures implemented in My Doctor طبيبي to protect patient data, ensure HIPAA compliance readiness, and maintain system integrity.
 
 ---
 
