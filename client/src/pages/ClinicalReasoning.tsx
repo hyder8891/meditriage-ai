@@ -32,7 +32,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 function ClinicalReasoningContent() {
   const [, setLocation] = useLocation();
-  const { strings } = useLanguage();
+  const { strings, language } = useLanguage();
   const [chiefComplaint, setChiefComplaint] = useState("");
   const [symptoms, setSymptoms] = useState("");
   const [patientAge, setPatientAge] = useState("");
@@ -197,6 +197,7 @@ function ClinicalReasoningContent() {
       },
       patientAge: patientAge && patientAge.trim() ? parseInt(patientAge) : undefined,
       patientGender,
+      language,
     });
   };
 
@@ -453,7 +454,7 @@ function ClinicalReasoningContent() {
                     <CardDescription>Ranked by likelihood</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {reasoning.differentialDiagnosis.map((diagnosisItem: any, index: number) => {
+                    {reasoning.differentialDiagnosis.slice(0, 1).map((diagnosisItem: any, index: number) => {
                       const severityColors = {
                         mild: 'bg-green-50 border-green-200',
                         moderate: 'bg-yellow-50 border-yellow-200',

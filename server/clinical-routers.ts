@@ -148,11 +148,14 @@ export const clinicalRouter = router({
       }).optional(),
       patientAge: z.number().optional(),
       patientGender: z.string().optional(),
+      language: z.enum(['en', 'ar']).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       if (ctx.user.role !== 'admin') {
         throw new Error('Unauthorized');
       }
+
+      const language = input.language || 'en';
 
       // Use BRAIN engine for comprehensive medical reasoning
       const brainResult = await brain.reason({
@@ -168,19 +171,30 @@ export const clinicalRouter = router({
           temperature: parseFloat(input.vitals.temperature || '0'),
           oxygenSaturation: input.vitals.oxygenSaturation || 0,
         } : undefined,
-        language: 'en',
+        language,
       });
+
+      // Determine severity based on probability and red flags
+      const getSeverity = (probability: number, hasRedFlags: boolean): 'mild' | 'moderate' | 'severe' | 'critical' => {
+        if (hasRedFlags) return 'critical';
+        if (probability > 0.7) return 'severe';
+        if (probability > 0.4) return 'moderate';
+        return 'mild';
+      };
 
       // Format BRAIN output to match expected reasoning structure
       const reasoning = {
         differentialDiagnosis: brainResult.diagnosis.differentialDiagnosis.map((dx: any) => ({
-          condition: dx.condition,
-          probability: dx.probability,
-          reasoning: dx.reasoning,
-          keyFindings: dx.supportingEvidence,
+          diagnosis: dx.condition,
+          confidence: Math.round(dx.probability * 100),
+          severity: getSeverity(dx.probability, brainResult.diagnosis.redFlags.length > 0),
+          clinicalPresentation: dx.reasoning,
+          supportingEvidence: dx.supportingEvidence || [],
+          nextSteps: brainResult.diagnosis.recommendations.immediateActions.slice(0, 3),
         })),
+        reasoning: brainResult.diagnosis.differentialDiagnosis[0]?.reasoning || 'Clinical analysis based on presented symptoms',
         recommendedTests: brainResult.diagnosis.recommendations.tests,
-        urgencyLevel: brainResult.diagnosis.redFlags.length > 0 ? 'urgent' : 'routine',
+        urgencyAssessment: `Urgency Level: ${brainResult.diagnosis.redFlags.length > 0 ? 'URGENT' : 'ROUTINE'}. ${brainResult.assessment.followUp}`,
         redFlags: brainResult.diagnosis.redFlags,
         clinicalPearls: brainResult.diagnosis.recommendations.immediateActions,
         citations: brainResult.evidence.map((e: any) => `${e.title} (${e.source})`),
@@ -190,9 +204,9 @@ export const clinicalRouter = router({
       for (const diagnosisItem of reasoning.differentialDiagnosis.slice(0, 5)) {
         await saveDiagnosis({
           caseId: input.caseId,
-          diagnosis: diagnosisItem.condition,
-          probability: diagnosisItem.probability,
-          reasoning: diagnosisItem.reasoning,
+          diagnosis: diagnosisItem.diagnosis,
+          probability: diagnosisItem.confidence / 100,
+          reasoning: diagnosisItem.clinicalPresentation,
           redFlags: JSON.stringify(reasoning.redFlags),
           recommendedActions: JSON.stringify(reasoning.recommendedTests),
         });

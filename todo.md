@@ -1,5 +1,13 @@
 # MediTriage AI Pro - TODO
 
+## URGENT: AI Analysis Display Issues (FIXED)
+- [x] Clinical Reasoning showing English when Arabic is selected
+- [x] Differential Diagnosis showing nothing (should show only top diagnosis)
+- [x] Clinical Reasoning section displaying nothing
+- [x] Urgency Assessment section displaying nothing
+- [x] Recommended Diagnostic Tests too generic
+- [x] Red Flags too generic
+
 ## URGENT: Sidebar Layout Issues (Current)
 - [x] Fix profile dropdown overlapping subscription button (z-index issue)
 - [x] Fix sidebar navigation RTL text alignment and spacing

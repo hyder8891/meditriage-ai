@@ -114,13 +114,15 @@ You MUST respond with valid JSON matching this exact schema:
 Guidelines:
 1. Provide 3-5 differential diagnoses ranked by likelihood
 2. Include detailed clinical reasoning for each diagnosis
-3. Recommend appropriate diagnostic tests (RADT, throat culture, CBC, etc.)
-4. Identify critical red flags that require immediate attention
-5. Assess urgency level based on presentation severity
+3. Recommend SPECIFIC diagnostic tests based on the exact symptoms (e.g., for sore throat: RADT, throat culture; for chest pain: ECG, troponin, chest X-ray)
+4. Identify SPECIFIC red flags based on the actual presentation (not generic warnings)
+5. Assess urgency level based on presentation severity with specific timeframes
 6. All content must be provided in BOTH English and Arabic
 7. Use proper medical terminology
 8. Consider patient age, gender, and vital signs in your assessment
-9. Be thorough but concise in explanations`;
+9. Be thorough but concise in explanations
+10. For diagnostic tests: explain WHY each test is needed for THIS specific case
+11. For red flags: only include flags that are RELEVANT to the current symptoms (not generic lists)`;
 
   const userPrompt = `Analyze this clinical presentation:
 
