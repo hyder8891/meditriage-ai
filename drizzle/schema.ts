@@ -1,4 +1,5 @@
 import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, date, decimal, time, float } from "drizzle-orm/mysql-core";
+import { relations } from "drizzle-orm";
 
 /**
  * Core user table backing auth flow.
@@ -3858,3 +3859,4 @@ export const slotGenerationHistory = mysqlTable("slot_generation_history", {
 
 export type SlotGenerationHistory = typeof slotGenerationHistory.$inferSelect;
 export type InsertSlotGenerationHistory = typeof slotGenerationHistory.$inferInsert;
+
