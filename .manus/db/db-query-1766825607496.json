@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, name, email, phone_number, role FROM users LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, name, email, phone_number, role FROM users LIMIT 10",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Hassan HJ",
+      "email": "haljanabi88@gmail.com",
+      "phone_number": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "99999",
+      "name": "Test Lab User",
+      "email": "lab-test@example.com",
+      "phone_number": "NULL",
+      "role": "patient"
+    },
+    {
+      "id": "900067",
+      "name": "Hhwaljanabi",
+      "email": "Hhwaljanabi@yahoo.com",
+      "phone_number": "NULL",
+      "role": "clinician"
+    },
+    {
+      "id": "900079",
+      "name": "haidar_goold_oo",
+      "email": "Haidar_goold_oo@yahoo.com",
+      "phone_number": "NULL",
+      "role": "doctor"
+    },
+    {
+      "id": "900086",
+      "name": "admin",
+      "email": "admin@admin.com",
+      "phone_number": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "1440001",
+      "name": "Admin User",
+      "email": "admin@meditriage.ai",
+      "phone_number": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "2100011",
+      "name": "Dr. Ahmed Al-Husseini",
+      "email": "ahmed.husseini@meditriage.iq",
+      "phone_number": "NULL",
+      "role": "doctor"
+    },
+    {
+      "id": "2100012",
+      "name": "Dr. Fatima Al-Najjar",
+      "email": "fatima.najjar@meditriage.iq",
+      "phone_number": "NULL",
+      "role": "doctor"
+    },
+    {
+      "id": "2100013",
+      "name": "Dr. Omar Al-Jubouri",
+      "email": "omar.jubouri@meditriage.iq",
+      "phone_number": "NULL",
+      "role": "doctor"
+    },
+    {
+      "id": "2100014",
+      "name": "Dr. Layla Hassan",
+      "email": "layla.hassan@meditriage.iq",
+      "phone_number": "NULL",
+      "role": "doctor"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tphone_number\trole\n1\tHassan HJ\thaljanabi88@gmail.com\tNULL\tadmin\n99999\tTest Lab User\tlab-test@example.com\tNULL\tpatient\n900067\tHhwaljanabi\tHhwaljanabi@yahoo.com\tNULL\tclinician\n900079\thaidar_goold_oo\tHaidar_goold_oo@yahoo.com\tNULL\tdoctor\n900086\tadmin\tadmin@admin.com\tNULL\tadmin\n1440001\tAdmin User\tadmin@meditriage.ai\tNULL\tadmin\n2100011\tDr. Ahmed Al-Husseini\tahmed.husseini@meditriage.iq\tNULL\tdoctor\n2100012\tDr. Fatima Al-Najjar\tfatima.najjar@meditriage.iq\tNULL\tdoctor\n2100013\tDr. Omar Al-Jubouri\tomar.jubouri@meditriage.iq\tNULL\tdoctor\n2100014\tDr. Layla Hassan\tlayla.hassan@meditriage.iq\tNULL\tdoctor\n",
+  "stderr": "",
+  "execution_time_ms": 1551
+}

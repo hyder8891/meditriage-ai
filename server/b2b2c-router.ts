@@ -585,13 +585,26 @@ export const b2b2cRouter = router({
           if (!conversationsMap.has(otherUserId)) {
             // Fetch the other user's details
             const [otherUser] = await db
-              .select()
+              .select({
+                id: users.id,
+                name: users.name,
+                email: users.email,
+                phoneNumber: users.phoneNumber,
+                role: users.role,
+                specialty: users.specialty,
+              })
               .from(users)
               .where(eq(users.id, otherUserId))
               .limit(1);
 
+            // Create display name: use name if it's not generic, otherwise use phone or email
+            let displayName = otherUser?.name || '';
+            if (!displayName || displayName.startsWith('User ')) {
+              displayName = otherUser?.phoneNumber || otherUser?.email || `User ${otherUserId}`;
+            }
+
             conversationsMap.set(otherUserId, {
-              otherUser: otherUser || null,
+              otherUser: otherUser ? { ...otherUser, displayName } : null,
               latestMessage: msg,
               unreadCount: 0,
             });

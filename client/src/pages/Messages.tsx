@@ -215,7 +215,7 @@ function MessagesContent() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
                           <span className={`font-medium truncate ${hasUnread ? "font-bold" : ""}`}>
-                            {otherUser.name || "Unknown"}
+                            {otherUser.displayName || otherUser.name || otherUser.phoneNumber || otherUser.email || `User ${otherUser.id}`}
                           </span>
                           {hasUnread && (
                             <Badge className="bg-red-500 text-white text-xs">

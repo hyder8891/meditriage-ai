@@ -1109,3 +1109,7 @@
 - [x] Fix non-functional Message button on MyPatients page  
 - [x] Implement real-time messaging system for clinician-patient communication
 - [x] Add proper navigation and functionality to messaging interface
+
+## URGENT: Messaging System Display Issues
+- [x] Fix messaging system to display actual patient/doctor names instead of "User [ID]"
+- [x] Ensure profile pictures/avatars are shown in message list
