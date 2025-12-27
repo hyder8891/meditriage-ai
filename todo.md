@@ -1120,3 +1120,9 @@
 - [x] Add clickable join link in patient appointments tab
 - [x] Fix unclickable functions in patient dashboard
 - [x] Ensure all patient dashboard features are functional
+
+## Navigation Audit and Fixes (Current)
+- [x] Audit all buttons with links for clickability
+- [x] Fix profile navigation for patient view across all pages/tabs
+- [x] Fix profile navigation for doctor view across all pages/tabs
+- [x] Ensure all routing leads to correct destinations

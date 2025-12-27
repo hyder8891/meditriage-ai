@@ -104,6 +104,10 @@ export function UserProfileDropdown() {
               <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'بوابتي' : 'My Portal'}</span>
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation("/patient/profile")}>
+              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'ملفي الشخصي' : 'My Profile'}</span>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/patient/messages")}>
               <MessageSquare className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'الرسائل' : 'Messages'}</span>
@@ -124,6 +128,10 @@ export function UserProfileDropdown() {
             <DropdownMenuItem onClick={() => setLocation("/clinician/dashboard")}>
               <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation("/clinician/profile")}>
+              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'ملفي الشخصي' : 'My Profile'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/clinician/patients")}>
               <FileText className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />

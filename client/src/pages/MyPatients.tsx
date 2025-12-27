@@ -143,11 +143,11 @@ export default function MyPatients() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Link href={`/clinician/patients/${patient.id}`}>
-                      <Button size="sm" variant="outline">
+                    <Link to={`/clinician/patients/${patient.id}`}>
+                      <div className="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 text-sm font-medium cursor-pointer transition-colors">
                         <FileText className="h-4 w-4 mr-2" />
                         View Profile
-                      </Button>
+                      </div>
                     </Link>
                     
                     <Button 

@@ -107,17 +107,17 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex gap-3">
-            <Link href="/admin/load-test">
-              <Button variant="outline" className="border-purple-300 hover:bg-purple-50">
+            <Link to="/admin/load-test">
+              <div className="inline-flex items-center justify-center rounded-md border border-purple-300 bg-transparent px-4 py-2 text-sm font-medium hover:bg-purple-50 cursor-pointer transition-colors">
                 <Activity className="w-4 h-4 mr-2" />
                 Load Testing
-              </Button>
+              </div>
             </Link>
-            <Link href="/admin/users">
-              <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
+            <Link to="/admin/users">
+              <div className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 px-4 py-2 text-sm font-medium text-white cursor-pointer transition-colors">
                 <Users className="w-4 h-4 mr-2" />
                 Manage All Users
-              </Button>
+              </div>
             </Link>
           </div>
         </div>

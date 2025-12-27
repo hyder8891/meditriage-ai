@@ -47,8 +47,8 @@ export function AppLogo({
   };
 
   return (
-    <Link href={navigationHref}>
-      <a className={`flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer ${className}`}>
+    <Link to={navigationHref}>
+      <div className={`flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer ${className}`}>
         <div className="relative">
           {/* Gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg blur-sm opacity-75"></div>
@@ -64,7 +64,7 @@ export function AppLogo({
             My Doctor طبيبي
           </span>
         )}
-      </a>
+      </div>
     </Link>
   );
 }

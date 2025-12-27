@@ -102,16 +102,16 @@ export function UsageLimitGuard({ children, feature, userRole, language = "ar" }
             </p>
           </div>
 
-          <Link href={upgradeUrl}>
-            <button className="w-full py-3 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg font-semibold hover:from-teal-600 hover:to-blue-600 transition">
+          <Link to={upgradeUrl}>
+            <div className="w-full py-3 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg font-semibold hover:from-teal-600 hover:to-blue-600 transition cursor-pointer text-center">
               {language === "ar" ? "عرض الخطط" : "View Plans"}
-            </button>
+            </div>
           </Link>
 
-          <Link href={userRole === "patient" ? "/patient/portal" : "/clinician/dashboard"}>
-            <button className="w-full mt-3 py-3 bg-slate-100 text-slate-600 rounded-lg font-semibold hover:bg-slate-200 transition">
+          <Link to={userRole === "patient" ? "/patient/portal" : "/clinician/dashboard"}>
+            <div className="w-full mt-3 py-3 bg-slate-100 text-slate-600 rounded-lg font-semibold hover:bg-slate-200 transition cursor-pointer text-center">
               {language === "ar" ? "العودة إلى لوحة التحكم" : "Back to Dashboard"}
-            </button>
+            </div>
           </Link>
         </div>
       </div>

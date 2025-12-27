@@ -24,11 +24,11 @@ function MyDoctorsContent() {
           </p>
         </div>
         
-        <Link href="/patient/find-doctors">
-          <Button>
+        <Link to="/patient/find-doctors">
+          <div className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer transition-colors">
             <Plus className="h-4 w-4 mr-2" />
             {isArabic ? 'ابحث عن طبيب جديد' : 'Find New Doctor'}
-          </Button>
+          </div>
         </Link>
       </div>
 
@@ -48,11 +48,11 @@ function MyDoctorsContent() {
                 {isArabic ? 'لم تتصل بأي طبيب بعد. ابحث عن الأطباء المتاحين لبدء الاستشارات.' : 'You haven\'t connected with any doctors yet. Find available doctors to start consultations.'}
               </p>
             </div>
-            <Link href="/patient/find-doctors">
-              <Button>
+            <Link to="/patient/find-doctors">
+              <div className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer transition-colors">
                 <Plus className="h-4 w-4 mr-2" />
                 {isArabic ? 'ابحث عن طبيب' : 'Find a Doctor'}
-              </Button>
+              </div>
             </Link>
           </div>
         </Card>
@@ -111,15 +111,17 @@ function MyDoctorsContent() {
 
                   {/* Action Buttons Section - Stack on mobile, column on desktop */}
                   <div className="flex flex-col gap-2 sm:ml-4 w-full sm:w-auto sm:min-w-[140px]">
-                    <Link href="/patient/messages" className="w-full">
-                      <Button
-                        disabled={!isAvailable}
-                        className={isAvailable ? "bg-green-600 hover:bg-green-700 w-full" : "w-full"}
-                        size="sm"
+                    <Link to="/patient/messages" className="w-full">
+                      <div
+                        className={`inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 w-full cursor-pointer transition-colors ${
+                          isAvailable 
+                            ? "bg-green-600 hover:bg-green-700 text-white" 
+                            : "bg-muted text-muted-foreground cursor-not-allowed"
+                        }`}
                       >
                         <MessageCircle className="h-4 w-4 mr-2" />
                         {isAvailable ? "Message Now" : isBusy ? "Doctor Busy" : "Offline"}
-                      </Button>
+                      </div>
                     </Link>
                     
                     <Button variant="outline" size="sm" className="w-full">
