@@ -231,7 +231,7 @@ export const selfHealingRouter = router({
           "reset_circuit_breaker",
           "throttle_requests",
         ]),
-        metadata: z.record(z.unknown()).optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {

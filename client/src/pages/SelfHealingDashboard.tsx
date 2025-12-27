@@ -26,6 +26,7 @@ import {
   Zap
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function SelfHealingDashboard() {
   const { toast } = useToast();
@@ -107,7 +108,8 @@ export default function SelfHealingDashboard() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <AdminLayout>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -414,5 +416,6 @@ export default function SelfHealingDashboard() {
         </TabsContent>
       </Tabs>
     </div>
+    </AdminLayout>
   );
 }

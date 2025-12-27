@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { TableSkeleton } from "@/components/SkeletonLoader";
 import { Link } from "wouter";
 import { AppLogo } from "@/components/AppLogo";
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function AdminDashboard() {
   const [selectedTab, setSelectedTab] = useState("overview");
@@ -90,8 +91,8 @@ export default function AdminDashboard() {
   const recentUsers = users?.slice(0, 5) || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <AdminLayout>
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -452,6 +453,6 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

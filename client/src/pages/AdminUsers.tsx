@@ -10,6 +10,7 @@ import { Users, Search, Shield, CheckCircle, XCircle, Trash2 } from "lucide-reac
 import { toast } from "sonner";
 import { TableSkeleton } from "@/components/SkeletonLoader";
 import { AppLogo } from "@/components/AppLogo";
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function AdminUsers() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,8 +65,8 @@ export default function AdminUsers() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <AdminLayout>
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -233,6 +234,6 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

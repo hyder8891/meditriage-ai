@@ -74,6 +74,8 @@ import DebugUser from "./pages/DebugUser";
 import DebugAuth from "./pages/DebugAuth";
 import AdminUsers from "./pages/AdminUsers";
 import Settings from "./pages/Settings";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminSettings from "./pages/admin/AdminSettings";
 import PatientMedicalRecords from "./pages/PatientMedicalRecords";
 import BioScannerPage from "./pages/patient/BioScannerPage";
 import { PatientVitalsViewer } from "./pages/clinician/PatientVitalsViewer";
@@ -246,6 +248,16 @@ function Router() {
       <Route path={"/admin/self-healing"}>
         <ProtectedRoute requiredRole="admin">
           <SelfHealingDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/admin/analytics"}>
+        <ProtectedRoute requiredRole="admin">
+          <AdminAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/admin/settings"}>
+        <ProtectedRoute requiredRole="admin">
+          <AdminSettings />
         </ProtectedRoute>
       </Route>
       <Route path={"/settings"} component={Settings} />

@@ -32,7 +32,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
+import { AdminLayout } from '@/components/AdminLayout';
 
 export default function LoadTestDashboard() {
   const [totalUsers, setTotalUsers] = useState(100);
@@ -114,7 +115,8 @@ export default function LoadTestDashboard() {
   const isRunning = currentTest?.status === 'running';
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <AdminLayout>
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Load Testing Dashboard</h1>
@@ -871,5 +873,6 @@ export default function LoadTestDashboard() {
         </TabsContent>
       </Tabs>
     </div>
+    </AdminLayout>
   );
 }

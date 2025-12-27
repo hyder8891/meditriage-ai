@@ -22,11 +22,17 @@ export function ProtectedRoute({ children, requiredRole, redirectTo }: Protected
       return;
     }
 
-    // If role is required and user doesn't have it, check if admin
+    // If role is required and user doesn't have it
     if (requiredRole && user?.role !== requiredRole) {
-      // Admin can access all portals
+      // For admin routes, ONLY admins can access (no cross-access)
+      if (requiredRole === "admin") {
+        setLocation("/");
+        return;
+      }
+      
+      // For non-admin routes, admins can access all portals
       if (user?.role === "admin") {
-        // Allow admin to access any portal
+        // Allow admin to access patient and clinician portals
         return;
       }
       
