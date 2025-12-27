@@ -6,7 +6,7 @@
 import mysql from 'mysql2/promise';
 import { clinicalGuidelines, symptomDiseaseMappings } from './server/brain/knowledge/training-data.ts';
 
-const DATABASE_URL = process.env.DATABASE_URL || 'mysql://root@localhost:3306/meditriage';
+const DATABASE_URL = process.env.DATABASE_URL || 'mysql://root@localhost:3306/mydoctor';
 
 async function seedBRAINKnowledge() {
   console.log('🧠 Starting BRAIN knowledge base seeding...');

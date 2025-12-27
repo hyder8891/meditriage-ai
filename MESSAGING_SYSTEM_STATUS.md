@@ -32,12 +32,12 @@ The `getConversations` tRPC query is NOT returning the conversations. This is li
 ## Test Accounts
 
 **Patient:**
-- Email: `patient.test@meditriage.com`
+- Email: `patient.test@mydoctor.com`
 - Password: `test123`
 - User ID: 3150028
 
 **Doctor:**
-- Email: `doctor.test@meditriage.com`
+- Email: `doctor.test@mydoctor.com`
 - Password: `test123`
 - User ID: 3150029
 
@@ -64,6 +64,6 @@ WHERE doctor_id = 3150029 AND patient_id = 3150028;
 
 ## Files Involved
 
-- `/home/ubuntu/meditriage-ai/server/b2b2c-router.ts` - getConversations procedure (line 559-617)
-- `/home/ubuntu/meditriage-ai/client/src/pages/Messages.tsx` - Frontend messages page
-- `/home/ubuntu/meditriage-ai/client/src/App.tsx` - Route configuration
+- `/home/ubuntu/mydoctor-ai/server/b2b2c-router.ts` - getConversations procedure (line 559-617)
+- `/home/ubuntu/mydoctor-ai/client/src/pages/Messages.tsx` - Frontend messages page
+- `/home/ubuntu/mydoctor-ai/client/src/App.tsx` - Route configuration

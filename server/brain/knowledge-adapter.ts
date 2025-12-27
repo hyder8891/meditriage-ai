@@ -41,7 +41,7 @@ export async function normalizeSymptoms(symptoms: string[]): Promise<Array<{
         original: symptom,
         conceptId: `SYM-${matchedSymptom.id}`,
         standardTerm: matchedSymptom.nameEn,
-        source: 'MediTriage Knowledge Base',
+        source: 'My Doctor Knowledge Base',
         symptomData: matchedSymptom,
       });
     } else {
@@ -105,7 +105,7 @@ export async function findDiagnosesFromNewKnowledge(normalizedSymptoms: Array<{
       conceptId: match.disease.icdCode,
       conceptName: match.disease.nameEn,
       icd10: match.disease.icdCode,
-      source: 'MediTriage Knowledge Base',
+      source: 'My Doctor Knowledge Base',
     },
     confidence: match.matchScore,
     matchingSymptoms: match.matchingSymptoms,

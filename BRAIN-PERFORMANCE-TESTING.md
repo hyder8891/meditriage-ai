@@ -183,7 +183,7 @@ This document describes the comprehensive performance testing suite created for 
 ### Full Test Suite (100 cases)
 
 ```bash
-cd /home/ubuntu/meditriage-ai
+cd /home/ubuntu/mydoctor-ai
 pnpm test server/brain/brain-performance.test.ts --run
 ```
 
@@ -192,7 +192,7 @@ pnpm test server/brain/brain-performance.test.ts --run
 ### Sample Test (12 cases)
 
 ```bash
-cd /home/ubuntu/meditriage-ai
+cd /home/ubuntu/mydoctor-ai
 npx tsx server/brain/brain-sample-test.ts
 ```
 

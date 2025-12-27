@@ -2,20 +2,20 @@
 
 ## 🎯 Overview
 
-This document provides comprehensive testing instructions for the Redis-powered real-time notification system implemented in MediTriage AI Pro.
+This document provides comprehensive testing instructions for the Redis-powered real-time notification system implemented in My Doctor.
 
 ---
 
 ## 📋 Test Accounts Created
 
 ### Patient Account
-- **Email:** `patient.test@meditriage.com`
+- **Email:** `patient.test@mydoctor.com`
 - **Password:** `test123`
 - **Role:** Patient
 - **Purpose:** Test receiving notifications as a patient user
 
 ### Doctor Account  
-- **Email:** `doctor.test@meditriage.com`
+- **Email:** `doctor.test@mydoctor.com`
 - **Password:** `test123`
 - **Role:** Clinician
 - **Purpose:** Test receiving notifications as a healthcare provider
@@ -48,12 +48,12 @@ This document provides comprehensive testing instructions for the Redis-powered 
 
 1. **Window 1 - Patient:**
    - Open browser window
-   - Login as `patient.test@meditriage.com`
+   - Login as `patient.test@mydoctor.com`
    - Navigate to `/test-notifications`
 
 2. **Window 2 - Doctor (Incognito Mode):**
    - Open incognito/private window
-   - Login as `doctor.test@meditriage.com`
+   - Login as `doctor.test@mydoctor.com`
    - Navigate to `/test-notifications`
 
 3. **Test Cross-User Notifications:**
@@ -305,4 +305,4 @@ node test-db-pool-load.mjs  # Includes Redis connection test
 
 **Last Updated:** December 21, 2024  
 **Version:** 1.0.0  
-**Maintainer:** MediTriage AI Development Team
+**Maintainer:** My Doctor Development Team

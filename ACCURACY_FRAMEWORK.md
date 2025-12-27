@@ -1,8 +1,8 @@
-# MediTriage AI Pro - Accuracy Improvement Framework
+# My Doctor - Accuracy Improvement Framework
 
 ## Executive Summary
 
-This document outlines a comprehensive, multi-layered accuracy improvement system for all AI-powered functions in MediTriage AI Pro. The framework addresses accuracy, reliability, and clinical safety through validation, cross-referencing, confidence scoring, and continuous learning.
+This document outlines a comprehensive, multi-layered accuracy improvement system for all AI-powered functions in My Doctor. The framework addresses accuracy, reliability, and clinical safety through validation, cross-referencing, confidence scoring, and continuous learning.
 
 ---
 
@@ -543,5 +543,5 @@ export async function monitorAccuracy(
 
 **Document Version**: 1.0  
 **Last Updated**: December 23, 2025  
-**Author**: MediTriage AI Development Team  
+**Author**: My Doctor Development Team  
 **Status**: DRAFT - Awaiting Approval

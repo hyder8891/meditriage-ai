@@ -2,7 +2,7 @@
 
 ## Vision Statement
 
-BRAIN is an advanced medical AI system that combines multiple data sources, machine learning models, and continuous learning mechanisms to provide evidence-based clinical decision support. It serves as the "intelligent core" of MediTriage AI Pro, processing medical information through interconnected knowledge systems and learning from every interaction.
+BRAIN is an advanced medical AI system that combines multiple data sources, machine learning models, and continuous learning mechanisms to provide evidence-based clinical decision support. It serves as the "intelligent core" of My Doctor, processing medical information through interconnected knowledge systems and learning from every interaction.
 
 ## System Architecture
 

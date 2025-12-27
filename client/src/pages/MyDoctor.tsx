@@ -59,7 +59,7 @@ interface AnalysisResult {
   };
 }
 
-export default function MediTriage() {
+export default function MyDoctor() {
   const [language, setLanguage] = useState<"en" | "ar">("ar");
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);

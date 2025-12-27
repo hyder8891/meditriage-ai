@@ -1,4 +1,4 @@
-# MediTriage AI - 1000 Concurrent Users Load Test Report
+# My Doctor - 1000 Concurrent Users Load Test Report
 
 **Test Date:** December 25, 2025  
 **Test Duration:** ~2 minutes (4 test scenarios)  
@@ -139,4 +139,4 @@ Based on response times, your application should be able to handle:
 
 ## 📎 Raw Test Data
 
-Full test output saved to: `/home/ubuntu/meditriage-ai/load-test-results.txt`
+Full test output saved to: `/home/ubuntu/mydoctor-ai/load-test-results.txt`

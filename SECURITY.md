@@ -388,7 +388,7 @@ upgrade-insecure-requests
 ## 16. Security Contacts
 
 ### Reporting Security Issues
-- **Email:** security@meditriage.iq (to be configured)
+- **Email:** security@mydoctor.iq (to be configured)
 - **Response Time:** Within 24 hours
 - **Disclosure:** Responsible disclosure policy
 

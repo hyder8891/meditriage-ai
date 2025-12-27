@@ -2,7 +2,7 @@
 
 ## Overview
 
-MediTriage AI Pro's SOAP note generation has been enhanced to provide **better organization, clearer visual hierarchy, and more professional medical documentation** compared to Live-Scribe and other medical transcription tools.
+My Doctor's SOAP note generation has been enhanced to provide **better organization, clearer visual hierarchy, and more professional medical documentation** compared to Live-Scribe and other medical transcription tools.
 
 ---
 
@@ -16,7 +16,7 @@ MediTriage AI Pro's SOAP note generation has been enhanced to provide **better o
 - No clear separation between sections
 - Difficult to scan quickly
 
-**After (MediTriage AI Pro):**
+**After (My Doctor):**
 - Multi-level headings (H1, H2, H3) with distinct styling
 - Horizontal rules (---) separating major sections
 - Blockquotes for chief complaints
@@ -177,9 +177,9 @@ Custom prose styling:
 
 ---
 
-## Comparison: Live-Scribe vs MediTriage AI Pro
+## Comparison: Live-Scribe vs My Doctor
 
-| Feature | Live-Scribe | MediTriage AI Pro |
+| Feature | Live-Scribe | My Doctor |
 |---------|-------------|-------------------|
 | **Visual Hierarchy** | Basic | ✅ Multi-level with colors |
 | **Data Tables** | Plain text | ✅ Professional tables |
@@ -273,7 +273,7 @@ When a clinician transcribes a patient encounter, they now receive:
 
 ## Conclusion
 
-MediTriage AI Pro now generates **significantly better organized and more professional SOAP notes** than Live-Scribe, with:
+My Doctor now generates **significantly better organized and more professional SOAP notes** than Live-Scribe, with:
 - ✅ Clear visual hierarchy
 - ✅ Structured data tables
 - ✅ Status indicators

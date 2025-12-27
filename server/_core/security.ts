@@ -203,7 +203,7 @@ export function getClientIp(req: Request): string {
  * Session Security Configuration
  */
 export const sessionConfig = {
-  cookieName: 'meditriage_session',
+  cookieName: 'mydoctor_session',
   maxAge: 24 * 60 * 60 * 1000, // 24 hours
   secure: process.env.NODE_ENV === 'production', // HTTPS only in production
   httpOnly: true, // Prevent XSS access to cookies

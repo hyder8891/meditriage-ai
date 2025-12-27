@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDemoKey123456789",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "meditriage-demo.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "meditriage-demo",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "meditriage-demo.appspot.com",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "mydoctor-demo.appspot.com",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789:web:abc123"
 };

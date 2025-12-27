@@ -275,7 +275,7 @@ BRAIN System
 
 ## 🎯 Impact
 
-BRAIN transforms MediTriage AI Pro from a simple symptom checker into a comprehensive medical intelligence platform that:
+BRAIN transforms My Doctor from a simple symptom checker into a comprehensive medical intelligence platform that:
 - Provides evidence-based clinical reasoning
 - Learns continuously from clinician feedback
 - Adapts to Iraqi medical context

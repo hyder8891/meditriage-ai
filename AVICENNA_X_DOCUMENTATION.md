@@ -1,6 +1,6 @@
 # Avicenna-X Complete Workflow Documentation
 
-**MediTriage AI Pro - Advanced Medical Intelligence Platform**
+**My Doctor - Advanced Medical Intelligence Platform**
 
 **Author:** Manus AI  
 **Version:** 1.0  
@@ -622,7 +622,7 @@ S3_BUCKET=your_bucket_name
 S3_REGION=your_region
 
 # Application
-VITE_APP_TITLE=MediTriage AI Pro
+VITE_APP_TITLE=My Doctor
 VITE_APP_LOGO=/logo.png
 ```
 
@@ -700,9 +700,9 @@ pnpm start
 ### Support
 
 For technical support or questions:
-- Email: support@meditriage.ai
-- Documentation: https://docs.meditriage.ai
-- Issue Tracker: https://github.com/meditriage/avicenna-x/issues
+- Email: support@mydoctor.ai
+- Documentation: https://docs.mydoctor.ai
+- Issue Tracker: https://github.com/mydoctor/avicenna-x/issues
 
 ---
 
@@ -719,4 +719,4 @@ Future enhancements will include expanded language support, additional medical s
 **Document Version:** 1.0  
 **Last Updated:** December 24, 2025  
 **Author:** Manus AI  
-**Copyright:** © 2025 MediTriage AI Pro. All rights reserved.
+**Copyright:** © 2025 My Doctor. All rights reserved.

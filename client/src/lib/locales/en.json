@@ -103,7 +103,7 @@
   },
   "testimonials": {
     "title": "What Healthcare Professionals Say",
-    "quote1": "MediTriage AI has transformed our emergency department workflow. We've reduced average wait times by 38% while improving patient satisfaction scores significantly.",
+    "quote1": "My Doctor has transformed our emergency department workflow. We've reduced average wait times by 38% while improving patient satisfaction scores significantly.",
     "author1": "Dr. Ahmed Al-Mansouri",
     "role1": "Emergency Medicine Director",
     "quote2": "The accuracy of the AI triage system is remarkable. It consistently identifies high-acuity patients and provides valuable clinical decision support to our nursing staff.",
@@ -117,7 +117,7 @@
     "title": "Real-World Impact: Reducing ED Overcrowding",
     "facility": "400-bed tertiary care hospital",
     "challenge": "Challenge: 6-hour average ED wait times, patient walkouts, staff burnout",
-    "solution": "Solution: MediTriage AI deployment with kiosk and staff interface",
+    "solution": "Solution: My Doctor deployment with kiosk and staff interface",
     "result1": "42% reduction in wait times",
     "result2": "89% patient satisfaction improvement",
     "result3": "31% increase in ED throughput",
@@ -130,7 +130,7 @@
     "q2": "How long does implementation take?",
     "a2": "Typical deployment takes less than 2 weeks, including EMR integration, staff training, and system configuration.",
     "q3": "Does it replace nurses or support them?",
-    "a3": "MediTriage AI is designed to support and enhance clinical decision-making, not replace healthcare professionals. It provides evidence-based recommendations that nurses and physicians use to make final decisions.",
+    "a3": "My Doctor is designed to support and enhance clinical decision-making, not replace healthcare professionals. It provides evidence-based recommendations that nurses and physicians use to make final decisions.",
     "q4": "What languages are supported?",
     "a4": "Currently supports Arabic, English, and French with additional languages in development.",
     "q5": "Is patient data secure and compliant?",
@@ -148,7 +148,7 @@
     "btnDemo": "Schedule Demo",
     "btnWhitepaper": "Download White Paper",
     "btnContact": "Contact Sales",
-    "email": "info@meditriage.ai",
+    "email": "info@mydoctor.iq",
     "phoneSaudi": "+966 XX XXX XXXX (Saudi Arabia)",
     "phoneUAE": "+971 XX XXX XXXX (UAE)"
   },
@@ -176,6 +176,6 @@
     "newsletter": "Newsletter",
     "newsletterDesc": "Stay updated on emergency medicine AI",
     "subscribe": "Subscribe",
-    "copyright": "© 2025 MediTriage AI Pro. All rights reserved."
+    "copyright": "© 2025 My Doctor. All rights reserved."
   }
 }

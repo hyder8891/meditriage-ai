@@ -21,7 +21,7 @@ This is why you're getting `auth/unauthorized-domain` errors!
 
 ### Step 1: Access Firebase Console
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project: **My Doctor طبيبي** (formerly MediTriage AI Pro)
+2. Select your project: **My Doctor طبيبي** (formerly My Doctor)
 
 ### Step 2: Navigate to Authentication Settings
 1. Click on **Authentication** in the left sidebar
@@ -50,7 +50,7 @@ To avoid this issue every time the Manus sandbox URL changes:
 ### Step 5: Add Production Domain (When Published)
 When you publish your app, you'll need to add your production domain:
 1. Click **Add domain** button
-2. Enter your custom domain (e.g., `meditriage.com`)
+2. Enter your custom domain (e.g., `mydoctor.com`)
 3. Click **Add**
 
 ## What This Fixes
