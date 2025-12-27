@@ -10,6 +10,8 @@ import { CircuitBreakerRegistry } from "./_core/self-healing/circuit-breaker";
 import { getDb } from "./db";
 import { failureEvents, recoveryActions, circuitBreakerStates } from "../drizzle/self-healing-schema";
 import { desc, eq, and, gte } from "drizzle-orm";
+import { executeRecoveryAction, type RecoveryAction } from "./self-healing-recovery";
+import { sendAlert, alertCriticalFailure, alertCircuitBreakerOpen } from "./self-healing-alerts";
 
 export const selfHealingRouter = router({
   /**
@@ -212,4 +214,75 @@ export const selfHealingRouter = router({
 
     return states;
   }),
+
+  /**
+   * Manually trigger recovery action
+   */
+  triggerRecoveryAction: protectedProcedure
+    .input(
+      z.object({
+        serviceName: z.string(),
+        actionType: z.enum([
+          "restart_service",
+          "clear_cache",
+          "scale_resources",
+          "reconnect_database",
+          "cleanup_memory",
+          "reset_circuit_breaker",
+          "throttle_requests",
+        ]),
+        metadata: z.record(z.unknown()).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Only admins can trigger recovery actions
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+
+      const result = await executeRecoveryAction(
+        input.serviceName,
+        input.actionType as string,
+        input.metadata
+      );
+
+      return result;
+    }),
+
+  /**
+   * Send test alert
+   */
+  sendTestAlert: protectedProcedure
+    .input(
+      z.object({
+        type: z.enum([
+          "circuit_breaker_open",
+          "critical_failure",
+          "recovery_failure",
+          "system_degraded",
+        ]),
+        serviceName: z.string().optional(),
+        message: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Only admins can send test alerts
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized: Admin access required");
+      }
+
+      const alert = {
+        id: `test-${Date.now()}`,
+        type: input.type,
+        severity: "high" as const,
+        title: `Test Alert: ${input.type}`,
+        message: input.message || `This is a test alert for ${input.type}`,
+        metadata: { serviceName: input.serviceName || "test-service", test: true },
+        timestamp: new Date(),
+      };
+
+      await sendAlert(alert);
+
+      return { success: true, message: "Test alert sent successfully" };
+    }),
 });

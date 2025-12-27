@@ -83,6 +83,7 @@ import PatientAppointments from "./pages/PatientAppointments";
 import ConsultationRoom from "./pages/ConsultationRoom";
 import ConsultationHistory from "./pages/ConsultationHistory";
 import MyDoctor from "./pages/MyDoctor";
+import SelfHealingDashboard from "./pages/SelfHealingDashboard";
 import { Redirect } from "wouter";
 
 function Router() {
@@ -240,6 +241,11 @@ function Router() {
       <Route path={"/admin/load-test"}>
         <ProtectedRoute requiredRole="admin">
           <LoadTestDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/admin/self-healing"}>
+        <ProtectedRoute requiredRole="admin">
+          <SelfHealingDashboard />
         </ProtectedRoute>
       </Route>
       <Route path={"/settings"} component={Settings} />
