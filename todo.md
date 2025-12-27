@@ -1102,3 +1102,10 @@
   - [x] Verify slot generation and management system
   - [x] Confirm booking request flow: create → confirm/reject → appointment
   - [x] Frontend booking pages already implemented and working
+
+## URGENT: Patient Management Bugs (Current)
+- [x] Fix 404 error on patient detail page - route mismatch between /clinician/patients/:id and /clinician/patient/:id
+- [x] Fix non-functional Schedule button on MyPatients page
+- [x] Fix non-functional Message button on MyPatients page  
+- [x] Implement real-time messaging system for clinician-patient communication
+- [x] Add proper navigation and functionality to messaging interface

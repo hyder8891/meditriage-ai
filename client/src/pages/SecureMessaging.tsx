@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,26 +17,89 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { io, Socket } from "socket.io-client";
+import { useLocation } from "wouter";
 
 function SecureMessagingContent() {
   const { language } = useLanguage();
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   const [selectedConversation, setSelectedConversation] = useState<number | null>(null);
   const [messageContent, setMessageContent] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const socketRef = useRef<Socket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const utils = trpc.useUtils();
 
+  // Get patient ID from URL query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const patientId = params.get('patient');
+    if (patientId) {
+      setSelectedConversation(parseInt(patientId));
+    }
+  }, []);
+
   // Get all conversations for current user
-  const { data: sentMessages } = trpc.clinical.getMessagesBySender.useQuery(
+  const { data: sentMessages, refetch: refetchSent } = trpc.clinical.getMessagesBySender.useQuery(
     { senderId: user?.id || 0 },
     { enabled: !!user }
   );
   
-  const { data: receivedMessages } = trpc.clinical.getMessagesByRecipient.useQuery(
+  const { data: receivedMessages, refetch: refetchReceived } = trpc.clinical.getMessagesByRecipient.useQuery(
     { recipientId: user?.id || 0 },
     { enabled: !!user }
   );
+
+  // Initialize Socket.IO connection for real-time messaging
+  useEffect(() => {
+    if (!user?.id) return;
+
+    // Connect to Socket.IO server
+    const socket = io({
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('Socket.IO connected:', socket.id);
+      // Register user for receiving notifications
+      socket.emit('register-user', { userId: user.id });
+    });
+
+    // Listen for new messages in real-time
+    socket.on(`user:${user.id}:new-message`, (data: any) => {
+      console.log('New message received:', data);
+      // Refetch messages to update UI
+      refetchSent();
+      refetchReceived();
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log('Socket.IO disconnected:', reason);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket.IO connection error:', error);
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.emit('unregister-user', { userId: user.id });
+        socketRef.current.disconnect();
+      }
+    };
+  }, [user?.id, refetchSent, refetchReceived]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [selectedConversation, sentMessages, receivedMessages]);
 
   // Send message mutation
   const sendMessageMutation = trpc.clinical.sendMessage.useMutation({
@@ -80,6 +143,9 @@ function SecureMessagingContent() {
     if (existing) {
       existing.messages.push(msg);
       existing.lastMessage = msg;
+      if (msg.recipientId === user?.id && !msg.read) {
+        existing.unreadCount += 1;
+      }
     } else {
       acc.push({
         partnerId,
@@ -115,6 +181,8 @@ function SecureMessagingContent() {
 
   const handleSelectConversation = (partnerId: number) => {
     setSelectedConversation(partnerId);
+    // Update URL with patient parameter
+    navigate(`/clinician/messages?patient=${partnerId}`, { replace: true });
     
     // Mark unread messages as read
     const unreadMessages = receivedMessages?.filter(
@@ -249,6 +317,7 @@ function SecureMessagingContent() {
                           </div>
                         );
                       })}
+                      <div ref={messagesEndRef} />
                     </div>
                   </ScrollArea>
 

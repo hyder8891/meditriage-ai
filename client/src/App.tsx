@@ -164,6 +164,9 @@ function Router() {
       <Route path={"/clinician/patient/:id"}>
         {() => <ProtectedRoute requiredRole="clinician"><PatientDetail /></ProtectedRoute>}
       </Route>
+      <Route path={"/clinician/patients/:id"}>
+        {() => <ProtectedRoute requiredRole="clinician"><PatientDetail /></ProtectedRoute>}
+      </Route>
       <Route path={"/clinician/reports"}>
         {() => <ProtectedRoute requiredRole="clinician"><Reports /></ProtectedRoute>}
       </Route>

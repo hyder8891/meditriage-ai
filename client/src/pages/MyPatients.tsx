@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, User, MessageCircle, Calendar, FileText } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle";
 
 export default function MyPatients() {
+  const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "pending" | "terminated" | undefined>("active");
 
@@ -149,12 +150,20 @@ export default function MyPatients() {
                       </Button>
                     </Link>
                     
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => navigate(`/clinician/messages?patient=${patient.id}`)}
+                    >
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Message
                     </Button>
                     
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => navigate(`/clinician/calendar?patient=${patient.id}`)}
+                    >
                       <Calendar className="h-4 w-4 mr-2" />
                       Schedule
                     </Button>
