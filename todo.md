@@ -1113,3 +1113,10 @@
 ## URGENT: Messaging System Display Issues
 - [x] Fix messaging system to display actual patient/doctor names instead of "User [ID]"
 - [x] Ensure profile pictures/avatars are shown in message list
+
+## URGENT: Video Call and Patient Dashboard Issues
+- [x] Fix patient unable to join video calls they initiated
+- [x] Add video call notifications for patients
+- [x] Add clickable join link in patient appointments tab
+- [x] Fix unclickable functions in patient dashboard
+- [x] Ensure all patient dashboard features are functional

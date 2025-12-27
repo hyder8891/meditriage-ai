@@ -4,6 +4,7 @@ import { sendAppointmentConfirmation } from "./services/email";
 import { getDb } from "./db";
 import { users, consultations } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { emitNotificationToUser } from "./_core/socket-server";
 import {
   createConsultation,
   getConsultationById,
@@ -261,6 +262,20 @@ export const consultationRouter = router({
       }
 
       await startConsultation(input.id);
+      
+      // Notify the patient that doctor has joined
+      if (ctx.user.id === consultation.clinicianId) {
+        try {
+          emitNotificationToUser(consultation.patientId, 'consultation-update', {
+            consultationId: consultation.id,
+            status: 'in_progress',
+            message: 'Doctor has joined the consultation',
+          });
+        } catch (error) {
+          console.error('[Consultation] Failed to emit notification:', error);
+        }
+      }
+      
       return { success: true };
     }),
 

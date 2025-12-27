@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,10 +9,14 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { AppLogo } from "@/components/AppLogo";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
+import { io, Socket } from "socket.io-client";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function PatientAppointments() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  const socketRef = useRef<Socket | null>(null);
 
   // Fetch consultations from backend
   const { data: consultations, isLoading } = trpc.consultation.getMy.useQuery();
@@ -29,6 +33,64 @@ export default function PatientAppointments() {
       });
     },
   });
+
+  // Socket.IO for real-time consultation updates
+  useEffect(() => {
+    if (!user) return;
+
+    // Connect to Socket.IO server
+    const socket = io(window.location.origin, {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('[PatientAppointments] Socket connected:', socket.id);
+      // Register user for receiving consultation updates
+      socket.emit('register-user', { userId: user.id });
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('[PatientAppointments] Socket connection error:', error);
+    });
+
+    // Listen for consultation status updates
+    socket.on(`user:${user.id}:consultation-update`, (data) => {
+      console.log('[PatientAppointments] Consultation update received:', data);
+      
+      // Invalidate queries to refresh UI
+      utils.consultation.getMy.invalidate();
+      
+      // Show notification based on status
+      if (data.status === 'in_progress') {
+        toast.success(
+          language === 'ar' ? 'الطبيب انضم إلى المكالمة!' : 'Doctor joined the call!',
+          {
+            description: language === 'ar' 
+              ? 'انقر على "انضم الآن" للدخول إلى الاستشارة'
+              : 'Click "Join Now" to enter the consultation',
+            duration: 10000,
+            action: {
+              label: language === 'ar' ? 'انضم' : 'Join',
+              onClick: () => setLocation(`/consultation/${data.consultationId}`),
+            },
+          }
+        );
+      }
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.emit('unregister-user', { userId: user.id });
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [user, utils, language, setLocation]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -166,13 +228,16 @@ export default function PatientAppointments() {
                         </div>
                         
                         <div className="flex gap-2">
-                          {(consultation.status === 'scheduled' || consultation.status === 'waiting') && (
+                          {(consultation.status === 'scheduled' || consultation.status === 'waiting' || consultation.status === 'in_progress') && (
                             <Button 
                               size="sm" 
                               onClick={() => setLocation(`/consultation/${consultation.id}`)}
+                              className={consultation.status === 'in_progress' ? 'bg-green-600 hover:bg-green-700 animate-pulse' : ''}
                             >
                               <Video className="w-4 h-4 mr-2" />
-                              {language === 'ar' ? 'انضم' : 'Join'}
+                              {consultation.status === 'in_progress' 
+                                ? (language === 'ar' ? 'انضم الآن' : 'Join Now')
+                                : (language === 'ar' ? 'انضم' : 'Join')}
                             </Button>
                           )}
                           {(consultation.status === 'scheduled' || consultation.status === 'waiting') && (
