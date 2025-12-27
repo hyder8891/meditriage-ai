@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { PatientLayout } from "@/components/PatientLayout";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { io, Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 function MessagesContent() {
   const { language } = useLanguage();
@@ -18,12 +20,12 @@ function MessagesContent() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [messageContent, setMessageContent] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
   const utils = trpc.useUtils();
 
   // Get all conversations
   const { data: conversations, isLoading: conversationsLoading, error: conversationsError } = 
     trpc.b2b2c.messaging.getConversations.useQuery(undefined, {
-      refetchInterval: 5000, // Poll every 5 seconds for new messages
       retry: false,
     });
   
@@ -40,7 +42,6 @@ function MessagesContent() {
       { otherUserId: selectedUserId! },
       { 
         enabled: selectedUserId !== null,
-        refetchInterval: 3000, // Poll every 3 seconds when conversation is open
       }
     );
 
@@ -51,6 +52,11 @@ function MessagesContent() {
       utils.b2b2c.messaging.getConversation.invalidate();
       utils.b2b2c.messaging.getConversations.invalidate();
     },
+    onError: (error) => {
+      toast.error(isArabic ? 'فشل إرسال الرسالة' : 'Failed to send message', {
+        description: error.message,
+      });
+    },
   });
 
   // Mark as read mutation
@@ -60,6 +66,59 @@ function MessagesContent() {
       utils.b2b2c.messaging.getUnreadCount.invalidate();
     },
   });
+
+  // Initialize Socket.IO for real-time messaging
+  useEffect(() => {
+    if (!user) return;
+
+    // Connect to Socket.IO server
+    const socket = io(window.location.origin, {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('[Messages] Socket connected:', socket.id);
+      // Register user for receiving messages
+      socket.emit('register-user', { userId: user.id });
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('[Messages] Socket connection error:', error);
+    });
+
+    // Listen for new messages
+    socket.on(`user:${user.id}:new-message`, (data) => {
+      console.log('[Messages] New message received:', data);
+      
+      // Invalidate queries to refresh UI
+      utils.b2b2c.messaging.getConversations.invalidate();
+      
+      // If the message is from the currently selected conversation, refresh it
+      if (selectedUserId && data.senderId === selectedUserId) {
+        utils.b2b2c.messaging.getConversation.invalidate({ otherUserId: selectedUserId });
+      }
+      
+      // Show notification if not in the conversation
+      if (data.senderId !== selectedUserId) {
+        toast.info(isArabic ? 'رسالة جديدة' : 'New message', {
+          description: data.senderName || (isArabic ? 'رسالة جديدة من محادثة' : 'New message from conversation'),
+        });
+      }
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.emit('unregister-user', { userId: user.id });
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [user, selectedUserId, utils, isArabic]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

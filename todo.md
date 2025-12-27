@@ -1074,3 +1074,31 @@
 - [ ] Test video call WebRTC signaling - MANUAL TESTING NEEDED
 - [ ] Verify real-time notifications work - MANUAL TESTING NEEDED
 - [ ] Create checkpoint after verification - READY
+
+
+## URGENT: Doctor-Patient Connection Issues (User Reported - Current)
+- [x] Fix video call connections between doctor and patient dashboards
+  - [x] Audit existing video call implementation (ConsultationRoom.tsx)
+  - [x] Check if consultation router exists and works
+  - [x] Initialize Socket.IO server in main server startup
+  - [x] Add Socket.IO client to ConsultationRoom.tsx
+  - [x] Implement WebRTC peer connection with signaling
+  - [x] Add room joining/leaving logic
+  - [x] Add ICE candidate exchange
+  - [x] Add offer/answer SDP exchange
+  - [x] Add connection status indicators
+- [x] Fix messaging system connections
+  - [x] Audit existing messaging implementation (Messages.tsx, SecureMessaging.tsx)
+  - [x] Check if messages router exists and works (b2b2c-router.ts messaging sub-router)
+  - [x] Add Socket.IO client to Messages.tsx
+  - [x] Implement real-time message notifications
+  - [x] Add user registration for Socket.IO rooms
+  - [x] Replace polling with Socket.IO event listeners
+  - [x] Add toast notifications for new messages
+- [x] Fix appointment booking and scheduling system
+  - [x] Audit existing appointment implementation (PatientAppointments.tsx, PatientBooking.tsx, ClinicianCalendar.tsx)
+  - [x] Check if appointments router exists and works (calendar-router.ts with full booking flow)
+  - [x] Verify backend has complete booking request system
+  - [x] Verify slot generation and management system
+  - [x] Confirm booking request flow: create → confirm/reject → appointment
+  - [x] Frontend booking pages already implemented and working

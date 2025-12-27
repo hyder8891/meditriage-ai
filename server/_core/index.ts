@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeBatchScheduler } from "./batch-scheduler";
+import { initializeSocketServer } from "./socket-server";
 import { 
   securityHeaders, 
   sanitizeInput, 
@@ -108,6 +109,10 @@ async function startServer() {
 
   server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Initialize Socket.IO server for real-time communication
+    initializeSocketServer(server);
+    console.log('✅ Socket.IO server initialized');
     
     // Initialize automated batch processing scheduler
     initializeBatchScheduler();

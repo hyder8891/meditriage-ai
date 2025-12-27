@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AppLogo } from "@/components/AppLogo";
+import { io, Socket } from "socket.io-client";
 
 interface ChatMessage {
   id: string;
@@ -40,11 +41,14 @@ export default function ConsultationRoom() {
   const { language } = useLanguage();
   
   const consultationId = parseInt(id || "0");
+  const roomId = `consultation-${consultationId}`;
   
   // Video/Audio states
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [showChat, setShowChat] = useState(true);
+  const [isConnecting, setIsConnecting] = useState(true);
+  const [remoteConnected, setRemoteConnected] = useState(false);
   
   // Chat states
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -55,6 +59,10 @@ export default function ConsultationRoom() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const remoteSocketIdRef = useRef<string | null>(null);
   
   // Queries
   const { data: consultation, isLoading } = trpc.consultation.getById.useQuery(
@@ -75,6 +83,8 @@ export default function ConsultationRoom() {
   const endMutation = trpc.consultation.end.useMutation({
     onSuccess: () => {
       toast.success(language === 'ar' ? 'انتهت الاستشارة' : 'Consultation ended');
+      // Cleanup before leaving
+      cleanupConnection();
       setLocation(user?.role === 'clinician' ? '/clinician/dashboard' : '/patient/portal');
     },
   });
@@ -85,34 +95,255 @@ export default function ConsultationRoom() {
     },
   });
   
-  // Initialize local video stream
+  // Initialize Socket.IO and WebRTC
   useEffect(() => {
-    let stream: MediaStream | null = null;
+    if (!user || !consultationId) return;
     
-    const initializeMedia = async () => {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
-        
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing media devices:', error);
-        toast.error(language === 'ar' ? 'فشل الوصول إلى الكاميرا/الميكروفون' : 'Failed to access camera/microphone');
+    // Connect to Socket.IO server
+    const socket = io(window.location.origin, {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+    });
+    
+    socketRef.current = socket;
+    
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket.id);
+      // Join consultation room
+      socket.emit('join-room', {
+        roomId,
+        userId: user.id,
+        role: user.role,
+      });
+      setIsConnecting(false);
+    });
+    
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+      toast.error(language === 'ar' ? 'فشل الاتصال بالخادم' : 'Failed to connect to server');
+    });
+    
+    // Handle existing participants
+    socket.on('existing-participants', (participants: string[]) => {
+      console.log('Existing participants:', participants);
+      if (participants.length > 0) {
+        remoteSocketIdRef.current = participants[0];
+        // Create offer for existing participant
+        createOffer(participants[0]);
       }
-    };
+    });
     
+    // Handle new user joining
+    socket.on('user-joined', ({ socketId, userId, role }) => {
+      console.log('User joined:', socketId, userId, role);
+      if (!remoteSocketIdRef.current) {
+        remoteSocketIdRef.current = socketId;
+        // Wait for offer from the new user
+      }
+    });
+    
+    // Handle user leaving
+    socket.on('user-left', ({ socketId }) => {
+      console.log('User left:', socketId);
+      if (socketId === remoteSocketIdRef.current) {
+        setRemoteConnected(false);
+        remoteSocketIdRef.current = null;
+        if (remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = null;
+        }
+        toast.info(language === 'ar' ? 'غادر الطرف الآخر' : 'Other participant left');
+      }
+    });
+    
+    // WebRTC signaling handlers
+    socket.on('offer', async ({ offer, from }) => {
+      console.log('Received offer from:', from);
+      remoteSocketIdRef.current = from;
+      await handleOffer(offer, from);
+    });
+    
+    socket.on('answer', async ({ answer }) => {
+      console.log('Received answer');
+      await handleAnswer(answer);
+    });
+    
+    socket.on('ice-candidate', async ({ candidate }) => {
+      console.log('Received ICE candidate');
+      await handleIceCandidate(candidate);
+    });
+    
+    // Chat message handler
+    socket.on('chat-message', ({ message, sender, senderName, timestamp }) => {
+      setChatMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        senderId: sender,
+        senderName,
+        message,
+        timestamp: new Date(timestamp),
+      }]);
+    });
+    
+    // Initialize local media
     initializeMedia();
     
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      cleanupConnection();
+    };
+  }, [user, consultationId, roomId, language]);
+  
+  const initializeMedia = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 1280, height: 720 },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      
+      localStreamRef.current = stream;
+      
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+      
+      console.log('Local media initialized');
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+      toast.error(language === 'ar' ? 'فشل الوصول إلى الكاميرا/الميكروفون' : 'Failed to access camera/microphone');
+    }
+  };
+  
+  const createPeerConnection = () => {
+    const configuration: RTCConfiguration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+      ],
+    };
+    
+    const pc = new RTCPeerConnection(configuration);
+    
+    // Add local stream tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => {
+        pc.addTrack(track, localStreamRef.current!);
+      });
+    }
+    
+    // Handle remote stream
+    pc.ontrack = (event) => {
+      console.log('Received remote track');
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = event.streams[0];
+        setRemoteConnected(true);
       }
     };
-  }, [language]);
+    
+    // Handle ICE candidates
+    pc.onicecandidate = (event) => {
+      if (event.candidate && socketRef.current && remoteSocketIdRef.current) {
+        socketRef.current.emit('ice-candidate', {
+          candidate: event.candidate,
+          to: remoteSocketIdRef.current,
+        });
+      }
+    };
+    
+    // Handle connection state changes
+    pc.onconnectionstatechange = () => {
+      console.log('Connection state:', pc.connectionState);
+      if (pc.connectionState === 'connected') {
+        toast.success(language === 'ar' ? 'تم الاتصال بنجاح' : 'Connected successfully');
+      } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+        toast.error(language === 'ar' ? 'فشل الاتصال' : 'Connection failed');
+      }
+    };
+    
+    peerConnectionRef.current = pc;
+    return pc;
+  };
+  
+  const createOffer = async (targetSocketId: string) => {
+    try {
+      const pc = createPeerConnection();
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      
+      socketRef.current?.emit('offer', {
+        offer,
+        to: targetSocketId,
+      });
+      
+      console.log('Offer sent to:', targetSocketId);
+    } catch (error) {
+      console.error('Error creating offer:', error);
+    }
+  };
+  
+  const handleOffer = async (offer: RTCSessionDescriptionInit, from: string) => {
+    try {
+      const pc = createPeerConnection();
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      
+      socketRef.current?.emit('answer', {
+        answer,
+        to: from,
+      });
+      
+      console.log('Answer sent');
+    } catch (error) {
+      console.error('Error handling offer:', error);
+    }
+  };
+  
+  const handleAnswer = async (answer: RTCSessionDescriptionInit) => {
+    try {
+      if (peerConnectionRef.current) {
+        await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+        console.log('Remote description set');
+      }
+    } catch (error) {
+      console.error('Error handling answer:', error);
+    }
+  };
+  
+  const handleIceCandidate = async (candidate: RTCIceCandidateInit) => {
+    try {
+      if (peerConnectionRef.current) {
+        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    } catch (error) {
+      console.error('Error adding ICE candidate:', error);
+    }
+  };
+  
+  const cleanupConnection = () => {
+    // Stop local stream
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+      localStreamRef.current = null;
+    }
+    
+    // Close peer connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    
+    // Disconnect socket
+    if (socketRef.current) {
+      socketRef.current.emit('leave-room', { roomId, userId: user?.id });
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+  };
   
   // Auto-scroll chat
   useEffect(() => {
@@ -127,9 +358,8 @@ export default function ConsultationRoom() {
   }, [consultation?.status]);
   
   const toggleVideo = () => {
-    if (localVideoRef.current?.srcObject) {
-      const stream = localVideoRef.current.srcObject as MediaStream;
-      const videoTrack = stream.getVideoTracks()[0];
+    if (localStreamRef.current) {
+      const videoTrack = localStreamRef.current.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         setIsVideoEnabled(videoTrack.enabled);
@@ -138,9 +368,8 @@ export default function ConsultationRoom() {
   };
   
   const toggleAudio = () => {
-    if (localVideoRef.current?.srcObject) {
-      const stream = localVideoRef.current.srcObject as MediaStream;
-      const audioTrack = stream.getAudioTracks()[0];
+    if (localStreamRef.current) {
+      const audioTrack = localStreamRef.current.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         setIsAudioEnabled(audioTrack.enabled);
@@ -155,20 +384,16 @@ export default function ConsultationRoom() {
   };
   
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !socketRef.current || !user) return;
     
-    const message: ChatMessage = {
-      id: Date.now().toString(),
-      senderId: user?.id || 0,
-      senderName: user?.name || 'User',
+    socketRef.current.emit('chat-message', {
+      roomId,
       message: newMessage,
-      timestamp: new Date(),
-    };
+      sender: user.id,
+      senderName: user.name || 'User',
+    });
     
-    setChatMessages(prev => [...prev, message]);
     setNewMessage("");
-    
-    // TODO: Send message via WebSocket or tRPC subscription
   };
   
   const handleSaveNotes = () => {
@@ -228,10 +453,24 @@ export default function ConsultationRoom() {
           </div>
           
           <div className="flex items-center gap-2">
-            <Badge className="bg-green-600">
-              <Clock className="w-3 h-3 mr-1" />
-              {consultation.duration || 0} {language === 'ar' ? 'دقيقة' : 'min'}
-            </Badge>
+            {isConnecting && (
+              <Badge className="bg-yellow-600">
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                {language === 'ar' ? 'جاري الاتصال...' : 'Connecting...'}
+              </Badge>
+            )}
+            {!isConnecting && remoteConnected && (
+              <Badge className="bg-green-600">
+                <Clock className="w-3 h-3 mr-1" />
+                {language === 'ar' ? 'متصل' : 'Connected'}
+              </Badge>
+            )}
+            {!isConnecting && !remoteConnected && (
+              <Badge className="bg-orange-600">
+                <Clock className="w-3 h-3 mr-1" />
+                {language === 'ar' ? 'في انتظار الطرف الآخر' : 'Waiting for other'}
+              </Badge>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -257,18 +496,22 @@ export default function ConsultationRoom() {
                 playsInline
                 className="w-full h-full object-cover"
               />
-              <div className="absolute bottom-4 left-4 bg-black/50 px-3 py-1 rounded-full text-white text-sm">
-                {otherParticipantName}
-              </div>
-              {/* Placeholder when no remote stream */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
-                <div className="text-center">
-                  <User className="w-24 h-24 text-gray-500 mx-auto mb-4" />
-                  <p className="text-gray-400">
-                    {language === 'ar' ? 'في انتظار الطرف الآخر...' : 'Waiting for other participant...'}
-                  </p>
+              {remoteConnected && (
+                <div className="absolute bottom-4 left-4 bg-black/50 px-3 py-1 rounded-full text-white text-sm">
+                  {otherParticipantName}
                 </div>
-              </div>
+              )}
+              {/* Placeholder when no remote stream */}
+              {!remoteConnected && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
+                  <div className="text-center">
+                    <User className="w-24 h-24 text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-400">
+                      {language === 'ar' ? 'في انتظار الطرف الآخر...' : 'Waiting for other participant...'}
+                    </p>
+                  </div>
+                </div>
+              )}
             </Card>
             
             {/* Local Video */}
@@ -278,7 +521,8 @@ export default function ConsultationRoom() {
                 autoPlay
                 playsInline
                 muted
-                className="w-full h-full object-cover mirror"
+                className="w-full h-full object-cover"
+                style={{ transform: 'scaleX(-1)' }}
               />
               <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-white text-xs">
                 {language === 'ar' ? 'أنت' : 'You'}
@@ -352,20 +596,14 @@ export default function ConsultationRoom() {
                         className={`flex ${msg.senderId === user?.id ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg px-3 py-2 ${
+                          className={`max-w-[80%] rounded-lg p-3 ${
                             msg.senderId === user?.id
                               ? 'bg-blue-600 text-white'
                               : 'bg-gray-700 text-white'
                           }`}
                         >
-                          <p className="text-xs font-semibold mb-1">{msg.senderName}</p>
+                          <p className="text-xs opacity-75 mb-1">{msg.senderName}</p>
                           <p className="text-sm">{msg.message}</p>
-                          <p className="text-xs opacity-70 mt-1">
-                            {msg.timestamp.toLocaleTimeString(language === 'ar' ? 'ar-IQ' : 'en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
                         </div>
                       </div>
                     ))}
@@ -393,27 +631,24 @@ export default function ConsultationRoom() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white text-lg flex items-center gap-2">
                       <FileText className="w-5 h-5" />
-                      {language === 'ar' ? 'ملاحظات' : 'Notes'}
+                      {language === 'ar' ? 'الملاحظات' : 'Notes'}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4 pt-0">
+                  <CardContent className="space-y-3">
                     <Textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder={language === 'ar' ? 'اكتب ملاحظاتك هنا...' : 'Write your notes here...'}
-                      className="bg-gray-700 border-gray-600 text-white min-h-[120px] mb-2"
+                      placeholder={language === 'ar' ? 'ملاحظات الاستشارة...' : 'Consultation notes...'}
+                      className="bg-gray-700 border-gray-600 text-white min-h-[120px]"
                     />
                     <Button
                       onClick={handleSaveNotes}
                       disabled={saveNotesMutation.isPending}
                       className="w-full"
-                      size="sm"
                     >
                       {saveNotesMutation.isPending ? (
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : (
-                        <FileText className="w-4 h-4 mr-2" />
-                      )}
+                      ) : null}
                       {language === 'ar' ? 'حفظ الملاحظات' : 'Save Notes'}
                     </Button>
                   </CardContent>
@@ -423,12 +658,6 @@ export default function ConsultationRoom() {
           )}
         </div>
       </div>
-      
-      <style>{`
-        .mirror {
-          transform: scaleX(-1);
-        }
-      `}</style>
     </div>
   );
 }
