@@ -36,6 +36,13 @@
       "when": 1766635675765,
       "tag": "0004_sudden_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1766841296955,
+      "tag": "0005_aberrant_omega_sentinel",
+      "breakpoints": true
     }
   ]
 }

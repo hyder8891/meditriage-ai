@@ -124,6 +124,11 @@ async function startServer() {
     // Initialize AEC Sentinel (error monitoring)
     const { initializeSentinel } = await import("../aec/sentinel-layer.js");
     initializeSentinel();
+    
+    // Initialize Self-Healing System
+    const { selfHealingSystem } = await import("./self-healing/index.js");
+    await selfHealingSystem.initialize();
+    console.log('✅ Self-healing system initialized');
   });
 }
 

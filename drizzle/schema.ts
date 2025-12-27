@@ -3860,3 +3860,9 @@ export const slotGenerationHistory = mysqlTable("slot_generation_history", {
 export type SlotGenerationHistory = typeof slotGenerationHistory.$inferSelect;
 export type InsertSlotGenerationHistory = typeof slotGenerationHistory.$inferInsert;
 
+
+// ============================================================================
+// Self-Healing System Tables
+// ============================================================================
+
+export * from "./self-healing-schema";

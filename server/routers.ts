@@ -33,6 +33,7 @@ import { loadTestRouter } from "./load-test-router";
 import { soapRouter } from "./soap-router";
 import { clinicalReasoningRouter } from "./routers/clinical-reasoning-router";
 import { calendarRouter } from "./calendar-router";
+import { selfHealingRouter } from "./self-healing-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -102,6 +103,7 @@ export const appRouter = router({
   calendar: calendarRouter,
   soap: soapRouter,
   clinicalReasoning: clinicalReasoningRouter,
+  selfHealing: selfHealingRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
