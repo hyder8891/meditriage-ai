@@ -258,8 +258,8 @@ function Router() {
         <Route path={"/admin/doctors"} component={SecureAdminDoctors} />
         
         {/* Analytics & Monitoring */}
-        <Route path={"/admin/budget"} component={AdminFeatures.AdminBudget} />
-        <Route path={"/admin/orchestration"} component={AdminFeatures.AdminOrchestration} />
+        <Route path={"/admin/budget"} component={BudgetTracking} />
+        <Route path={"/admin/orchestration"} component={OrchestrationLogs} />
         <Route path={"/admin/load-test"} component={AdminFeatures.AdminLoadTest} />
         <Route path={"/admin/self-healing"} component={AdminFeatures.AdminSelfHealing} />
         

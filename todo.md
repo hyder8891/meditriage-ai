@@ -1486,3 +1486,10 @@
 - [x] Test budget tracking calculations and aggregations  
 - [x] Test orchestration logs filtering and queries
 - [x] All 9 admin tests passing successfully
+
+## URGENT: Core Admin Dashboard Functions Not Working (User Reported)
+- [x] Audit all admin dashboard functions and identify which ones are broken
+- [x] User Management - Already functional at /admin/dashboard and /admin/users
+- [x] Implement functional UI for Budget Tracking (/admin/budget) - Fixed routing
+- [x] Implement functional UI for Orchestration Logs (/admin/orchestration) - Fixed routing
+- [x] Test budget tracking and orchestration logs end-to-end - All 9 tests passing
