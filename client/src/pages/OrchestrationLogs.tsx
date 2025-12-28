@@ -5,6 +5,7 @@
 
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
+import { AdminLayout } from "@/components/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +77,8 @@ export default function OrchestrationLogs() {
   const [moduleFilter, setModuleFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [page, setPage] = useState(0);
+  const limit = 50;
 
   // Calculate date range
   const { startDate, endDate } = useMemo(() => {
@@ -103,26 +106,31 @@ export default function OrchestrationLogs() {
     };
   }, [timeRange]);
 
-  // Fetch orchestration logs
-  const { data: logs, isLoading, refetch } = trpc.orchestration.getMyLogs.useQuery({
-    startDate,
-    endDate,
-    status: statusFilter === "all" ? undefined : statusFilter,
+  // Fetch orchestration logs from admin endpoint
+  const { data: logsData, isLoading, refetch } = trpc.admin.getOrchestrationLogs.useQuery({
+    startDate: new Date(startDate),
+    endDate: new Date(endDate),
+    status: statusFilter === "all" ? undefined : (statusFilter as any),
     module: moduleFilter === "all" ? undefined : moduleFilter,
-    limit: 100,
+    limit,
+    offset: page * limit,
   });
+  
+  const logs = logsData?.logs || [];
+  const totalLogs = logsData?.total || 0;
+  const hasMore = logsData?.hasMore || false;
 
-  // Filter logs by search query
+  // Filter logs by search query (client-side for current page)
   const filteredLogs = useMemo(() => {
-    if (!logs) return [];
+    if (!logs || logs.length === 0) return [];
     if (!searchQuery.trim()) return logs;
 
     const query = searchQuery.toLowerCase();
     return logs.filter(
-      (log) =>
-        log.requestId.toLowerCase().includes(query) ||
-        log.module.toLowerCase().includes(query) ||
-        log.operation.toLowerCase().includes(query) ||
+      (log: any) =>
+        log.requestId?.toLowerCase().includes(query) ||
+        log.module?.toLowerCase().includes(query) ||
+        log.operation?.toLowerCase().includes(query) ||
         (log.errorMessage && log.errorMessage.toLowerCase().includes(query))
     );
   }, [logs, searchQuery]);
@@ -154,24 +162,26 @@ export default function OrchestrationLogs() {
 
   if (isLoading) {
     return (
-      <div className="container py-8 space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
+      <AdminLayout>
+        <div className="container py-8 space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid gap-4 md:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-4 w-24" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-32" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-4 w-24" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-32" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      </AdminLayout>
     );
   }
 
@@ -193,7 +203,8 @@ export default function OrchestrationLogs() {
   }, [logs]);
 
   return (
-    <div className="container py-8 space-y-6">
+    <AdminLayout>
+      <div className="container py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -351,7 +362,7 @@ export default function OrchestrationLogs() {
                     onClick={() => setSelectedLog(log)}
                   >
                     <TableCell className="text-sm">
-                      {formatTimestamp(log.startedAt)}
+                      {formatTimestamp(log.startTime)}
                     </TableCell>
                     <TableCell>
                       <span className="font-medium">
@@ -410,7 +421,7 @@ export default function OrchestrationLogs() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Started At</p>
-                  <p className="text-sm">{formatTimestamp(selectedLog.startedAt)}</p>
+                  <p className="text-sm">{formatTimestamp(selectedLog.startTime)}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Duration</p>
@@ -438,5 +449,6 @@ export default function OrchestrationLogs() {
         </DialogContent>
       </Dialog>
     </div>
+    </AdminLayout>
   );
 }

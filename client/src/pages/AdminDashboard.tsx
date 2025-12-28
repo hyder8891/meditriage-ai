@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { TableSkeleton } from "@/components/SkeletonLoader";
 import { Link } from "wouter";
+import { useEffect } from "react";
 import { AppLogo } from "@/components/AppLogo";
 import { AdminLayout } from "@/components/AdminLayout";
 
@@ -33,6 +34,15 @@ export default function AdminDashboard() {
   
   // Fetch system stats
   const { data: stats, isLoading: statsLoading } = trpc.admin.getSystemStats.useQuery();
+  
+  // Fetch real-time dashboard analytics
+  const { data: analytics, isLoading: analyticsLoading } = trpc.admin.getDashboardAnalytics.useQuery();
+  
+  // Fetch system health
+  const { data: systemHealth } = trpc.admin.getSystemHealth.useQuery();
+  
+  // Fetch budget summary
+  const { data: budgetSummary } = trpc.admin.getBudgetSummary.useQuery({ timeRange: "today" });
 
   // Mutations
   const verifyClinicianMutation = trpc.admin.verifyClinician.useMutation({
@@ -169,7 +179,100 @@ export default function AdminDashboard() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            {/* Stats Cards */}
+            {/* Real-Time Analytics Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Users Today</CardTitle>
+                  <Activity className="h-4 w-4 text-blue-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analytics?.activeUsersToday || 0}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Real-time activity
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Triage Sessions</CardTitle>
+                  <FileText className="h-4 w-4 text-purple-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analytics?.triageSessionsToday || 0}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Today's sessions
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Consultations</CardTitle>
+                  <Users className="h-4 w-4 text-teal-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analytics?.consultationsToday || 0}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Today's consultations
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Cost Today</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">${analytics?.costTodayUSD || "0.00"}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    API usage cost
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Error Rate</CardTitle>
+                  <AlertCircle className="h-4 w-4 text-orange-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analytics?.errorRatePercent || "0.00"}%</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Today's error rate
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* System Health Alert */}
+            {systemHealth && systemHealth.overallStatus !== "healthy" && (
+              <Card className={systemHealth.overallStatus === "down" ? "border-red-200 bg-red-50" : "border-orange-200 bg-orange-50"}>
+                <CardHeader>
+                  <CardTitle className={systemHealth.overallStatus === "down" ? "text-red-800" : "text-orange-800"} >
+                    <AlertCircle className="h-5 w-5 inline mr-2" />
+                    System Health Warning
+                  </CardTitle>
+                  <CardDescription className={systemHealth.overallStatus === "down" ? "text-red-700" : "text-orange-700"}>
+                    {systemHealth.servicesDown > 0 && `${systemHealth.servicesDown} service(s) down. `}
+                    {systemHealth.servicesDegraded > 0 && `${systemHealth.servicesDegraded} service(s) degraded.`}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => setSelectedTab("activity")}
+                    variant="outline"
+                    className={systemHealth.overallStatus === "down" ? "border-red-300 hover:bg-red-100" : "border-orange-300 hover:bg-orange-100"}
+                  >
+                    View System Health Details
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* User Stats Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -433,8 +536,128 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Activity Tab */}
-          <TabsContent value="activity" className="space-y-4">
+          {/* Activity Tab - System Health & Monitoring */}
+          <TabsContent value="activity" className="space-y-6">
+            {/* System Health Overview */}
+            <Card>
+              <CardHeader>
+                <CardTitle>System Health Status</CardTitle>
+                <CardDescription>Real-time service monitoring</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-lg border">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${
+                        systemHealth?.overallStatus === "healthy" ? "bg-green-500" :
+                        systemHealth?.overallStatus === "degraded" ? "bg-orange-500" : "bg-red-500"
+                      }`}></div>
+                      <div>
+                        <p className="font-semibold">Overall System Status</p>
+                        <p className="text-sm text-muted-foreground">
+                          {systemHealth?.overallStatus === "healthy" && "All systems operational"}
+                          {systemHealth?.overallStatus === "degraded" && "Some services experiencing issues"}
+                          {systemHealth?.overallStatus === "down" && "Critical services offline"}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant={
+                      systemHealth?.overallStatus === "healthy" ? "outline" :
+                      systemHealth?.overallStatus === "degraded" ? "secondary" : "destructive"
+                    } className={
+                      systemHealth?.overallStatus === "healthy" ? "bg-green-50 text-green-700 border-green-200" :
+                      systemHealth?.overallStatus === "degraded" ? "bg-orange-50 text-orange-700 border-orange-200" :
+                      "bg-red-50 text-red-700 border-red-200"
+                    }>
+                      {systemHealth?.overallStatus?.toUpperCase() || "UNKNOWN"}
+                    </Badge>
+                  </div>
+
+                  {systemHealth?.metrics && systemHealth.metrics.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm">Service Details</h4>
+                      {systemHealth.metrics.slice(0, 10).map((metric, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 rounded border">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              metric.status === "healthy" ? "bg-green-500" :
+                              metric.status === "degraded" ? "bg-orange-500" : "bg-red-500"
+                            }`}></div>
+                            <span className="text-sm font-medium">{metric.service}</span>
+                            {metric.endpoint && (
+                              <span className="text-xs text-muted-foreground">({metric.endpoint})</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4">
+                            {metric.responseTime && (
+                              <span className="text-xs text-muted-foreground">
+                                {metric.responseTime}ms
+                              </span>
+                            )}
+                            <Badge variant="outline" className="text-xs">
+                              {metric.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Budget Overview */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Budget Overview (Today)</CardTitle>
+                <CardDescription>API usage and costs</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="p-4 rounded-lg border">
+                      <p className="text-sm text-muted-foreground">Total Cost</p>
+                      <p className="text-2xl font-bold">${budgetSummary?.summary.totalCostUSD || "0.00"}</p>
+                    </div>
+                    <div className="p-4 rounded-lg border">
+                      <p className="text-sm text-muted-foreground">Total Requests</p>
+                      <p className="text-2xl font-bold">{budgetSummary?.summary.totalRequests || 0}</p>
+                    </div>
+                    <div className="p-4 rounded-lg border">
+                      <p className="text-sm text-muted-foreground">Total Tokens</p>
+                      <p className="text-2xl font-bold">{(budgetSummary?.summary.totalTokens || 0).toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  {budgetSummary?.costByModule && budgetSummary.costByModule.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Cost by Module</h4>
+                      <div className="space-y-2">
+                        {budgetSummary.costByModule.slice(0, 5).map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between p-2 rounded border">
+                            <span className="text-sm">{item.module}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-muted-foreground">{item.requestCount} requests</span>
+                              <span className="text-sm font-semibold">${((item.totalCostCents || 0) / 100).toFixed(2)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-2">
+                    <Link to="/admin/budget">
+                      <Button variant="outline" className="w-full">
+                        View Full Budget Dashboard
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Links */}
             <Card>
               <CardHeader>
                 <CardTitle>System Activity</CardTitle>

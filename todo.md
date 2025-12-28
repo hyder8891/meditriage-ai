@@ -1371,3 +1371,118 @@
 - [x] Lab Results Integration Dashboard (labRouter integration)
 - [x] Triage Queue Monitoring (real-time queue status)
 - [x] System Settings Panel (configuration management)
+
+
+## Admin Panel Enhancement - Backend Control Center
+
+### Database Schema Extensions
+- [x] Create admin_activity_logs table for audit trail (using existing account_activity)
+- [x] Create system_metrics table for performance monitoring (using existing system_health_metrics)
+- [x] Create budget_entries table for financial tracking (using existing budget_tracking)
+- [x] Create orchestration_execution_logs table for Avicenna-X monitoring (using existing orchestration_logs)
+- [ ] Add indexes for performance optimization on large tables
+
+### Backend tRPC Procedures - Admin Router
+- [ ] Add getActivityLogs procedure with pagination and filtering
+- [ ] Add getSystemMetrics procedure for real-time performance data
+- [x] Add getBudgetSummary and getBudgetTrend procedures
+- [x] Add getOrchestrationLogs procedure with filtering by phase/status
+- [x] Add getOrchestrationStats procedure for statistics
+- [x] Add getSystemHealth procedure for health monitoring
+- [x] Add getDashboardAnalytics procedure with aggregated metrics
+- [ ] Add exportData procedures for CSV/Excel exports
+- [ ] Add bulkUserOperations procedures (bulk verify, bulk delete)
+
+### Admin Dashboard UI Enhancements
+- [x] Add real-time system health monitoring widget
+- [x] Add AI function usage statistics (BRAIN, PharmaGuard, etc.)
+- [x] Add error rate monitoring and alerting
+- [ ] Add database size and growth tracking
+- [ ] Add API response time charts
+- [ ] Add user engagement metrics (DAU, MAU, retention)
+- [ ] Add revenue/subscription tracking integration
+
+### Budget Tracking Feature
+- [x] Connect BudgetTracking.tsx to real backend data
+- [x] Add expense categorization (API costs, infrastructure, etc.)
+- [ ] Add budget alerts and threshold notifications
+- [ ] Add cost per user/session analytics
+- [x] Add monthly/yearly cost trends visualization
+- [ ] Add export budget reports functionality
+
+### Orchestration Logs Feature
+- [x] Connect OrchestrationLogs.tsx to real backend data
+- [x] Add filtering by execution phase (SENSE, THINK, ACT)
+- [x] Add filtering by status (success, failure, pending)
+- [x] Add execution time tracking and performance metrics
+- [x] Add error details and stack traces for failed executions
+- [x] Add search functionality for specific patient cases
+- [ ] Add export logs functionality
+
+### Triage Queue Monitoring
+- [ ] Create TriageQueue.tsx page for real-time monitoring
+- [ ] Add live queue status with priority levels
+- [ ] Add average wait time calculations
+- [ ] Add patient distribution by urgency level
+- [ ] Add real-time updates using polling or WebSocket
+- [ ] Add queue management actions (reassign, escalate)
+- [ ] Add historical queue performance analytics
+
+### User Management Enhancements
+- [ ] Add user search and advanced filtering
+- [ ] Add bulk operations (select multiple users)
+- [ ] Add user activity timeline view
+- [ ] Add user engagement scoring
+- [ ] Add user export functionality (CSV/Excel)
+- [ ] Add user impersonation for support (with audit log)
+- [ ] Add user communication tools (send notifications)
+
+### System Monitoring & Alerts
+- [ ] Add real-time error monitoring dashboard
+- [ ] Add automated alert system for critical issues
+- [ ] Add performance degradation detection
+- [ ] Add database connection pool monitoring
+- [ ] Add API rate limiting status
+- [ ] Add storage usage monitoring
+- [ ] Add email notification system for admins
+
+### Analytics & Reporting
+- [ ] Add comprehensive analytics dashboard
+- [ ] Add AI accuracy metrics over time
+- [ ] Add user journey analytics
+- [ ] Add conversion funnel analysis
+- [ ] Add feature usage heatmap
+- [ ] Add custom report builder
+- [ ] Add scheduled report generation and email delivery
+
+### Security & Audit
+- [ ] Add comprehensive audit logging for all admin actions
+- [ ] Add IP tracking and geolocation for admin logins
+- [ ] Add session management and force logout capability
+- [ ] Add two-factor authentication for admin accounts
+- [ ] Add role-based access control refinement
+- [ ] Add security event monitoring
+- [ ] Add compliance reporting (HIPAA, GDPR)
+
+### Testing & Quality
+- [ ] Write vitest tests for all new admin procedures
+- [ ] Write vitest tests for budget tracking operations
+- [ ] Write vitest tests for orchestration logs queries
+- [ ] Write vitest tests for triage queue monitoring
+- [ ] Write vitest tests for activity logging
+- [ ] Write vitest tests for analytics calculations
+- [ ] Test admin panel performance with large datasets
+
+### Documentation & Deployment
+- [ ] Document admin panel features and usage
+- [ ] Create admin user guide
+- [ ] Add inline help and tooltips
+- [ ] Create checkpoint after admin enhancements
+- [ ] Verify all admin features work in production
+
+
+### Admin Panel Testing Completed
+- [x] Write vitest tests for admin router procedures
+- [x] Test budget tracking calculations and aggregations  
+- [x] Test orchestration logs filtering and queries
+- [x] All 9 admin tests passing successfully
