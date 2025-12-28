@@ -58,17 +58,51 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
   }
 
   const menuItems = [
-    { icon: Activity, label: language === 'ar' ? 'لوحة التحكم' : 'Dashboard', path: '/clinician/dashboard' },
-    { icon: TrendingUp, label: language === 'ar' ? 'التشخيص السريري' : 'Clinical Reasoning', path: '/clinician/reasoning' },
-    { icon: Pill, label: language === 'ar' ? 'حارس الأدوية' : 'PharmaGuard', path: '/clinician/pharmaguard' },
-    { icon: Mic, label: language === 'ar' ? 'الكاتب الحي' : 'Live Scribe', path: '/clinician/live-scribe' },
-    { icon: FileText, label: language === 'ar' ? 'نتائج التحاليل' : 'Lab Results', path: '/clinician/lab-results' },
-    { icon: FileImage, label: language === 'ar' ? 'التصوير الطبي' : 'Medical Imaging', path: '/clinician/xray-analysis' },
-    { icon: FileText, label: language === 'ar' ? 'التقارير الطبية' : 'Medical Reports', path: '/clinician/medical-reports' },
-    { icon: Calendar, label: language === 'ar' ? 'التقويم' : 'Calendar', path: '/clinician/calendar' },
-    { icon: Pill, label: language === 'ar' ? 'الأدوية' : 'Medications', path: '/clinician/medications' },
-    { icon: Users, label: language === 'ar' ? 'المرضى' : 'Patients', path: '/clinician/my-patients' },
-    { icon: MessageSquare, label: language === 'ar' ? 'الرسائل' : 'Messages', path: '/clinician/messages', badge: unreadCount },
+    // Dashboard
+    { icon: Activity, label: language === 'ar' ? 'لوحة التحكم' : 'Dashboard', path: '/clinician/dashboard', section: 'main' },
+    
+    // Clinical Tools
+    { icon: TrendingUp, label: language === 'ar' ? 'التشخيص السريري' : 'Clinical Reasoning', path: '/clinician/reasoning', section: 'clinical' },
+    { icon: Stethoscope, label: language === 'ar' ? 'التوجيه السريري' : 'Clinical Routers', path: '/clinician/clinical-routers', section: 'clinical' },
+    { icon: Activity, label: language === 'ar' ? 'قائمة الفرز' : 'Triage Queue', path: '/clinician/triage-queue', section: 'clinical' },
+    { icon: Mic, label: language === 'ar' ? 'تحليل الصوت' : 'Audio Analysis', path: '/clinician/audio-analysis', section: 'clinical' },
+    { icon: FileText, label: language === 'ar' ? 'النماذج الذكية' : 'Smart Forms', path: '/clinician/smart-forms', section: 'clinical' },
+    
+    // Medical Tools
+    { icon: Pill, label: language === 'ar' ? 'حارس الأدوية' : 'PharmaGuard', path: '/clinician/pharmaguard', section: 'medical' },
+    { icon: Mic, label: language === 'ar' ? 'الكاتب الحي' : 'Live Scribe', path: '/clinician/live-scribe', section: 'medical' },
+    { icon: FileText, label: language === 'ar' ? 'نتائج التحاليل' : 'Lab Results', path: '/clinician/lab-results', section: 'medical' },
+    { icon: FileImage, label: language === 'ar' ? 'التصوير الطبي' : 'Medical Imaging', path: '/clinician/xray-analysis', section: 'medical' },
+    { icon: FileText, label: language === 'ar' ? 'التقارير الطبية' : 'Medical Reports', path: '/clinician/medical-reports', section: 'medical' },
+    
+    // Patient Engagement
+    { icon: Users, label: language === 'ar' ? 'المرضى' : 'Patients', path: '/clinician/my-patients', section: 'patients' },
+    { icon: MessageSquare, label: language === 'ar' ? 'الرسائل' : 'Messages', path: '/clinician/messages', badge: unreadCount, section: 'patients' },
+    { icon: MessageSquare, label: language === 'ar' ? 'المحادثات' : 'Conversations', path: '/clinician/conversations', section: 'patients' },
+    { icon: FileText, label: language === 'ar' ? 'سجل المحادثات' : 'Chat History', path: '/clinician/chat-history', section: 'patients' },
+    { icon: Activity, label: language === 'ar' ? 'الأجهزة القابلة للارتداء' : 'Wearables', path: '/clinician/wearables', section: 'patients' },
+    { icon: Calendar, label: language === 'ar' ? 'التقويم' : 'Calendar', path: '/clinician/calendar', section: 'patients' },
+    { icon: Pill, label: language === 'ar' ? 'الأدوية' : 'Medications', path: '/clinician/medications', section: 'patients' },
+    
+    // Environmental Health
+    { icon: Activity, label: language === 'ar' ? 'تنبيهات الطقس' : 'Weather Alerts', path: '/clinician/weather-alerts', section: 'environment' },
+    { icon: Activity, label: language === 'ar' ? 'جودة الهواء' : 'Air Quality', path: '/clinician/air-quality', section: 'environment' },
+    
+    // Analytics & Monitoring
+    { icon: TrendingUp, label: language === 'ar' ? 'تتبع الميزانية' : 'Budget Tracking', path: '/clinician/budget-tracking', section: 'analytics' },
+    { icon: FileText, label: language === 'ar' ? 'سجلات النظام' : 'Orchestration Logs', path: '/clinician/orchestration-logs', section: 'analytics' },
+    { icon: Activity, label: language === 'ar' ? 'اختبار الأداء' : 'Load Testing', path: '/admin/load-test', section: 'analytics' },
+    { icon: Activity, label: language === 'ar' ? 'الإصلاح الذاتي' : 'Self-Healing', path: '/admin/self-healing', section: 'analytics' },
+    
+    // Business Features
+    { icon: Home, label: language === 'ar' ? 'بوابة B2B2C' : 'B2B2C Portal', path: '/clinician/b2b2c-portal', section: 'business' },
+    { icon: Activity, label: language === 'ar' ? 'مزاد الموارد' : 'Resource Auction', path: '/clinician/resource-auction', section: 'business' },
+    { icon: FileText, label: language === 'ar' ? 'التفضيلات' : 'Preferences', path: '/settings', section: 'business' },
+    
+    // Auth & Config
+    { icon: Activity, label: language === 'ar' ? 'المصادقة بالهاتف' : 'Phone Auth', path: '/clinician/phone-auth', section: 'config' },
+    { icon: Activity, label: language === 'ar' ? 'إعدادات OAuth' : 'OAuth Config', path: '/clinician/oauth-config', section: 'config' },
+    { icon: Activity, label: language === 'ar' ? 'التأهيل' : 'Onboarding', path: '/clinician/onboarding-setup', section: 'config' },
   ];
 
   // Bottom nav items for mobile (most important 4)

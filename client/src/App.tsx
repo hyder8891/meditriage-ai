@@ -98,6 +98,20 @@ const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
 const MyDoctor = lazy(() => import("./pages/MyDoctor"));
 const SelfHealingDashboard = lazy(() => import("./pages/SelfHealingDashboard"));
+const TriageQueue = lazy(() => import("./pages/TriageQueue"));
+const ClinicalRouters = lazy(() => import("./pages/ClinicalRouters"));
+const AudioAnalysis = lazy(() => import("./pages/AudioAnalysis"));
+const SmartForms = lazy(() => import("./pages/SmartForms"));
+const Wearables = lazy(() => import("./pages/Wearables"));
+const WeatherAlerts = lazy(() => import("./pages/WeatherAlerts"));
+const AirQuality = lazy(() => import("./pages/AirQuality"));
+const Conversations = lazy(() => import("./pages/Conversations"));
+const ChatHistory = lazy(() => import("./pages/ChatHistory"));
+const B2B2CPortal = lazy(() => import("./pages/B2B2CPortal"));
+const ResourceAuction = lazy(() => import("./pages/ResourceAuction"));
+const PhoneAuth = lazy(() => import("./pages/PhoneAuth"));
+const OAuthConfig = lazy(() => import("./pages/OAuthConfig"));
+const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
 const SecureAdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const SecureAdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const SecureAdminPatients = lazy(() => import("./pages/admin/AdminPatients"));
@@ -235,6 +249,48 @@ function Router() {
         </Route>
         <Route path={"/clinician/patient-vitals"}>
           {() => <ProtectedRoute requiredRole="clinician"><PatientVitalsViewer /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/triage-queue"}>
+          {() => <ProtectedRoute requiredRole="clinician"><TriageQueue /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/clinical-routers"}>
+          {() => <ProtectedRoute requiredRole="clinician"><ClinicalRouters /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/audio-analysis"}>
+          {() => <ProtectedRoute requiredRole="clinician"><AudioAnalysis /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/smart-forms"}>
+          {() => <ProtectedRoute requiredRole="clinician"><SmartForms /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/wearables"}>
+          {() => <ProtectedRoute requiredRole="clinician"><Wearables /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/weather-alerts"}>
+          {() => <ProtectedRoute requiredRole="clinician"><WeatherAlerts /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/air-quality"}>
+          {() => <ProtectedRoute requiredRole="clinician"><AirQuality /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/conversations"}>
+          {() => <ProtectedRoute requiredRole="clinician"><Conversations /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/chat-history"}>
+          {() => <ProtectedRoute requiredRole="clinician"><ChatHistory /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/b2b2c-portal"}>
+          {() => <ProtectedRoute requiredRole="clinician"><B2B2CPortal /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/resource-auction"}>
+          {() => <ProtectedRoute requiredRole="clinician"><ResourceAuction /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/phone-auth"}>
+          {() => <ProtectedRoute requiredRole="clinician"><PhoneAuth /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/oauth-config"}>
+          {() => <ProtectedRoute requiredRole="clinician"><OAuthConfig /></ProtectedRoute>}
+        </Route>
+        <Route path={"/clinician/onboarding-setup"}>
+          {() => <ProtectedRoute requiredRole="clinician"><OnboardingPage /></ProtectedRoute>}
         </Route>
         <Route path={"/clinician/budget-tracking"}>
           {() => <ProtectedRoute requiredRole="clinician"><BudgetTracking /></ProtectedRoute>}
