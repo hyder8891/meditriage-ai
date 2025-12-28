@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Loader2, Send, User, Sparkles } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo, useCallback, useMemo } from "react";
 import { Streamdown } from "streamdown";
 
 /**
@@ -110,7 +110,7 @@ export type AIChatBoxProps = {
  * };
  * ```
  */
-export function AIChatBox({
+export const AIChatBox = memo(function AIChatBox({
   messages,
   onSendMessage,
   isLoading = false,
@@ -165,7 +165,7 @@ export function AIChatBox({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     const trimmedInput = input.trim();
     if (!trimmedInput || isLoading) return;
@@ -178,14 +178,14 @@ export function AIChatBox({
 
     // Keep focus on input
     textareaRef.current?.focus();
-  };
+  }, [input, isLoading, onSendMessage]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
-  };
+  }, [handleSubmit]);
 
   return (
     <div
@@ -332,4 +332,4 @@ export function AIChatBox({
       </form>
     </div>
   );
-}
+});

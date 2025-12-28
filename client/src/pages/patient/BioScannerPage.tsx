@@ -24,12 +24,12 @@ import { VitalsTrendsChart } from "@/components/VitalsTrendsChart";
 export default function BioScannerPage() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
-  const [lastResult, setLastResult] = useState<{ bpm: number; confidence: number } | null>(null);
+  const [lastResult, setLastResult] = useState<{ heartRate: number; confidence: number } | null>(null);
 
   const { data: stats, refetch: refetchStats } = trpc.vitals.getStats.useQuery();
   const { data: recentVitals, refetch: refetchRecent } = trpc.vitals.getRecent.useQuery({ limit: 5 });
 
-  const handleScanComplete = (result: { bpm: number; confidence: number }) => {
+  const handleScanComplete = (result: { heartRate: number; confidence: number }) => {
     setLastResult(result);
     // Refetch stats and recent vitals after successful scan
     setTimeout(() => {
@@ -111,12 +111,12 @@ export default function BioScannerPage() {
                       </h3>
                       <p className="text-sm text-green-700 mb-3">
                         {language === 'ar' 
-                          ? `معدل النبض: ${lastResult.bpm} نبضة/دقيقة`
-                          : `Heart Rate: ${lastResult.bpm} BPM`}
+                          ? `معدل النبض: ${lastResult.heartRate} نبضة/دقيقة`
+                          : `Heart Rate: ${lastResult.heartRate} BPM`}
                       </p>
                       <div className="flex items-center gap-3 text-sm">
-                        <Badge className={getHeartRateStatus(lastResult.bpm).color}>
-                          {getHeartRateStatus(lastResult.bpm).label}
+                        <Badge className={getHeartRateStatus(lastResult.heartRate).color}>
+                          {getHeartRateStatus(lastResult.heartRate).label}
                         </Badge>
                         <span className="text-green-700">
                           {language === 'ar' ? 'الدقة:' : 'Confidence:'} {lastResult.confidence}%

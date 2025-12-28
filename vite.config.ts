@@ -24,6 +24,51 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Optimize chunk splitting for better performance and memory usage
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom'],
+          'router': ['wouter'],
+          'ui-radix': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-select',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-tooltip',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-scroll-area',
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-avatar',
+            '@radix-ui/react-checkbox',
+          ],
+          'charts': ['recharts'],
+          'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'trpc': ['@trpc/client', '@trpc/react-query', '@tanstack/react-query'],
+          'markdown': ['streamdown'],
+        },
+      },
+    },
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+    // Disable source maps in production for smaller bundle
+    sourcemap: false,
+    // Optimize minification
+    minify: 'esbuild',
+    target: 'es2015',
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'wouter',
+      '@trpc/client',
+      '@trpc/react-query',
+      '@tanstack/react-query',
+    ],
+    // Exclude heavy 3D libraries that aren't used on most pages
+    exclude: ['@react-three/fiber', '@react-three/drei', 'three'],
   },
   server: {
     host: true,

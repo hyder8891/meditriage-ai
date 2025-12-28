@@ -4100,3 +4100,6 @@ export const rlTrainingEpisodes = mysqlTable("rl_training_episodes", {
 
 export type RlTrainingEpisode = typeof rlTrainingEpisodes.$inferSelect;
 export type InsertRlTrainingEpisode = typeof rlTrainingEpisodes.$inferInsert;
+
+// Export consultations schema
+export * from "./schema-consultations";

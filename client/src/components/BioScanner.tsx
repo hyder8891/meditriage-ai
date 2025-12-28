@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
@@ -49,688 +49,486 @@ class ProgressiveBioEngine {
     this.recentReadings = [];
   }
 
-  /**
-   * Calculate median absolute deviation for outlier detection
-   */
-  private calculateMAD(values: number[]): number {
-    if (values.length === 0) return 0;
+  addSample(intensity: number) {
+    const now = performance.now();
+    this.buffer.push(intensity);
+    this.timestamps.push(now);
+
+    // Update FPS dynamically
+    if (this.timestamps.length > 1) {
+      const elapsed = (now - this.timestamps[0]) / 1000;
+      if (elapsed > 0) {
+        this.fps = Math.max(15, Math.min(60, this.timestamps.length / elapsed));
+      }
+    }
+
+    // Keep buffer size manageable
+    if (this.buffer.length > this.WINDOW_SIZE) {
+      this.buffer.shift();
+      this.timestamps.shift();
+    }
+  }
+
+  // Median Absolute Deviation for outlier detection
+  private calculateMAD(values: number[]): { median: number; mad: number } {
     const sorted = [...values].sort((a, b) => a - b);
     const median = sorted[Math.floor(sorted.length / 2)];
     const deviations = values.map(v => Math.abs(v - median));
-    const sortedDevs = deviations.sort((a, b) => a - b);
-    return sortedDevs[Math.floor(sortedDevs.length / 2)];
+    const sortedDev = deviations.sort((a, b) => a - b);
+    const mad = sortedDev[Math.floor(sortedDev.length / 2)];
+    return { median, mad };
   }
 
-  /**
-   * Get stabilized BPM using multi-measurement averaging with outlier rejection
-   */
-  getStabilizedBPM(): { bpm: number; confidence: number; isStable: boolean; sampleSize: number } | null {
+  // Filter outliers using MAD
+  private filterOutliers(readings: Array<{ bpm: number; confidence: number; timestamp: number }>) {
+    if (readings.length < 3) return readings;
+    
+    const bpms = readings.map(r => r.bpm);
+    const { median, mad } = this.calculateMAD(bpms);
+    
+    // Modified Z-score threshold (3.5 is standard for outlier detection)
+    const threshold = 3.5;
+    
+    return readings.filter(r => {
+      const modifiedZ = Math.abs(0.6745 * (r.bpm - median) / (mad || 1));
+      return modifiedZ < threshold;
+    });
+  }
+
+  // Calculate coefficient of variation
+  private calculateCV(values: number[]): number {
+    if (values.length < 2) return 100;
+    const mean = values.reduce((a, b) => a + b, 0) / values.length;
+    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+    const std = Math.sqrt(variance);
+    return (std / mean) * 100;
+  }
+
+  // Get averaged BPM with outlier rejection
+  getAveragedBPM(): { bpm: number; confidence: number; isStable: boolean; sampleSize: number } | null {
     if (this.recentReadings.length < this.MIN_READINGS_FOR_AVERAGE) {
       return null;
     }
 
-    // Get last 5 readings for averaging
-    const recent = this.recentReadings.slice(-5);
-    const bpmValues = recent.map(r => r.bpm);
-    
-    // Calculate median and MAD for outlier detection
-    const median = [...bpmValues].sort((a, b) => a - b)[Math.floor(bpmValues.length / 2)];
-    const mad = this.calculateMAD(bpmValues);
-    const madThreshold = 2.5; // Standard outlier threshold
-    
     // Filter outliers
-    const filtered = recent.filter(r => {
-      const deviation = Math.abs(r.bpm - median);
-      return mad === 0 || deviation <= madThreshold * mad;
-    });
+    const filtered = this.filterOutliers(this.recentReadings);
     
-    if (filtered.length === 0) return null;
-    
+    if (filtered.length < this.MIN_READINGS_FOR_AVERAGE) {
+      return null;
+    }
+
     // Confidence-weighted average
-    let weightedSum = 0;
-    let weightSum = 0;
+    const totalWeight = filtered.reduce((sum, r) => sum + r.confidence, 0);
+    const weightedBPM = filtered.reduce((sum, r) => sum + (r.bpm * r.confidence), 0) / totalWeight;
     
-    filtered.forEach(r => {
-      const weight = r.confidence / 100; // Convert percentage to 0-1
-      weightedSum += r.bpm * weight;
-      weightSum += weight;
-    });
+    // Average confidence
+    const avgConfidence = totalWeight / filtered.length;
     
-    const avgBpm = Math.round(weightedSum / weightSum);
-    const avgConfidence = Math.round(filtered.reduce((sum, r) => sum + r.confidence, 0) / filtered.length);
-    
-    // Calculate coefficient of variation to detect stability
-    const mean = filtered.reduce((sum, r) => sum + r.bpm, 0) / filtered.length;
-    const variance = filtered.reduce((sum, r) => sum + Math.pow(r.bpm - mean, 2), 0) / filtered.length;
-    const stdDev = Math.sqrt(variance);
-    const coefficientOfVariation = (stdDev / mean) * 100;
-    
-    const isStable = coefficientOfVariation < 5; // Stable if CV < 5%
-    
+    // Check stability (CV < 5% means stable)
+    const bpms = filtered.map(r => r.bpm);
+    const cv = this.calculateCV(bpms);
+    const isStable = cv < 5;
+
     return {
-      bpm: avgBpm,
+      bpm: Math.round(weightedBPM),
       confidence: avgConfidence,
       isStable,
       sampleSize: filtered.length
     };
   }
 
-  process(imageData: ImageData): { bpm: number | null; confidence: number; val: number; debug: string; peaks?: number } {
-    const now = performance.now();
-    
-    // --- 1. SIGNAL EXTRACTION ---
-    let sumGreen = 0;
-    let pixelCount = 0;
-    const data = imageData.data;
-    
-    // Sample EVERY pixel for maximum signal strength (4 bytes per pixel: RGBA)
-    for (let i = 0; i < data.length; i += 4) {
-      sumGreen += data[i + 1]; // Green channel
-      pixelCount++;
-    }
-    
-    const avg = sumGreen / pixelCount; 
+  analyze(): { bpm: number; confidence: number; tier: number; signalQuality: number } | null {
+    if (this.buffer.length < 60) return null;
 
-    // Add to buffer
-    this.buffer.push(avg);
-    this.timestamps.push(now);
+    const elapsed = (performance.now() - this.startTime) / 1000;
     
-    // Update FPS dynamically every second
-    if (this.timestamps.length > 1 && now - this.lastFpsUpdate > 1000) {
-      const recentWindow = this.timestamps.slice(-60); // Last 60 frames
-      if (recentWindow.length > 1) {
-        const duration = recentWindow[recentWindow.length - 1] - recentWindow[0];
-        this.fps = Math.round((recentWindow.length - 1) / (duration / 1000));
-        this.lastFpsUpdate = now;
-      }
-    }
+    // Progressive tier selection based on elapsed time
+    let tier = 1;
+    let threshold = 0.30;
+    let minDebounce = 400;
+    let minPeaks = 2;
 
-    // Maintain sliding window
-    if (this.buffer.length > this.WINDOW_SIZE) {
-      this.buffer.shift();
-      this.timestamps.shift();
-    }
-
-    // Need minimal data to start (1 second at 30fps = 30 samples)
-    if (this.buffer.length < 30) {
-        return { bpm: null, confidence: 0, val: avg, debug: `Warming up... ${this.buffer.length}/30` };
-    }
-
-    // --- 2. PROGRESSIVE SIGNAL PROCESSING ---
-    
-    // Determine current tier based on elapsed time
-    const elapsed = (now - this.startTime) / 1000; // seconds
-    let thresholdPercent: number;
-    let minDebounce: number;
-    let minPeaks: number;
-    let tier: string;
-    
-    if (elapsed < 3) {
-      // Tier 1: Balanced for immediate feedback without false peaks
-      thresholdPercent = 0.30; // Higher threshold to avoid harmonic doubling
-      minDebounce = 400; // Longer debounce ensures only ONE peak per heartbeat
-      minPeaks = 2;
-      tier = "T1";
-    } else if (elapsed < 8) {
-      // Tier 2: Moderate detection with good accuracy
-      thresholdPercent = 0.35;
-      minDebounce = 450;
-      minPeaks = 3;
-      tier = "T2";
-    } else {
-      // Tier 3: High accuracy mode
-      thresholdPercent = 0.40;
+    if (elapsed > 8) {
+      tier = 3;
+      threshold = 0.40;
       minDebounce = 500;
       minPeaks = 4;
-      tier = "T3";
-    }
-    
-    // A. Detrend using Moving Average (removes slow drift, keeps heartbeat oscillations)
-    const windowSize = 30; // ~1 second at 30fps - removes slow changes
-    const detrended: number[] = [];
-    
-    for (let i = 0; i < this.buffer.length; i++) {
-      // Calculate moving average around this point
-      const start = Math.max(0, i - Math.floor(windowSize / 2));
-      const end = Math.min(this.buffer.length, i + Math.floor(windowSize / 2));
-      const window = this.buffer.slice(start, end);
-      const movingAvg = window.reduce((a, b) => a + b) / window.length;
-      
-      // Subtract moving average to remove trend
-      detrended.push(this.buffer[i] - movingAvg);
-    }
-    
-    // B. Zero-mean normalization
-    const mean = detrended.reduce((a, b) => a + b) / detrended.length;
-    const normalized = detrended.map(v => v - mean);
-
-    // B. Dynamic Peak Thresholding
-    const maxAmp = Math.max(...normalized.map(Math.abs));
-    const threshold = maxAmp * thresholdPercent;
-    
-    // Debug logging every 30 frames (~1 second)
-    if (this.buffer.length % 30 === 0) {
-      console.log(`[${tier}] 🔬 Signal Analysis:`, {
-        bufferSize: this.buffer.length,
-        rawMean: mean.toFixed(2),
-        maxAmplitude: maxAmp.toFixed(2),
-        threshold: threshold.toFixed(2),
-        thresholdPercent: (thresholdPercent * 100).toFixed(0) + '%',
-        signalRange: `${Math.min(...normalized).toFixed(2)} to ${Math.max(...normalized).toFixed(2)}`
-      });
+    } else if (elapsed > 3) {
+      tier = 2;
+      threshold = 0.35;
+      minDebounce = 450;
+      minPeaks = 3;
     }
 
-    // C. Peak Detection with Progressive Debounce
-    let peaks: number[] = [];
-    let candidatePeaks = 0; // Track how many potential peaks we find
-    for (let i = 1; i < normalized.length - 1; i++) {
-      const prev = normalized[i-1];
-      const curr = normalized[i];
-      const next = normalized[i+1];
+    // Calculate signal quality
+    const signalQuality = this.calculateSignalQuality();
+    if (signalQuality < 0.3) return null;
+
+    // Bandpass filter (0.75-3 Hz for HR)
+    const filtered = this.bandpassFilter(this.buffer, this.fps);
+    
+    // Normalize
+    const max = Math.max(...filtered);
+    const min = Math.min(...filtered);
+    const range = max - min;
+    if (range < 0.01) return null;
+    
+    const normalized = filtered.map(v => (v - min) / range);
+
+    // Detect peaks with dynamic threshold
+    const peaks = this.detectPeaks(normalized, threshold, minDebounce);
+    
+    if (peaks.length < minPeaks) return null;
+
+    // Calculate intervals
+    const intervals: number[] = [];
+    for (let i = 1; i < peaks.length; i++) {
+      const interval = (this.timestamps[peaks[i]] - this.timestamps[peaks[i-1]]) / 1000;
+      intervals.push(interval);
+    }
+
+    if (intervals.length === 0) return null;
+
+    // Use median interval (more robust than mean)
+    const medianInterval = this.median(intervals);
+    const bpm = Math.round(60 / medianInterval);
+
+    // Validate BPM range
+    if (bpm < this.MIN_BPM || bpm > this.MAX_BPM) return null;
+
+    // Calculate confidence
+    const intervalCV = this.calculateCV(intervals);
+    let confidence = Math.max(0, Math.min(100, 100 - intervalCV * 2));
+    confidence = confidence * signalQuality;
+
+    // Only accept readings with minimum confidence
+    if (confidence < 40) return null;
+
+    // Add to recent readings
+    this.recentReadings.push({
+      bpm,
+      confidence: confidence / 100,
+      timestamp: performance.now()
+    });
+
+    // Keep only recent readings (last 30 seconds)
+    const cutoff = performance.now() - 30000;
+    this.recentReadings = this.recentReadings.filter(r => r.timestamp > cutoff);
+
+    // Limit to MAX_READINGS
+    if (this.recentReadings.length > this.MAX_READINGS) {
+      this.recentReadings.shift();
+    }
+
+    return { bpm, confidence, tier, signalQuality };
+  }
+
+  private calculateSignalQuality(): number {
+    if (this.buffer.length < 30) return 0;
+    
+    const recentBuffer = this.buffer.slice(-90);
+    const max = Math.max(...recentBuffer);
+    const min = Math.min(...recentBuffer);
+    const range = max - min;
+    
+    const mean = recentBuffer.reduce((a, b) => a + b, 0) / recentBuffer.length;
+    const variance = recentBuffer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentBuffer.length;
+    const std = Math.sqrt(variance);
+    
+    const snr = range / (std + 0.001);
+    return Math.min(1, snr / 10);
+  }
+
+  private bandpassFilter(data: number[], fps: number): number[] {
+    const lowCutoff = 0.75;
+    const highCutoff = 3.0;
+    
+    const lowPass = this.simpleMovingAverage(data, Math.floor(fps / highCutoff));
+    const highPass = data.map((v, i) => v - this.simpleMovingAverage(data.slice(0, i + 1), Math.floor(fps / lowCutoff))[i]);
+    
+    return highPass;
+  }
+
+  private simpleMovingAverage(data: number[], window: number): number[] {
+    const result: number[] = [];
+    for (let i = 0; i < data.length; i++) {
+      const start = Math.max(0, i - window + 1);
+      const slice = data.slice(start, i + 1);
+      result.push(slice.reduce((a, b) => a + b, 0) / slice.length);
+    }
+    return result;
+  }
+
+  private detectPeaks(data: number[], threshold: number, minDebounce: number): number[] {
+    const peaks: number[] = [];
+    let lastPeakTime = -Infinity;
+
+    for (let i = 1; i < data.length - 1; i++) {
+      const timeSinceLastPeak = this.timestamps[i] - lastPeakTime;
       
-      // Local maxima greater than dynamic threshold
-      if (curr > prev && curr > next) {
-        candidatePeaks++; // Found a local maximum
-        if (curr > threshold) {
-          // Progressive debounce
-          if (peaks.length === 0 || (this.timestamps[i] - this.timestamps[peaks[peaks.length-1]]) > minDebounce) {
-            peaks.push(i);
-            if (this.buffer.length % 30 === 0) {
-              console.log(`[${tier}] ✅ Peak ${peaks.length} detected at index ${i}, value: ${curr.toFixed(2)}`);
-            }
-          }
-        }
+      if (data[i] > threshold &&
+          data[i] > data[i - 1] &&
+          data[i] > data[i + 1] &&
+          timeSinceLastPeak >= minDebounce) {
+        peaks.push(i);
+        lastPeakTime = this.timestamps[i];
       }
     }
 
-    // Debug logging for peak detection results
-    if (this.buffer.length % 30 === 0) {
-      console.log(`[${tier}] 📊 Peak Detection:`, {
-        candidatePeaks,
-        peaksAboveThreshold: peaks.length,
-        minRequired: minPeaks,
-        minDebounce: minDebounce + 'ms'
-      });
-    }
-    
-    // --- 3. BPM CALCULATION ---
-    if (peaks.length < minPeaks) {
-        return { bpm: null, confidence: 5, val: avg, debug: `[${tier}] Detecting... (${peaks.length}/${minPeaks} peaks)`, peaks: peaks.length };
-    }
+    return peaks;
+  }
 
-    // Calculate average interval between peaks in milliseconds
-    let totalInterval = 0;
-    for (let i = 1; i < peaks.length; i++) {
-        totalInterval += (this.timestamps[peaks[i]] - this.timestamps[peaks[i-1]]);
-    }
-    const avgIntervalMs = totalInterval / (peaks.length - 1);
-    
-    const calculatedBpm = 60000 / avgIntervalMs;
-
-    // --- 4. CONFIDENCE SCORING (VARIANCE-BASED) ---
-    // Score based on regularity of intervals
-    let variance = 0;
-    for (let i = 1; i < peaks.length; i++) {
-        const interval = this.timestamps[peaks[i]] - this.timestamps[peaks[i-1]];
-        variance += Math.pow(interval - avgIntervalMs, 2);
-    }
-    variance /= (peaks.length - 1);
-    
-    // Lower variance = Higher confidence
-    // Variance of 100ms² = 90% confidence, 1000ms² = 0% confidence
-    let confidence = Math.max(0, 100 - (variance / 10)); 
-
-    // Filter impossible values
-    if (calculatedBpm < this.MIN_BPM || calculatedBpm > this.MAX_BPM) {
-        return { bpm: null, confidence: 0, val: avg, debug: `Out of range: ${calculatedBpm.toFixed(0)} BPM`, peaks: peaks.length };
-    }
-
-    const roundedBpm = Math.round(calculatedBpm);
-    const roundedConfidence = Math.round(confidence);
-
-    // --- 5. MULTI-MEASUREMENT AVERAGING ---
-    // Add to recent readings if confidence is decent (>40%)
-    if (roundedConfidence >= 40) {
-      this.recentReadings.push({
-        bpm: roundedBpm,
-        confidence: roundedConfidence,
-        timestamp: now
-      });
-      
-      // Keep only last MAX_READINGS
-      if (this.recentReadings.length > this.MAX_READINGS) {
-        this.recentReadings.shift();
-      }
-    }
-
-    // Try to get stabilized reading
-    const stabilized = this.getStabilizedBPM();
-    
-    if (stabilized) {
-      // Return stabilized reading with enhanced debug info
-      const stabilityIndicator = stabilized.isStable ? "🎯 STABLE" : "📊 Averaging";
-      return {
-        bpm: stabilized.bpm,
-        confidence: stabilized.confidence,
-        val: avg,
-        peaks: peaks.length,
-        debug: `[${tier}] ${stabilityIndicator} ${stabilized.bpm} BPM (n=${stabilized.sampleSize}) | ${stabilized.confidence}%`
-      };
-    }
-
-    // Not enough readings yet, return current reading
-    return { 
-        bpm: roundedBpm, 
-        confidence: roundedConfidence, 
-        val: avg,
-        peaks: peaks.length,
-        debug: `[${tier}] ⏳ Collecting... (${this.recentReadings.length}/${this.MIN_READINGS_FOR_AVERAGE}) | ${roundedBpm} BPM`
-    };
+  private median(arr: number[]): number {
+    const sorted = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   }
 }
 
 interface BioScannerProps {
-  onComplete?: (result: { bpm: number; confidence: number }) => void;
-  measurementDuration?: number; // in seconds, default 15
+  onComplete?: (data: { heartRate: number; confidence: number }) => void;
+  measurementDuration?: number;
 }
 
-export function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerProps) {
-  console.log('🚀 BioScanner PROGRESSIVE v3.0 - Three-tier detection system');
-  
+export const BioScanner = memo(function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const graphCanvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const [scanning, setScanning] = useState(false);
-  const [bpm, setBpm] = useState<number | null>(null);
-  const [progress, setProgress] = useState(0);
+  const engineRef = useRef<ProgressiveBioEngine>(new ProgressiveBioEngine());
+  const animationRef = useRef<number | undefined>(undefined);
+
+  const [isScanning, setIsScanning] = useState(false);
+  const [heartRate, setHeartRate] = useState<number | null>(null);
   const [confidence, setConfidence] = useState(0);
-  const [debugInfo, setDebugInfo] = useState("Ready to scan");
-  const [signalStrength, setSignalStrength] = useState(0);
-  const [isStable, setIsStable] = useState(false);
-  const [sampleSize, setSampleSize] = useState(0);
-  
-  // Use a Ref for the engine so it persists across renders
-  const engineRef = useRef(new ProgressiveBioEngine());
-  const animationFrameRef = useRef<number | undefined>(undefined);
-  const streamRef = useRef<MediaStream | undefined>(undefined);
-  const isScanningRef = useRef(false); // Use ref to avoid race condition with state
-  
-  const saveVital = trpc.vitals.logVital.useMutation();
+  const [progress, setProgress] = useState(0);
+  const [tier, setTier] = useState(1);
+  const [signalQuality, setSignalQuality] = useState(0);
+  const [averagedResult, setAveragedResult] = useState<{
+    bpm: number;
+    confidence: number;
+    isStable: boolean;
+    sampleSize: number;
+  } | null>(null);
 
-  const startCamera = async () => {
-    try {
-      console.log('[BioScanner] 🎥 Starting camera...');
-      setDebugInfo("Requesting camera access...");
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: "user",
-          width: { ideal: 640 },
-          height: { ideal: 480 }
-        } 
-      });
-      
-      streamRef.current = stream;
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        console.log('[BioScanner] ▶️ Video playing');
-        
-        setScanning(true);
-        isScanningRef.current = true; // Set ref immediately (no async delay)
-        setBpm(null);
-        setProgress(0);
-        setConfidence(0);
-        setIsStable(false);
-        setSampleSize(0);
-        engineRef.current.reset();
-        setDebugInfo("Camera active - Starting scan...");
-        
-        console.log('[BioScanner] 🚀 Starting processLoop, isScanningRef:', isScanningRef.current);
-        // Start the processing loop
-        animationFrameRef.current = requestAnimationFrame(processLoop);
-      }
-    } catch (err) {
-      console.error('[BioScanner] ❌ Camera error:', err);
-      setDebugInfo("Camera access denied");
-      toast.error("Camera access failed. Please allow camera permissions.");
-    }
-  };
+  const saveMutation = trpc.vitals.logVital.useMutation();
 
-  const drawDebugGraph = (value: number) => {
-    const cvs = graphCanvasRef.current;
-    if (!cvs) return;
-    const ctx = cvs.getContext("2d");
-    if (!ctx) return;
-
-    // Fade previous content
-    ctx.fillStyle = "rgba(15, 23, 42, 0.2)"; // slate-900 with transparency
-    ctx.fillRect(0, 0, cvs.width, cvs.height);
-    
-    // Draw recent buffer (last 150 samples)
-    const data = engineRef.current.buffer.slice(-150);
-    if (data.length < 2) return;
-    
-    const min = Math.min(...data);
-    const max = Math.max(...data);
-    const range = max - min || 1;
-
-    ctx.beginPath();
-    ctx.strokeStyle = "#10b981"; // emerald-500
-    ctx.lineWidth = 2;
-    
-    data.forEach((v, i) => {
-      const x = (i / 150) * cvs.width;
-      const y = cvs.height - ((v - min) / range) * cvs.height;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-  };
-
-  const processLoop = () => {
-    if (!videoRef.current || !canvasRef.current || !isScanningRef.current) {
-      console.log('[BioScanner] ⏹️ Loop stopped', { 
-        hasVideo: !!videoRef.current, 
-        hasCanvas: !!canvasRef.current, 
-        isScanning: isScanningRef.current 
-      });
-      return;
-    }
-    
+  const processFrame = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
+    if (!video || !canvas || !isScanning) return;
+
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    
-    if (!ctx || video.readyState !== video.HAVE_ENOUGH_DATA) {
-      animationFrameRef.current = requestAnimationFrame(processLoop);
-      return;
-    }
+    if (!ctx) return;
 
-    // 1. Draw video frame to canvas (300x300)
-    ctx.drawImage(video, 0, 0, 300, 300);
-    
-    // 2. Extract center region (60x60 pixels from center for focused signal)
-    const centerX = 120; // (300 - 60) / 2
-    const centerY = 120;
-    const regionSize = 60;
-    const imageData = ctx.getImageData(centerX, centerY, regionSize, regionSize);
-    
-    // 3. Process frame with engine
-    const result = engineRef.current.process(imageData);
-    
-    // 4. Update UI
-    if (result.bpm !== null) {
-      setBpm(result.bpm);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    let sum = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      sum += data[i];
+    }
+    const avgIntensity = sum / (data.length / 4);
+
+    engineRef.current.addSample(avgIntensity);
+
+    const result = engineRef.current.analyze();
+    if (result) {
+      setHeartRate(result.bpm);
       setConfidence(result.confidence);
-      setSignalStrength(Math.min(5, Math.floor(result.confidence / 20)));
-      
-      // Update stabilization state
-      const stabilized = engineRef.current.getStabilizedBPM();
-      if (stabilized) {
-        setIsStable(stabilized.isStable);
-        setSampleSize(stabilized.sampleSize);
-      }
-    }
-    setDebugInfo(result.debug);
-    
-    // 5. Update waveform visualization
-    if (engineRef.current.buffer.length > 0) {
-      drawDebugGraph(engineRef.current.buffer[engineRef.current.buffer.length - 1]);
+      setTier(result.tier);
+      setSignalQuality(result.signalQuality);
     }
 
-    // 6. Update progress
-    setProgress(prev => {
-      // Use actual FPS from engine, not assumed 30fps
-      const actualFPS = engineRef.current.fps || 30;
-      const increment = 100 / (measurementDuration * actualFPS);
-      const newProgress = prev + increment;
-      
-      console.log('[BioScanner] 📊 Progress:', newProgress.toFixed(1), '% | FPS:', actualFPS);
-      
-      if (newProgress >= 100) {
-        stopScanning(result.bpm, result.confidence);
-        return 100;
-      }
-      
-      // Continue loop INSIDE callback to avoid stale state
-      animationFrameRef.current = requestAnimationFrame(processLoop);
-      return newProgress;
-    });
+    // Get averaged result
+    const averaged = engineRef.current.getAveragedBPM();
+    setAveragedResult(averaged);
 
-    // 7. Loop continuation moved inside setProgress callback above
-  };
+    animationRef.current = requestAnimationFrame(processFrame);
+  }, [isScanning]);
 
-  const stopScanning = (finalBpm: number | null, finalConfidence: number) => {
-    console.log('[BioScanner] 🛑 Stopping scan. BPM:', finalBpm, 'Confidence:', finalConfidence);
-    
-    setScanning(false);
-    isScanningRef.current = false; // Stop the ref immediately
-    
-    // Stop camera
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
-    
-    // Cancel animation frame
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-    
-    // Save result if valid
-    if (finalBpm && finalBpm >= 40 && finalBpm <= 200) {
-      const stressLevel = finalBpm < 60 ? 'LOW' : finalBpm > 100 ? 'HIGH' : 'NORMAL';
-      
-      saveVital.mutate({ 
-        heartRate: finalBpm, 
-        confidence: finalConfidence,
-        stress: stressLevel
-      }, {
-        onSuccess: () => {
-          toast.success(`Heart rate saved: ${finalBpm} BPM`);
-          if (onComplete) {
-            onComplete({ bpm: finalBpm, confidence: finalConfidence });
-          }
-        },
-        onError: (err) => {
-          console.error('[BioScanner] Failed to save vital:', err);
-          toast.error("Failed to save measurement");
-        }
+  const startScanning = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
       });
-      
-      setDebugInfo(`✅ Scan complete: ${finalBpm} BPM (${finalConfidence}% confidence)`);
-    } else {
-      setDebugInfo("❌ Scan failed - insufficient data quality");
-      toast.error("Scan failed. Please try again with better lighting.");
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+
+      engineRef.current.reset();
+      setIsScanning(true);
+      setProgress(0);
+      setHeartRate(null);
+      setConfidence(0);
+      setAveragedResult(null);
+
+      const startTime = Date.now();
+      const interval = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const prog = Math.min((elapsed / measurementDuration) * 100, 100);
+        setProgress(prog);
+
+        if (prog >= 100) {
+          clearInterval(interval);
+          stopScanning();
+        }
+      }, 100);
+
+      animationRef.current = requestAnimationFrame(processFrame);
+    } catch (error) {
+      console.error("Camera access error:", error);
+      toast.error("فشل الوصول إلى الكاميرا");
     }
-  };
+  }, [measurementDuration, processFrame]);
 
-  const cancelScan = () => {
-    console.log('[BioScanner] ❌ User cancelled scan');
-    stopScanning(null, 0);
-    setBpm(null);
-    setConfidence(0);
-    setProgress(0);
-    setDebugInfo("Scan cancelled");
-  };
+  const stopScanning = useCallback(() => {
+    setIsScanning(false);
 
-  // Cleanup on unmount
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+
+    // Use averaged result if available, otherwise use latest reading
+    const finalResult = averagedResult || (heartRate ? { bpm: heartRate, confidence: confidence / 100 } : null);
+
+    if (finalResult && finalResult.bpm > 0) {
+      saveMutation.mutate({
+        heartRate: finalResult.bpm,
+        confidence: finalResult.confidence * 100,
+        stress: finalResult.bpm > 100 ? "HIGH" : finalResult.bpm < 60 ? "LOW" : "NORMAL",
+        measurementDuration,
+      });
+
+      if (onComplete) {
+        onComplete({
+          heartRate: finalResult.bpm,
+          confidence: finalResult.confidence * 100,
+        });
+      }
+
+      toast.success(`تم قياس معدل ضربات القلب: ${finalResult.bpm} نبضة/دقيقة`);
+    }
+  }, [heartRate, confidence, averagedResult, onComplete, saveMutation]);
+
   useEffect(() => {
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
 
-  const getQualityColor = () => {
-    if (confidence >= 80) return "text-green-600 bg-green-100";
-    if (confidence >= 60) return "text-yellow-600 bg-yellow-100";
-    if (confidence >= 40) return "text-orange-600 bg-orange-100";
-    return "text-red-600 bg-red-100";
-  };
-
-  const getQualityLabel = () => {
-    if (confidence >= 80) return "Excellent";
-    if (confidence >= 60) return "Good";
-    if (confidence >= 40) return "Fair";
-    return "Poor Quality";
-  };
+  // Display the averaged result if stable, otherwise show current reading
+  const displayBPM = averagedResult?.isStable ? averagedResult.bpm : heartRate;
+  const displayConfidence = averagedResult?.isStable 
+    ? averagedResult.confidence * 100 
+    : confidence;
 
   return (
-    <Card className="p-6 space-y-6">
-      {/* Camera Preview */}
-      <div className="relative mx-auto w-full max-w-md aspect-square bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-emerald-500 shadow-2xl">
-        <video 
-          ref={videoRef} 
-          className="w-full h-full object-cover" 
-          muted 
-          playsInline 
-        />
-        
-        {/* Hidden canvas for processing */}
-        <canvas ref={canvasRef} width={300} height={300} className="hidden" />
-        
-        {/* Scan region indicator (120x120 center area) */}
-        {scanning && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-40 h-40 border-4 border-emerald-400 rounded-lg animate-pulse" />
-          </div>
-        )}
-        
-        {/* On-Screen Debug Overlay */}
-        {scanning && (
-          <div className="absolute bottom-0 left-0 right-0 bg-black/90 text-emerald-400 text-xs font-mono p-3 space-y-1">
-            <div className="flex justify-between">
-              <span>📊 {debugInfo}</span>
-              <span>🎯 {progress.toFixed(0)}%</span>
+    <Card className="p-6">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Heart className="w-5 h-5 text-red-500" />
+            مراقبة معدل ضربات القلب
+          </h3>
+          {averagedResult && (
+            <div className="text-sm text-muted-foreground">
+              {averagedResult.isStable ? "🎯 مستقر" : "📊 جاري المعايرة"}
+              {" "}(n={averagedResult.sampleSize})
             </div>
-            {bpm && (
-              <>
-                <div className="flex justify-between text-white">
-                  <span>❤️ {bpm} BPM</span>
-                  <span>✓ {confidence}%</span>
-                </div>
-                {sampleSize > 0 && (
-                  <div className="flex justify-between text-emerald-300">
-                    <span>{isStable ? '🎯 STABLE' : '📊 Averaging'}</span>
-                    <span>n={sampleSize}</span>
-                  </div>
+          )}
+        </div>
+
+        <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            playsInline
+            muted
+          />
+          <canvas ref={canvasRef} className="hidden" width={320} height={240} />
+
+          {isScanning && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                {displayBPM && (
+                  <>
+                    <div className="text-6xl font-bold text-white drop-shadow-lg">
+                      {displayBPM}
+                    </div>
+                    <div className="text-xl text-white/90">نبضة/دقيقة</div>
+                    <div className="text-sm text-white/70">
+                      الدقة: {displayConfidence.toFixed(0)}% | المستوى: {tier} | 
+                      الإشارة: {(signalQuality * 100).toFixed(0)}%
+                    </div>
+                  </>
                 )}
-              </>
-            )}
-            <div className="text-[10px] text-emerald-300">
-              RAW: {engineRef.current.buffer.length > 0 ? engineRef.current.buffer[engineRef.current.buffer.length - 1].toFixed(1) : '0'}
+              </div>
             </div>
-          </div>
-        )}
-        
-        {/* Idle state */}
-        {!scanning && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
-            <div className="text-center text-white">
-              <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-sm">Camera ready</p>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* Live Signal Waveform */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-slate-700">LIVE SIGNAL WAVEFORM</span>
-          <div className="flex gap-1">
-            {[...Array(5)].map((_, i) => (
-              <div 
-                key={i} 
-                className={`w-1 h-3 rounded ${i < signalStrength ? 'bg-emerald-500' : 'bg-slate-300'}`} 
+        {isScanning && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>التقدم</span>
+              <span>{progress.toFixed(0)}%</span>
+            </div>
+            <div className="w-full bg-secondary rounded-full h-2">
+              <div
+                className="bg-primary h-2 rounded-full transition-all"
+                style={{ width: `${progress}%` }}
               />
-            ))}
-          </div>
-        </div>
-        <canvas 
-          ref={graphCanvasRef} 
-          width={600} 
-          height={80} 
-          className="w-full h-20 bg-slate-900 rounded-lg border border-slate-700" 
-        />
-      </div>
-
-      {/* BPM Display */}
-      <div className="text-center py-4">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <Heart className={`w-8 h-8 ${bpm ? 'text-red-500 animate-pulse' : 'text-slate-400'}`} />
-          <span className="text-5xl font-bold text-slate-900">
-            {bpm || '--'}
-          </span>
-          <span className="text-xl text-slate-600 self-end mb-2">BPM</span>
-        </div>
-        
-        {confidence > 0 && (
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <span className="text-sm text-slate-600">Confidence:</span>
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getQualityColor()}`}>
-              {confidence}% • {getQualityLabel()}
-            </span>
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Progress Bar */}
-      {scanning && (
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs text-slate-600">
-            <span>Scanning...</span>
-            <span>{Math.floor(progress)}%</span>
-          </div>
-          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <div className="flex gap-2">
+          {!isScanning ? (
+            <Button onClick={startScanning} className="flex-1">
+              <Camera className="w-4 h-4 mr-2" />
+              بدء القياس
+            </Button>
+          ) : (
+            <Button onClick={stopScanning} variant="destructive" className="flex-1">
+              إيقاف القياس
+            </Button>
+          )}
+          <Button
+            onClick={() => {
+              engineRef.current.reset();
+              setHeartRate(null);
+              setConfidence(0);
+              setProgress(0);
+              setAveragedResult(null);
+            }}
+            variant="outline"
+            disabled={isScanning}
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
-      )}
 
-      {/* Control Buttons */}
-      <div className="flex gap-3">
-        {!scanning ? (
-          <Button 
-            onClick={startCamera} 
-            size="lg" 
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white min-h-[56px] text-lg md:min-h-[48px] md:text-base"
-          >
-            <Activity className="mr-2 w-5 h-5" /> 
-            Start Scan
-          </Button>
-        ) : (
-          <Button 
-            onClick={cancelScan} 
-            size="lg" 
-            variant="destructive"
-            className="w-full min-h-[56px] text-lg md:min-h-[48px] md:text-base"
-          >
-            Cancel Scan
-          </Button>
-        )}
-      </div>
-
-      {/* Instructions */}
-      <div className="text-xs text-slate-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
-        <p className="font-semibold mb-1">📋 For best results:</p>
-        <ul className="space-y-1 ml-4 list-disc">
-          <li>Ensure your face is well-lit (natural light works best)</li>
-          <li>Position your face in the center of the square</li>
-          <li>Stay still and avoid talking during the scan</li>
-          <li>Remove glasses if possible</li>
-        </ul>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p>• ضع إصبعك على الكاميرا الخلفية</p>
+          <p>• تأكد من الإضاءة الجيدة</p>
+          <p>• حافظ على ثبات يدك</p>
+          <p>• انتظر {measurementDuration} ثانية للحصول على أفضل النتائج</p>
+        </div>
       </div>
     </Card>
   );
-}
+});
