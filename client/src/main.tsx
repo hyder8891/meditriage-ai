@@ -8,6 +8,7 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 import { useAuthStore } from "@/hooks/useAuth";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,7 +79,9 @@ const trpcClient = trpc.createClient({
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <App />
+      <AdminAuthProvider>
+        <App />
+      </AdminAuthProvider>
     </trpc.Provider>
   </QueryClientProvider>,
 );

@@ -98,6 +98,13 @@ const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
 const MyDoctor = lazy(() => import("./pages/MyDoctor"));
 const SelfHealingDashboard = lazy(() => import("./pages/SelfHealingDashboard"));
+const SecureAdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const SecureAdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const SecureAdminPatients = lazy(() => import("./pages/admin/AdminPatients"));
+const SecureAdminDoctors = lazy(() => import("./pages/admin/AdminDoctors"));
+
+// Import all admin feature pages
+import * as AdminFeatures from "./pages/admin/index";
 
 function Router() {
   return (
@@ -245,6 +252,44 @@ function Router() {
           </ProtectedRoute>
         </Route>
         <Route path={"/admin/login"} component={AdminLogin} />
+        <Route path={"/admin/secret-login"} component={SecureAdminLogin} />
+        <Route path={"/admin/dashboard"} component={SecureAdminDashboard} />
+        <Route path={"/admin/patients"} component={SecureAdminPatients} />
+        <Route path={"/admin/doctors"} component={SecureAdminDoctors} />
+        
+        {/* Analytics & Monitoring */}
+        <Route path={"/admin/budget"} component={AdminFeatures.AdminBudget} />
+        <Route path={"/admin/orchestration"} component={AdminFeatures.AdminOrchestration} />
+        <Route path={"/admin/load-test"} component={AdminFeatures.AdminLoadTest} />
+        <Route path={"/admin/self-healing"} component={AdminFeatures.AdminSelfHealing} />
+        
+        {/* Clinical Tools */}
+        <Route path={"/admin/clinical"} component={AdminFeatures.AdminClinical} />
+        <Route path={"/admin/triage"} component={AdminFeatures.AdminTriage} />
+        <Route path={"/admin/symptom-checker"} component={AdminFeatures.AdminSymptomChecker} />
+        <Route path={"/admin/audio-symptom"} component={AdminFeatures.AdminAudioSymptom} />
+        <Route path={"/admin/smart-forms"} component={AdminFeatures.AdminSmartForms} />
+        
+        {/* Patient Engagement */}
+        <Route path={"/admin/wearables"} component={AdminFeatures.AdminWearables} />
+        <Route path={"/admin/weather"} component={AdminFeatures.AdminWeather} />
+        <Route path={"/admin/air-quality"} component={AdminFeatures.AdminAirQuality} />
+        <Route path={"/admin/conversations"} component={AdminFeatures.AdminConversations} />
+        <Route path={"/admin/chat-history"} component={AdminFeatures.AdminChatHistory} />
+        
+        {/* Business Features */}
+        <Route path={"/admin/b2b2c"} component={AdminFeatures.AdminB2B2C} />
+        <Route path={"/admin/resource-auction"} component={AdminFeatures.AdminResourceAuction} />
+        <Route path={"/admin/preferences"} component={AdminFeatures.AdminPreferences} />
+        
+        {/* Auth & Onboarding */}
+        <Route path={"/admin/phone-auth"} component={AdminFeatures.AdminPhoneAuth} />
+        <Route path={"/admin/oauth"} component={AdminFeatures.AdminOAuth} />
+        <Route path={"/admin/onboarding"} component={AdminFeatures.AdminOnboarding} />
+        
+        {/* Lab & Testing */}
+        <Route path={"/admin/lab-results"} component={AdminFeatures.AdminLabResults} />
+        <Route path={"/admin/triage-queue"} component={AdminFeatures.AdminTriageQueue} />
         <Route path={"/admin/login/traditional"} component={AdminLoginTraditional} />
         {/* <Route path={"/admin/training"} component={AdminTraining} /> */}
         <Route path={"/admin/users"}>
