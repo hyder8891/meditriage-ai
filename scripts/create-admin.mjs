@@ -15,8 +15,8 @@ async function createAdminUser() {
   const connection = await mysql.createConnection(DATABASE_URL);
   const db = drizzle(connection);
 
-  const email = 'admin@admin.com';
-  const password = 'admin880088';
+  const email = 'admin';
+  const password = 'admin';
   const name = 'Admin User';
 
   console.log('Hashing password...');

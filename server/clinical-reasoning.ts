@@ -1,4 +1,6 @@
 import { invokeLLM } from "./_core/llm";
+import { invokeResilientLLM } from "./_core/resilient-llm";
+import { getSemanticCache } from "./_core/semantic-cache";
 
 export interface PatientInfo {
   complaints: string;
@@ -147,7 +149,12 @@ ${patientInfo.allergies && patientInfo.allergies.length > 0 ? `**Allergies:** ${
 
 Provide comprehensive clinical reasoning analysis with differential diagnoses, recommended tests, red flags, and urgency assessment.`;
 
-  const response = await invokeLLM({
+  // Use resilient LLM with retry, circuit breaker, and caching
+  const cache = getSemanticCache();
+  const cacheKey = `clinical-reasoning:${JSON.stringify({ chiefComplaint: patientInfo.chiefComplaint, age: patientInfo.age, gender: patientInfo.gender })}`;
+  
+  const response = await invokeResilientLLM(
+    {
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
@@ -246,7 +253,26 @@ Provide comprehensive clinical reasoning analysis with differential diagnoses, r
         },
       },
     },
-  });
+    },
+    {
+      operation: 'clinical-reasoning',
+      requestId: `cr-${Date.now()}`,
+      metadata: { chiefComplaint: patientInfo.chiefComplaint, language },
+    },
+    {
+      retries: 3,
+      timeout: 30000,
+      fallback: async () => {
+        // Try cached response first
+        const cached = await cache.get(cacheKey);
+        if (cached) return cached;
+        throw new Error('Clinical reasoning service temporarily unavailable');
+      },
+    }
+  );
+  
+  // Cache successful response
+  await cache.set(cacheKey, response);
 
   const content = response.choices[0].message.content;
   if (!content) {

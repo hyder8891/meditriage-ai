@@ -18,10 +18,12 @@ const pool = mysql.createPool({
   port: dbConfig.port,
   ssl: dbConfig.ssl,
   waitForConnections: true,
-  connectionLimit: 10, // Max 10 concurrent connections
-  queueLimit: 0, // Unlimited queue
+  connectionLimit: 50, // Increased for production load
+  queueLimit: 100, // Prevent memory exhaustion
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
+  keepAliveInitialDelay: 10000, // Keep connections alive
+  maxIdle: 10, // Close idle connections
+  idleTimeout: 60000, // 1 minute idle timeout
 });
 
 async function getConnection() {

@@ -1164,3 +1164,97 @@
 - [x] Test access control for all three platforms
 - [x] Verify each platform is fully isolated and functional
 - [x] Enforce strict admin-only access for admin dashboard (no cross-access from other roles)
+
+
+## NEW REQUIREMENT: Separate Admin Dashboard (User Request)
+
+### Admin Dashboard Core Features
+- [ ] Create separate admin-only routes with role-based protection
+- [ ] Build admin dashboard layout with dedicated sidebar navigation
+- [ ] Implement admin authentication and authorization middleware
+- [ ] Create admin overview page with system-wide metrics
+- [ ] Add admin user management interface
+- [ ] Implement admin settings and configuration panel
+
+### Admin Triage Monitoring
+- [ ] Create real-time triage sessions monitoring page
+- [ ] Build emergency alerts dashboard with priority filtering
+- [ ] Add patient triage history view with search and filters
+- [ ] Implement triage session details view for admins
+- [ ] Add ability to review and flag triage assessments
+
+### Admin Analytics & Reporting
+- [ ] Create analytics page with triage trends and visualizations
+- [ ] Add emergency detection statistics and patterns
+- [ ] Implement patient demographics and usage analytics
+- [ ] Build system performance metrics dashboard
+- [ ] Add export functionality for reports and data
+
+### Admin Patient Management
+- [ ] Create patient management page with search functionality
+- [ ] Add patient profile view for admins
+- [ ] Implement patient history and records access
+- [ ] Add ability to manage patient accounts
+- [ ] Create patient communication tools for admins
+
+### Testing for Admin Features
+- [ ] Write vitest tests for admin-only procedures
+- [ ] Test role-based access control for admin routes
+- [ ] Test admin dashboard data accuracy
+- [ ] Test admin user management workflows
+- [ ] End-to-end testing for admin features
+
+
+## COMPREHENSIVE IMPROVEMENT AUDIT (December 28, 2025)
+
+### 🔴 CRITICAL PRIORITY (P0) - Implement Immediately
+- [x] Create resilient LLM wrapper with retry + circuit breaker
+- [x] Implement semantic caching for LLM responses
+- [x] Optimize database connection pool configuration (training-pipeline.ts)
+- [x] Migrate clinical-reasoning.ts to resilient LLM
+- [ ] Migrate routers.ts chat endpoints to resilient LLM (IN PROGRESS)
+- [ ] Add LLM output validation before JSON parsing
+- [ ] Add timeout protection to all external API calls
+- [ ] Implement request tracing IDs for debugging
+
+### 🟠 HIGH PRIORITY (P1) - Next Sprint
+- [x] Implement predictive failure detection with anomaly detection
+- [x] Add automated recovery actions (fallback, cache, degrade)
+- [ ] Implement API Gateway layer with centralized rate limiting
+- [ ] Integrate self-healing into all LLM/API calls (2/103 completed)
+- [ ] Add connection health checks to database pool
+- [ ] Complete migration of all 103 LLM calls to resilient wrapper
+
+### 🟡 MEDIUM PRIORITY (P2) - Next Month
+- [x] Implement reinforcement learning with reward functions
+- [x] Add multi-armed bandit for treatment selection (Thompson Sampling)
+- [x] Implement advanced training metrics (precision, recall, F1, AUROC, calibration)
+- [ ] Add A/B testing framework for algorithm improvements
+- [ ] Implement online learning with incremental updates
+- [ ] Add request batching for LLM calls
+- [ ] Implement concept drift detection
+- [ ] Add dimensionality reduction for context vectors
+- [ ] Create database tables for RL (rl_q_table, rl_bandit_arms)
+
+### 🟢 LOW PRIORITY (P3) - Future
+- [ ] Implement distributed tracing system
+- [ ] Add comprehensive API call analytics
+- [ ] Implement data quality self-healing
+- [ ] Add hallucination detection for LLM outputs
+- [ ] Implement auto-scaling on load detection
+- [ ] Add cache warming for high-latency services
+
+### 📊 Metrics to Track
+- [ ] Set up LLM call failure rate monitoring
+- [ ] Track average and P99 LLM latency
+- [ ] Monitor database connection pool utilization
+- [ ] Track circuit breaker state changes
+- [ ] Measure cache hit rate
+- [ ] Monitor automated recovery success rate
+
+### 📝 Code Quality Improvements
+- [ ] Eliminate code duplication between lab-ocr.ts and lab-ocr-enhanced.ts
+- [ ] Standardize error response format across all APIs
+- [ ] Add defensive programming patterns (input validation)
+- [ ] Create LLM wrapper with built-in resilience
+- [ ] Implement request validation middleware
