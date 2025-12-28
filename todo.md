@@ -1331,3 +1331,13 @@
 - [x] Fixed incorrect import path in AdminLogin.tsx (useAuth hook)
 - [x] Removed non-existent 'loading' property from useAuth destructuring
 - [x] Verified route returns HTTP 200 status
+
+## Replace OAuth with Username/Password Authentication
+- [x] Update database schema to support username/password credentials
+- [x] Add password hashing using bcrypt
+- [x] Create login page with username/password form
+- [x] Update authentication procedures in routers.ts
+- [x] Seed database with admin/admin credentials
+- [x] Update frontend to use new login flow
+- [ ] Remove OAuth dependencies and code (kept for backwards compatibility)
+- [x] Test login functionality with admin/admin

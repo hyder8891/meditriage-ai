@@ -34,6 +34,7 @@ import { soapRouter } from "./soap-router";
 import { clinicalReasoningRouter } from "./routers/clinical-reasoning-router";
 import { calendarRouter } from "./calendar-router";
 import { selfHealingRouter } from "./self-healing-router";
+import { seedAdminRouter } from "./seed-admin-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -76,6 +77,7 @@ import {
 
 export const appRouter = router({
   system: systemRouter,
+  seedAdmin: seedAdminRouter,
   consultation: consultationRouter,
   admin: adminRouter,
   brain: brainRouter,

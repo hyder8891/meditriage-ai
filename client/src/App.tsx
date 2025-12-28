@@ -98,12 +98,14 @@ const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
 const MyDoctor = lazy(() => import("./pages/MyDoctor"));
 const SelfHealingDashboard = lazy(() => import("./pages/SelfHealingDashboard"));
+const Login = lazy(() => import("./pages/Login"));
 
 function Router() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
-        <Route path={"/"} component={Home} />
+        <Route path="/" component={Login} />
+        <Route path="/home" component={MedHome} />
         <Route path={"/dashboard"}>
           {() => {
             const { user } = useAuth();
