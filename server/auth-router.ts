@@ -235,7 +235,7 @@ export const authRouter = router({
   login: publicProcedure
     .input(
       z.object({
-        email: z.string().min(1, "Email or username is required"),
+        email: z.string().email("Invalid email address"),
         password: z.string().min(1, "Password is required"),
       })
     )
