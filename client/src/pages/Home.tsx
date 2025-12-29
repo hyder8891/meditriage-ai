@@ -786,8 +786,8 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               <Card className="hover-lift border-2 border-green-200 bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                    <Shield className="w-8 h-8 text-green-600" />
+                  <div className="h-20 mx-auto mb-4 flex items-center justify-center">
+                    <img src="/logos/hipaa-logo.jpg" alt="HIPAA Compliant" className="h-16 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold text-lg mb-2">HIPAA Compliant</h4>
                   <p className="text-sm text-slate-600">
@@ -800,8 +800,8 @@ export default function Home() {
 
               <Card className="hover-lift border-2 border-blue-200 bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Database className="w-8 h-8 text-blue-600" />
+                  <div className="h-20 mx-auto mb-4 flex items-center justify-center">
+                    <img src="/logos/gdpr-logo.jpg" alt="GDPR Compliant" className="h-16 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold text-lg mb-2">GDPR Compliant</h4>
                   <p className="text-sm text-slate-600">
@@ -814,8 +814,8 @@ export default function Home() {
 
               <Card className="hover-lift border-2 border-purple-200 bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
-                    <Award className="w-8 h-8 text-purple-600" />
+                  <div className="h-20 mx-auto mb-4 flex items-center justify-center">
+                    <img src="/logos/fda-logo.png" alt="FDA Registered" className="h-16 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold text-lg mb-2">FDA Registered</h4>
                   <p className="text-sm text-slate-600">
@@ -836,8 +836,8 @@ export default function Home() {
             <div className="grid md:grid-cols-4 gap-6">
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Lock className="w-6 h-6 text-slate-700" />
+                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
+                    <img src="/logos/iso27001-logo.jpg" alt="ISO 27001" className="h-14 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold mb-1">ISO 27001</h4>
                   <p className="text-xs text-slate-600">
@@ -848,8 +848,8 @@ export default function Home() {
 
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-slate-700" />
+                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
+                    <img src="/logos/soc2-logo.png" alt="SOC 2 Type II" className="h-14 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold mb-1">SOC 2 Type II</h4>
                   <p className="text-xs text-slate-600">
@@ -860,8 +860,8 @@ export default function Home() {
 
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-slate-700" />
+                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
+                    <img src="/logos/iso9001-logo.jpg" alt="ISO 9001" className="h-14 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold mb-1">ISO 9001</h4>
                   <p className="text-xs text-slate-600">
@@ -872,8 +872,8 @@ export default function Home() {
 
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Award className="w-6 h-6 text-slate-700" />
+                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
+                    <img src="/logos/iso13485-logo.png" alt="ISO 13485" className="h-14 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold mb-1">ISO 13485</h4>
                   <p className="text-xs text-slate-600">
@@ -892,8 +892,8 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-red-100 flex items-center justify-center">
-                    <Heart className="w-7 h-7 text-red-600" />
+                  <div className="h-20 mx-auto mb-3 flex items-center justify-center">
+                    <img src="/logos/fhir-logo.png" alt="HL7 FHIR" className="h-16 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold text-lg mb-2">HL7 FHIR</h4>
                   <p className="text-sm text-slate-600">
@@ -906,8 +906,8 @@ export default function Home() {
 
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Stethoscope className="w-7 h-7 text-blue-600" />
+                  <div className="h-20 mx-auto mb-3 flex items-center justify-center">
+                    <img src="/logos/icd10-logo.png" alt="ICD-10" className="h-16 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold text-lg mb-2">ICD-10</h4>
                   <p className="text-sm text-slate-600">
@@ -920,8 +920,8 @@ export default function Home() {
 
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-green-100 flex items-center justify-center">
-                    <Microscope className="w-7 h-7 text-green-600" />
+                  <div className="h-20 mx-auto mb-3 flex items-center justify-center">
+                    <img src="/logos/snomed-logo.jpeg" alt="SNOMED CT" className="h-16 w-auto object-contain" />
                   </div>
                   <h4 className="font-bold text-lg mb-2">SNOMED CT</h4>
                   <p className="text-sm text-slate-600">
@@ -972,8 +972,8 @@ export default function Home() {
 
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-orange-100 flex items-center justify-center">
-                    <Database className="w-6 h-6 text-orange-600" />
+                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
+                    <img src="/logos/mongodb-logo.png" alt="MongoDB" className="h-12 w-auto object-contain" />
                   </div>
                   <p className="font-bold text-sm">MongoDB</p>
                   <p className="text-xs text-slate-600">{language === 'ar' ? 'قاعدة البيانات' : 'Database'}</p>
@@ -982,8 +982,8 @@ export default function Home() {
 
               <Card className="hover-lift bg-white">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center">
-                    <Heart className="w-6 h-6 text-red-600" />
+                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
+                    <img src="/logos/openai-logo.png" alt="OpenAI" className="h-12 w-auto object-contain" />
                   </div>
                   <p className="font-bold text-sm">OpenAI</p>
                   <p className="text-xs text-slate-600">{language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Technology'}</p>

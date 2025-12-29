@@ -80,6 +80,10 @@
 (Issues will be tracked here as they arise)
 
 - [x] Replace placeholder logos with actual healthcare organization logos (Mayo Clinic, Cleveland Clinic, Johns Hopkins)
+- [x] Replace generic icons with real logos for compliance badges (FDA, GDPR, HIPAA)
+- [x] Replace generic icons with real logos for certification standards (ISO 13485, ISO 9001, SOC 2 Type II, ISO 27001)
+- [x] Replace generic icons with real logos for medical standards (SNOMED CT, ICD-10, HL7 FHIR)
+- [x] Replace generic icons with real logos for trusted partners (OpenAI, MongoDB)
 
 ## Future Enhancements
 - [ ] Telemedicine video consultation
