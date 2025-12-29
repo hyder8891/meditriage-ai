@@ -693,38 +693,66 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Technology Partners Logos - technologies with using their logo */}
+          {/* Technology Stack - Individual Logos */}
           <div className="bg-white rounded-3xl p-12 shadow-xl">
             <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">
-              {language === 'ar' ? 'مدعوم بأفضل التقنيات' : 'Powered by Industry-Leading Technologies'}
+              {language === 'ar' ? 'مدعوم بأفضل التقنيات' : 'Built with Modern Technologies'}
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-              <div className="flex items-center justify-center p-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 items-center">
+              <div className="flex items-center justify-center p-4 group">
                 <img 
-                  src="/images/homepage/tech-logos.jpg" 
-                  alt="Technology stack logos"
-                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  src="/images/tech-logos/react.png" 
+                  alt="React"
+                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  title="React"
                 />
               </div>
-              <div className="flex items-center justify-center p-4">
+              <div className="flex items-center justify-center p-4 group">
                 <img 
-                  src="/images/homepage/health-stack.jpeg" 
-                  alt="Healthcare technology stack"
-                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  src="/images/tech-logos/typescript.png" 
+                  alt="TypeScript"
+                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  title="TypeScript"
                 />
               </div>
-              <div className="flex items-center justify-center p-4">
+              <div className="flex items-center justify-center p-4 group">
                 <img 
-                  src="/images/homepage/ai-healthcare.webp" 
-                  alt="AI healthcare technology"
-                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                  src="/images/tech-logos/trpc.png" 
+                  alt="tRPC"
+                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  title="tRPC"
                 />
               </div>
-              <div className="flex items-center justify-center p-4">
+              <div className="flex items-center justify-center p-4 group">
                 <img 
-                  src="/images/homepage/arab-family-tech.jpg" 
-                  alt="Arab family healthcare technology"
-                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity rounded-lg"
+                  src="/images/tech-logos/tailwind.png" 
+                  alt="Tailwind CSS"
+                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  title="Tailwind CSS"
+                />
+              </div>
+              <div className="flex items-center justify-center p-4 group">
+                <img 
+                  src="/images/tech-logos/drizzle.webp" 
+                  alt="Drizzle ORM"
+                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  title="Drizzle ORM"
+                />
+              </div>
+              <div className="flex items-center justify-center p-4 group">
+                <img 
+                  src="/images/tech-logos/nodejs.png" 
+                  alt="Node.js"
+                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  title="Node.js"
+                />
+              </div>
+              <div className="flex items-center justify-center p-4 group">
+                <img 
+                  src="/images/tech-logos/express.png" 
+                  alt="Express"
+                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  title="Express"
                 />
               </div>
             </div>
