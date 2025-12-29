@@ -1400,3 +1400,7 @@
 - [x] Create visual technology showcase with images explaining robust features
 - [x] Enhance homepage visual appeal with cultural relevance for Iraq/Arab/Middle East region
 - [x] Ensure all images are high-quality, watermark-free, and culturally appropriate
+
+## Homepage Hero Image Update (Current Task)
+- [x] Generate custom hero image combining multiple healthcare scenarios (families, individuals, doctors, patients)
+- [x] Update homepage hero section with new composite image

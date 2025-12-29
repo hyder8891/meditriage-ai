@@ -226,8 +226,8 @@ export default function Home() {
                 {/* Main image with overlay stats */}
                 <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                   <img 
-                    src="/images/homepage/arab-family-doctor.jpg" 
-                    alt="Arab family healthcare consultation"
+                    src="/images/homepage/healthcare-scenarios-hero.jpg" 
+                    alt="Diverse healthcare scenarios - families, telemedicine, medical teams, and patient care"
                     className="w-full h-auto object-cover"
                   />
                   
