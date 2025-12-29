@@ -52,10 +52,10 @@ export default function Home() {
     const interval = duration / steps;
     
     const targets = {
-      symptoms: 50000,
-      accuracy: 99.2,
+      symptoms: 500000,
+      accuracy: 99,
       response: 3,
-      conditions: 1200,
+      conditions: 12000,
     };
 
     let step = 0;
