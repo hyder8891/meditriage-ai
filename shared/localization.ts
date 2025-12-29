@@ -529,7 +529,7 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
       ctaSection: {
         title: 'Ready to Transform Your Emergency Department?',
         subtitle: 'Join 50+ healthcare facilities using AI-powered triage to save lives and optimize resources',
-        btnDemo: 'Schedule Demo',
+        btnDemo: 'Get Started',
         btnWhitepaper: 'Download White Paper',
         btnContact: 'Contact Sales',
         email: 'info@mydoctor.iq',
@@ -985,7 +985,7 @@ export const LOCALIZATION: Record<Language, LocalizationStrings> = {
       ctaSection: {
         title: 'هل أنت مستعد لتحويل قسم الطوارئ الخاص بك؟',
         subtitle: 'انضم إلى أكثر من 50 منشأة صحية تستخدم الفرز المدعوم بالذكاء الاصطناعي لإنقاذ الأرواح وتحسين الموارد',
-        btnDemo: 'جدولة عرض توضيحي',
+        btnDemo: 'ابدأ الآن',
         btnWhitepaper: 'تحميل الورقة البيضاء',
         btnContact: 'اتصل بالمبيعات',
         email: 'info@mydoctor.iq',

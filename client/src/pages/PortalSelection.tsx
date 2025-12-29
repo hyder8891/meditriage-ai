@@ -110,10 +110,6 @@ export default function PortalSelection() {
                   {language === 'en' ? 'Access Clinician Portal' : 'الوصول إلى بوابة الأطباء'}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
-
-                <p className="text-xs text-purple-300 text-center">
-                  {language === 'en' ? 'Demo Account Available' : 'حساب تجريبي متاح'}
-                </p>
               </CardContent>
             </Card>
 

@@ -1,244 +1,284 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { 
-  ArrowLeft, 
-  Mail, 
-  Lock, 
-  Activity,
-  AlertCircle,
-  Sparkles
-} from "lucide-react";
+import { Stethoscope, Mail, Lock, ArrowLeft, Eye, EyeOff, Smartphone } from "lucide-react";
+import { AppLogo } from "@/components/AppLogo";
 import { useLocation } from "wouter";
-import { useAuthStore } from "@/hooks/useAuth";
-import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
-import { getLoginUrl } from "@/const";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/hooks/useAuth";
+import { SMSLogin } from "@/components/SMSLogin";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
-import { Smartphone } from "lucide-react";
 
 export default function ClinicianLogin() {
   const [, setLocation] = useLocation();
-  const { user, setAuth } = useAuthStore();
-  const authLoading = false; // We'll handle loading state via mutation
-  const [email, setEmail] = useState("demo@mydoctor.ai");
-  const [password, setPassword] = useState("demo123");
-  const [isLoading, setIsLoading] = useState(false);
-  const { signInWithGoogle, isLoading: oauthLoading } = useFirebaseAuth('clinician', 'en');
-  const utils = trpc.useUtils();
+  const { language } = useLanguage();
+  const { setAuth, isAuthenticated, user } = useAuth();
 
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: async (data) => {
-      if (data.success && data.token && data.user) {
-        // Update auth store with token and user
-        setAuth(data.token, data.user as any, data.refreshToken);
-        // Also update trpc cache
-        utils.auth.me.setData(undefined, data.user as any);
-        toast.success("Login successful! Redirecting to dashboard...");
-        setTimeout(() => {
-          setLocation("/clinician/dashboard");
-        }, 1000);
-      } else {
-        toast.error("Invalid credentials");
-        setIsLoading(false);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message || "Login failed");
-      setIsLoading(false);
-    },
-  });
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    loginMutation.mutate({ email, password });
-  };
-
-  const handleDemoLogin = () => {
-    setEmail("demo@mydoctor.ai");
-    setPassword("demo123");
-    setIsLoading(true);
-    loginMutation.mutate({ 
-      email: "demo@mydoctor.ai", 
-      password: "demo123" 
-    });
-  };
-
-  // If already authenticated, redirect to dashboard
+  // Redirect if already authenticated
   useEffect(() => {
-    if (user && (user.role === 'admin' || user.role === 'clinician') && !authLoading) {
-      setLocation("/clinician/dashboard");
+    if (isAuthenticated && user) {
+      if (user.role === 'clinician') {
+        setLocation('/clinician/dashboard');
+      } else if (user.role === 'patient') {
+        setLocation('/patient/portal');
+      }
     }
-  }, [user, authLoading, setLocation]);
+  }, [isAuthenticated, user, setLocation]);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [name, setName] = useState("");
+  const [showSMSLogin, setShowSMSLogin] = useState(false);
+  const { signInWithGoogle, signInWithApple, signInWithEmail, registerWithEmail, isLoading: oauthLoading } = useFirebaseAuth('clinician', language as 'en' | 'ar');
+
+  const t = {
+    title: language === 'ar' ? 'دخول الطبيب' : 'Clinician Login',
+    subtitle: language === 'ar' ? 'سجل الدخول للوصول إلى لوحة التحكم' : 'Sign in to access your clinician dashboard',
+    registerTitle: language === 'ar' ? 'إنشاء حساب طبيب' : 'Create Clinician Account',
+    registerSubtitle: language === 'ar' ? 'سجل للحصول على حساب طبيب جديد' : 'Register for a new clinician account',
+    email: language === 'ar' ? 'البريد الإلكتروني' : 'Email',
+    password: language === 'ar' ? 'كلمة المرور' : 'Password',
+    name: language === 'ar' ? 'الاسم الكامل' : 'Full Name',
+    signIn: language === 'ar' ? 'تسجيل الدخول' : 'Sign In',
+    register: language === 'ar' ? 'إنشاء حساب' : 'Create Account',
+    noAccount: language === 'ar' ? 'ليس لديك حساب؟' : "Don't have an account?",
+    haveAccount: language === 'ar' ? 'لديك حساب؟' : 'Already have an account?',
+    registerLink: language === 'ar' ? 'سجل الآن' : 'Register now',
+    signInLink: language === 'ar' ? 'سجل الدخول' : 'Sign in',
+    backHome: language === 'ar' ? 'العودة للرئيسية' : 'Back to Home',
+    forgotPassword: language === 'ar' ? 'نسيت كلمة المرور؟' : 'Forgot password?',
+    orContinue: language === 'ar' ? 'أو تابع مع' : 'Or continue with',
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isRegistering) {
+      if (!name || !email || !password) {
+        toast.error(language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields');
+        return;
+      }
+      await registerWithEmail(email, password, name);
+    } else {
+      if (!email || !password) {
+        toast.error(language === 'ar' ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور' : 'Please enter email and password');
+        return;
+      }
+      await signInWithEmail(email, password);
+    }
+  };
+
+  // Show SMS login if toggled
+  if (showSMSLogin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Button
+            variant="ghost"
+            onClick={() => setShowSMSLogin(false)}
+            className="mb-6"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {language === 'ar' ? 'العودة لتسجيل الدخول بالبريد' : 'Back to Email Login'}
+          </Button>
+          
+          <div className="flex items-center justify-center mb-8">
+            <AppLogo href="/" size="lg" showText={true} />
+          </div>
+          <p className="text-center text-sm text-gray-500 mb-6">
+            {language === 'ar' ? 'لوحة تحكم الطبيب' : 'Clinician Dashboard'}
+          </p>
+          
+          <SMSLogin role="clinician" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white flex items-center justify-center p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
-
-      <div className="w-full max-w-md relative z-10 space-y-6 animate-slide-up">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         {/* Back Button */}
         <Button
           variant="ghost"
-          size="sm"
           onClick={() => setLocation("/")}
-          className="text-white hover:bg-white/10"
+          className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t.backHome}
         </Button>
 
-        {/* Login Card */}
-        <Card className="card-modern glass-strong border-blue-400/30 shadow-2xl">
-          <CardHeader className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <Activity className="w-7 h-7 text-white" />
-              </div>
+        {/* Logo */}
+        <div className="flex items-center justify-center mb-8">
+          <AppLogo href="/" size="lg" showText={true} />
+        </div>
+        <p className="text-center text-sm text-gray-500 mb-6">
+          {language === 'ar' ? 'لوحة تحكم الطبيب' : 'Clinician Dashboard'}
+        </p>
 
-              <Badge 
-                className="badge-modern glass cursor-pointer hover:bg-blue-500/20 transition-colors"
-                onClick={handleDemoLogin}
-              >
-                <Sparkles className="w-3 h-3 mr-1" />
-                Demo Acc
-              </Badge>
+        {/* Login/Register Card */}
+        <Card className="border-2 border-emerald-200 shadow-xl">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Stethoscope className="w-8 h-8 text-emerald-600" />
             </div>
-
-            <div>
-              <CardTitle className="text-3xl text-white">Clinician Login</CardTitle>
-              <CardDescription className="text-white/90 text-base mt-2">
-                Access your secure workspace.
-              </CardDescription>
-            </div>
+            <CardTitle className="text-2xl">
+              {isRegistering ? t.registerTitle : t.title}
+            </CardTitle>
+            <CardDescription>
+              {isRegistering ? t.registerSubtitle : t.subtitle}
+            </CardDescription>
           </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {isRegistering && (
+                <div className="space-y-2">
+                  <Label htmlFor="name">{t.name}</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder={language === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="text-lg"
+                  />
+                </div>
+              )}
 
-          <CardContent className="space-y-6">
-            <form onSubmit={handleLogin} className="space-y-4">
-              {/* Email Field */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white font-medium">Email</Label>
+                <Label htmlFor="email">{t.email}</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="email"
                     type="email"
+                    placeholder={language === 'ar' ? 'doctor@example.com' : 'doctor@example.com'}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="demo@mydoctor.ai"
-                    className="pl-11 bg-white/90 border-purple-400/30 text-slate-900 placeholder:text-slate-500 focus:border-blue-400"
-                    required
+                    className="pl-10 text-lg"
                   />
                 </div>
               </div>
 
-              {/* Password Field */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white font-medium">Password</Label>
+                <Label htmlFor="password">{t.password}</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="pl-11 bg-white/90 border-purple-400/30 text-slate-900 placeholder:text-slate-500 focus:border-blue-400"
-                    required
+                    className="pl-10 pr-10 text-lg"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
 
-              {/* Sign In Button */}
+              {!isRegistering && (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => toast.info(language === 'ar' ? 'قريباً' : 'Coming soon')}
+                    className="text-sm text-emerald-600 hover:text-emerald-700"
+                  >
+                    {t.forgotPassword}
+                  </button>
+                </div>
+              )}
+
               <Button
                 type="submit"
-                size="lg"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-0 shadow-lg"
+                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-lg py-6"
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                {isRegistering ? t.register : t.signIn}
               </Button>
             </form>
 
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-purple-400/20"></div>
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-slate-900/50 px-2 text-purple-300">OR</span>
-              </div>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                {isRegistering ? t.haveAccount : t.noAccount}{" "}
+                <button
+                  onClick={() => setIsRegistering(!isRegistering)}
+                  className="text-emerald-600 hover:text-emerald-700 font-medium"
+                >
+                  {isRegistering ? t.signInLink : t.registerLink}
+                </button>
+              </p>
             </div>
 
             {/* OAuth Options */}
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                onClick={signInWithGoogle}
-                disabled={oauthLoading}
-                className="border-purple-400/30 text-white hover:bg-white/10"
-              >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Google
-              </Button>
-              {/* Facebook login temporarily disabled - not available in useFirebaseAuth */}
-            </div>
-            
-            {/* Manus OAuth */}
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => window.location.href = getLoginUrl()}
-              className="w-full border-purple-400/30 text-white hover:bg-white/10"
-            >
-              Sign in with Manus OAuth
-            </Button>
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">{t.orContinue}</span>
+                </div>
+              </div>
 
-            {/* Create Account Link */}
-            <p className="text-center text-sm text-purple-300">
-              New provider?{" "}
-              <button
-                type="button"
-                onClick={() => toast.info("Contact admin to create account")}
-                className="text-blue-400 hover:text-blue-300 underline"
-              >
-                Create Account
-              </button>
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Demo Credentials Info */}
-        <Card className="card-modern glass-strong border-yellow-400/30">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
-              <div className="space-y-1 text-sm">
-                <p className="font-semibold text-yellow-400">Demo Credentials</p>
-                <p className="text-purple-200">
-                  Email: <span className="text-white font-mono">demo@mydoctor.ai</span>
-                </p>
-                <p className="text-purple-200">
-                  Password: <span className="text-white font-mono">demo123</span>
-                </p>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowSMSLogin(true)}
+                  className="w-full"
+                >
+                  <Smartphone className="w-5 h-5 mr-2" />
+                  {language === 'ar' ? 'رسالة نصية' : 'SMS Login'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={signInWithGoogle}
+                  disabled={oauthLoading}
+                  className="w-full"
+                >
+                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Google
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={signInWithApple}
+                  disabled={oauthLoading}
+                  className="w-full"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                  Apple
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Security Notice */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          {language === 'ar' 
+            ? '🔒 اتصالك آمن ومشفر'
+            : '🔒 Your connection is secure and encrypted'}
+        </p>
       </div>
     </div>
   );
