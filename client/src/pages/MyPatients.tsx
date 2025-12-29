@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, User, MessageCircle, Calendar, FileText } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 
-export default function MyPatients() {
+function MyPatientsContent() {
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "pending" | "terminated" | undefined>("active");
@@ -181,6 +182,14 @@ export default function MyPatients() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MyPatients() {
+  return (
+    <ClinicianLayout>
+      <MyPatientsContent />
+    </ClinicianLayout>
   );
 }
 
