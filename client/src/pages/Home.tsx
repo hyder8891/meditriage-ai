@@ -528,13 +528,13 @@ export default function Home() {
             {[
               {
                 icon: Activity,
-                value: `${(counters.symptoms * 10).toLocaleString()}+`,
+                value: `${counters.symptoms.toLocaleString()}+`,
                 label: language === 'ar' ? 'أعراض تم تحليلها' : 'Symptoms Analyzed',
                 color: 'from-blue-500 to-blue-600',
               },
               {
                 icon: Award,
-                value: `${counters.accuracy}%`,
+                value: `${counters.accuracy.toFixed(1)}%`,
                 label: language === 'ar' ? 'معدل الدقة' : 'Accuracy Rate',
                 color: 'from-purple-500 to-purple-600',
               },
@@ -546,7 +546,7 @@ export default function Home() {
               },
               {
                 icon: Database,
-                value: `${(counters.conditions * 10).toLocaleString()}+`,
+                value: `${counters.conditions.toLocaleString()}+`,
                 label: language === 'ar' ? 'حالات مغطاة' : 'Conditions Covered',
                 color: 'from-green-500 to-green-600',
               },

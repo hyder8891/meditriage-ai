@@ -105,3 +105,5 @@
 - [x] Logo integration in application
 - [x] Branding update to MediTriage AI Pro
 - [x] Optimize logo.png file size for better performance
+- [x] Fix second statistics section counter values (remove *10 multiplier to match first section)
+- [x] Ensure logo backgrounds are fully transparent in header and footer
