@@ -342,51 +342,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Animated Statistics */}
-          <div className="mt-20 bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-12 shadow-xl">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-slate-900 mb-3">
-                {language === 'ar' ? 'أرقام تتحدث عن نفسها' : 'Numbers That Speak for Themselves'}
-              </h3>
-              <p className="text-slate-600">
-                {language === 'ar' ? 'إحصائيات حقيقية من منصتنا' : 'Real statistics from our platform'}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
-                  {counters.symptoms.toLocaleString()}+
-                </div>
-                <div className="text-slate-600 font-medium">
-                  {language === 'ar' ? 'تقييم للأعراض' : 'Symptom Assessments'}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
-                  {counters.accuracy}%
-                </div>
-                <div className="text-slate-600 font-medium">
-                  {language === 'ar' ? 'دقة التشخيص' : 'Diagnostic Accuracy'}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
-                  {counters.response}s
-                </div>
-                <div className="text-slate-600 font-medium">
-                  {language === 'ar' ? 'وقت الاستجابة' : 'Response Time'}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
-                  {counters.conditions.toLocaleString()}+
-                </div>
-                <div className="text-slate-600 font-medium">
-                  {language === 'ar' ? 'حالة طبية' : 'Medical Conditions'}
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
       </section>
 
