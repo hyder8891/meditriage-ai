@@ -471,7 +471,7 @@ export default function Home() {
             {[
               {
                 icon: Activity,
-                value: counters.symptoms.toLocaleString(),
+                value: `${(counters.symptoms * 10).toLocaleString()}+`,
                 label: language === 'ar' ? 'أعراض تم تحليلها' : 'Symptoms Analyzed',
                 color: 'from-blue-500 to-blue-600',
               },
@@ -489,7 +489,7 @@ export default function Home() {
               },
               {
                 icon: Database,
-                value: `${counters.conditions.toLocaleString()}+`,
+                value: `${(counters.conditions * 10).toLocaleString()}+`,
                 label: language === 'ar' ? 'حالات مغطاة' : 'Conditions Covered',
                 color: 'from-green-500 to-green-600',
               },
@@ -653,8 +653,8 @@ export default function Home() {
                   </h3>
                   <p className="text-slate-600">
                     {language === 'ar'
-                      ? 'نستخدم نماذج الذكاء الاصطناعي الطبية المتقدمة من Google Gemini وDeepSeek للتحليل الدقيق'
-                      : 'Utilizing advanced medical AI models from Google Gemini and DeepSeek for accurate analysis'}
+                      ? 'نستخدم نماذج الذكاء الاصطناعي الطبية المتقدمة للتحليل الدقيق'
+                      : 'Utilizing advanced medical AI models for accurate analysis'}
                   </p>
                 </div>
               </div>
@@ -693,7 +693,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Technology Partners Logos */}
+          {/* Technology Partners Logos - technologies with using their logo */}
           <div className="bg-white rounded-3xl p-12 shadow-xl">
             <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">
               {language === 'ar' ? 'مدعوم بأفضل التقنيات' : 'Powered by Industry-Leading Technologies'}
