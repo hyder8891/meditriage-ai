@@ -22,6 +22,7 @@
 - [ ] Assessment history with timestamps and outcomes
 - [ ] Emergency contacts management
 - [ ] Document upload (insurance cards, medical records)
+- [x] Medical professional certificate/credential management
 
 ### 4. Real-Time Features
 - [ ] Live chat with medical professionals (optional)

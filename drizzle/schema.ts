@@ -4101,5 +4101,44 @@ export const rlTrainingEpisodes = mysqlTable("rl_training_episodes", {
 export type RlTrainingEpisode = typeof rlTrainingEpisodes.$inferSelect;
 export type InsertRlTrainingEpisode = typeof rlTrainingEpisodes.$inferInsert;
 
+/**
+ * Medical Certificates - Stores professional medical certifications and credentials
+ */
+export const medicalCertificates = mysqlTable("medical_certificates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  
+  // Certificate details
+  certificateType: varchar("certificate_type", { length: 100 }).notNull(), // medical_license, board_certification, specialty, etc.
+  certificateName: varchar("certificate_name", { length: 255 }).notNull(),
+  issuingOrganization: varchar("issuing_organization", { length: 255 }).notNull(),
+  certificateNumber: varchar("certificate_number", { length: 100 }).notNull(),
+  
+  // Dates
+  issueDate: date("issue_date").notNull(),
+  expiryDate: date("expiry_date"),
+  
+  // Verification
+  verificationStatus: mysqlEnum("verification_status", ["pending", "verified", "rejected", "expired"]).default("pending").notNull(),
+  verifiedBy: int("verified_by"), // Admin user ID who verified
+  verifiedAt: timestamp("verified_at"),
+  verificationNotes: text("verification_notes"),
+  
+  // Document storage
+  documentKey: varchar("document_key", { length: 512 }), // S3 key for certificate document
+  documentUrl: varchar("document_url", { length: 1024 }), // S3 URL for certificate document
+  
+  // Additional info
+  specialty: varchar("specialty", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  state: varchar("state", { length: 100 }),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MedicalCertificate = typeof medicalCertificates.$inferSelect;
+export type InsertMedicalCertificate = typeof medicalCertificates.$inferInsert;
+
 // Export consultations schema
 export * from "./schema-consultations";

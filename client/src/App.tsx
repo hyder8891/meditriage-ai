@@ -98,6 +98,7 @@ const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
 const MyDoctor = lazy(() => import("./pages/MyDoctor"));
 const SelfHealingDashboard = lazy(() => import("./pages/SelfHealingDashboard"));
+const Certificates = lazy(() => import("./pages/Certificates"));
 const SecureAdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const SecureAdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const SecureAdminPatients = lazy(() => import("./pages/admin/AdminPatients"));
@@ -318,6 +319,9 @@ function Router() {
           </ProtectedRoute>
         </Route>
         <Route path={"/settings"} component={Settings} />
+        <Route path={"/certificates"}>
+          <ProtectedRoute><Certificates /></ProtectedRoute>
+        </Route>
         <Route path={"/test-notifications"} component={TestNotifications} />
         <Route path={"/symptom-checker"} component={SymptomChecker} />
         <Route path={"/symptom-checker-structured"} component={SymptomCheckerStructured} />
