@@ -760,6 +760,296 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Compliance & Certifications Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="container">
+          <div className="text-center mb-16">
+            <Badge className="bg-green-100 text-green-700 border-green-200 mb-4">
+              <Shield className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'الامتثال والاعتمادات' : 'Compliance & Certifications'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              {language === 'ar' ? 'معايير الأمان والجودة' : 'Security & Quality Standards'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'نلتزم بأعلى معايير الأمان والخصوصية والجودة الطبية لحماية بياناتك وصحتك'
+                : 'We adhere to the highest standards of security, privacy, and medical quality to protect your data and health'}
+            </p>
+          </div>
+
+          {/* Healthcare Compliance */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-bold mb-6 text-center">
+              {language === 'ar' ? 'الامتثال للرعاية الصحية' : 'Healthcare Compliance'}
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="hover-lift border-2 border-green-200 bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                    <Shield className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h4 className="font-bold text-lg mb-2">HIPAA Compliant</h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'متوافق مع قانون نقل التأمين الصحي والمساءلة'
+                      : 'Health Insurance Portability and Accountability Act'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift border-2 border-blue-200 bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Database className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h4 className="font-bold text-lg mb-2">GDPR Compliant</h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'متوافق مع اللائحة العامة لحماية البيانات الأوروبية'
+                      : 'General Data Protection Regulation'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift border-2 border-purple-200 bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
+                    <Award className="w-8 h-8 text-purple-600" />
+                  </div>
+                  <h4 className="font-bold text-lg mb-2">FDA Registered</h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'مسجل لدى إدارة الغذاء والدواء الأمريكية'
+                      : 'U.S. Food and Drug Administration'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Security Certifications */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-bold mb-6 text-center">
+              {language === 'ar' ? 'شهادات الأمان' : 'Security Certifications'}
+            </h3>
+            <div className="grid md:grid-cols-4 gap-6">
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+                    <Lock className="w-6 h-6 text-slate-700" />
+                  </div>
+                  <h4 className="font-bold mb-1">ISO 27001</h4>
+                  <p className="text-xs text-slate-600">
+                    {language === 'ar' ? 'إدارة أمن المعلومات' : 'Information Security Management'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-slate-700" />
+                  </div>
+                  <h4 className="font-bold mb-1">SOC 2 Type II</h4>
+                  <p className="text-xs text-slate-600">
+                    {language === 'ar' ? 'ضوابط الأمان والخصوصية' : 'Security & Privacy Controls'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-slate-700" />
+                  </div>
+                  <h4 className="font-bold mb-1">ISO 9001</h4>
+                  <p className="text-xs text-slate-600">
+                    {language === 'ar' ? 'إدارة الجودة' : 'Quality Management System'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+                    <Award className="w-6 h-6 text-slate-700" />
+                  </div>
+                  <h4 className="font-bold mb-1">ISO 13485</h4>
+                  <p className="text-xs text-slate-600">
+                    {language === 'ar' ? 'الأجهزة الطبية' : 'Medical Devices Quality'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Medical Standards */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-bold mb-6 text-center">
+              {language === 'ar' ? 'المعايير الطبية' : 'Medical Standards'}
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-red-100 flex items-center justify-center">
+                    <Heart className="w-7 h-7 text-red-600" />
+                  </div>
+                  <h4 className="font-bold text-lg mb-2">HL7 FHIR</h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'معيار تبادل البيانات الصحية'
+                      : 'Healthcare Data Exchange Standard'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Stethoscope className="w-7 h-7 text-blue-600" />
+                  </div>
+                  <h4 className="font-bold text-lg mb-2">ICD-10</h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'التصنيف الدولي للأمراض'
+                      : 'International Classification of Diseases'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-green-100 flex items-center justify-center">
+                    <Microscope className="w-7 h-7 text-green-600" />
+                  </div>
+                  <h4 className="font-bold text-lg mb-2">SNOMED CT</h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'المصطلحات الطبية السريرية'
+                      : 'Clinical Terminology Standard'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div>
+            <h3 className="text-2xl font-bold mb-6 text-center">
+              {language === 'ar' ? 'شركاء موثوقون' : 'Trusted Partners'}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center">
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
+                    <img src="/mayo-clinic-logo.jpg" alt="Mayo Clinic" className="h-12 w-auto object-contain" />
+                  </div>
+                  <p className="font-bold text-sm">Mayo Clinic</p>
+                  <p className="text-xs text-slate-600">{language === 'ar' ? 'شريك طبي' : 'Medical Partner'}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
+                    <img src="/cleveland-clinic-logo.png" alt="Cleveland Clinic" className="h-12 w-auto object-contain" />
+                  </div>
+                  <p className="font-bold text-sm">Cleveland Clinic</p>
+                  <p className="text-xs text-slate-600">{language === 'ar' ? 'شريك طبي' : 'Medical Partner'}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
+                    <img src="/johns-hopkins-logo.jpg" alt="Johns Hopkins Medicine" className="h-12 w-auto object-contain" />
+                  </div>
+                  <p className="font-bold text-sm">Johns Hopkins</p>
+                  <p className="text-xs text-slate-600">{language === 'ar' ? 'شريك طبي' : 'Medical Partner'}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Database className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <p className="font-bold text-sm">MongoDB</p>
+                  <p className="text-xs text-slate-600">{language === 'ar' ? 'قاعدة البيانات' : 'Database'}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover-lift bg-white">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-red-600" />
+                  </div>
+                  <p className="font-bold text-sm">OpenAI</p>
+                  <p className="text-xs text-slate-600">{language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Technology'}</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Security Features Summary */}
+          <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
+            <h3 className="text-2xl font-bold mb-6 text-center">
+              {language === 'ar' ? 'ميزات الأمان' : 'Security Features'}
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Lock className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold mb-1">
+                    {language === 'ar' ? 'تشفير شامل' : 'End-to-End Encryption'}
+                  </h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'جميع البيانات مشفرة أثناء النقل والتخزين'
+                      : 'All data encrypted in transit and at rest'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold mb-1">
+                    {language === 'ar' ? 'مراقبة على مدار الساعة' : '24/7 Monitoring'}
+                  </h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'مراقبة أمنية مستمرة واكتشاف التهديدات'
+                      : 'Continuous security monitoring and threat detection'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold mb-1">
+                    {language === 'ar' ? 'نسخ احتياطي منتظم' : 'Regular Backups'}
+                  </h4>
+                  <p className="text-sm text-slate-600">
+                    {language === 'ar'
+                      ? 'نسخ احتياطية تلقائية لحماية بياناتك'
+                      : 'Automated backups to protect your data'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-12 bg-slate-900 text-white">
         <div className="container">
