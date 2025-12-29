@@ -934,64 +934,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Trust Badges */}
-          <div>
-            <h3 className="text-2xl font-bold mb-6 text-center">
-              {language === 'ar' ? 'شركاء موثوقون' : 'Trusted Partners'}
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center">
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
-                    <img src="/mayo-clinic-logo.jpg" alt="Mayo Clinic" className="h-12 w-auto object-contain" />
-                  </div>
-                  <p className="font-bold text-sm">Mayo Clinic</p>
-                  <p className="text-xs text-slate-600">{language === 'ar' ? 'شريك طبي' : 'Medical Partner'}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
-                    <img src="/cleveland-clinic-logo.png" alt="Cleveland Clinic" className="h-12 w-auto object-contain" />
-                  </div>
-                  <p className="font-bold text-sm">Cleveland Clinic</p>
-                  <p className="text-xs text-slate-600">{language === 'ar' ? 'شريك طبي' : 'Medical Partner'}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
-                    <img src="/johns-hopkins-logo.jpg" alt="Johns Hopkins Medicine" className="h-12 w-auto object-contain" />
-                  </div>
-                  <p className="font-bold text-sm">Johns Hopkins</p>
-                  <p className="text-xs text-slate-600">{language === 'ar' ? 'شريك طبي' : 'Medical Partner'}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
-                    <img src="/logos/mongodb-logo.png" alt="MongoDB" className="h-12 w-auto object-contain" />
-                  </div>
-                  <p className="font-bold text-sm">MongoDB</p>
-                  <p className="text-xs text-slate-600">{language === 'ar' ? 'قاعدة البيانات' : 'Database'}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-2 flex items-center justify-center">
-                    <img src="/logos/openai-logo.png" alt="OpenAI" className="h-12 w-auto object-contain" />
-                  </div>
-                  <p className="font-bold text-sm">OpenAI</p>
-                  <p className="text-xs text-slate-600">{language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Technology'}</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
           {/* Security Features Summary */}
           <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
             <h3 className="text-2xl font-bold mb-6 text-center">
