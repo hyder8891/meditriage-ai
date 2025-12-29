@@ -34,8 +34,6 @@ import { soapRouter } from "./soap-router";
 import { clinicalReasoningRouter } from "./routers/clinical-reasoning-router";
 import { calendarRouter } from "./calendar-router";
 import { selfHealingRouter } from "./self-healing-router";
-import { triageRouter } from "./triage-router";
-import { clinicalRouterRouter as patientRoutingRouter } from "./clinical-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -106,8 +104,6 @@ export const appRouter = router({
   soap: soapRouter,
   clinicalReasoning: clinicalReasoningRouter,
   selfHealing: selfHealingRouter,
-  triage: triageRouter,
-  patientRouting: patientRoutingRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -398,7 +394,7 @@ export const appRouter = router({
   triageEnhanced: triageEnhancedRouter,
   symptomCheckerStructured: symptomCheckerStructuredRouter,
   
-  triageLegacy: router({
+  triage: router({
     // Start a new triage conversation with DeepSeek backend
     chatDeepSeek: protectedProcedure
       .input(z.object({

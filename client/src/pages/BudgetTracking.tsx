@@ -5,7 +5,6 @@
 
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
-import { AdminLayout } from "@/components/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,47 +55,38 @@ const MODULE_LABELS: Record<string, string> = {
 
 export default function BudgetTracking() {
   const [timeRange, setTimeRange] = useState<TimeRange>("month");
-  
-  // Fetch budget summary from backend
-  const { data: budgetSummary, isLoading, refetch } = trpc.admin.getBudgetSummary.useQuery({ 
-    timeRange 
-  });
-  
-  // Fetch budget trend data
-  const { data: budgetTrend } = trpc.admin.getBudgetTrend.useQuery({ 
-    days: timeRange === "today" ? 1 : timeRange === "week" ? 7 : timeRange === "month" ? 30 : 365 
-  });
 
-  return (
-    <AdminLayout>
-      <BudgetTrackingContent 
-        timeRange={timeRange}
-        setTimeRange={setTimeRange}
-        budgetSummary={budgetSummary}
-        budgetTrend={budgetTrend}
-        isLoading={isLoading}
-        refetch={refetch}
-      />
-    </AdminLayout>
-  );
-}
+  // Calculate date range
+  const { startDate, endDate } = useMemo(() => {
+    const end = new Date();
+    let start = new Date();
 
-function BudgetTrackingContent({
-  timeRange,
-  setTimeRange,
-  budgetSummary,
-  budgetTrend,
-  isLoading,
-  refetch,
-}: {
-  timeRange: TimeRange;
-  setTimeRange: (range: TimeRange) => void;
-  budgetSummary: any;
-  budgetTrend: any;
-  isLoading: boolean;
-  refetch: () => void;
-}) {
-  // Use budgetSummary from props instead of fetching again
+    switch (timeRange) {
+      case "today":
+        start.setHours(0, 0, 0, 0);
+        break;
+      case "week":
+        start.setDate(start.getDate() - 7);
+        break;
+      case "month":
+        start.setMonth(start.getMonth() - 1);
+        break;
+      case "all":
+        start = new Date(0); // Beginning of time
+        break;
+    }
+
+    return {
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
+    };
+  }, [timeRange]);
+
+  // Fetch usage statistics
+  const { data: stats, isLoading, refetch } = trpc.budget.getMyUsageStats.useQuery({
+    startDate,
+    endDate,
+  });
 
   // Format currency
   const formatCurrency = (cents: number) => {
@@ -108,16 +98,10 @@ function BudgetTrackingContent({
     return num.toLocaleString();
   };
 
-  // Use data from budgetSummary prop
-  const stats = budgetSummary?.summary;
-  const costByModule = budgetSummary?.costByModule || [];
-  const costByProvider = budgetSummary?.costByProvider || [];
-  const highCostRequests = budgetSummary?.highCostRequests || [];
-
   // Calculate budget usage percentage (assuming $100 default budget limit)
   const DEFAULT_BUDGET_CENTS = 10000; // $100
   const budgetPercentage = stats
-    ? Math.min(((parseInt(stats.totalCostCents) || 0) / DEFAULT_BUDGET_CENTS) * 100, 100)
+    ? Math.min((stats.totalCostCents / DEFAULT_BUDGET_CENTS) * 100, 100)
     : 0;
 
   // Determine budget status
@@ -203,7 +187,7 @@ function BudgetTrackingContent({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats ? `$${stats.totalCostUSD}` : "$0.00"}
+              {stats ? formatCurrency(stats.totalCostCents) : "$0.00"}
             </div>
             <p className="text-xs text-muted-foreground">
               Budget: {formatCurrency(DEFAULT_BUDGET_CENTS)}
@@ -221,7 +205,7 @@ function BudgetTrackingContent({
               {stats ? formatNumber(stats.totalRequests) : "0"}
             </div>
             <p className="text-xs text-muted-foreground">
-              Time range: {timeRange}
+              Success: {stats ? formatNumber(stats.successfulRequests) : "0"}
             </p>
           </CardContent>
         </Card>
@@ -262,7 +246,7 @@ function BudgetTrackingContent({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {costByModule && costByModule.length > 0 ? (
+          {stats && Object.keys(stats.byModule).length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -274,23 +258,23 @@ function BudgetTrackingContent({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {costByModule.map((item: any) => {
-                  const percentage = stats?.totalCostCents
-                    ? ((item.totalCostCents || 0) / parseInt(stats.totalCostCents)) * 100
+                {Object.entries(stats.byModule).map(([moduleName, moduleData]: [string, any]) => {
+                  const percentage = stats.totalCostCents
+                    ? (moduleData.costCents / stats.totalCostCents) * 100
                     : 0;
                   return (
-                    <TableRow key={item.module}>
+                    <TableRow key={moduleName}>
                       <TableCell className="font-medium">
-                        {MODULE_LABELS[item.module] || item.module}
+                        {MODULE_LABELS[moduleName] || moduleName}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatNumber(item.requestCount || 0)}
+                        {formatNumber(moduleData.count)}
                       </TableCell>
                       <TableCell className="text-right">
-                        N/A
+                        {formatNumber(moduleData.tokens)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(item.totalCostCents || 0)}
+                        {formatCurrency(moduleData.costCents)}
                       </TableCell>
                       <TableCell className="text-right">{percentage.toFixed(1)}%</TableCell>
                     </TableRow>

@@ -46,15 +46,19 @@
 }
 
 :root {
-  --primary: oklch(0.65 0.15 180);
+  /* New Color Palette - Blue/Purple/Cyan */
+  --primary: oklch(0.55 0.22 264); /* Deep Blue #2563EB */
   --primary-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.55 0.13 180);
+  --secondary-brand: oklch(0.58 0.24 293); /* Purple #7C3AED */
+  --accent-cyan: oklch(0.70 0.14 210); /* Cyan #06B6D4 */
+  --success-green: oklch(0.65 0.17 160); /* Green #10B981 */
+  --sidebar-primary: oklch(0.50 0.22 264);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --chart-1: oklch(0.75 0.10 180);
-  --chart-2: oklch(0.65 0.13 180);
-  --chart-3: oklch(0.55 0.15 180);
-  --chart-4: oklch(0.45 0.13 180);
-  --chart-5: oklch(0.35 0.10 180);
+  --chart-1: oklch(0.75 0.15 264);
+  --chart-2: oklch(0.65 0.18 264);
+  --chart-3: oklch(0.55 0.22 264);
+  --chart-4: oklch(0.45 0.20 264);
+  --chart-5: oklch(0.35 0.15 264);
   --radius: 0.65rem;
   --background: oklch(0.99 0.005 250);
   --foreground: oklch(0.2 0.015 260);
@@ -128,8 +132,9 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Modern Typography */
+  /* Modern Typography System */
   h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', 'Cairo', sans-serif;
     @apply font-bold tracking-tight;
   }
 
@@ -148,6 +153,11 @@
   h3 {
     @apply text-3xl md:text-4xl;
     font-weight: 700;
+  }
+
+  /* Accent/Label Typography */
+  .font-accent {
+    font-family: 'Space Grotesk', 'Cairo', sans-serif;
   }
 
   /* Smooth Scrolling */
@@ -261,9 +271,21 @@
     @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl border border-white/30 dark:border-gray-700/30;
   }
 
-  /* Gradient Backgrounds */
+  /* Gradient Backgrounds - Updated for Blue/Purple Theme */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(262 83% 58%) 100%);
+    background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+  }
+
+  .gradient-hero {
+    background: linear-gradient(135deg, #ffffff 0%, #EFF6FF 100%);
+  }
+
+  .gradient-blue-deep {
+    background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+  }
+
+  .gradient-cta {
+    background: linear-gradient(135deg, #2563EB 0%, #7C3AED 50%, #9333EA 100%);
   }
 
   .gradient-success {
