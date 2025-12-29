@@ -91,7 +91,7 @@ export default function Home() {
                   src="/logo.png" 
                   alt="MediTriage AI Pro" 
                   className="h-14 w-auto" 
-                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain', backgroundColor: 'transparent' }}
                 />
               </div>
               <div className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -354,7 +354,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
                   {counters.symptoms.toLocaleString()}+
                 </div>
                 <div className="text-slate-600 font-medium">
@@ -362,7 +362,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
                   {counters.accuracy}%
                 </div>
                 <div className="text-slate-600 font-medium">
@@ -370,7 +370,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-5xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-800 bg-clip-text text-transparent mb-2">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
                   {counters.response}s
                 </div>
                 <div className="text-slate-600 font-medium">
@@ -378,7 +378,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-5xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent mb-2 min-h-[3rem] flex items-center justify-center">
                   {counters.conditions.toLocaleString()}+
                 </div>
                 <div className="text-slate-600 font-medium">
@@ -528,13 +528,13 @@ export default function Home() {
             {[
               {
                 icon: Activity,
-                value: `${(counters.symptoms * 10).toLocaleString()}+`,
+                value: `${counters.symptoms.toLocaleString()}+`,
                 label: language === 'ar' ? 'أعراض تم تحليلها' : 'Symptoms Analyzed',
                 color: 'from-blue-500 to-blue-600',
               },
               {
                 icon: Award,
-                value: `${counters.accuracy}%`,
+                value: `${counters.accuracy.toFixed(1)}%`,
                 label: language === 'ar' ? 'معدل الدقة' : 'Accuracy Rate',
                 color: 'from-purple-500 to-purple-600',
               },
@@ -546,7 +546,7 @@ export default function Home() {
               },
               {
                 icon: Database,
-                value: `${(counters.conditions * 10).toLocaleString()}+`,
+                value: `${counters.conditions.toLocaleString()}+`,
                 label: language === 'ar' ? 'حالات مغطاة' : 'Conditions Covered',
                 color: 'from-green-500 to-green-600',
               },
@@ -1057,7 +1057,7 @@ export default function Home() {
               <img 
                 src="/logo.png" 
                 alt="MediTriage AI Pro" 
-                className="h-12 w-auto mb-4 brightness-0 invert" 
+                className="h-12 w-auto mb-4" 
               />
               <p className="text-slate-400 text-sm">
                 {language === 'ar' ? 'رعاية صحية ذكية بالذكاء الاصطناعي' : 'Smart healthcare powered by AI'}

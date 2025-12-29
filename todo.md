@@ -82,6 +82,10 @@
 - [x] Fix footer logo not displaying
 - [x] Add animated statistics and counters to "How It Works" section
 - [x] Add animated statistics to other key sections for engagement
+- [x] Fix footer logo not displaying (reported again)
+- [x] Fix header logo showing white background instead of transparent
+- [x] Fix counter numbers not animating/counting up
+- [x] Fix counter numbers overflowing their containers
 
 - [x] Replace placeholder logos with actual healthcare organization logos (Mayo Clinic, Cleveland Clinic, Johns Hopkins)
 - [x] Replace generic icons with real logos for compliance badges (FDA, GDPR, HIPAA)
@@ -101,3 +105,5 @@
 - [x] Logo integration in application
 - [x] Branding update to MediTriage AI Pro
 - [x] Optimize logo.png file size for better performance
+- [x] Fix second statistics section counter values (remove *10 multiplier to match first section)
+- [x] Ensure logo backgrounds are fully transparent in header and footer
