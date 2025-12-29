@@ -79,6 +79,10 @@
 ## Bugs & Issues
 (Issues will be tracked here as they arise)
 
+- [x] Fix footer logo not displaying
+- [x] Add animated statistics and counters to "How It Works" section
+- [x] Add animated statistics to other key sections for engagement
+
 - [x] Replace placeholder logos with actual healthcare organization logos (Mayo Clinic, Cleveland Clinic, Johns Hopkins)
 - [x] Replace generic icons with real logos for compliance badges (FDA, GDPR, HIPAA)
 - [x] Replace generic icons with real logos for certification standards (ISO 13485, ISO 9001, SOC 2 Type II, ISO 27001)
@@ -96,3 +100,4 @@
 - [x] Logo design and creation (caduceus-based, medical-tech aesthetic)
 - [x] Logo integration in application
 - [x] Branding update to MediTriage AI Pro
+- [x] Optimize logo.png file size for better performance
