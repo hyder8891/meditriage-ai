@@ -260,6 +260,7 @@
 - [x] Test all navigation flows
 - [x] Test error handling and edge cases
 - [ ] Performance testing for all AI functions (ongoing)
+- [x] Fix doctor login not working
 
 
 ### Rebrand from My Doctor to My Doctor

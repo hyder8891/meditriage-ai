@@ -13,7 +13,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuthStore } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { getLoginUrl } from "@/const";
@@ -22,17 +22,20 @@ import { Smartphone } from "lucide-react";
 
 export default function ClinicianLogin() {
   const [, setLocation] = useLocation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, setAuth } = useAuthStore();
+  const authLoading = false; // We'll handle loading state via mutation
   const [email, setEmail] = useState("demo@mydoctor.ai");
   const [password, setPassword] = useState("demo123");
   const [isLoading, setIsLoading] = useState(false);
   const { signInWithGoogle, isLoading: oauthLoading } = useFirebaseAuth('clinician', 'en');
   const utils = trpc.useUtils();
 
-  const adminLoginMutation = trpc.auth.adminLogin.useMutation({
+  const loginMutation = trpc.auth.login.useMutation({
     onSuccess: async (data) => {
       if (data.success && data.token && data.user) {
-        // Update auth state via trpc utils
+        // Update auth store with token and user
+        setAuth(data.token, data.user as any, data.refreshToken);
+        // Also update trpc cache
         utils.auth.me.setData(undefined, data.user as any);
         toast.success("Login successful! Redirecting to dashboard...");
         setTimeout(() => {
@@ -52,15 +55,15 @@ export default function ClinicianLogin() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    adminLoginMutation.mutate({ username: email, password });
+    loginMutation.mutate({ email, password });
   };
 
   const handleDemoLogin = () => {
     setEmail("demo@mydoctor.ai");
     setPassword("demo123");
     setIsLoading(true);
-    adminLoginMutation.mutate({ 
-      username: "demo@mydoctor.ai", 
+    loginMutation.mutate({ 
+      email: "demo@mydoctor.ai", 
       password: "demo123" 
     });
   };
