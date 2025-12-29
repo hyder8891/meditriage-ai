@@ -128,7 +128,10 @@ export default function Home() {
               ) : (
                 <>
                   <Button variant="ghost" onClick={() => setLocation("/patient-login")}>
-                    {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+                    {language === 'ar' ? 'دخول المريض' : 'Patient Login'}
+                  </Button>
+                  <Button variant="ghost" onClick={() => setLocation("/clinician/login")}>
+                    {language === 'ar' ? 'دخول الطبيب' : 'Doctor Login'}
                   </Button>
                   <Button onClick={() => setLocation("/patient-login")} className="gradient-primary text-white">
                     {language === 'ar' ? 'ابدأ الآن' : 'Get Started'}
@@ -217,14 +220,20 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Abstract Medical Illustration (40%) */}
+            {/* Right: Middle Eastern Family Healthcare Image (40%) */}
             <div className="lg:col-span-2 relative animate-float">
               <div className="relative">
-                {/* Main visual element */}
-                <div className="relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl p-8 backdrop-blur-sm border border-blue-200/50">
-                  <div className="space-y-4">
-                    {/* Floating UI elements */}
-                    <div className="bg-white rounded-2xl p-6 shadow-xl hover-lift">
+                {/* Main image with overlay stats */}
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                  <img 
+                    src="/images/homepage/arab-family-doctor.jpg" 
+                    alt="Arab family healthcare consultation"
+                    className="w-full h-auto object-cover"
+                  />
+                  
+                  {/* Floating stats overlay */}
+                  <div className="absolute bottom-6 left-6 right-6 space-y-3">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl hover-lift">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                           <Brain className="w-6 h-6 text-white" />
@@ -236,19 +245,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-6 shadow-xl hover-lift animation-delay-200">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-                          <Clock className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-600">{language === 'ar' ? 'وقت الاستجابة' : 'Response Time'}</div>
-                          <div className="text-2xl font-bold text-slate-900">&lt;3s</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-2xl p-6 shadow-xl hover-lift animation-delay-1000">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl hover-lift animation-delay-200">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                           <Users className="w-6 h-6 text-white" />
@@ -598,6 +595,140 @@ export default function Home() {
             {language === 'ar' ? 'ابدأ الآن مجاناً' : 'Get Started Free'}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
+        </div>
+      </section>
+
+      {/* Technology Showcase Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="container">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-purple-100 text-purple-700 border-purple-200 font-accent">
+              <Sparkles className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'التكنولوجيا المتقدمة' : 'Advanced Technology'}
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === 'ar' ? 'مدعوم بأحدث التقنيات' : 'Powered by Cutting-Edge Technology'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              {language === 'ar'
+                ? 'نستخدم أحدث تقنيات الذكاء الاصطناعي والبنية التحتية السحابية لتقديم رعاية صحية موثوقة وآمنة'
+                : 'We leverage the latest AI technologies and cloud infrastructure to deliver reliable and secure healthcare'}
+            </p>
+          </div>
+
+          {/* Technology Stack with Images */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            {/* Left: Arab Family Using Technology */}
+            <div className="relative">
+              <div className="rounded-3xl overflow-hidden shadow-2xl">
+                <img 
+                  src="/images/homepage/arab-family-tablet.jpg" 
+                  alt="Arab family using healthcare technology"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+              {/* Floating badge */}
+              <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl p-6 shadow-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-slate-600">{language === 'ar' ? 'سهل الاستخدام' : 'Easy to Use'}</div>
+                    <div className="text-xl font-bold text-slate-900">{language === 'ar' ? 'لجميع الأعمار' : 'For All Ages'}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Technology Features */}
+            <div className="space-y-6">
+              <div className="flex items-start gap-4 p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                  <Brain className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    {language === 'ar' ? 'ذكاء اصطناعي متقدم' : 'Advanced AI Models'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'نستخدم نماذج الذكاء الاصطناعي الطبية المتقدمة من Google Gemini وDeepSeek للتحليل الدقيق'
+                      : 'Utilizing advanced medical AI models from Google Gemini and DeepSeek for accurate analysis'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                  <Database className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    {language === 'ar' ? 'بنية تحتية قوية' : 'Robust Infrastructure'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'مبني على React وNode.js مع قاعدة بيانات آمنة وموثوقة لضمان أفضل أداء'
+                      : 'Built on React and Node.js with secure and reliable database for optimal performance'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    {language === 'ar' ? 'أمان من الدرجة الأولى' : 'Enterprise-Grade Security'}
+                  </h3>
+                  <p className="text-slate-600">
+                    {language === 'ar'
+                      ? 'تشفير شامل وامتثال كامل لمعايير HIPAA لحماية بياناتك الصحية'
+                      : 'End-to-end encryption and full HIPAA compliance to protect your health data'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Technology Partners Logos */}
+          <div className="bg-white rounded-3xl p-12 shadow-xl">
+            <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">
+              {language === 'ar' ? 'مدعوم بأفضل التقنيات' : 'Powered by Industry-Leading Technologies'}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+              <div className="flex items-center justify-center p-4">
+                <img 
+                  src="/images/homepage/tech-logos.jpg" 
+                  alt="Technology stack logos"
+                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                />
+              </div>
+              <div className="flex items-center justify-center p-4">
+                <img 
+                  src="/images/homepage/health-stack.jpeg" 
+                  alt="Healthcare technology stack"
+                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                />
+              </div>
+              <div className="flex items-center justify-center p-4">
+                <img 
+                  src="/images/homepage/ai-healthcare.webp" 
+                  alt="AI healthcare technology"
+                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                />
+              </div>
+              <div className="flex items-center justify-center p-4">
+                <img 
+                  src="/images/homepage/arab-family-tech.jpg" 
+                  alt="Arab family healthcare technology"
+                  className="w-full h-auto object-contain opacity-70 hover:opacity-100 transition-opacity rounded-lg"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
