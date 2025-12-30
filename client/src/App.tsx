@@ -330,8 +330,12 @@ function Router() {
         <Route path={"/brain-dashboard"} component={BRAINDashboard} />
         <Route path={"/training-dashboard"} component={TrainingDashboard} />
         <Route path={"/brain-performance"} component={BrainPerformance} />
-        <Route path={"/medical-literature"} component={MedicalLiterature} />
-        <Route path={"/doc-dash"} component={MedicalLiterature} />
+        <Route path={"/medical-literature"}>
+          {() => <ProtectedRoute requiredRole="clinician"><MedicalLiterature /></ProtectedRoute>}
+        </Route>
+        <Route path={"/doc-dash"}>
+          {() => <ProtectedRoute requiredRole="clinician"><MedicalLiterature /></ProtectedRoute>}
+        </Route>
         <Route path={"/debug/user"} component={DebugUser} />
         <Route path={"/debug/auth"} component={DebugAuth} />
         <Route component={NotFound} />

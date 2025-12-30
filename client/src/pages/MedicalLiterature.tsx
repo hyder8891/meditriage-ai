@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, BookOpen, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 
-export default function MedicalLiterature() {
+function MedicalLiteratureContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -53,7 +54,7 @@ export default function MedicalLiterature() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4" dir="rtl">
+    <div className="container mx-auto py-8 px-4 max-w-7xl" dir="rtl">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
           <BookOpen className="h-8 w-8" />
@@ -301,5 +302,13 @@ export default function MedicalLiterature() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function MedicalLiterature() {
+  return (
+    <ClinicianLayout>
+      <MedicalLiteratureContent />
+    </ClinicianLayout>
   );
 }

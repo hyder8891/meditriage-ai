@@ -209,3 +209,8 @@
 - [ ] Create monitoring dashboard for training progress
 
 - [x] Update Medical Literature navigation label from "الأدبيات الطبية" to "المكتبة الطبية" in Arabic
+
+## Current Issues
+
+- [x] Protect /medical-literature route to require clinician authentication
+- [x] Add sidebar navigation to Medical Literature page using ClinicianLayout
