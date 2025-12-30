@@ -115,14 +115,17 @@
 - [x] Add NCBI API key to environment variables
 - [x] Create NCBI E-utilities helper functions in server
 - [x] Implement PubMed literature search endpoint
-- [ ] Implement PMC full-text article retrieval
-- [ ] Implement MedGen/MeSH medical term lookup
-- [ ] Implement Gene database integration for genetic conditions
-- [ ] Implement ClinVar integration for genetic variants
+- [x] Implement PMC full-text article retrieval
+- [x] Implement MedGen/MeSH medical term lookup
+- [x] Implement Gene database integration for genetic conditions
+- [x] Implement ClinVar integration for genetic variants
 - [x] Create frontend UI for medical literature search
 - [x] Add search results display with pagination and filters
-- [ ] Add article abstract preview and full-text access
+- [x] Add article abstract preview and full-text access
 - [x] Test NCBI API integration with rate limiting (10 req/sec)
+- [x] Add Medical Literature/Library navigation link to dashboard sidebar
+- [x] Add Medical Literature to ClinicianLayout sidebar navigation
+- [x] Add Medical Literature to PatientPortal navigation
 
 ### UMLS Integration (License Pending - 3 Business Days)
 - [ ] Wait for UMLS license approval email

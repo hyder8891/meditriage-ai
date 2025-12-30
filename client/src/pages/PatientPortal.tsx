@@ -13,7 +13,7 @@ import {
   TrendingUp,
   Calendar,
   Heart,
-
+  BookOpen,
   ArrowRight,
   Zap,
   Clock,
@@ -83,6 +83,7 @@ export default function PatientPortal() {
     { icon: Activity, label: language === 'ar' ? 'لوحة التحكم' : 'Dashboard', path: '/patient/portal' },
     { icon: Search, label: language === 'ar' ? 'ابحث عن طبيب' : 'Find Doctors', path: '/patient/find-doctors' },
     { icon: Users, label: language === 'ar' ? 'أطبائي' : 'My Doctors', path: '/patient/my-doctors' },
+    { icon: BookOpen, label: language === 'ar' ? 'الأدبيات الطبية' : 'Medical Literature', path: '/medical-literature' },
     { icon: MessageSquare, label: language === 'ar' ? 'الرسائل' : 'Messages', path: '/patient/messages' },
     { icon: Crown, label: language === 'ar' ? 'الاشتراك' : 'Subscription', path: '/patient/subscription' },
   ];
