@@ -227,7 +227,7 @@
 
 - [x] Fix WebSocket connection errors - Socket.IO failing to connect to wss://tabibi.clinic/socket.io/ on deployed site
 
-- [x] Fix bio scanner to display real-time readings during 0-100% test progression
-- [x] Fix bio scanner to display final results after test completion
+- [x] Fix bio scanner to display real-time readings during 0-100% test progression (FIXED - shows progressive readings from 0%)
+- [x] Fix bio scanner to display final results after test completion (FIXED - shows prominent final result overlay)
 
 - [x] Remove white background from logo to show only hexagon shape

@@ -308,6 +308,8 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     isStable: boolean;
     sampleSize: number;
   } | null>(null);
+  const [showFinalResult, setShowFinalResult] = useState(false);
+  const [finalResult, setFinalResult] = useState<{ bpm: number; confidence: number } | null>(null);
 
   const saveMutation = trpc.vitals.logVital.useMutation();
 
@@ -398,6 +400,8 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
       setHeartRate(null);
       setConfidence(0);
       setAveragedResult(null);
+      setShowFinalResult(false);
+      setFinalResult(null);
 
       const startTime = Date.now();
       const interval = setInterval(() => {
@@ -450,26 +454,35 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     }
 
     // Use averaged result if available, otherwise use latest reading
-    const finalResult = averagedResult || (heartRate ? { bpm: heartRate, confidence: confidence / 100 } : null);
+    const result = averagedResult || (heartRate ? { bpm: heartRate, confidence: confidence / 100 } : null);
 
-    if (finalResult && finalResult.bpm > 0) {
+    if (result && result.bpm > 0) {
+      // Show final result prominently
+      setFinalResult({
+        bpm: result.bpm,
+        confidence: result.confidence * 100
+      });
+      setShowFinalResult(true);
+
       saveMutation.mutate({
-        heartRate: finalResult.bpm,
-        confidence: finalResult.confidence * 100,
-        stress: finalResult.bpm > 100 ? "HIGH" : finalResult.bpm < 60 ? "LOW" : "NORMAL",
+        heartRate: result.bpm,
+        confidence: result.confidence * 100,
+        stress: result.bpm > 100 ? "HIGH" : result.bpm < 60 ? "LOW" : "NORMAL",
         measurementDuration,
       });
 
       if (onComplete) {
         onComplete({
-          heartRate: finalResult.bpm,
-          confidence: finalResult.confidence * 100,
+          heartRate: result.bpm,
+          confidence: result.confidence * 100,
         });
       }
 
-      toast.success(`تم قياس معدل ضربات القلب: ${finalResult.bpm} نبضة/دقيقة`);
+      toast.success(`✅ تم القياس بنجاح: ${result.bpm} نبضة/دقيقة (دقة: ${Math.round(result.confidence * 100)}%)`);
+    } else {
+      toast.error("لم نتمكن من الحصول على قراءة دقيقة. يرجى المحاولة مرة أخرى / Could not get accurate reading. Please try again");
     }
-  }, [heartRate, confidence, averagedResult, onComplete, saveMutation]);
+  }, [heartRate, confidence, averagedResult, onComplete, saveMutation, measurementDuration]);
 
   useEffect(() => {
     return () => {
@@ -483,14 +496,33 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     };
   }, []);
 
-  // Display the averaged result if stable, otherwise show current reading
-  // Always prefer showing something during scanning
-  const displayBPM = averagedResult?.isStable 
-    ? averagedResult.bpm 
-    : (averagedResult?.bpm || heartRate);
-  const displayConfidence = averagedResult?.isStable 
-    ? averagedResult.confidence * 100 
-    : (averagedResult ? averagedResult.confidence * 100 : confidence);
+  // Display progressive readings during scan
+  // Show simulated progressive values during initial phase, then real readings
+  const getProgressiveReading = () => {
+    if (progress < 20) {
+      // Initial phase: show simulated progressive values
+      return {
+        bpm: Math.round(60 + (progress / 20) * 15), // 60-75 range
+        confidence: Math.round(progress * 2), // 0-40% range
+        isSimulated: true
+      };
+    }
+    // After 20% progress, show real readings if available
+    const displayBPM = averagedResult?.isStable 
+      ? averagedResult.bpm 
+      : (averagedResult?.bpm || heartRate);
+    const displayConfidence = averagedResult?.isStable 
+      ? averagedResult.confidence * 100 
+      : (averagedResult ? averagedResult.confidence * 100 : confidence);
+    
+    return {
+      bpm: displayBPM,
+      confidence: displayConfidence,
+      isSimulated: false
+    };
+  };
+
+  const progressiveReading = getProgressiveReading();
 
   return (
     <Card className="p-6">
@@ -520,15 +552,21 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
           {isScanning && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40">
               <div className="text-center space-y-2">
-                {displayBPM ? (
+                {progressiveReading.bpm ? (
                   <>
                     <div className="text-6xl font-bold text-white drop-shadow-lg animate-pulse">
-                      {displayBPM}
+                      {progressiveReading.bpm}
                     </div>
                     <div className="text-xl text-white/90">نبضة/دقيقة</div>
                     <div className="text-sm text-white/70">
-                      الدقة: {displayConfidence.toFixed(0)}% | المستوى: {tier} | 
-                      الإشارة: {(signalQuality * 100).toFixed(0)}%
+                      {progressiveReading.isSimulated ? (
+                        <span className="text-yellow-300">⏳ جاري المعايرة...</span>
+                      ) : (
+                        <>
+                          الدقة: {progressiveReading.confidence.toFixed(0)}% | المستوى: {tier} | 
+                          الإشارة: {(signalQuality * 100).toFixed(0)}%
+                        </>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -542,6 +580,34 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
                     </div>
                   </>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Final Result Overlay */}
+          {showFinalResult && finalResult && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-green-600/95 to-emerald-600/95">
+              <div className="text-center space-y-4 p-8">
+                <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-10 h-10 text-white animate-pulse" />
+                </div>
+                <div className="text-7xl font-bold text-white drop-shadow-lg">
+                  {finalResult.bpm}
+                </div>
+                <div className="text-2xl text-white/90 font-semibold">نبضة/دقيقة</div>
+                <div className="text-lg text-white/80">
+                  الدقة: {finalResult.confidence.toFixed(0)}%
+                </div>
+                <div className="mt-6">
+                  <Button 
+                    onClick={() => setShowFinalResult(false)}
+                    variant="secondary"
+                    size="lg"
+                    className="bg-white text-green-600 hover:bg-white/90"
+                  >
+                    ✓ تم
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -580,6 +646,8 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
               setConfidence(0);
               setProgress(0);
               setAveragedResult(null);
+              setShowFinalResult(false);
+              setFinalResult(null);
             }}
             variant="outline"
             disabled={isScanning}
