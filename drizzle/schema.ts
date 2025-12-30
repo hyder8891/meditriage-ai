@@ -260,6 +260,343 @@ export type TrainingSession = typeof trainingSessions.$inferSelect;
 export type InsertTrainingSession = typeof trainingSessions.$inferInsert;
 
 /**
+ * Training datasets - tracks data sources for model training
+ */
+export const trainingDatasets = mysqlTable("training_datasets", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  dataSource: varchar("data_source", { length: 100 }).notNull(), // pubmed, pmc, medgen, clinvar, regional
+  
+  // Dataset statistics
+  totalRecords: int("total_records").default(0),
+  processedRecords: int("processed_records").default(0),
+  validRecords: int("valid_records").default(0),
+  
+  // Data quality metrics
+  qualityScore: int("quality_score").default(0), // 0-100
+  completeness: int("completeness").default(0), // 0-100
+  
+  // Regional specificity
+  isRegionalData: boolean("is_regional_data").default(false),
+  region: varchar("region", { length: 100 }), // iraq, mena, global
+  
+  // Status tracking
+  status: mysqlEnum("status", ["pending", "downloading", "processing", "ready", "failed"]).default("pending").notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().onUpdateNow(),
+  nextUpdateDue: timestamp("next_update_due"),
+  
+  // Storage info
+  storageKey: varchar("storage_key", { length: 512 }),
+  storageSize: int("storage_size"), // in bytes
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TrainingDataset = typeof trainingDatasets.$inferSelect;
+export type InsertTrainingDataset = typeof trainingDatasets.$inferInsert;
+
+/**
+ * Training jobs - manages training execution and configuration
+ */
+export const trainingJobs = mysqlTable("training_jobs", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  jobName: varchar("job_name", { length: 255 }).notNull(),
+  jobType: mysqlEnum("job_type", ["full_training", "incremental", "fine_tuning", "evaluation"]).notNull(),
+  
+  // Configuration
+  baseModel: varchar("base_model", { length: 100 }).notNull(), // gpt-4, claude, gemini
+  trainingConfig: text("training_config"), // JSON with hyperparameters
+  
+  // Dataset selection
+  datasetIds: text("dataset_ids"), // JSON array of dataset IDs
+  totalDataPoints: int("total_data_points").default(0),
+  
+  // Progress tracking
+  status: mysqlEnum("status", ["queued", "running", "paused", "completed", "failed", "cancelled"]).default("queued").notNull(),
+  progress: int("progress").default(0), // 0-100
+  currentEpoch: int("current_epoch").default(0),
+  totalEpochs: int("total_epochs").default(1),
+  
+  // Timing
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  estimatedCompletion: timestamp("estimated_completion"),
+  duration: int("duration"), // in seconds
+  
+  // Results
+  outputModelId: int("output_model_id"),
+  trainingMetrics: text("training_metrics"), // JSON with loss, accuracy, etc.
+  errorMessage: text("error_message"),
+  
+  // Resource usage
+  cpuUsage: int("cpu_usage"), // percentage
+  memoryUsage: int("memory_usage"), // in MB
+  gpuUsage: int("gpu_usage"), // percentage
+  
+  // User tracking
+  triggeredBy: int("triggered_by").notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TrainingJob = typeof trainingJobs.$inferSelect;
+export type InsertTrainingJob = typeof trainingJobs.$inferInsert;
+
+/**
+ * Training progress - real-time progress updates for training jobs
+ */
+export const trainingProgress = mysqlTable("training_progress", {
+  id: int("id").autoincrement().primaryKey(),
+  jobId: int("job_id").notNull(),
+  
+  // Progress details
+  epoch: int("epoch").notNull(),
+  step: int("step").notNull(),
+  totalSteps: int("total_steps").notNull(),
+  
+  // Metrics
+  loss: float("loss"),
+  accuracy: float("accuracy"),
+  validationLoss: float("validation_loss"),
+  validationAccuracy: float("validation_accuracy"),
+  perplexity: float("perplexity"),
+  
+  // Additional metrics
+  learningRate: float("learning_rate"),
+  batchSize: int("batch_size"),
+  
+  // Timing
+  stepDuration: int("step_duration"), // in milliseconds
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type TrainingProgress = typeof trainingProgress.$inferSelect;
+export type InsertTrainingProgress = typeof trainingProgress.$inferInsert;
+
+/**
+ * Model versions - stores trained model metadata and versioning
+ */
+export const modelVersions = mysqlTable("model_versions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  versionName: varchar("version_name", { length: 255 }).notNull(),
+  versionNumber: varchar("version_number", { length: 50 }).notNull(),
+  
+  // Model info
+  baseModel: varchar("base_model", { length: 100 }).notNull(),
+  modelType: varchar("model_type", { length: 100 }).notNull(), // triage, diagnosis, general
+  
+  // Training info
+  trainingJobId: int("training_job_id"),
+  trainedOnDatasets: text("trained_on_datasets"), // JSON array
+  totalTrainingData: int("total_training_data"),
+  
+  // Performance metrics
+  accuracy: float("accuracy"),
+  f1Score: float("f1_score"),
+  precision: float("precision"),
+  recall: float("recall"),
+  bleuScore: float("bleu_score"),
+  
+  // Regional performance
+  regionalAccuracy: text("regional_accuracy"), // JSON with region-specific metrics
+  
+  // Model storage
+  modelKey: varchar("model_key", { length: 512 }),
+  modelUrl: varchar("model_url", { length: 1024 }),
+  modelSize: int("model_size"), // in bytes
+  
+  // Deployment status
+  isDeployed: boolean("is_deployed").default(false),
+  deployedAt: timestamp("deployed_at"),
+  isActive: boolean("is_active").default(false),
+  
+  // Metadata
+  description: text("description"),
+  releaseNotes: text("release_notes"),
+  
+  createdBy: int("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ModelVersion = typeof modelVersions.$inferSelect;
+export type InsertModelVersion = typeof modelVersions.$inferInsert;
+
+/**
+ * Medical articles - stores parsed medical literature from various sources
+ */
+export const medicalArticles = mysqlTable("medical_articles", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Article identifiers
+  pmid: varchar("pmid", { length: 50 }), // PubMed ID
+  pmcid: varchar("pmcid", { length: 50 }), // PMC ID
+  doi: varchar("doi", { length: 255 }), // Digital Object Identifier
+  
+  // Article metadata
+  title: text("title").notNull(),
+  abstract: text("abstract"),
+  fullText: text("full_text"),
+  
+  // Authors and publication
+  authors: text("authors"), // JSON array
+  journal: varchar("journal", { length: 500 }),
+  publicationDate: date("publication_date"),
+  publicationYear: int("publication_year"),
+  
+  // Classification
+  articleType: varchar("article_type", { length: 100 }), // research, review, case_study
+  medicalField: varchar("medical_field", { length: 100 }),
+  meshTerms: text("mesh_terms"), // JSON array of MeSH terms
+  keywords: text("keywords"), // JSON array
+  
+  // Regional relevance
+  isRegionallyRelevant: boolean("is_regionally_relevant").default(false),
+  relevantRegions: text("relevant_regions"), // JSON array
+  regionalDiseases: text("regional_diseases"), // JSON array
+  
+  // Quality metrics
+  citationCount: int("citation_count").default(0),
+  impactFactor: float("impact_factor"),
+  qualityScore: int("quality_score").default(0), // 0-100
+  
+  // Processing status
+  processingStatus: mysqlEnum("processing_status", ["pending", "processed", "indexed", "failed"]).default("pending"),
+  processedAt: timestamp("processed_at"),
+  
+  // Training usage
+  usedInTraining: boolean("used_in_training").default(false),
+  trainingJobIds: text("training_job_ids"), // JSON array
+  
+  // Storage
+  storageKey: varchar("storage_key", { length: 512 }),
+  sourceUrl: varchar("source_url", { length: 1024 }),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MedicalArticle = typeof medicalArticles.$inferSelect;
+export type InsertMedicalArticle = typeof medicalArticles.$inferInsert;
+
+/**
+ * Medical entities - extracted medical terms, diseases, drugs, etc.
+ */
+export const medicalEntities = mysqlTable("medical_entities", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Entity identification
+  entityType: mysqlEnum("entity_type", ["disease", "symptom", "drug", "procedure", "anatomy", "gene"]).notNull(),
+  entityName: varchar("entity_name", { length: 500 }).notNull(),
+  entityNameAr: varchar("entity_name_ar", { length: 500 }), // Arabic translation
+  
+  // Standard codes
+  icd10Code: varchar("icd10_code", { length: 50 }),
+  snomedCode: varchar("snomed_code", { length: 50 }),
+  meshCode: varchar("mesh_code", { length: 50 }),
+  umlsCode: varchar("umls_code", { length: 50 }),
+  
+  // Entity details
+  description: text("description"),
+  descriptionAr: text("description_ar"),
+  synonyms: text("synonyms"), // JSON array
+  
+  // Regional data
+  regionalPrevalence: text("regional_prevalence"), // JSON with region-specific data
+  menaSpecific: boolean("mena_specific").default(false),
+  
+  // Relationships
+  relatedEntities: text("related_entities"), // JSON array of entity IDs
+  
+  // Source tracking
+  sourceArticleIds: text("source_article_ids"), // JSON array
+  occurrenceCount: int("occurrence_count").default(1),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MedicalEntity = typeof medicalEntities.$inferSelect;
+export type InsertMedicalEntity = typeof medicalEntities.$inferInsert;
+
+/**
+ * Regional medical data - MENA and Iraq-specific medical information
+ */
+export const regionalMedicalData = mysqlTable("regional_medical_data", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  region: varchar("region", { length: 100 }).notNull(), // iraq, syria, jordan, etc.
+  dataType: mysqlEnum("data_type", ["disease_prevalence", "treatment_protocol", "medication_availability", "health_statistics", "environmental_factors"]).notNull(),
+  
+  // Data content
+  title: varchar("title", { length: 500 }).notNull(),
+  titleAr: varchar("title_ar", { length: 500 }),
+  content: text("content").notNull(),
+  contentAr: text("content_ar"),
+  
+  // Medical classification
+  diseaseCategory: varchar("disease_category", { length: 100 }),
+  affectedPopulation: text("affected_population"), // JSON with demographics
+  
+  // Statistics
+  prevalenceRate: float("prevalence_rate"),
+  incidenceRate: float("incidence_rate"),
+  mortalityRate: float("mortality_rate"),
+  
+  // Data source
+  dataSource: varchar("data_source", { length: 500 }).notNull(),
+  sourceUrl: varchar("source_url", { length: 1024 }),
+  dataYear: int("data_year"),
+  
+  // Validation
+  isVerified: boolean("is_verified").default(false),
+  verifiedBy: int("verified_by"),
+  verifiedAt: timestamp("verified_at"),
+  
+  // Training usage
+  usedInTraining: boolean("used_in_training").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RegionalMedicalData = typeof regionalMedicalData.$inferSelect;
+export type InsertRegionalMedicalData = typeof regionalMedicalData.$inferInsert;
+
+/**
+ * Training metrics - detailed metrics for training analysis
+ */
+export const trainingMetrics = mysqlTable("training_metrics", {
+  id: int("id").autoincrement().primaryKey(),
+  jobId: int("job_id").notNull(),
+  modelVersionId: int("model_version_id"),
+  
+  // Performance metrics
+  metricType: varchar("metric_type", { length: 100 }).notNull(), // accuracy, loss, f1, precision, recall
+  metricValue: float("metric_value").notNull(),
+  
+  // Context
+  datasetType: varchar("dataset_type", { length: 50 }), // training, validation, test
+  epoch: int("epoch"),
+  
+  // Regional breakdown
+  region: varchar("region", { length: 100 }),
+  regionalValue: float("regional_value"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type TrainingMetric = typeof trainingMetrics.$inferSelect;
+export type InsertTrainingMetric = typeof trainingMetrics.$inferInsert;
+
+/**
  * Clinical cases table for case management
  */
 export const cases = mysqlTable("cases", {

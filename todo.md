@@ -231,3 +231,145 @@
 - [x] Fix bio scanner to display final results after test completion (FIXED - shows prominent final result overlay)
 
 - [x] Remove white background from logo to show only hexagon shape
+
+
+## AI Model Training System - "Train the Brain"
+
+### Database Schema for Training
+- [x] Create training_datasets table for data source tracking
+- [x] Create training_jobs table for training session management
+- [x] Create training_progress table for real-time progress tracking
+- [x] Create model_versions table for model versioning and metadata
+- [x] Create medical_articles table for storing parsed literature
+- [x] Create medical_entities table for extracted medical terms
+- [x] Create regional_data table for MENA-specific medical data
+- [x] Create training_metrics table for performance analytics
+
+### Massive Data Collection Pipeline
+- [x] Implement PubMed bulk download (baseline + daily updates)
+- [x] Implement PMC Open Access full-text download
+- [x] Implement MedGen disease database download
+- [x] Implement ClinVar genetic variants download
+- [x] Implement Gene database download
+- [ ] Implement DrugBank integration for drug information
+- [ ] Implement WHO disease statistics for MENA region
+- [ ] Implement regional health ministry data integration
+- [ ] Create automated daily/weekly update scheduler
+- [ ] Implement parallel download with rate limiting
+- [ ] Add data deduplication and quality checks
+- [ ] Create data preprocessing and cleaning pipeline
+
+### MENA Region-Specific Data Integration
+- [ ] Collect Iraq-specific disease prevalence data
+- [ ] Integrate MENA regional health statistics
+- [ ] Add Arabic medical terminology mapping
+- [ ] Include regional disease patterns (diabetes, cardiovascular, infectious)
+- [ ] Add regional medication availability database
+- [ ] Include cultural health practices and considerations
+- [ ] Add regional environmental health factors
+- [ ] Integrate regional hospital and clinic data
+- [ ] Add regional emergency response protocols
+- [ ] Include regional insurance and healthcare system data
+
+### Training Data Processing
+- [ ] Implement XML/JSON parsing for medical literature
+- [ ] Extract article metadata (title, abstract, authors, citations)
+- [ ] Extract medical entities (diseases, symptoms, treatments, drugs)
+- [ ] Implement MeSH term extraction and mapping
+- [ ] Create medical knowledge graph from articles
+- [ ] Implement text chunking for large documents
+- [ ] Create embeddings for semantic search
+- [ ] Build training dataset formatter for LLM fine-tuning
+- [ ] Implement data augmentation for regional context
+- [ ] Create validation dataset from regional cases
+
+### Training Orchestration System
+- [x] Create training job scheduler and queue system
+- [x] Implement distributed training coordinator
+- [x] Build training progress monitoring with WebSocket
+- [x] Create checkpoint management system
+- [x] Implement automatic model evaluation
+- [ ] Add training interruption and resume capability
+- [ ] Create training logs and error handling
+- [ ] Implement resource monitoring (CPU, GPU, memory)
+- [ ] Add training completion notifications
+- [ ] Create model versioning and rollback system
+
+### Model Training & Fine-tuning
+- [ ] Implement base model selection (GPT-4, Claude, Gemini)
+- [ ] Create fine-tuning pipeline for medical knowledge
+- [ ] Implement RAG (Retrieval-Augmented Generation) system
+- [ ] Build medical knowledge base indexing
+- [ ] Create context-aware prompt engineering
+- [ ] Implement multi-stage training (general → medical → regional)
+- [ ] Add few-shot learning with regional examples
+- [ ] Create model evaluation metrics (accuracy, F1, BLEU)
+- [ ] Implement A/B testing for model versions
+- [ ] Add model performance benchmarking
+
+### "Train the Brain" UI & Dashboard
+- [x] Create training dashboard page with analytics
+- [x] Build data collection status monitor
+- [x] Add real-time training progress visualization
+- [x] Create training job management interface
+- [ ] Build model version comparison tool
+- [ ] Add training metrics charts (loss, accuracy, perplexity)
+- [x] Create data source statistics display
+- [x] Build training history timeline
+- [x] Add "Start Training" button with configuration options
+- [ ] Create training logs viewer
+- [x] Add model deployment controls
+- [ ] Build training cost estimator
+
+### Training API Endpoints (tRPC)
+- [x] Create startTraining procedure with configuration
+- [x] Create getTrainingProgress procedure
+- [x] Create getTrainingMetrics procedure
+- [x] Create listModelVersions procedure
+- [x] Create deployModel procedure
+- [x] Create getDatasetStats procedure
+- [x] Create downloadTrainingData procedure
+- [x] Create cancelTraining procedure
+- [ ] Create evaluateModel procedure
+- [ ] Create compareModels procedure
+
+### Data Quality & Validation
+- [ ] Implement data quality scoring system
+- [ ] Create duplicate detection and removal
+- [ ] Add medical accuracy validation
+- [ ] Implement bias detection for regional data
+- [ ] Create data completeness checks
+- [ ] Add source credibility scoring
+- [ ] Implement data freshness monitoring
+- [ ] Create data lineage tracking
+- [ ] Add data privacy and compliance checks
+
+### Performance Optimization
+- [ ] Implement parallel data processing
+- [ ] Add caching for frequently accessed data
+- [ ] Optimize database queries for large datasets
+- [ ] Implement batch processing for training data
+- [ ] Add compression for stored articles
+- [ ] Optimize model inference speed
+- [ ] Implement distributed training support
+- [ ] Add GPU acceleration for training
+
+### Monitoring & Analytics
+- [ ] Create training dashboard with real-time metrics
+- [ ] Build data collection analytics
+- [ ] Add model performance tracking over time
+- [ ] Create training cost analytics
+- [ ] Build data source contribution analysis
+- [ ] Add regional data coverage heatmap
+- [ ] Create training success rate monitoring
+- [ ] Build alerting system for training failures
+
+### Integration & Deployment
+- [ ] Integrate trained model with triage assessment
+- [ ] Create model API endpoints for inference
+- [ ] Implement model versioning in production
+- [ ] Add A/B testing framework for models
+- [ ] Create model rollback mechanism
+- [ ] Build model performance monitoring in production
+- [ ] Add user feedback collection for model improvement
+- [ ] Create continuous training pipeline
