@@ -229,3 +229,5 @@
 
 - [x] Fix bio scanner to display real-time readings during 0-100% test progression
 - [x] Fix bio scanner to display final results after test completion
+
+- [x] Remove white background from logo to show only hexagon shape

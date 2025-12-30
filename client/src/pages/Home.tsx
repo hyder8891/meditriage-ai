@@ -91,7 +91,7 @@ export default function Home() {
                   src="/logo.png" 
                   alt="MediTriage AI Pro" 
                   className="h-14 w-auto" 
-                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain', backgroundColor: 'transparent' }}
+                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
                 />
               </div>
               <div className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -1013,7 +1013,7 @@ export default function Home() {
               <img 
                 src="/logo.png" 
                 alt="MediTriage AI Pro" 
-                className="h-12 w-auto mb-4" 
+                className="h-12 w-auto mb-4"
               />
               <p className="text-slate-400 text-sm">
                 {language === 'ar' ? 'رعاية صحية ذكية بالذكاء الاصطناعي' : 'Smart healthcare powered by AI'}
