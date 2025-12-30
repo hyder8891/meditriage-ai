@@ -348,9 +348,44 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
 
   const startScanning = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-      });
+      let stream: MediaStream | null = null;
+      
+      // Try back camera with torch first (preferred for finger measurement)
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            facingMode: { exact: "environment" },
+            // @ts-ignore - torch is not in TypeScript types but supported on mobile
+            advanced: [{ torch: true }]
+          },
+        });
+        
+        // Try to enable torch/flashlight if available
+        const videoTrack = stream.getVideoTracks()[0];
+        if (videoTrack && 'applyConstraints' in videoTrack) {
+          try {
+            // @ts-ignore - torch constraint
+            await videoTrack.applyConstraints({ advanced: [{ torch: true }] });
+          } catch (e) {
+            console.log('Torch not available on this device');
+          }
+        }
+      } catch (backCameraError) {
+        console.log('Back camera not available, trying front camera:', backCameraError);
+        // Fallback to front camera if back camera fails
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+          });
+          toast.info("الكاميرا الخلفية غير متاحة. سيتم استخدام الكاميرا الأمامية / Back camera unavailable. Using front camera", { duration: 4000 });
+        } catch (frontCameraError) {
+          throw new Error("No camera available");
+        }
+      }
+      
+      if (!stream) {
+        throw new Error("Failed to access camera");
+      }
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -541,9 +576,9 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
         </div>
 
         <div className="text-xs text-muted-foreground space-y-1">
-          <p>• ضع إصبعك على الكاميرا الخلفية</p>
-          <p>• تأكد من الإضاءة الجيدة</p>
-          <p>• حافظ على ثبات يدك</p>
+          <p>• ضع إصبعك على الكاميرا الخلفية وغطها بالكامل</p>
+          <p>• سيتم تشغيل الفلاش تلقائياً للقياس</p>
+          <p>• حافظ على ثبات يدك وعدم الضغط بقوة</p>
           <p>• انتظر {measurementDuration} ثانية للحصول على أفضل النتائج</p>
         </div>
       </div>

@@ -214,11 +214,15 @@
 
 - [x] Protect /medical-literature route to require clinician authentication
 - [x] Add sidebar navigation to Medical Literature page using ClinicianLayout
+- [x] Bio scanner not working - Fixed camera configuration and added fallback
 
 
 ## Recent Fixes
 
+- [x] Bio-scanner camera configuration fixed - Changed from front camera to back camera with flashlight for finger-based measurement (matches user instructions)
+- [x] Bio-scanner fallback mechanism added - Automatically falls back to front camera if back camera is unavailable
 - [x] Bio-scanner error handling improved - Added comprehensive bilingual error messages for camera access issues (permission denied, camera not found, already in use, HTTPS required, etc.)
-- [x] Bio-scanner backend API tested and verified working - All 7 vitals API endpoints passing tests
+- [x] Bio-scanner backend API tested and verified working - All 6 vitals API endpoints passing tests (logVital, getRecent, getStats, getTrends, saveCalibration, getCalibration)
+- [x] Bio-scanner instructions updated - Clarified to place finger on back camera with flashlight enabled
 
 - [x] Fix WebSocket connection errors - Socket.IO failing to connect to wss://tabibi.clinic/socket.io/ on deployed site
