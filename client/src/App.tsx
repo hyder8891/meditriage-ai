@@ -98,6 +98,7 @@ const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
 const MyDoctor = lazy(() => import("./pages/MyDoctor"));
 const SelfHealingDashboard = lazy(() => import("./pages/SelfHealingDashboard"));
+const MedicalLiterature = lazy(() => import("./pages/MedicalLiterature"));
 const Certificates = lazy(() => import("./pages/Certificates"));
 const SecureAdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const SecureAdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -329,6 +330,7 @@ function Router() {
         <Route path={"/brain-dashboard"} component={BRAINDashboard} />
         <Route path={"/training-dashboard"} component={TrainingDashboard} />
         <Route path={"/brain-performance"} component={BrainPerformance} />
+        <Route path={"/medical-literature"} component={MedicalLiterature} />
         <Route path={"/debug/user"} component={DebugUser} />
         <Route path={"/debug/auth"} component={DebugAuth} />
         <Route component={NotFound} />

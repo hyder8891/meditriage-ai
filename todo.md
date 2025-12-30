@@ -107,3 +107,99 @@
 - [x] Optimize logo.png file size for better performance
 - [x] Fix second statistics section counter values (remove *10 multiplier to match first section)
 - [x] Ensure logo backgrounds are fully transparent in header and footer
+
+
+## Medical Knowledge Base Integration
+
+### NCBI E-utilities Integration (API Key: 747de4aa0649aaefc1806adc49c2c22de209)
+- [x] Add NCBI API key to environment variables
+- [x] Create NCBI E-utilities helper functions in server
+- [x] Implement PubMed literature search endpoint
+- [ ] Implement PMC full-text article retrieval
+- [ ] Implement MedGen/MeSH medical term lookup
+- [ ] Implement Gene database integration for genetic conditions
+- [ ] Implement ClinVar integration for genetic variants
+- [x] Create frontend UI for medical literature search
+- [x] Add search results display with pagination and filters
+- [ ] Add article abstract preview and full-text access
+- [x] Test NCBI API integration with rate limiting (10 req/sec)
+
+### UMLS Integration (License Pending - 3 Business Days)
+- [ ] Wait for UMLS license approval email
+- [ ] Generate UMLS API key after approval
+- [ ] Add UMLS API key to environment variables
+- [ ] Implement UMLS terminology search endpoint
+- [ ] Implement medical concept mapping (CUI lookups)
+- [ ] Integrate RxNorm for standardized drug information
+- [ ] Integrate SNOMED CT for clinical terminology
+- [ ] Implement ICD-10/ICD-11 code mapping
+- [ ] Create frontend UI for medical terminology search
+- [ ] Test UMLS API integration
+
+### OpenFDA Integration (No API Key Required)
+- [ ] Implement OpenFDA drug adverse events search
+- [ ] Implement drug label information retrieval
+- [ ] Implement device adverse events search
+- [ ] Implement food recalls search
+- [ ] Implement drug enforcement reports
+- [ ] Create frontend UI for drug safety information
+- [ ] Add adverse event visualization
+- [ ] Test OpenFDA API integration
+
+### ClinicalTrials.gov Integration (No API Key Required)
+- [ ] Implement clinical trials search by condition
+- [ ] Implement trial details retrieval
+- [ ] Implement trial location search
+- [ ] Implement eligibility criteria parsing
+- [ ] Create frontend UI for clinical trials search
+- [ ] Add trial results visualization
+- [ ] Test ClinicalTrials.gov API integration
+
+### PubChem Integration (No API Key Required)
+- [ ] Implement chemical compound search
+- [ ] Implement drug structure lookup
+- [ ] Implement bioassay data retrieval
+- [ ] Implement drug-drug interaction lookup
+- [ ] Create frontend UI for chemical/drug data
+- [ ] Test PubChem API integration
+
+
+
+## Medical Literature Bulk Download & Training Pipeline
+
+### PubMed Baseline Bulk Download
+- [x] Create PubMed baseline download script (FTP)
+- [x] Implement XML parsing for PubMed articles
+- [x] Extract article metadata (title, abstract, authors, MeSH terms)
+- [ ] Store parsed articles in database
+- [ ] Create incremental update script for new articles
+
+### PMC Open Access Bulk Download
+- [ ] Create PMC Open Access download script
+- [ ] Implement full-text article parsing
+- [ ] Extract article sections (abstract, methods, results, discussion)
+- [ ] Store full-text articles in database
+- [ ] Create update script for new PMC articles
+
+### Data Ingestion Pipeline
+- [ ] Create article preprocessing pipeline
+- [ ] Implement text cleaning and normalization
+- [ ] Extract medical entities (diseases, drugs, procedures)
+- [ ] Create article embeddings for semantic search
+- [ ] Build article indexing system
+
+### Model Training Integration
+- [ ] Create training data formatter for LLM
+- [ ] Implement batch training script
+- [ ] Create medical knowledge base from articles
+- [ ] Implement RAG (Retrieval-Augmented Generation) system
+- [ ] Create training progress monitoring
+- [ ] Implement model evaluation metrics
+
+### Automation & Scheduling
+- [ ] Create automated download scheduler (weekly updates)
+- [ ] Implement data quality checks
+- [ ] Create training pipeline orchestration
+- [ ] Add error handling and retry logic
+- [ ] Create monitoring dashboard for training progress
+
