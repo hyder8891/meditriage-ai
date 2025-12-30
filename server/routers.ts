@@ -37,6 +37,9 @@ import { calendarRouter } from "./calendar-router";
 import { selfHealingRouter } from "./self-healing-router";
 import { certificateRouter } from "./certificate-router";
 import { aiTrainingRouter } from "./ai-training-router";
+import { drugInteractionRouter } from "./drug-interaction-router";
+import { clinicalTrialsRouter } from "./clinical-trials-router";
+import { medicalAssistantRouter } from "./medical-assistant-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -110,6 +113,9 @@ export const appRouter = router({
   selfHealing: selfHealingRouter,
   certificate: certificateRouter,
   aiTraining: aiTrainingRouter,
+  drugInteraction: drugInteractionRouter,
+  clinicalTrials: clinicalTrialsRouter,
+  medicalAssistant: medicalAssistantRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
