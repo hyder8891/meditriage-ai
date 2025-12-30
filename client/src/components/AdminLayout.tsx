@@ -24,6 +24,7 @@ import {
   User,
   Shield,
   Wrench,
+  Brain,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -51,6 +52,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "User Management", href: "/admin/users", icon: Users },
+    { name: "Train the Brain", href: "/train-the-brain", icon: Brain },
     { name: "System Analytics", href: "/admin/analytics", icon: BarChart3 },
     { name: "Load Testing", href: "/admin/load-test", icon: Activity },
     { name: "Self-Healing", href: "/admin/self-healing", icon: Wrench },

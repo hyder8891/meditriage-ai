@@ -373,3 +373,8 @@
 - [ ] Build model performance monitoring in production
 - [ ] Add user feedback collection for model improvement
 - [ ] Create continuous training pipeline
+
+## New Issues (User Reported)
+
+- [x] "Train the brain" feature - Added to Admin navigation menu, accessible at /train-the-brain
+- [x] Bio-scanner not working - Fixed by lowering confidence threshold and adding better visual feedback for signal quality

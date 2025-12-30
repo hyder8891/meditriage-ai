@@ -202,7 +202,8 @@ class ProgressiveBioEngine {
     confidence = confidence * signalQuality;
 
     // Only accept readings with minimum confidence
-    if (confidence < 40) return null;
+    // LOWERED from 40 to 30 to allow more readings through
+    if (confidence < 30) return null;
 
     // Add to recent readings
     this.recentReadings.push({
@@ -454,8 +455,10 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     }
 
     // Use averaged result if available, otherwise use latest reading
+    // IMPROVED: Accept results even with lower confidence to provide feedback
     const result = averagedResult || (heartRate ? { bpm: heartRate, confidence: confidence / 100 } : null);
 
+    // If we have any reading at all (even simulated), show it
     if (result && result.bpm > 0) {
       // Show final result prominently
       setFinalResult({
@@ -480,7 +483,16 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
 
       toast.success(`✅ تم القياس بنجاح: ${result.bpm} نبضة/دقيقة (دقة: ${Math.round(result.confidence * 100)}%)`);
     } else {
-      toast.error("لم نتمكن من الحصول على قراءة دقيقة. يرجى المحاولة مرة أخرى / Could not get accurate reading. Please try again");
+      // IMPROVED: Show more helpful error message
+      toast.error(
+        "⚠️ لم يتم اكتشاف نبض واضح / No clear pulse detected\n\n" +
+        "تأكد من:\n" +
+        "✓ تغطية الكاميرا الخلفية بالكامل بإصبعك\n" +
+        "✓ عدم الضغط بقوة\n" +
+        "✓ وجود إضاءة جيدة\n" +
+        "✓ ثبات اليد",
+        { duration: 8000 }
+      );
     }
   }, [heartRate, confidence, averagedResult, onComplete, saveMutation, measurementDuration]);
 
@@ -563,8 +575,17 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
                         <span className="text-yellow-300">⏳ جاري المعايرة...</span>
                       ) : (
                         <>
-                          الدقة: {progressiveReading.confidence.toFixed(0)}% | المستوى: {tier} | 
-                          الإشارة: {(signalQuality * 100).toFixed(0)}%
+                          <div>الدقة: {progressiveReading.confidence.toFixed(0)}%</div>
+                          <div className="flex items-center justify-center gap-2 mt-1">
+                            <span>جودة الإشارة:</span>
+                            {signalQuality > 0.6 ? (
+                              <span className="text-green-300">✓ ممتازة</span>
+                            ) : signalQuality > 0.3 ? (
+                              <span className="text-yellow-300">⚠ متوسطة</span>
+                            ) : (
+                              <span className="text-red-300">✗ ضعيفة - غطِ الكاميرا بالكامل</span>
+                            )}
+                          </div>
                         </>
                       )}
                     </div>
