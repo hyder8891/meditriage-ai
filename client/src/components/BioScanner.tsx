@@ -379,7 +379,25 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
       animationRef.current = requestAnimationFrame(processFrame);
     } catch (error) {
       console.error("Camera access error:", error);
-      toast.error("فشل الوصول إلى الكاميرا");
+      
+      // Provide specific error messages based on error type
+      let errorMessage = "Failed to access camera / فشل الوصول إلى الكاميرا";
+      
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+          errorMessage = "Camera permission denied. Please allow camera access in your browser settings. / تم رفض إذن الكاميرا. يرجى السماح بالوصول إلى الكاميرا في إعدادات المتصفح.";
+        } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+          errorMessage = "No camera found on this device. / لم يتم العثور على كاميرا على هذا الجهاز.";
+        } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+          errorMessage = "Camera is already in use by another application. / الكاميرا قيد الاستخدام بالفعل من قبل تطبيق آخر.";
+        } else if (error.name === "OverconstrainedError") {
+          errorMessage = "Camera constraints not supported. / قيود الكاميرا غير مدعومة.";
+        } else if (error.name === "NotSupportedError") {
+          errorMessage = "Camera access requires HTTPS. / يتطلب الوصول إلى الكاميرا HTTPS.";
+        }
+      }
+      
+      toast.error(errorMessage, { duration: 6000 });
     }
   }, [measurementDuration, processFrame]);
 

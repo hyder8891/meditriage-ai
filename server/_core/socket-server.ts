@@ -7,6 +7,7 @@ let io: SocketIOServer | null = null;
 
 export function initializeSocketServer(httpServer: HttpServer) {
   io = new SocketIOServer(httpServer, {
+    path: '/socket.io',
     cors: {
       // Allow dynamic origins for preview environments
       origin: (requestOrigin, callback) => {

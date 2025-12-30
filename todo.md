@@ -214,3 +214,11 @@
 
 - [x] Protect /medical-literature route to require clinician authentication
 - [x] Add sidebar navigation to Medical Literature page using ClinicianLayout
+
+
+## Recent Fixes
+
+- [x] Bio-scanner error handling improved - Added comprehensive bilingual error messages for camera access issues (permission denied, camera not found, already in use, HTTPS required, etc.)
+- [x] Bio-scanner backend API tested and verified working - All 7 vitals API endpoints passing tests
+
+- [x] Fix WebSocket connection errors - Socket.IO failing to connect to wss://tabibi.clinic/socket.io/ on deployed site

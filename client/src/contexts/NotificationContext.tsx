@@ -57,7 +57,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
     // Connect to WebSocket server
     const newSocket = io(window.location.origin, {
-      transports: ['websocket', 'polling'],
+      path: '/socket.io',
+      transports: ['polling', 'websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      timeout: 20000,
     });
 
     newSocket.on('connect', () => {
