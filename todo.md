@@ -226,3 +226,6 @@
 - [x] Bio-scanner instructions updated - Clarified to place finger on back camera with flashlight enabled
 
 - [x] Fix WebSocket connection errors - Socket.IO failing to connect to wss://tabibi.clinic/socket.io/ on deployed site
+
+- [x] Fix bio scanner to display real-time readings during 0-100% test progression
+- [x] Fix bio scanner to display final results after test completion

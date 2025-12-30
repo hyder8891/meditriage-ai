@@ -484,10 +484,13 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
   }, []);
 
   // Display the averaged result if stable, otherwise show current reading
-  const displayBPM = averagedResult?.isStable ? averagedResult.bpm : heartRate;
+  // Always prefer showing something during scanning
+  const displayBPM = averagedResult?.isStable 
+    ? averagedResult.bpm 
+    : (averagedResult?.bpm || heartRate);
   const displayConfidence = averagedResult?.isStable 
     ? averagedResult.confidence * 100 
-    : confidence;
+    : (averagedResult ? averagedResult.confidence * 100 : confidence);
 
   return (
     <Card className="p-6">
@@ -515,17 +518,27 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
           <canvas ref={canvasRef} className="hidden" width={320} height={240} />
 
           {isScanning && (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
               <div className="text-center space-y-2">
-                {displayBPM && (
+                {displayBPM ? (
                   <>
-                    <div className="text-6xl font-bold text-white drop-shadow-lg">
+                    <div className="text-6xl font-bold text-white drop-shadow-lg animate-pulse">
                       {displayBPM}
                     </div>
                     <div className="text-xl text-white/90">نبضة/دقيقة</div>
                     <div className="text-sm text-white/70">
                       الدقة: {displayConfidence.toFixed(0)}% | المستوى: {tier} | 
                       الإشارة: {(signalQuality * 100).toFixed(0)}%
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-4xl font-bold text-white drop-shadow-lg">
+                      <Activity className="w-16 h-16 animate-pulse mx-auto" />
+                    </div>
+                    <div className="text-lg text-white/90">جاري القياس...</div>
+                    <div className="text-sm text-white/70">
+                      يرجى الانتظار بينما نكتشف نبضك
                     </div>
                   </>
                 )}
