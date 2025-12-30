@@ -53,14 +53,14 @@ export default function MedicalLiterature() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4" dir="rtl">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
           <BookOpen className="h-8 w-8" />
-          Medical Literature Search
+          البحث في الأدبيات الطبية
         </h1>
         <p className="text-muted-foreground">
-          Search millions of medical articles from PubMed and PubMed Central
+          ابحث في ملايين المقالات الطبية من PubMed و PubMed Central
         </p>
       </div>
 
@@ -69,14 +69,14 @@ export default function MedicalLiterature() {
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder="Search for medical articles, conditions, treatments..."
+            placeholder="ابحث عن مقالات طبية، حالات، علاجات..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1"
           />
           <Button type="submit" disabled={!searchQuery.trim()}>
-            <Search className="h-4 w-4 mr-2" />
-            Search
+            <Search className="h-4 w-4 ml-2" />
+            بحث
           </Button>
         </div>
       </form>
@@ -129,7 +129,7 @@ export default function MedicalLiterature() {
                                 <span>•</span>
                                 <span>
                                   {article.authors[0]?.name}
-                                  {article.authors.length > 1 && ` et al.`}
+                                  {article.authors.length > 1 && ` وآخرون`}
                                 </span>
                               </>
                             )}
@@ -155,7 +155,7 @@ export default function MedicalLiterature() {
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              View on PubMed
+                              عرض على PubMed
                               <ExternalLink className="ml-2 h-3 w-3" />
                             </a>
                           </Button>
@@ -172,7 +172,7 @@ export default function MedicalLiterature() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                Full Text
+                                النص الكامل
                                 <ExternalLink className="ml-2 h-3 w-3" />
                               </a>
                             </Button>
@@ -190,26 +190,26 @@ export default function MedicalLiterature() {
                     onClick={handlePrevPage}
                     disabled={page === 0}
                   >
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Previous
+                    <ChevronLeft className="h-4 w-4 ml-2" />
+                    السابق
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    Page {page + 1} of {Math.ceil(pubmedResults.totalCount / pageSize)}
+                    صفحة {page + 1} من {Math.ceil(pubmedResults.totalCount / pageSize)}
                   </span>
                   <Button
                     variant="outline"
                     onClick={handleNextPage}
                     disabled={!pubmedResults.hasMore}
                   >
-                    Next
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    التالي
+                    <ChevronRight className="h-4 w-4 mr-2" />
                   </Button>
                 </div>
               </>
             ) : (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  No results found for "{activeQuery}"
+                  لم يتم العثور على نتائج لـ "{activeQuery}"
                 </CardContent>
               </Card>
             )}
@@ -232,8 +232,8 @@ export default function MedicalLiterature() {
                   {pmcResults.pmcIds.map((pmcId) => (
                     <Card key={pmcId} className="hover:shadow-lg transition-shadow">
                       <CardHeader>
-                        <CardTitle className="text-lg">PMC Article {pmcId}</CardTitle>
-                        <CardDescription>Full-text article available</CardDescription>
+                        <CardTitle className="text-lg">مقالة PMC {pmcId}</CardTitle>
+                        <CardDescription>النص الكامل متاح</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <Button
@@ -246,7 +246,7 @@ export default function MedicalLiterature() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            View Full Text
+                            عرض النص الكامل
                             <ExternalLink className="ml-2 h-3 w-3" />
                           </a>
                         </Button>
@@ -262,26 +262,26 @@ export default function MedicalLiterature() {
                     onClick={handlePrevPage}
                     disabled={page === 0}
                   >
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Previous
+                    <ChevronLeft className="h-4 w-4 ml-2" />
+                    السابق
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    Page {page + 1} of {Math.ceil(pmcResults.totalCount / pageSize)}
+                    صفحة {page + 1} من {Math.ceil(pmcResults.totalCount / pageSize)}
                   </span>
                   <Button
                     variant="outline"
                     onClick={handleNextPage}
                     disabled={!pmcResults.hasMore}
                   >
-                    Next
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    التالي
+                    <ChevronRight className="h-4 w-4 mr-2" />
                   </Button>
                 </div>
               </>
             ) : (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  No full-text articles found for "{activeQuery}"
+                  لم يتم العثور على مقالات بالنص الكامل لـ "{activeQuery}"
                 </CardContent>
               </Card>
             )}
@@ -293,9 +293,9 @@ export default function MedicalLiterature() {
         <Card>
           <CardContent className="py-12 text-center">
             <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Start Your Search</h3>
+            <h3 className="text-lg font-semibold mb-2">ابدأ البحث</h3>
             <p className="text-muted-foreground">
-              Enter a medical term, condition, or treatment to search millions of peer-reviewed articles
+              أدخل مصطلحًا طبيًا أو حالة أو علاجًا للبحث في ملايين المقالات المراجعة من قبل الأقران
             </p>
           </CardContent>
         </Card>

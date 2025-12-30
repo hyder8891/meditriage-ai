@@ -79,6 +79,8 @@
 ## Bugs & Issues
 (Issues will be tracked here as they arise)
 
+- [x] Translate Medical Literature Search page to Arabic
+
 - [x] Fix footer logo not displaying
 - [x] Add animated statistics and counters to "How It Works" section
 - [x] Add animated statistics to other key sections for engagement
