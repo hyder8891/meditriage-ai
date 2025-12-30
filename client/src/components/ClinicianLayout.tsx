@@ -66,7 +66,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
     { icon: FileText, label: language === 'ar' ? 'نتائج التحاليل' : 'Lab Results', path: '/clinician/lab-results' },
     { icon: FileImage, label: language === 'ar' ? 'التصوير الطبي' : 'Medical Imaging', path: '/clinician/xray-analysis' },
     { icon: FileText, label: language === 'ar' ? 'التقارير الطبية' : 'Medical Reports', path: '/clinician/medical-reports' },
-    { icon: BookOpen, label: language === 'ar' ? 'الأدبيات الطبية' : 'Medical Literature', path: '/medical-literature' },
+    { icon: BookOpen, label: language === 'ar' ? 'المكتبة الطبية' : 'Medical Literature', path: '/medical-literature' },
     { icon: Calendar, label: language === 'ar' ? 'التقويم' : 'Calendar', path: '/clinician/calendar' },
     { icon: Pill, label: language === 'ar' ? 'الأدوية' : 'Medications', path: '/clinician/medications' },
     { icon: Users, label: language === 'ar' ? 'المرضى' : 'Patients', path: '/clinician/my-patients' },
