@@ -8,6 +8,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { TourProvider } from "./contexts/TourContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { GuidedTour } from "./components/GuidedTour";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useErrorReporting } from "./hooks/useErrorReporting";
 import { useAuth } from "./hooks/useAuth";
 import { trpc } from "./lib/trpc";
@@ -368,6 +369,7 @@ function App() {
           <TourProvider>
             <NotificationProvider>
               <TooltipProvider>
+                <OfflineIndicator />
                 <Router />
                 <GuidedTour />
               </TooltipProvider>
