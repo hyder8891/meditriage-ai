@@ -4479,3 +4479,6 @@ export type InsertMedicalCertificate = typeof medicalCertificates.$inferInsert;
 
 // Export consultations schema
 export * from "./schema-consultations";
+
+// Export Avicenna-X Orchestration System schema
+export * from "./avicenna-schema";

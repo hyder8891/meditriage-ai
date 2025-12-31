@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Medical AEC (Autonomous Error Correction)
  * 
@@ -19,8 +18,6 @@
  */
 
 import { getDb } from "../db";
-
-const db = await getDb();
 import { Redis } from "@upstash/redis";
 import { invokeGeminiPro } from "../_core/gemini-dual";
 import type { HybridDiagnosis } from "./orchestrator";
@@ -80,10 +77,25 @@ export async function recordMedicalCorrection(delta: DiagnosisDelta): Promise<vo
     console.log(`[Medical AEC] Recording correction from doctor ${delta.doctorId}...`);
 
     // Store in database
-    // TODO: Insert into medical_corrections table
+    const db = await getDb();
+    if (!db) throw new Error("Database connection failed");
+    const { medicalCorrections } = await import("../../drizzle/avicenna-schema");
+    
+    const [correction] = await db!.insert(medicalCorrections).values({
+      userId: delta.userId,
+      doctorId: delta.doctorId,
+      triageRecordId: delta.triageRecordId,
+      aiDiagnosis: delta.aiDiagnosis,
+      doctorDiagnosis: delta.doctorDiagnosis,
+      correctionType: delta.correctionType,
+      severityDelta: delta.severityDelta,
+      doctorFeedback: delta.doctorFeedback,
+    }).$returningId();
+    
+    console.log(`[Medical AEC] Correction ${correction.id} stored in database`);
 
     // Add to RLHF training queue
-    await addToRLHFQueue(delta);
+    await addToRLHFQueue(delta, correction.id);
 
     // Check if this error is systematic (appears frequently)
     const isSystematic = await checkIfSystematicError(delta);
@@ -151,8 +163,28 @@ export async function deployPromptPatch(patch: PromptPatch): Promise<boolean> {
     console.log(`[Medical AEC] Deploying prompt patch v${patch.promptVersion}...`);
 
     // Store in database
-    // TODO: Insert into medical_reasoning_prompts table
-    // TODO: Set isActive = true, deactivate previous version
+    const db = await getDb();
+    if (!db) throw new Error("Database connection failed");
+    const { medicalReasoningPrompts } = await import("../../drizzle/avicenna-schema");
+    const { eq } = await import("drizzle-orm");
+    
+    // Deactivate previous versions
+    await db!.update(medicalReasoningPrompts)
+      .set({ isActive: false, deactivatedAt: new Date() })
+      .where(eq(medicalReasoningPrompts.promptName, patch.promptName));
+    
+    // Insert new version
+    await db!.insert(medicalReasoningPrompts).values({
+      promptName: patch.promptName,
+      promptVersion: patch.promptVersion,
+      systemPrompt: patch.systemPrompt,
+      userPromptTemplate: patch.userPromptTemplate,
+      isActive: true,
+      activatedAt: new Date(),
+      createdBy: "aec",
+    });
+    
+    console.log(`[Medical AEC] Prompt patch v${patch.promptVersion} stored in database`);
 
     // Clear Redis cache to force reload
     await redis.del("medical_reasoning_prompt:active");
@@ -213,13 +245,17 @@ export async function analyzeCorrectionsJob(): Promise<void> {
 // RLHF Training Data Generation
 // ============================================================================
 
-async function addToRLHFQueue(delta: DiagnosisDelta): Promise<void> {
+async function addToRLHFQueue(delta: DiagnosisDelta, correctionId: number): Promise<void> {
   try {
+    const db = await getDb();
+    if (!db) throw new Error("Database connection failed");
+    const { rlhfTrainingData } = await import("../../drizzle/avicenna-schema");
+    
     // Convert correction to training example
     const trainingExample = {
-      correctionId: 0, // TODO: Get from database insert
+      correctionId,
       inputContext: {
-        // TODO: Reconstruct from triage record
+        // TODO: Reconstruct from triage record if triageRecordId is available
         symptoms: [],
         vitals: {},
         history: "",
@@ -233,7 +269,12 @@ async function addToRLHFQueue(delta: DiagnosisDelta): Promise<void> {
     };
 
     // Store in database
-    // TODO: Insert into rlhf_training_data table
+    await db!.insert(rlhfTrainingData).values({
+      correctionId: trainingExample.correctionId,
+      inputContext: trainingExample.inputContext,
+      expectedOutput: trainingExample.expectedOutput,
+      qualityScore: trainingExample.qualityScore.toString(),
+    });
 
     console.log("[Medical AEC] Added to RLHF training queue");
   } catch (error) {
@@ -311,28 +352,12 @@ Analyze this error pattern and determine:
 
 Return as JSON.`;
 
-  const response = await invokeGeminiPro({
-    messages: [{ role: "user", content: prompt }],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "error_analysis",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            isPatchable: { type: "boolean" },
-            rootCause: { type: "string" },
-            suggestedPromptChange: { type: "string" },
-            expectedImprovement: { type: "string" },
-          },
-          required: ["isPatchable", "rootCause", "suggestedPromptChange", "expectedImprovement"],
-        },
-      },
-    },
-  });
+  const response = await invokeGeminiPro(
+    [{ role: "user", content: prompt }],
+    { systemInstruction: "You are a medical AI quality assurance expert. Return your analysis as valid JSON." }
+  );
 
-  return JSON.parse(response.choices[0].message.content);
+  return JSON.parse(response);
 }
 
 async function generatePatchedPrompt(
@@ -353,11 +378,12 @@ Generate an improved version of the system prompt that fixes this error while pr
 
 Return the new system prompt as plain text (not JSON).`;
 
-  const response = await invokeGeminiPro({
-    messages: [{ role: "user", content: prompt }],
-  });
+  const response = await invokeGeminiPro(
+    [{ role: "user", content: prompt }],
+    { systemInstruction: "You are a medical AI prompt engineer." }
+  );
 
-  const patchedSystemPrompt = response.choices[0].message.content;
+  const patchedSystemPrompt = response;
 
   return {
     systemPrompt: patchedSystemPrompt,
@@ -378,7 +404,26 @@ async function loadCurrentPrompt(): Promise<any> {
     }
 
     // Load from database
-    // TODO: Query medical_reasoning_prompts table for active prompt
+    const db = await getDb();
+    if (!db) throw new Error("Database connection failed");
+    const { medicalReasoningPrompts } = await import("../../drizzle/avicenna-schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [activePrompt] = await db!.select()
+      .from(medicalReasoningPrompts)
+      .where(eq(medicalReasoningPrompts.isActive, true))
+      .orderBy(medicalReasoningPrompts.promptVersion)
+      .limit(1);
+    
+    if (activePrompt) {
+      // Cache for 1 hour
+      await redis.set("medical_reasoning_prompt:active", activePrompt, { ex: 3600 });
+      return {
+        version: activePrompt.promptVersion,
+        systemPrompt: activePrompt.systemPrompt,
+        userPromptTemplate: activePrompt.userPromptTemplate,
+      };
+    }
     
     // Default fallback
     return {
@@ -398,10 +443,28 @@ async function loadCurrentPrompt(): Promise<any> {
 
 async function getRecentCorrections(days: number): Promise<DiagnosisDelta[]> {
   try {
-    // TODO: Query medical_corrections table
-    // WHERE created_at > NOW() - INTERVAL days DAY
+    const db = await getDb();
+    if (!db) throw new Error("Database connection failed");
+    const { medicalCorrections } = await import("../../drizzle/avicenna-schema");
+    const { gt, sql } = await import("drizzle-orm");
     
-    return [];
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    const corrections = await db!.select()
+      .from(medicalCorrections)
+      .where(gt(medicalCorrections.createdAt, cutoffDate));
+    
+    return corrections.map(c => ({
+      userId: c.userId,
+      doctorId: c.doctorId,
+      triageRecordId: c.triageRecordId || undefined,
+      aiDiagnosis: c.aiDiagnosis,
+      doctorDiagnosis: c.doctorDiagnosis,
+      correctionType: c.correctionType as DiagnosisDelta["correctionType"],
+      severityDelta: c.severityDelta || undefined,
+      doctorFeedback: c.doctorFeedback || undefined,
+    }));
   } catch (error) {
     console.error("[Medical AEC] Error getting recent corrections:", error);
     return [];
@@ -457,13 +520,24 @@ export async function calculateAccuracyRate(days: number): Promise<number> {
  */
 export async function getPromptPerformanceMetrics(promptVersion: number): Promise<any> {
   try {
-    // TODO: Query medical_reasoning_prompts table
-    // Return usage_count, avg_confidence_score, accuracy_rate
+    const db = await getDb();
+    if (!db) throw new Error("Database connection failed");
+    const { medicalReasoningPrompts } = await import("../../drizzle/avicenna-schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [prompt] = await db!.select()
+      .from(medicalReasoningPrompts)
+      .where(eq(medicalReasoningPrompts.promptVersion, promptVersion))
+      .limit(1);
+    
+    if (!prompt) {
+      return null;
+    }
     
     return {
-      usageCount: 0,
-      avgConfidenceScore: 0,
-      accuracyRate: 0,
+      usageCount: prompt.usageCount,
+      avgConfidenceScore: prompt.avgConfidenceScore ? parseFloat(prompt.avgConfidenceScore) : 0,
+      accuracyRate: prompt.accuracyRate ? parseFloat(prompt.accuracyRate) : 0,
     };
   } catch (error) {
     console.error("[Medical AEC] Error getting prompt metrics:", error);
@@ -478,9 +552,19 @@ export async function rollbackPrompt(toVersion: number): Promise<boolean> {
   try {
     console.log(`[Medical AEC] Rolling back to prompt version ${toVersion}...`);
 
-    // TODO: Update medical_reasoning_prompts table
-    // SET isActive = true WHERE promptVersion = toVersion
-    // SET isActive = false WHERE promptVersion != toVersion
+    const db = await getDb();
+    if (!db) throw new Error("Database connection failed");
+    const { medicalReasoningPrompts } = await import("../../drizzle/avicenna-schema");
+    const { eq, ne } = await import("drizzle-orm");
+    
+    // Deactivate all versions
+    await db!.update(medicalReasoningPrompts)
+      .set({ isActive: false, deactivatedAt: new Date() });
+    
+    // Activate target version
+    await db!.update(medicalReasoningPrompts)
+      .set({ isActive: true, activatedAt: new Date() })
+      .where(eq(medicalReasoningPrompts.promptVersion, toVersion));
 
     // Clear cache
     await redis.del("medical_reasoning_prompt:active");

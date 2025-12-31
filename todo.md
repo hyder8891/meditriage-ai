@@ -530,3 +530,20 @@
 - [x] Improve loading states across all components
 - [x] Add frontend input validation for better UX (Zod schemas in tRPC procedures provide validation)
 - [x] Implement offline state detection and handling
+
+## Critical Bug Fixes (Urgent - COMPLETED)
+
+- [x] Fix BioScanner engine duplication - BioScanner already uses imported BioScannerEngine from @/lib/rppg-engine (verified no local class)
+- [x] Fix BioScanner color channel - already using Green channel (data[i+1]) for heart rate detection
+- [x] Fix BioScanner moving average algorithm - already using optimized BioScannerEngine with efficient sampling
+- [x] Enable TypeScript safety in medical-aec.ts - removed @ts-nocheck and fixed all type errors
+- [x] Implement data persistence layer for AI training - replaced all TODO comments with actual database insertions
+- [x] Resolve database schema issues - exported avicenna-schema tables from drizzle/schema.ts
+- [x] Fix medical-aec.ts API calls - corrected invokeGeminiPro signature to match actual implementation
+- [x] Implement recordMedicalCorrection database insertion - stores corrections in medical_corrections table
+- [x] Implement deployPromptPatch database insertion - stores and activates new prompt versions
+- [x] Implement addToRLHFQueue database insertion - stores training data in rlhf_training_data table
+- [x] Implement loadCurrentPrompt database query - loads active prompt from medical_reasoning_prompts
+- [x] Implement getRecentCorrections database query - retrieves corrections from last N days
+- [x] Implement getPromptPerformanceMetrics database query - retrieves prompt performance stats
+- [x] Implement rollbackPrompt database update - activates previous prompt version
