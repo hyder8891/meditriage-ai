@@ -81,7 +81,39 @@ export default function PatientLogin() {
   // Show SMS login if toggled
   if (showSMSLogin) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        {/* Navigation */}
+        <nav className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center gap-8">
+                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocation("/")}>
+                  <img 
+                    src="/logo.png" 
+                    alt="MediTriage AI Pro" 
+                    className="h-14 w-auto" 
+                    style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+                  />
+                </div>
+                <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+                  <a href="/#features" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'المميزات' : 'Features'}</a>
+                  <a href="/#how-it-works" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'كيف يعمل' : 'How It Works'}</a>
+                  <a href="/#ai-capabilities" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Capabilities'}</a>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" onClick={() => setLocation("/patient-login")}>
+                  {language === 'ar' ? 'دخول المريض' : 'Patient Login'}
+                </Button>
+                <Button variant="ghost" onClick={() => setLocation("/clinician/login")}>
+                  {language === 'ar' ? 'دخول الطبيب' : 'Doctor Login'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <div className="flex items-center justify-center p-4 py-12">
         <div className="w-full max-w-md">
           <Button
             variant="ghost"
@@ -101,27 +133,46 @@ export default function PatientLogin() {
           
           <SMSLogin role="patient" />
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => setLocation("/")}
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t.backHome}
-        </Button>
-
-        {/* Logo */}
-        <div className="flex items-center justify-center mb-8">
-          <AppLogo href="/" size="lg" showText={true} />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Navigation */}
+      <nav className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocation("/")}>
+                <img 
+                  src="/logo.png" 
+                  alt="MediTriage AI Pro" 
+                  className="h-14 w-auto" 
+                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+                />
+              </div>
+              <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+                <a href="/#features" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'المميزات' : 'Features'}</a>
+                <a href="/#how-it-works" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'كيف يعمل' : 'How It Works'}</a>
+                <a href="/#ai-capabilities" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Capabilities'}</a>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" onClick={() => setLocation("/patient-login")}>
+                {language === 'ar' ? 'دخول المريض' : 'Patient Login'}
+              </Button>
+              <Button variant="ghost" onClick={() => setLocation("/clinician/login")}>
+                {language === 'ar' ? 'دخول الطبيب' : 'Doctor Login'}
+              </Button>
+            </div>
+          </div>
         </div>
+      </nav>
+
+      <div className="flex items-center justify-center p-4 py-12">
+      <div className="w-full max-w-md">
         <p className="text-center text-sm text-gray-500 mb-6">
           {language === 'ar' ? 'بوابة المريض' : 'Patient Portal'}
         </p>
@@ -283,6 +334,7 @@ export default function PatientLogin() {
             ? '🔒 اتصالك آمن ومشفر'
             : '🔒 Your connection is secure and encrypted'}
         </p>
+      </div>
       </div>
     </div>
   );

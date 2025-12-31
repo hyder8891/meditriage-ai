@@ -586,3 +586,6 @@
 - [ ] Verify heart rate accuracy with real measurements
 - [ ] Save checkpoint and push to GitHub
 - [x] Fix PharmGuard function accuracy issues
+
+- [ ] Fix navigation bar disappearing on Calendar and Medical Reports pages - INVESTIGATION NEEDED: Both pages still missing navbar
+- [x] Fix missing navigation bar on specific pages (reported by user)

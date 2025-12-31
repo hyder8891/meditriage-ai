@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar as CalendarIcon, Clock, Plus, Settings, CheckCircle, XCircle, AlertCircle } from "lucide-react";
@@ -43,7 +44,7 @@ const SLOT_DURATIONS = [
   { value: 60, label: "60 دقيقة" },
 ];
 
-export default function DoctorCalendar() {
+function DoctorCalendarContent() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showWorkingHoursDialog, setShowWorkingHoursDialog] = useState(false);
   const [workingHoursForm, setWorkingHoursForm] = useState({
@@ -458,5 +459,13 @@ export default function DoctorCalendar() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+export default function DoctorCalendar() {
+  return (
+    <ClinicianLayout>
+      <DoctorCalendarContent />
+    </ClinicianLayout>
   );
 }

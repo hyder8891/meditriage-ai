@@ -6,6 +6,7 @@
 
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -172,7 +173,7 @@ const REPORT_TYPES: ReportTypeOption[] = [
   },
 ];
 
-export default function MedicalReportsAnalysis() {
+function MedicalReportsAnalysisContent() {
   const { language } = useLanguage();
   const [selectedReportType, setSelectedReportType] = useState<ReportType | "">("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -371,5 +372,13 @@ export default function MedicalReportsAnalysis() {
         />
       )}
     </div>
+  );
+}
+
+export default function MedicalReportsAnalysis() {
+  return (
+    <ClinicianLayout>
+      <MedicalReportsAnalysisContent />
+    </ClinicianLayout>
   );
 }
