@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BioScanner } from "@/components/BioScanner";
+import { OpenRPPGScanner } from "@/components/OpenRPPGScanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -92,9 +92,8 @@ export default function BioScannerPage() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Scanner Section */}
           <div className="lg:col-span-2">
-            <BioScanner 
+            <OpenRPPGScanner 
               onComplete={handleScanComplete}
-              measurementDuration={15}
             />
 
             {/* Last Result */}

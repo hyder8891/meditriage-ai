@@ -4477,6 +4477,21 @@ export const medicalCertificates = mysqlTable("medical_certificates", {
 export type MedicalCertificate = typeof medicalCertificates.$inferSelect;
 export type InsertMedicalCertificate = typeof medicalCertificates.$inferInsert;
 
+/**
+ * API Keys - Stores third-party API keys for users
+ */
+export const apiKeys = mysqlTable("api_keys", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  service: varchar("service", { length: 50 }).notNull(), // vitallens, openai, etc.
+  apiKey: varchar("api_key", { length: 512 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ApiKey = typeof apiKeys.$inferSelect;
+export type InsertApiKey = typeof apiKeys.$inferInsert;
+
 // Export consultations schema
 export * from "./schema-consultations";
 

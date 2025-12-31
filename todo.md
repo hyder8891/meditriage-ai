@@ -561,3 +561,27 @@
   - Enhanced rPPG engine signal detection (stdDev threshold: 0.05→0.03, peak threshold: 0.08→0.05)
   - Reduced minimum peak distance from 0.25s to 0.2s for better detection
   - Added better console logging for debugging
+
+- [ ] Bio-scanner major reading issue (user reported) - investigate and fix, regenerate from scratch if necessary
+
+- [ ] **CRITICAL BIO-SCANNER BUG**: Scan stops after ~5-6 seconds, never reaches real data collection phase (only shows simulated readings 0-20%), camera feed goes black, no final results saved. Multiple architectural fixes attempted (intervalRef, isScanningRef, data-driven completion) all failed. Root cause: Unknown - possibly React re-render issue, timer race condition, or animation loop termination. NEEDS COMPLETE REDESIGN.
+
+- [ ] Remove old broken bio-scanner implementation and VitalLens.js
+- [ ] Create Python backend service with Open-rPPG
+- [ ] Create WebSocket endpoint for real-time video streaming
+- [ ] Update frontend to use Open-rPPG backend
+- [ ] Test Open-rPPG bio-scanner end-to-end
+
+
+## Bio-Scanner Open-rPPG Integration
+
+- [x] Remove old broken bio-scanner implementation and VitalLens.js
+- [x] Install Open-rPPG Python library and dependencies
+- [x] Create Python backend service with Open-rPPG (running on port 8001)
+- [x] Create WebSocket endpoint for real-time video streaming
+- [x] Delete old BioScanner.tsx component
+- [x] Create new OpenRPPGScanner.tsx component with modern gradient design
+- [x] Update BioScannerPage.tsx to use OpenRPPGScanner
+- [ ] Test Open-rPPG bio-scanner end-to-end (pending user verification)
+- [ ] Verify heart rate accuracy with real measurements
+- [ ] Save checkpoint and push to GitHub
