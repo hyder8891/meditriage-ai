@@ -156,7 +156,8 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     if (frameCountRef.current % 5 === 0) {
       const result = engineRef.current.calculateHeartRate();
       
-      if (result && result.bpm > 0 && result.confidence > 10) {
+      // Lower confidence threshold to 5 for better detection in real-world conditions
+      if (result && result.bpm > 0 && result.confidence > 5) {
         setHeartRate(result.bpm);
         setConfidence(result.confidence);
         setSignalQuality(result.signalStrength);
@@ -197,9 +198,11 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
           video: { 
             facingMode: { ideal: "environment" },
             width: { ideal: 640 },
-            height: { ideal: 480 }
+            height: { ideal: 480 },
+            frameRate: { ideal: 30 }
           },
         });
+        console.log('[BioScanner] ✅ Back camera accessed successfully');
         
         // Try to enable torch/flashlight if available (mobile devices)
         const videoTrack = stream.getVideoTracks()[0];
@@ -216,12 +219,18 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
           }
         }
       } catch (backCameraError) {
-        console.log('Back camera not available, trying front camera:', backCameraError);
+        console.warn('[BioScanner] ⚠️ Back camera not available, trying front camera:', backCameraError);
         // Fallback to front camera if back camera fails
         try {
           stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user" },
+            video: { 
+              facingMode: "user",
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+              frameRate: { ideal: 30 }
+            },
           });
+          console.log('[BioScanner] ✅ Front camera accessed successfully (fallback)');
         } catch (frontCameraError) {
           throw frontCameraError; // Throw to outer catch block
         }

@@ -376,6 +376,8 @@
 
 ## New Issues (User Reported)
 
+- [ ] Fix dashboard loading issue - authentication works but content not displaying
+
 - [x] "Train the brain" feature - Added to Admin navigation menu, accessible at /train-the-brain
 - [x] Bio-scanner not working - Fixed by lowering confidence threshold and adding better visual feedback for signal quality
 - [x] Bio-scanner camera "OverconstrainedError" - Fixed by changing from exact to ideal camera constraints
@@ -552,3 +554,10 @@
 - [x] Investigate and fix CSP error blocking JavaScript execution in bio-scanner
 - [x] Lower confidence threshold from 30% to 10% for better signal detection
 - [x] Add comprehensive debug logging to bio-scanner for troubleshooting
+
+- [ ] Bio-scanner not working (user reported) - Applied comprehensive fixes:
+  - Lowered confidence threshold from 10 to 5 for better real-world detection
+  - Improved camera configuration with explicit frameRate settings
+  - Enhanced rPPG engine signal detection (stdDev threshold: 0.05→0.03, peak threshold: 0.08→0.05)
+  - Reduced minimum peak distance from 0.25s to 0.2s for better detection
+  - Added better console logging for debugging

@@ -149,8 +149,9 @@ export class BioScannerEngine {
     console.log('[rPPG Debug] Signal stdDev:', stdDev.toFixed(3), '| Mean:', mean.toFixed(2));
     
     // If signal is too flat, quality is poor (lowered threshold significantly for real-world conditions)
-    if (stdDev < 0.05) {
-      console.log('[rPPG Debug] ❌ Signal too flat, stdDev < 0.05');
+    // Further lowered from 0.05 to 0.03 for better detection
+    if (stdDev < 0.03) {
+      console.log('[rPPG Debug] ❌ Signal too flat, stdDev < 0.03');
       return {
         bpm: 0,
         confidence: 0,
@@ -161,7 +162,8 @@ export class BioScannerEngine {
     }
 
     // Step 3: Detect peaks (local maxima above threshold)
-    const threshold = stdDev * 0.08; // Adaptive threshold based on signal strength (lowered significantly for subtle signals)
+    // Further lowered from 0.08 to 0.05 for better peak detection in low-light conditions
+    const threshold = stdDev * 0.05; // Adaptive threshold based on signal strength (lowered significantly for subtle signals)
     console.log('[rPPG Debug] Peak detection threshold:', threshold.toFixed(3));
     const peaks: number[] = [];
     const peakIndices: number[] = [];
@@ -173,8 +175,9 @@ export class BioScannerEngine {
 
       // Peak detection: current value is higher than neighbors and above threshold
       if (current > prev && current > next && current > threshold) {
-        // Ensure peaks are at least 0.25s apart (240 BPM max, allows for faster heart rates)
-        const minPeakDistance = effectiveFps * 0.25;
+        // Ensure peaks are at least 0.2s apart (300 BPM max, allows for faster heart rates)
+        // Lowered from 0.25s to 0.2s for better detection
+        const minPeakDistance = effectiveFps * 0.2;
         if (peakIndices.length === 0 || i - peakIndices[peakIndices.length - 1] > minPeakDistance) {
           peaks.push(current);
           peakIndices.push(i);
