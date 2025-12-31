@@ -555,7 +555,7 @@
 - [x] Lower confidence threshold from 30% to 10% for better signal detection
 - [x] Add comprehensive debug logging to bio-scanner for troubleshooting
 
-- [ ] Bio-scanner not working (user reported) - Applied comprehensive fixes:
+- [x] Bio-scanner not working (user reported) - Applied comprehensive fixes:
   - Lowered confidence threshold from 10 to 5 for better real-world detection
   - Improved camera configuration with explicit frameRate settings
   - Enhanced rPPG engine signal detection (stdDev threshold: 0.05→0.03, peak threshold: 0.08→0.05)
