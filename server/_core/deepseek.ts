@@ -47,7 +47,7 @@ interface DeepSeekOptions {
  * Automatically routes to Gemini Flash (fast) or Pro (complex reasoning)
  */
 export async function invokeDeepSeek(options: DeepSeekOptions): Promise<DeepSeekResponse> {
-  const { messages, temperature = 0.7, model } = options;
+  const { messages, temperature = 0.7, model, response_format } = options;
   
   // Determine if this requires deep reasoning or fast response
   const requiresDeepReasoning = 
@@ -67,19 +67,24 @@ export async function invokeDeepSeek(options: DeepSeekOptions): Promise<DeepSeek
     
     if (requiresDeepReasoning) {
       // Use Gemini Pro for complex medical reasoning
-      content = await invokeGeminiPro(userMessages, {
+      const result = await invokeGeminiFlash(userMessages, {
         temperature,
-        thinkingLevel: 'high',
-        grounding: true,
+        thinkingLevel: 'medium',
         systemInstruction: systemMessage?.content,
+        response_format,
       });
+      // If response_format is specified, extract content from response
+      content = response_format ? result.choices[0]?.message?.content : result;
     } else {
       // Use Gemini Flash for fast triage and simple queries
-      content = await invokeGeminiFlash(userMessages, {
+      const result = await invokeGeminiFlash(userMessages, {
         temperature,
         thinkingLevel: 'low',
         systemInstruction: systemMessage?.content,
+        response_format,
       });
+      // If response_format is specified, extract content from response
+      content = response_format ? result.choices[0]?.message?.content : result;
     }
 
     // Return DeepSeek-compatible response format

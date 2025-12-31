@@ -585,3 +585,4 @@
 - [ ] Test Open-rPPG bio-scanner end-to-end (pending user verification)
 - [ ] Verify heart rate accuracy with real measurements
 - [ ] Save checkpoint and push to GitHub
+- [x] Fix PharmGuard function accuracy issues

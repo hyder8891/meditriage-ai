@@ -318,6 +318,7 @@ Be empathetic, clear, and avoid medical jargon. Always encourage seeking profess
     .mutation(async ({ input }) => {
       const medNames = input.medications;
       
+      // Use invokeDeepSeek with model hint to trigger deep reasoning
       const response = await invokeDeepSeek({
         messages: [
           {
@@ -368,19 +369,25 @@ Provide structured JSON output with this exact format:
           },
           {
             role: 'user',
-            content: `Analyze drug-drug interactions for: ${medNames.join(', ')}. Consider Iraqi medication availability and common formulations.`,
+            content: `Analyze drug-drug interactions for: ${medNames.join(', ')}. Consider Iraqi medication availability and common formulations. Provide comprehensive differential analysis of potential interactions.`,
           },
         ],
         temperature: 0.3,
-        max_tokens: 2000,
+        max_tokens: 4000, // Increased for comprehensive analysis
+        model: 'reasoner', // Trigger deep reasoning mode
+        response_format: { type: 'json_object' }, // Enforce JSON output
       });
 
       const content = response.choices[0]?.message?.content || '';
       
       try {
-        const parsed = JSON.parse(content);
+        // Clean markdown code blocks if present
+        const cleanJson = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const parsed = JSON.parse(cleanJson);
         return parsed;
       } catch (e) {
+        console.error('[Drug Interactions] JSON parse error:', e);
+        console.error('[Drug Interactions] Raw content:', content);
         // Fallback if JSON parsing fails
         return {
           interactions: [],
