@@ -63,6 +63,8 @@ const profileUpdateSchema = z.object({
   phoneNumber: z.string().optional(),
   specialty: z.string().optional(),
   licenseNumber: z.string().optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContact: z.string().optional(),
 });
 
 export const preferencesRouter = router({
@@ -259,6 +261,8 @@ export const preferencesRouter = router({
       verified: user.verified,
       emailVerified: user.emailVerified,
       phoneVerified: user.phoneVerified,
+      emergencyContactName: user.emergencyContactName,
+      emergencyContact: user.emergencyContact,
       createdAt: user.createdAt,
       lastSignedIn: user.lastSignedIn,
     };

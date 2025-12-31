@@ -223,15 +223,30 @@ Return ONLY valid JSON, no markdown formatting.`;
         );
         
         // content is already a string from invokeGeminiFlash
+        console.log("[Symptom Checker] Raw AI response:", content);
 
         // Extract JSON from markdown code blocks if present
-        let jsonContent = content;
+        let jsonContent = content.trim();
         const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
         if (jsonMatch) {
           jsonContent = jsonMatch[1].trim();
         }
 
-        const assessment = JSON.parse(jsonContent);
+        // Try to parse JSON
+        let assessment;
+        try {
+          assessment = JSON.parse(jsonContent);
+        } catch (parseError) {
+          console.error("[Symptom Checker] JSON parse error:", parseError);
+          console.error("[Symptom Checker] Failed content:", jsonContent);
+          throw new Error("Failed to parse AI response as JSON");
+        }
+
+        // Validate required fields
+        if (!assessment.urgencyLevel || !assessment.possibleConditions) {
+          console.error("[Symptom Checker] Missing required fields in assessment:", assessment);
+          throw new Error("AI response missing required fields");
+        }
 
         return {
           success: true,
@@ -246,7 +261,8 @@ Return ONLY valid JSON, no markdown formatting.`;
           emergencyWarning: assessment.emergencyWarning || "",
         };
       } catch (error) {
-        console.error("Error generating assessment:", error);
+        console.error("[Symptom Checker] Error generating assessment:", error);
+        console.error("[Symptom Checker] Error details:", error instanceof Error ? error.message : String(error));
 
         // Return fallback assessment
         return {

@@ -470,3 +470,52 @@
 - [x] Implement proper frame throttling (process every 5th frame)
 - [x] Test bio-scanner performance improvements
 - [x] Verify heart rate accuracy with Green channel and optimized algorithm
+
+
+## New Issues - User Reported (Dec 31, 2025)
+
+- [x] Issue 1: Add emergency contact field to patient profile
+- [x] Issue 2: Fix symptom checker response handling
+- [x] Issue 3: Add file upload for medical records
+- [x] Issue 4: Implement appointment booking system
+- [x] Issue 5: Add medication reminder feature
+
+### Issue 1 Implementation Details
+- [x] Database schema already has emergency contact fields
+- [x] Updated PatientProfile UI to display emergency contact fields
+- [x] Updated profileUpdateSchema to accept emergency contact fields
+- [x] Emergency contact can now be saved and displayed in patient profile
+
+### Issue 2 Implementation Details
+- [x] Added comprehensive logging for AI responses
+- [x] Improved JSON parsing with better error handling
+- [x] Added validation for required fields in assessment
+- [x] Enhanced error messages for debugging
+- [x] Maintained fallback assessment for graceful degradation
+
+### Issue 3 Implementation Details
+- [x] Created medicalRecordsRouter with upload, retrieve, delete procedures
+- [x] Implemented S3 file upload with unique file keys
+- [x] Added file size validation (10MB limit)
+- [x] Created MedicalRecords page with upload dialog
+- [x] Added document type categorization
+- [x] Implemented document statistics display
+- [x] Added route to App.tsx at /medical-records
+
+### Issue 4 Implementation Details
+- [x] Database schema already has appointments table
+- [x] Created appointmentsRouter with CRUD procedures
+- [x] Implemented appointment booking with date/time validation
+- [x] Added appointment status management (pending, confirmed, completed, cancelled)
+- [x] Created Appointments page with booking dialog
+- [x] Implemented appointment statistics display
+- [x] Added route to App.tsx at /appointments
+
+### Issue 5 Implementation Details
+- [x] Database schema already has prescriptions and medicationAdherence tables
+- [x] Created medicationsRouter with medication management procedures
+- [x] Implemented medication tracking with adherence history
+- [x] Added mark as taken functionality
+- [x] Created Medications page with add medication dialog
+- [x] Implemented medication statistics display
+- [x] Added route to App.tsx at /medications

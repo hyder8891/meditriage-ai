@@ -68,6 +68,8 @@ export default function PatientProfile() {
     name: profile?.name || "",
     email: profile?.email || "",
     phoneNumber: profile?.phoneNumber || "",
+    emergencyContactName: profile?.emergencyContactName || "",
+    emergencyContact: profile?.emergencyContact || "",
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -82,6 +84,8 @@ export default function PatientProfile() {
       name: profile.name || "",
       email: profile.email || "",
       phoneNumber: profile.phoneNumber || "",
+      emergencyContactName: profile.emergencyContactName || "",
+      emergencyContact: profile.emergencyContact || "",
     });
   }
 
@@ -182,6 +186,28 @@ export default function PatientProfile() {
                     value={profileForm.phoneNumber}
                     onChange={(e) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
                   />
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Emergency Contact</h3>
+                  <div className="space-y-2">
+                    <Label htmlFor="emergencyContactName">Emergency Contact Name</Label>
+                    <Input
+                      id="emergencyContactName"
+                      value={profileForm.emergencyContactName}
+                      onChange={(e) => setProfileForm({ ...profileForm, emergencyContactName: e.target.value })}
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="emergencyContact">Emergency Contact Phone</Label>
+                    <Input
+                      id="emergencyContact"
+                      value={profileForm.emergencyContact}
+                      onChange={(e) => setProfileForm({ ...profileForm, emergencyContact: e.target.value })}
+                      placeholder="+964 XXX XXX XXXX"
+                    />
+                  </div>
                 </div>
                 <Button type="submit" disabled={updateProfile.isPending}>
                   {updateProfile.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

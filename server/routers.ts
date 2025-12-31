@@ -40,6 +40,9 @@ import { aiTrainingRouter } from "./ai-training-router";
 import { drugInteractionRouter } from "./drug-interaction-router";
 import { clinicalTrialsRouter } from "./clinical-trials-router";
 import { medicalAssistantRouter } from "./medical-assistant-router";
+import { medicalRecordsRouter } from "./medical-records-router";
+import { appointmentsRouter } from "./appointments-router";
+import { medicationsRouter } from "./medications-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -116,6 +119,9 @@ export const appRouter = router({
   drugInteraction: drugInteractionRouter,
   clinicalTrials: clinicalTrialsRouter,
   medicalAssistant: medicalAssistantRouter,
+  medicalRecords: medicalRecordsRouter,
+  appointments: appointmentsRouter,
+  medications: medicationsRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),

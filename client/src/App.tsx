@@ -89,6 +89,9 @@ const Settings = lazy(() => import("./pages/Settings"));
 const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const PatientMedicalRecords = lazy(() => import("./pages/PatientMedicalRecords"));
+const MedicalRecords = lazy(() => import("./pages/MedicalRecords"));
+const Appointments = lazy(() => import("./pages/Appointments"));
+const Medications = lazy(() => import("./pages/Medications"));
 const BioScannerPage = lazy(() => import("./pages/patient/BioScannerPage"));
 const PatientVitalsViewer = lazy(() => import("./pages/clinician/PatientVitalsViewer").then(m => ({ default: m.PatientVitalsViewer })));
 const VitalsTrends = lazy(() => import("./pages/VitalsTrends"));
@@ -213,6 +216,15 @@ function Router() {
         </Route>
         <Route path="/patient/medical-records">
           {() => <ProtectedRoute requiredRole="patient"><PatientMedicalRecords /></ProtectedRoute>}
+        </Route>
+        <Route path="/medical-records">
+          {() => <ProtectedRoute><MedicalRecords /></ProtectedRoute>}
+        </Route>
+        <Route path="/appointments">
+          {() => <ProtectedRoute><Appointments /></ProtectedRoute>}
+        </Route>
+        <Route path="/medications">
+          {() => <ProtectedRoute><Medications /></ProtectedRoute>}
         </Route>
         <Route path="/patient/bio-scanner">
           {() => <ProtectedRoute requiredRole="patient"><BioScannerPage /></ProtectedRoute>}
