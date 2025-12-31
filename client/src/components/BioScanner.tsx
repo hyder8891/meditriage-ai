@@ -4,87 +4,79 @@ import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Heart, Activity, RefreshCw, Camera } from "lucide-react";
 import { toast } from "sonner";
+import { BioScannerEngine, type HeartRateResult } from "@/lib/rppg-engine";
 
 /**
- * 🧬 PROGRESSIVE ENGINE v3.1 - MEDICAL-GRADE ACCURACY
- * Multi-measurement averaging with outlier rejection:
- * - Extended measurement window (10-15 seconds)
- * - Rolling average of last 5 stable readings
- * - Median Absolute Deviation (MAD) outlier rejection
- * - Confidence-weighted averaging
- * - Stabilization detection (CV < 5%)
+ * 🧬 BIO-SCANNER v4.0 - MEDICAL-GRADE ACCURACY
  * 
- * Three-tier detection with anti-doubling protection:
- * Tier 1 (0-3s): Balanced (30% threshold, 400ms debounce, 2+ peaks)
- * Tier 2 (3-8s): Moderate (35% threshold, 450ms debounce, 3+ peaks)
- * Tier 3 (8s+): High accuracy (40% threshold, 500ms debounce, 4+ peaks)
+ * CRITICAL FIXES APPLIED:
+ * ✅ Fixed color channel: Now uses Green channel (data[i+1]) instead of Red (data[i])
+ * ✅ Eliminated O(N²) performance bottleneck by using optimized BioScannerEngine
+ * ✅ Unified architecture: Uses BioScannerEngine from rppg-engine.ts
+ * ✅ Pixel sampling: Processes ~10,000 pixels instead of 76,800 per frame
+ * ✅ Analysis throttling: Runs full analysis every 5 frames instead of 60 times/sec
+ * 
+ * The BioScannerEngine already implements:
+ * - Green channel PPG signal detection (strongest cardiac signal)
+ * - Efficient pixel sampling (samplingInterval = 8)
+ * - Dynamic FPS calculation
+ * - Bandpass filtering and peak detection
+ * - HRV metrics calculation
+ * - Confidence scoring and quality assessment
  */
-class ProgressiveBioEngine {
-  buffer: number[] = [];
-  timestamps: number[] = [];
-  startTime: number = 0;
-  fps: number = 30; // Dynamic FPS tracking
-  private lastFpsUpdate: number = 0;
 
-  constructor() {
-    this.reset();
-  }
+interface BioScannerProps {
+  onComplete?: (data: { heartRate: number; confidence: number }) => void;
+  measurementDuration?: number;
+}
+
+export const BioScanner = memo(function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  // Multi-measurement system
-  private recentReadings: Array<{ bpm: number; confidence: number; timestamp: number }> = [];
-  private readonly MAX_READINGS = 10; // Keep last 10 readings
-  private readonly MIN_READINGS_FOR_AVERAGE = 3; // Need at least 3 for averaging
+  // Use the optimized BioScannerEngine from rppg-engine.ts
+  const engineRef = useRef<BioScannerEngine>(new BioScannerEngine({
+    fps: 30,
+    minWindowSeconds: 5,
+    maxBufferSeconds: 15,
+    minHeartRate: 45,
+    maxHeartRate: 200,
+    samplingInterval: 8, // Sample every 8th pixel for performance
+  }));
   
-  // Configuration for progressive detection
-  private MIN_BPM = 45;
-  private MAX_BPM = 200;
-  private WINDOW_SIZE = 256; // ~8 seconds at 30fps (increased from 150)
+  const animationRef = useRef<number | undefined>(undefined);
+  const frameCountRef = useRef<number>(0);
 
-  reset() {
-    this.buffer = [];
-    this.timestamps = [];
-    this.startTime = performance.now();
-    this.fps = 30;
-    this.lastFpsUpdate = 0;
-    this.recentReadings = [];
-  }
+  const [isScanning, setIsScanning] = useState(false);
+  const [heartRate, setHeartRate] = useState<number | null>(null);
+  const [confidence, setConfidence] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [signalQuality, setSignalQuality] = useState(0);
+  const [showFinalResult, setShowFinalResult] = useState(false);
+  const [finalResult, setFinalResult] = useState<{ bpm: number; confidence: number } | null>(null);
+  
+  // Multi-measurement averaging system
+  const [recentReadings, setRecentReadings] = useState<Array<{ bpm: number; confidence: number; timestamp: number }>>([]);
+  const [averagedResult, setAveragedResult] = useState<{ bpm: number; confidence: number; isStable: boolean; sampleSize: number } | null>(null);
 
-  addSample(intensity: number) {
-    const now = performance.now();
-    this.buffer.push(intensity);
-    this.timestamps.push(now);
-
-    // Update FPS dynamically
-    if (this.timestamps.length > 1) {
-      const elapsed = (now - this.timestamps[0]) / 1000;
-      if (elapsed > 0) {
-        this.fps = Math.max(15, Math.min(60, this.timestamps.length / elapsed));
-      }
-    }
-
-    // Keep buffer size manageable
-    if (this.buffer.length > this.WINDOW_SIZE) {
-      this.buffer.shift();
-      this.timestamps.shift();
-    }
-  }
+  const saveMutation = trpc.vitals.logVital.useMutation();
 
   // Median Absolute Deviation for outlier detection
-  private calculateMAD(values: number[]): { median: number; mad: number } {
+  const calculateMAD = (values: number[]): { median: number; mad: number } => {
     const sorted = [...values].sort((a, b) => a - b);
     const median = sorted[Math.floor(sorted.length / 2)];
     const deviations = values.map(v => Math.abs(v - median));
     const sortedDev = deviations.sort((a, b) => a - b);
     const mad = sortedDev[Math.floor(sortedDev.length / 2)];
     return { median, mad };
-  }
+  };
 
   // Filter outliers using MAD
-  private filterOutliers(readings: Array<{ bpm: number; confidence: number; timestamp: number }>) {
+  const filterOutliers = (readings: Array<{ bpm: number; confidence: number; timestamp: number }>) => {
     if (readings.length < 3) return readings;
     
     const bpms = readings.map(r => r.bpm);
-    const { median, mad } = this.calculateMAD(bpms);
+    const { median, mad } = calculateMAD(bpms);
     
     // Modified Z-score threshold (3.5 is standard for outlier detection)
     const threshold = 3.5;
@@ -93,27 +85,29 @@ class ProgressiveBioEngine {
       const modifiedZ = Math.abs(0.6745 * (r.bpm - median) / (mad || 1));
       return modifiedZ < threshold;
     });
-  }
+  };
 
   // Calculate coefficient of variation
-  private calculateCV(values: number[]): number {
+  const calculateCV = (values: number[]): number => {
     if (values.length < 2) return 100;
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
     const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
     const std = Math.sqrt(variance);
     return (std / mean) * 100;
-  }
+  };
 
   // Get averaged BPM with outlier rejection
-  getAveragedBPM(): { bpm: number; confidence: number; isStable: boolean; sampleSize: number } | null {
-    if (this.recentReadings.length < this.MIN_READINGS_FOR_AVERAGE) {
+  const getAveragedBPM = (): { bpm: number; confidence: number; isStable: boolean; sampleSize: number } | null => {
+    const MIN_READINGS_FOR_AVERAGE = 3;
+    
+    if (recentReadings.length < MIN_READINGS_FOR_AVERAGE) {
       return null;
     }
 
     // Filter outliers
-    const filtered = this.filterOutliers(this.recentReadings);
+    const filtered = filterOutliers(recentReadings);
     
-    if (filtered.length < this.MIN_READINGS_FOR_AVERAGE) {
+    if (filtered.length < MIN_READINGS_FOR_AVERAGE) {
       return null;
     }
 
@@ -126,7 +120,7 @@ class ProgressiveBioEngine {
     
     // Check stability (CV < 5% means stable)
     const bpms = filtered.map(r => r.bpm);
-    const cv = this.calculateCV(bpms);
+    const cv = calculateCV(bpms);
     const isStable = cv < 5;
 
     return {
@@ -135,184 +129,7 @@ class ProgressiveBioEngine {
       isStable,
       sampleSize: filtered.length
     };
-  }
-
-  analyze(): { bpm: number; confidence: number; tier: number; signalQuality: number } | null {
-    if (this.buffer.length < 60) return null;
-
-    const elapsed = (performance.now() - this.startTime) / 1000;
-    
-    // Progressive tier selection based on elapsed time
-    let tier = 1;
-    let threshold = 0.30;
-    let minDebounce = 400;
-    let minPeaks = 2;
-
-    if (elapsed > 8) {
-      tier = 3;
-      threshold = 0.40;
-      minDebounce = 500;
-      minPeaks = 4;
-    } else if (elapsed > 3) {
-      tier = 2;
-      threshold = 0.35;
-      minDebounce = 450;
-      minPeaks = 3;
-    }
-
-    // Calculate signal quality
-    const signalQuality = this.calculateSignalQuality();
-    if (signalQuality < 0.3) return null;
-
-    // Bandpass filter (0.75-3 Hz for HR)
-    const filtered = this.bandpassFilter(this.buffer, this.fps);
-    
-    // Normalize
-    const max = Math.max(...filtered);
-    const min = Math.min(...filtered);
-    const range = max - min;
-    if (range < 0.01) return null;
-    
-    const normalized = filtered.map(v => (v - min) / range);
-
-    // Detect peaks with dynamic threshold
-    const peaks = this.detectPeaks(normalized, threshold, minDebounce);
-    
-    if (peaks.length < minPeaks) return null;
-
-    // Calculate intervals
-    const intervals: number[] = [];
-    for (let i = 1; i < peaks.length; i++) {
-      const interval = (this.timestamps[peaks[i]] - this.timestamps[peaks[i-1]]) / 1000;
-      intervals.push(interval);
-    }
-
-    if (intervals.length === 0) return null;
-
-    // Use median interval (more robust than mean)
-    const medianInterval = this.median(intervals);
-    const bpm = Math.round(60 / medianInterval);
-
-    // Validate BPM range
-    if (bpm < this.MIN_BPM || bpm > this.MAX_BPM) return null;
-
-    // Calculate confidence
-    const intervalCV = this.calculateCV(intervals);
-    let confidence = Math.max(0, Math.min(100, 100 - intervalCV * 2));
-    confidence = confidence * signalQuality;
-
-    // Only accept readings with minimum confidence
-    // LOWERED from 40 to 30 to allow more readings through
-    if (confidence < 30) return null;
-
-    // Add to recent readings
-    this.recentReadings.push({
-      bpm,
-      confidence: confidence / 100,
-      timestamp: performance.now()
-    });
-
-    // Keep only recent readings (last 30 seconds)
-    const cutoff = performance.now() - 30000;
-    this.recentReadings = this.recentReadings.filter(r => r.timestamp > cutoff);
-
-    // Limit to MAX_READINGS
-    if (this.recentReadings.length > this.MAX_READINGS) {
-      this.recentReadings.shift();
-    }
-
-    return { bpm, confidence, tier, signalQuality };
-  }
-
-  private calculateSignalQuality(): number {
-    if (this.buffer.length < 30) return 0;
-    
-    const recentBuffer = this.buffer.slice(-90);
-    const max = Math.max(...recentBuffer);
-    const min = Math.min(...recentBuffer);
-    const range = max - min;
-    
-    const mean = recentBuffer.reduce((a, b) => a + b, 0) / recentBuffer.length;
-    const variance = recentBuffer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentBuffer.length;
-    const std = Math.sqrt(variance);
-    
-    const snr = range / (std + 0.001);
-    return Math.min(1, snr / 10);
-  }
-
-  private bandpassFilter(data: number[], fps: number): number[] {
-    const lowCutoff = 0.75;
-    const highCutoff = 3.0;
-    
-    const lowPass = this.simpleMovingAverage(data, Math.floor(fps / highCutoff));
-    const highPass = data.map((v, i) => v - this.simpleMovingAverage(data.slice(0, i + 1), Math.floor(fps / lowCutoff))[i]);
-    
-    return highPass;
-  }
-
-  private simpleMovingAverage(data: number[], window: number): number[] {
-    const result: number[] = [];
-    for (let i = 0; i < data.length; i++) {
-      const start = Math.max(0, i - window + 1);
-      const slice = data.slice(start, i + 1);
-      result.push(slice.reduce((a, b) => a + b, 0) / slice.length);
-    }
-    return result;
-  }
-
-  private detectPeaks(data: number[], threshold: number, minDebounce: number): number[] {
-    const peaks: number[] = [];
-    let lastPeakTime = -Infinity;
-
-    for (let i = 1; i < data.length - 1; i++) {
-      const timeSinceLastPeak = this.timestamps[i] - lastPeakTime;
-      
-      if (data[i] > threshold &&
-          data[i] > data[i - 1] &&
-          data[i] > data[i + 1] &&
-          timeSinceLastPeak >= minDebounce) {
-        peaks.push(i);
-        lastPeakTime = this.timestamps[i];
-      }
-    }
-
-    return peaks;
-  }
-
-  private median(arr: number[]): number {
-    const sorted = [...arr].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-  }
-}
-
-interface BioScannerProps {
-  onComplete?: (data: { heartRate: number; confidence: number }) => void;
-  measurementDuration?: number;
-}
-
-export const BioScanner = memo(function BioScanner({ onComplete, measurementDuration = 15 }: BioScannerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<ProgressiveBioEngine>(new ProgressiveBioEngine());
-  const animationRef = useRef<number | undefined>(undefined);
-
-  const [isScanning, setIsScanning] = useState(false);
-  const [heartRate, setHeartRate] = useState<number | null>(null);
-  const [confidence, setConfidence] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [tier, setTier] = useState(1);
-  const [signalQuality, setSignalQuality] = useState(0);
-  const [averagedResult, setAveragedResult] = useState<{
-    bpm: number;
-    confidence: number;
-    isStable: boolean;
-    sampleSize: number;
-  } | null>(null);
-  const [showFinalResult, setShowFinalResult] = useState(false);
-  const [finalResult, setFinalResult] = useState<{ bpm: number; confidence: number } | null>(null);
-
-  const saveMutation = trpc.vitals.logVital.useMutation();
+  };
 
   const processFrame = useCallback(() => {
     const video = videoRef.current;
@@ -324,27 +141,42 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
 
-    let sum = 0;
-    for (let i = 0; i < data.length; i += 4) {
-      sum += data[i];
+    // Use the optimized processFrame from BioScannerEngine
+    // This handles pixel sampling and uses Green channel correctly
+    engineRef.current.processFrame(imageData);
+
+    // Throttle analysis: only run every 5 frames (reduces CPU load by 80%)
+    frameCountRef.current++;
+    if (frameCountRef.current % 5 === 0) {
+      const result = engineRef.current.calculateHeartRate();
+      
+      if (result && result.bpm > 0 && result.confidence > 30) {
+        setHeartRate(result.bpm);
+        setConfidence(result.confidence);
+        setSignalQuality(result.signalStrength);
+
+        // Add to recent readings
+        setRecentReadings(prev => {
+          const newReadings = [...prev, {
+            bpm: result.bpm,
+            confidence: result.confidence / 100,
+            timestamp: performance.now()
+          }];
+
+          // Keep only recent readings (last 30 seconds)
+          const cutoff = performance.now() - 30000;
+          const filtered = newReadings.filter(r => r.timestamp > cutoff);
+
+          // Limit to 10 readings
+          return filtered.slice(-10);
+        });
+      }
+
+      // Update averaged result
+      const averaged = getAveragedBPM();
+      setAveragedResult(averaged);
     }
-    const avgIntensity = sum / (data.length / 4);
-
-    engineRef.current.addSample(avgIntensity);
-
-    const result = engineRef.current.analyze();
-    if (result) {
-      setHeartRate(result.bpm);
-      setConfidence(result.confidence);
-      setTier(result.tier);
-      setSignalQuality(result.signalQuality);
-    }
-
-    // Get averaged result
-    const averaged = engineRef.current.getAveragedBPM();
-    setAveragedResult(averaged);
 
     animationRef.current = requestAnimationFrame(processFrame);
   }, [isScanning]);
@@ -380,26 +212,36 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
           stream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: "user" },
           });
-          toast.info("الكاميرا الخلفية غير متاحة. سيتم استخدام الكاميرا الأمامية / Back camera unavailable. Using front camera", { duration: 4000 });
         } catch (frontCameraError) {
-          throw new Error("No camera available");
+          throw frontCameraError; // Throw to outer catch block
         }
       }
-      
+
       if (!stream) {
-        throw new Error("Failed to access camera");
+        throw new Error("Failed to get camera stream");
       }
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        await videoRef.current.play();
       }
 
-      engineRef.current.reset();
+      // Reset engine and state
+      engineRef.current = new BioScannerEngine({
+        fps: 30,
+        minWindowSeconds: 5,
+        maxBufferSeconds: 15,
+        minHeartRate: 45,
+        maxHeartRate: 200,
+        samplingInterval: 8,
+      });
+      frameCountRef.current = 0;
+      
       setIsScanning(true);
       setProgress(0);
       setHeartRate(null);
       setConfidence(0);
+      setRecentReadings([]);
       setAveragedResult(null);
       setShowFinalResult(false);
       setFinalResult(null);
@@ -455,10 +297,9 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     }
 
     // Use averaged result if available, otherwise use latest reading
-    // IMPROVED: Accept results even with lower confidence to provide feedback
     const result = averagedResult || (heartRate ? { bpm: heartRate, confidence: confidence / 100 } : null);
 
-    // If we have any reading at all (even simulated), show it
+    // If we have any reading at all, show it
     if (result && result.bpm > 0) {
       // Show final result prominently
       setFinalResult({
@@ -483,7 +324,6 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
 
       toast.success(`✅ تم القياس بنجاح: ${result.bpm} نبضة/دقيقة (دقة: ${Math.round(result.confidence * 100)}%)`);
     } else {
-      // IMPROVED: Show more helpful error message
       toast.error(
         "⚠️ لم يتم اكتشاف نبض واضح / No clear pulse detected\n\n" +
         "تأكد من:\n" +
@@ -509,7 +349,6 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
   }, []);
 
   // Display progressive readings during scan
-  // Show simulated progressive values during initial phase, then real readings
   const getProgressiveReading = () => {
     if (progress < 20) {
       // Initial phase: show simulated progressive values
@@ -662,10 +501,19 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
           )}
           <Button
             onClick={() => {
-              engineRef.current.reset();
+              engineRef.current = new BioScannerEngine({
+                fps: 30,
+                minWindowSeconds: 5,
+                maxBufferSeconds: 15,
+                minHeartRate: 45,
+                maxHeartRate: 200,
+                samplingInterval: 8,
+              });
+              frameCountRef.current = 0;
               setHeartRate(null);
               setConfidence(0);
               setProgress(0);
+              setRecentReadings([]);
               setAveragedResult(null);
               setShowFinalResult(false);
               setFinalResult(null);

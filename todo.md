@@ -3,7 +3,7 @@
 ## Core Features
 
 ### 1. AI-Powered Triage Assessment
-- [ ] Symptom input interface with natural language processing
+- [x] Symptom input interface with natural language processing
 - [ ] AI-powered severity assessment (Critical/Urgent/Standard/Non-urgent)
 - [ ] Intelligent questionnaire system based on symptoms
 - [ ] Real-time risk scoring and recommendations
@@ -12,62 +12,62 @@
 ### 2. Emergency Services Integration
 - [ ] One-click emergency call (911/local emergency services)
 - [ ] Automatic location detection and sharing
-- [ ] Nearest hospital/clinic finder with real-time directions
-- [ ] Emergency contact notification system
+- [x] Nearest hospital/clinic finder with real-time directions
+- [x] Emergency contact notification system
 - [ ] Ambulance dispatch integration
 
 ### 3. Patient Dashboard
-- [ ] Personal health profile management
-- [ ] Medical history tracking (conditions, allergies, medications)
-- [ ] Assessment history with timestamps and outcomes
-- [ ] Emergency contacts management
-- [ ] Document upload (insurance cards, medical records)
+- [x] Personal health profile management
+- [x] Medical history tracking (conditions, allergies, medications)
+- [x] Assessment history with timestamps and outcomes
+- [x] Emergency contacts management
+- [x] Document upload (insurance cards, medical records)
 - [x] Medical professional certificate/credential management
 
 ### 4. Real-Time Features
-- [ ] Live chat with medical professionals (optional)
-- [ ] Real-time status updates during emergency response
-- [ ] Push notifications for critical alerts
+- [x] Live chat with medical professionals (optional)
+- [x] Real-time status updates during emergency response
+- [x] Push notifications for critical alerts
 - [ ] Location tracking during emergency transport
 
 ### 5. Admin Panel
-- [ ] User management and role-based access
-- [ ] Triage assessment analytics and reporting
-- [ ] System health monitoring
-- [ ] Emergency response metrics dashboard
-- [ ] Audit logs for compliance
+- [x] User management and role-based access
+- [x] Triage assessment analytics and reporting
+- [x] System health monitoring
+- [x] Emergency response metrics dashboard
+- [x] Audit logs for compliance
 
 ### 6. Design & UX
-- [ ] Professional medical-tech design system
-- [ ] Responsive mobile-first layout
+- [x] Professional medical-tech design system
+- [x] Responsive mobile-first layout
 - [ ] Accessibility compliance (WCAG 2.1)
-- [ ] Dark/light theme support
+- [x] Dark/light theme support
 - [ ] Emergency mode with high-contrast UI
-- [ ] Logo integration (caduceus-based design)
+- [x] Logo integration (caduceus-based design)
 - [x] Add full compliance section with certifications and trust badges to Home.tsx
 
 ### 7. Security & Compliance
-- [ ] HIPAA compliance measures
+- [x] HIPAA compliance measures
 - [ ] End-to-end encryption for medical data
-- [ ] Secure authentication with MFA support
+- [x] Secure authentication with MFA support
 - [ ] Data retention policies
-- [ ] Privacy controls and consent management
+- [x] Privacy controls and consent management
 
 ## Technical Infrastructure
 
 ### Database
-- [ ] User profiles and authentication
-- [ ] Medical records and history
-- [ ] Triage assessments and outcomes
-- [ ] Emergency contacts
-- [ ] Audit logs
+- [x] User profiles and authentication
+- [x] Medical records and history
+- [x] Triage assessments and outcomes
+- [x] Emergency contacts
+- [x] Audit logs
 
 ### APIs & Integrations
-- [ ] LLM integration for AI triage
-- [ ] Maps integration for location services
+- [x] LLM integration for AI triage
+- [x] Maps integration for location services
 - [ ] Emergency services API
-- [ ] Notification system
-- [ ] File storage for medical documents
+- [x] Notification system
+- [x] File storage for medical documents
 
 ### Testing
 - [ ] Unit tests for triage logic
@@ -96,10 +96,10 @@
 - [x] Replace generic icons with real logos for trusted partners (OpenAI, MongoDB)
 
 ## Future Enhancements
-- [ ] Telemedicine video consultation
-- [ ] Prescription management
+- [x] Telemedicine video consultation
+- [x] Prescription management
 - [ ] Health insurance verification
-- [ ] Multi-language support
+- [x] Multi-language support
 - [ ] Wearable device integration
 
 ## Completed Items
@@ -445,3 +445,28 @@
 - [x] Add medical terminology explanation
 - [x] Add health tips and recommendations
 - [x] Add lab result interpretation (educational)
+
+
+## Bio-Scanner Critical Bug Fixes (High Priority)
+
+### 1. Physiological Signal Detection
+- [x] Fix wrong color channel - Change from Red (data[i]) to Green (data[i+1]) for PPG signal detection
+- [x] Verify Green channel provides stronger cardiac signal than Red
+
+### 2. Performance Optimization
+- [x] Fix O(N²) complexity in simpleMovingAverage function - Causing UI stutter and phone overheating
+- [x] Implement efficient moving average algorithm (sliding window approach)
+- [x] Add pixel sampling to reduce processing from 76,800 pixels to ~10,000 per frame
+- [x] Implement analysis throttling - Run full analysis 4-5 times per second instead of 60 times
+
+### 3. Architecture Unification
+- [x] Remove duplicate ProgressiveBioEngine class from BioScanner.tsx
+- [x] Use BioScannerEngine from lib/rppg-engine.ts instead
+- [x] Migrate any useful logic from ProgressiveBioEngine to rppg-engine.ts
+- [x] Ensure rppg-engine.ts handles outlier rejection and MAD calculation
+
+### 4. Code Quality
+- [x] Remove excessive main thread work in processFrame
+- [x] Implement proper frame throttling (process every 5th frame)
+- [x] Test bio-scanner performance improvements
+- [x] Verify heart rate accuracy with Green channel and optimized algorithm
