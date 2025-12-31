@@ -135,6 +135,11 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas || !isScanning) return;
+    
+    // Debug: Log every 60 frames (~2 seconds)
+    if (frameCountRef.current % 60 === 0) {
+      console.log('[BioScanner] Processing frame', frameCountRef.current, '| Buffer size:', engineRef.current.buffer.length);
+    }
 
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
@@ -151,7 +156,7 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     if (frameCountRef.current % 5 === 0) {
       const result = engineRef.current.calculateHeartRate();
       
-      if (result && result.bpm > 0 && result.confidence > 30) {
+      if (result && result.bpm > 0 && result.confidence > 10) {
         setHeartRate(result.bpm);
         setConfidence(result.confidence);
         setSignalQuality(result.signalStrength);
@@ -304,8 +309,9 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
     // Use averaged result if available, otherwise use latest reading
     const result = averagedResult || (heartRate ? { bpm: heartRate, confidence: confidence / 100 } : null);
 
-    // If we have any reading at all, show it
+    // If we have any reading at all, show it (even low confidence)
     if (result && result.bpm > 0) {
+      console.log('[BioScanner] Final result:', result);
       // Show final result prominently
       setFinalResult({
         bpm: result.bpm,

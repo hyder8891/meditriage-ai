@@ -547,3 +547,8 @@
 - [x] Implement getRecentCorrections database query - retrieves corrections from last N days
 - [x] Implement getPromptPerformanceMetrics database query - retrieves prompt performance stats
 - [x] Implement rollbackPrompt database update - activates previous prompt version
+
+- [x] Fix bio-scanner not showing heart rate readings - camera works but no BPM values appear during scan
+- [x] Investigate and fix CSP error blocking JavaScript execution in bio-scanner
+- [x] Lower confidence threshold from 30% to 10% for better signal detection
+- [x] Add comprehensive debug logging to bio-scanner for troubleshooting

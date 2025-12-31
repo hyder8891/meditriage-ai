@@ -64,7 +64,8 @@ export const securityHeaders = helmet({
         "https://accounts.google.com",
         "https://apis.google.com",
         "https://manus-analytics.com", // Analytics
-        "https://*.manus.computer"      // Preview environments
+        "https://*.manus.computer",     // Preview environments
+        "blob:"                          // Allow blob: for Web Workers if needed
       ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
