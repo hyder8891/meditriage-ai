@@ -186,23 +186,28 @@ export const BioScanner = memo(function BioScanner({ onComplete, measurementDura
       let stream: MediaStream | null = null;
       
       // Try back camera with torch first (preferred for finger measurement)
+      // Use 'ideal' instead of 'exact' to allow fallback if constraints can't be met
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { 
-            facingMode: { exact: "environment" },
-            // @ts-ignore - torch is not in TypeScript types but supported on mobile
-            advanced: [{ torch: true }]
+            facingMode: { ideal: "environment" },
+            width: { ideal: 640 },
+            height: { ideal: 480 }
           },
         });
         
-        // Try to enable torch/flashlight if available
+        // Try to enable torch/flashlight if available (mobile devices)
         const videoTrack = stream.getVideoTracks()[0];
-        if (videoTrack && 'applyConstraints' in videoTrack) {
+        const capabilities = videoTrack?.getCapabilities?.() as any;
+        if (capabilities?.torch) {
           try {
-            // @ts-ignore - torch constraint
-            await videoTrack.applyConstraints({ advanced: [{ torch: true }] });
+            await videoTrack.applyConstraints({
+              // @ts-ignore - torch constraint
+              advanced: [{ torch: true }]
+            });
+            console.log('Flashlight enabled successfully');
           } catch (e) {
-            console.log('Torch not available on this device');
+            console.log('Could not enable flashlight:', e);
           }
         }
       } catch (backCameraError) {

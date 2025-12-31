@@ -378,6 +378,7 @@
 
 - [x] "Train the brain" feature - Added to Admin navigation menu, accessible at /train-the-brain
 - [x] Bio-scanner not working - Fixed by lowering confidence threshold and adding better visual feedback for signal quality
+- [x] Bio-scanner camera "OverconstrainedError" - Fixed by changing from exact to ideal camera constraints
 
 
 ## API Integration Continuation
