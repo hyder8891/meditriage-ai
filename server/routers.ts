@@ -43,6 +43,8 @@ import { medicalAssistantRouter } from "./medical-assistant-router";
 import { medicalRecordsRouter } from "./medical-records-router";
 import { appointmentsRouter } from "./appointments-router";
 import { medicationsRouter } from "./medications-router";
+import { newGraduateRouter } from "./new-graduate-router";
+import { matchingRouter } from "./matching-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -122,6 +124,8 @@ export const appRouter = router({
   medicalRecords: medicalRecordsRouter,
   appointments: appointmentsRouter,
   medications: medicationsRouter,
+  newGraduate: newGraduateRouter,
+  matching: matchingRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),

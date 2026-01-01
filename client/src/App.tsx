@@ -98,6 +98,8 @@ const PatientVitalsViewer = lazy(() => import("./pages/clinician/PatientVitalsVi
 const VitalsTrends = lazy(() => import("./pages/VitalsTrends"));
 const LoadTestDashboard = lazy(() => import("./pages/LoadTestDashboard"));
 const PatientAppointments = lazy(() => import("./pages/PatientAppointments"));
+const SmartMatching = lazy(() => import("./pages/SmartMatching"));
+const DoctorAvailability = lazy(() => import("./pages/DoctorAvailability"));
 const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
 const MyDoctor = lazy(() => import("./pages/MyDoctor"));
@@ -235,6 +237,12 @@ function Router() {
         </Route>
         <Route path="/patient/appointments">
           {() => <ProtectedRoute requiredRole="patient"><PatientAppointments /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/smart-matching">
+          {() => <ProtectedRoute requiredRole="patient"><SmartMatching /></ProtectedRoute>}
+        </Route>
+        <Route path="/clinician/availability">
+          {() => <ProtectedRoute requiredRole="clinician"><DoctorAvailability /></ProtectedRoute>}
         </Route>
         <Route path="/consultation/:id" component={ConsultationRoom} />
         <Route path="/patient/consultation-history">

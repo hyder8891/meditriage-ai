@@ -4492,8 +4492,576 @@ export const apiKeys = mysqlTable("api_keys", {
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type InsertApiKey = typeof apiKeys.$inferInsert;
 
+/**
+ * Virtual Consultation Rooms - For telemedicine sessions
+ */
+export const virtualConsultationRooms = mysqlTable("virtual_consultation_rooms", {
+  id: int("id").autoincrement().primaryKey(),
+  consultationId: int("consultation_id").notNull(), // Links to consultations table
+  
+  // Room configuration
+  roomId: varchar("room_id", { length: 100 }).unique().notNull(), // Unique room identifier
+  roomStatus: mysqlEnum("room_status", ["waiting", "active", "ended", "cancelled"]).default("waiting").notNull(),
+  
+  // Participants
+  doctorId: int("doctor_id").notNull(),
+  patientId: int("patient_id").notNull(),
+  
+  // Session details
+  scheduledStartTime: timestamp("scheduled_start_time").notNull(),
+  actualStartTime: timestamp("actual_start_time"),
+  endTime: timestamp("end_time"),
+  duration: int("duration"), // in seconds
+  
+  // Media settings
+  videoEnabled: boolean("video_enabled").default(true).notNull(),
+  audioEnabled: boolean("audio_enabled").default(true).notNull(),
+  screenSharingEnabled: boolean("screen_sharing_enabled").default(false).notNull(),
+  recordingEnabled: boolean("recording_enabled").default(false).notNull(),
+  
+  // Recording storage
+  recordingKey: varchar("recording_key", { length: 512 }),
+  recordingUrl: varchar("recording_url", { length: 1024 }),
+  transcriptionKey: varchar("transcription_key", { length: 512 }),
+  
+  // Quality metrics
+  connectionQuality: varchar("connection_quality", { length: 20 }), // excellent, good, fair, poor
+  technicalIssues: text("technical_issues"), // JSON array of issues
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VirtualConsultationRoom = typeof virtualConsultationRooms.$inferSelect;
+export type InsertVirtualConsultationRoom = typeof virtualConsultationRooms.$inferInsert;
+
+/**
+ * Hospital Affiliations - Tracks doctor relationships with hospitals
+ */
+export const hospitalAffiliations = mysqlTable("hospital_affiliations", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull(),
+  facilityId: int("facility_id").notNull(), // Links to facilities table
+  
+  // Affiliation details
+  affiliationType: mysqlEnum("affiliation_type", ["staff", "visiting", "consultant", "resident", "fellow", "temporary"]).notNull(),
+  department: varchar("department", { length: 100 }),
+  position: varchar("position", { length: 100 }),
+  
+  // Privileges
+  admittingPrivileges: boolean("admitting_privileges").default(false).notNull(),
+  surgicalPrivileges: boolean("surgical_privileges").default(false).notNull(),
+  emrAccess: boolean("emr_access").default(false).notNull(),
+  emrAccessLevel: mysqlEnum("emr_access_level", ["read_only", "read_write", "full"]).default("read_only"),
+  
+  // Status
+  status: mysqlEnum("status", ["active", "inactive", "pending", "suspended", "expired"]).default("pending").notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date"),
+  
+  // Verification
+  verificationStatus: mysqlEnum("verification_status", ["pending", "verified", "rejected"]).default("pending").notNull(),
+  verifiedBy: int("verified_by"), // Admin/facility admin who verified
+  verifiedAt: timestamp("verified_at"),
+  verificationDocumentKey: varchar("verification_document_key", { length: 512 }),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type HospitalAffiliation = typeof hospitalAffiliations.$inferSelect;
+export type InsertHospitalAffiliation = typeof hospitalAffiliations.$inferInsert;
+
+/**
+ * Doctor Shifts - Tracks hospital shift schedules for new graduate doctors
+ */
+export const doctorShifts = mysqlTable("doctor_shifts", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull(),
+  facilityId: int("facility_id").notNull(),
+  
+  // Shift details
+  shiftDate: date("shift_date").notNull(),
+  startTime: time("start_time").notNull(),
+  endTime: time("end_time").notNull(),
+  shiftType: mysqlEnum("shift_type", ["day", "evening", "night", "on_call", "emergency"]).notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["scheduled", "confirmed", "in_progress", "completed", "cancelled", "no_show"]).default("scheduled").notNull(),
+  
+  // Check-in/out
+  checkInTime: timestamp("check_in_time"),
+  checkOutTime: timestamp("check_out_time"),
+  actualDuration: int("actual_duration"), // in minutes
+  
+  // Shift notes
+  notes: text("notes"),
+  patientsSeenCount: int("patients_seen_count").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorShift = typeof doctorShifts.$inferSelect;
+export type InsertDoctorShift = typeof doctorShifts.$inferInsert;
+
+/**
+ * Referral Requests - Patient referrals between doctors
+ */
+export const referralRequests = mysqlTable("referral_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Referral parties
+  referringDoctorId: int("referring_doctor_id").notNull(),
+  referredDoctorId: int("referred_doctor_id"), // null if open referral
+  patientId: int("patient_id").notNull(),
+  
+  // Referral details
+  referralType: mysqlEnum("referral_type", ["specialist", "second_opinion", "emergency", "follow_up", "procedure"]).notNull(),
+  specialty: varchar("specialty", { length: 100 }),
+  urgency: mysqlEnum("urgency", ["routine", "urgent", "emergency"]).default("routine").notNull(),
+  
+  // Clinical information
+  reason: text("reason").notNull(),
+  clinicalSummary: text("clinical_summary").notNull(),
+  relevantHistory: text("relevant_history"),
+  currentMedications: text("current_medications"),
+  attachedDocuments: text("attached_documents"), // JSON array of document IDs
+  
+  // Status tracking
+  status: mysqlEnum("status", ["pending", "accepted", "declined", "completed", "cancelled"]).default("pending").notNull(),
+  responseNotes: text("response_notes"),
+  respondedAt: timestamp("responded_at"),
+  
+  // Appointment linkage
+  appointmentId: int("appointment_id"),
+  consultationId: int("consultation_id"),
+  
+  // Follow-up
+  followUpRequired: boolean("follow_up_required").default(false).notNull(),
+  followUpNotes: text("follow_up_notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReferralRequest = typeof referralRequests.$inferSelect;
+export type InsertReferralRequest = typeof referralRequests.$inferInsert;
+
+/**
+ * Clinical Guidelines Library - Evidence-based guidelines for doctors
+ */
+export const clinicalGuidelinesLibrary = mysqlTable("clinical_guidelines_library", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Guideline information
+  title: varchar("title", { length: 500 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // cardiology, neurology, etc.
+  subcategory: varchar("subcategory", { length: 100 }),
+  
+  // Content
+  summary: text("summary").notNull(),
+  fullContent: text("full_content").notNull(),
+  algorithmFlowchart: text("algorithm_flowchart"), // JSON or URL to flowchart
+  
+  // Source and credibility
+  source: varchar("source", { length: 255 }).notNull(), // WHO, AHA, etc.
+  sourceUrl: varchar("source_url", { length: 1024 }),
+  evidenceLevel: mysqlEnum("evidence_level", ["A", "B", "C", "D"]), // Evidence quality
+  
+  // Versioning
+  version: varchar("version", { length: 50 }),
+  publishedDate: date("published_date"),
+  lastReviewedDate: date("last_reviewed_date"),
+  nextReviewDate: date("next_review_date"),
+  
+  // Regional relevance
+  regionalAdaptation: boolean("regional_adaptation").default(false).notNull(),
+  applicableRegions: text("applicable_regions"), // JSON array of regions
+  
+  // Usage tracking
+  viewCount: int("view_count").default(0),
+  bookmarkCount: int("bookmark_count").default(0),
+  
+  // Status
+  status: mysqlEnum("status", ["active", "archived", "under_review", "deprecated"]).default("active").notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ClinicalGuidelineLibrary = typeof clinicalGuidelinesLibrary.$inferSelect;
+export type InsertClinicalGuidelineLibrary = typeof clinicalGuidelinesLibrary.$inferInsert;
+
+/**
+ * Medical Calculators - Clinical calculation tools
+ */
+export const medicalCalculators = mysqlTable("medical_calculators", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Calculator information
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // cardiology, nephrology, etc.
+  description: text("description").notNull(),
+  
+  // Calculator configuration
+  calculatorType: varchar("calculator_type", { length: 50 }).notNull(), // bmi, gfr, apache, etc.
+  inputFields: text("input_fields").notNull(), // JSON schema for inputs
+  calculationFormula: text("calculation_formula").notNull(), // Formula or algorithm
+  outputFormat: text("output_format").notNull(), // JSON schema for outputs
+  
+  // Reference information
+  referenceSource: varchar("reference_source", { length: 255 }),
+  referenceUrl: varchar("reference_url", { length: 1024 }),
+  clinicalUse: text("clinical_use"),
+  limitations: text("limitations"),
+  
+  // Usage tracking
+  usageCount: int("usage_count").default(0),
+  
+  // Status
+  status: mysqlEnum("status", ["active", "deprecated"]).default("active").notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MedicalCalculator = typeof medicalCalculators.$inferSelect;
+export type InsertMedicalCalculator = typeof medicalCalculators.$inferInsert;
+
+/**
+ * Calculator Usage History - Tracks calculator usage by doctors
+ */
+export const calculatorUsageHistory = mysqlTable("calculator_usage_history", {
+  id: int("id").autoincrement().primaryKey(),
+  calculatorId: int("calculator_id").notNull(),
+  userId: int("user_id").notNull(),
+  patientId: int("patient_id"), // Optional link to patient
+  
+  // Calculation data
+  inputData: text("input_data").notNull(), // JSON of input values
+  outputData: text("output_data").notNull(), // JSON of calculated results
+  
+  // Context
+  consultationId: int("consultation_id"),
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type CalculatorUsageHistory = typeof calculatorUsageHistory.$inferSelect;
+export type InsertCalculatorUsageHistory = typeof calculatorUsageHistory.$inferInsert;
+
+/**
+ * Doctor Public Profiles - Public-facing doctor profiles for patient discovery
+ */
+export const doctorPublicProfiles = mysqlTable("doctor_public_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").unique().notNull(),
+  
+  // Profile visibility
+  isPublic: boolean("is_public").default(false).notNull(),
+  acceptingNewPatients: boolean("accepting_new_patients").default(true).notNull(),
+  
+  // Professional information
+  displayName: varchar("display_name", { length: 255 }).notNull(),
+  title: varchar("title", { length: 100 }), // Dr., Prof., etc.
+  bio: text("bio"),
+  specialties: text("specialties"), // JSON array
+  languages: text("languages"), // JSON array
+  education: text("education"), // JSON array of education history
+  certifications: text("certifications"), // JSON array
+  
+  // Practice information
+  yearsOfExperience: int("years_of_experience"),
+  consultationTypes: text("consultation_types"), // JSON array: video, audio, chat
+  consultationFee: decimal("consultation_fee", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  averageResponseTime: int("average_response_time"), // in minutes
+  
+  // Ratings and reviews
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0.00"),
+  totalReviews: int("total_reviews").default(0),
+  totalConsultations: int("total_consultations").default(0),
+  
+  // Media
+  profilePhotoKey: varchar("profile_photo_key", { length: 512 }),
+  profilePhotoUrl: varchar("profile_photo_url", { length: 1024 }),
+  
+  // SEO
+  profileSlug: varchar("profile_slug", { length: 255 }).unique(), // URL-friendly identifier
+  metaDescription: text("meta_description"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorPublicProfile = typeof doctorPublicProfiles.$inferSelect;
+export type InsertDoctorPublicProfile = typeof doctorPublicProfiles.$inferInsert;
+
+/**
+ * Doctor Reviews - Patient reviews and ratings for doctors
+ */
+export const doctorReviews = mysqlTable("doctor_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull(),
+  patientId: int("patient_id").notNull(),
+  consultationId: int("consultation_id"), // Link to specific consultation
+  
+  // Rating
+  rating: int("rating").notNull(), // 1-5 stars
+  
+  // Review content
+  reviewTitle: varchar("review_title", { length: 255 }),
+  reviewText: text("review_text"),
+  
+  // Detailed ratings
+  communicationRating: int("communication_rating"), // 1-5
+  professionalismRating: int("professionalism_rating"), // 1-5
+  knowledgeRating: int("knowledge_rating"), // 1-5
+  
+  // Moderation
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "flagged"]).default("pending").notNull(),
+  moderatedBy: int("moderated_by"),
+  moderatedAt: timestamp("moderated_at"),
+  moderationNotes: text("moderation_notes"),
+  
+  // Response from doctor
+  doctorResponse: text("doctor_response"),
+  respondedAt: timestamp("responded_at"),
+  
+  // Verification
+  isVerifiedPatient: boolean("is_verified_patient").default(false).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorReview = typeof doctorReviews.$inferSelect;
+export type InsertDoctorReview = typeof doctorReviews.$inferInsert;
+
+/**
+ * CME (Continuing Medical Education) Tracking
+ */
+export const cmeTracking = mysqlTable("cme_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull(),
+  
+  // Activity information
+  activityType: mysqlEnum("activity_type", ["course", "conference", "workshop", "webinar", "journal_review", "case_study", "other"]).notNull(),
+  activityTitle: varchar("activity_title", { length: 500 }).notNull(),
+  provider: varchar("provider", { length: 255 }),
+  
+  // Credits
+  creditsEarned: decimal("credits_earned", { precision: 5, scale: 2 }).notNull(),
+  creditType: varchar("credit_type", { length: 50 }).default("CME"), // CME, CEU, etc.
+  
+  // Dates
+  activityDate: date("activity_date").notNull(),
+  completionDate: date("completion_date"),
+  expiryDate: date("expiry_date"),
+  
+  // Verification
+  certificateKey: varchar("certificate_key", { length: 512 }),
+  certificateUrl: varchar("certificate_url", { length: 1024 }),
+  verificationCode: varchar("verification_code", { length: 100 }),
+  
+  // Category
+  category: varchar("category", { length: 100 }), // cardiology, emergency medicine, etc.
+  
+  // Status
+  status: mysqlEnum("status", ["completed", "in_progress", "expired"]).default("completed").notNull(),
+  
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CmeTracking = typeof cmeTracking.$inferSelect;
+export type InsertCmeTracking = typeof cmeTracking.$inferInsert;
+
+/**
+ * Peer Consultation Network - Doctor-to-doctor consultation requests
+ */
+export const peerConsultations = mysqlTable("peer_consultations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Parties
+  requestingDoctorId: int("requesting_doctor_id").notNull(),
+  consultingDoctorId: int("consulting_doctor_id"),
+  
+  // Case information
+  patientId: int("patient_id"), // Optional, may be anonymized
+  caseTitle: varchar("case_title", { length: 255 }).notNull(),
+  caseDescription: text("case_description").notNull(),
+  specialty: varchar("specialty", { length: 100 }),
+  
+  // Urgency
+  urgency: mysqlEnum("urgency", ["routine", "urgent", "emergency"]).default("routine").notNull(),
+  
+  // Anonymization
+  isAnonymized: boolean("is_anonymized").default(false).notNull(),
+  
+  // Attachments
+  attachedDocuments: text("attached_documents"), // JSON array
+  
+  // Response
+  status: mysqlEnum("status", ["open", "in_progress", "answered", "closed"]).default("open").notNull(),
+  response: text("response"),
+  respondedAt: timestamp("responded_at"),
+  
+  // Follow-up discussion
+  discussionThreadId: int("discussion_thread_id"),
+  
+  // Ratings
+  helpfulnessRating: int("helpfulness_rating"), // 1-5
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PeerConsultation = typeof peerConsultations.$inferSelect;
+export type InsertPeerConsultation = typeof peerConsultations.$inferInsert;
+
+/**
+ * Mentorship Relationships - Connects experienced doctors with new graduates
+ */
+export const mentorshipRelationships = mysqlTable("mentorship_relationships", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Parties
+  mentorId: int("mentor_id").notNull(),
+  menteeId: int("mentee_id").notNull(),
+  
+  // Relationship details
+  specialty: varchar("specialty", { length: 100 }),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date"),
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "active", "completed", "cancelled"]).default("pending").notNull(),
+  
+  // Goals and progress
+  goals: text("goals"), // JSON array of mentorship goals
+  progressNotes: text("progress_notes"),
+  
+  // Meeting tracking
+  totalMeetings: int("total_meetings").default(0),
+  lastMeetingDate: date("last_meeting_date"),
+  nextMeetingDate: date("next_meeting_date"),
+  
+  // Feedback
+  mentorFeedback: text("mentor_feedback"),
+  menteeFeedback: text("mentee_feedback"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MentorshipRelationship = typeof mentorshipRelationships.$inferSelect;
+export type InsertMentorshipRelationship = typeof mentorshipRelationships.$inferInsert;
+
+/**
+ * Case Studies Library - Educational case studies for learning
+ */
+export const caseStudiesLibrary = mysqlTable("case_studies_library", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Case information
+  title: varchar("title", { length: 500 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  specialty: varchar("specialty", { length: 100 }),
+  difficulty: mysqlEnum("difficulty", ["beginner", "intermediate", "advanced"]).notNull(),
+  
+  // Patient presentation
+  patientPresentation: text("patient_presentation").notNull(),
+  clinicalFindings: text("clinical_findings").notNull(),
+  diagnosticTests: text("diagnostic_tests"),
+  
+  // Case progression
+  differentialDiagnosis: text("differential_diagnosis"),
+  finalDiagnosis: text("final_diagnosis").notNull(),
+  treatment: text("treatment").notNull(),
+  outcome: text("outcome"),
+  
+  // Learning points
+  learningObjectives: text("learning_objectives"), // JSON array
+  keyTakeaways: text("key_takeaways"),
+  clinicalPearls: text("clinical_pearls"),
+  
+  // Media
+  imageKeys: text("image_keys"), // JSON array of S3 keys
+  imageUrls: text("image_urls"), // JSON array of S3 URLs
+  
+  // Metadata
+  authorId: int("author_id"),
+  source: varchar("source", { length: 255 }),
+  references: text("references"),
+  
+  // Engagement
+  viewCount: int("view_count").default(0),
+  completionCount: int("completion_count").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }),
+  
+  // Status
+  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CaseStudyLibrary = typeof caseStudiesLibrary.$inferSelect;
+export type InsertCaseStudyLibrary = typeof caseStudiesLibrary.$inferInsert;
+
+/**
+ * Doctor Revenue Tracking - Financial management for freelance doctors
+ */
+export const doctorRevenueTracking = mysqlTable("doctor_revenue_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  doctorId: int("doctor_id").notNull(),
+  
+  // Transaction details
+  transactionType: mysqlEnum("transaction_type", ["consultation", "procedure", "follow_up", "certificate", "other"]).notNull(),
+  consultationId: int("consultation_id"),
+  
+  // Financial information
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("USD").notNull(),
+  paymentMethod: varchar("payment_method", { length: 50 }),
+  
+  // Platform fees
+  platformFee: decimal("platform_fee", { precision: 10, scale: 2 }).default("0.00"),
+  netAmount: decimal("net_amount", { precision: 10, scale: 2 }).notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "completed", "refunded", "cancelled"]).default("pending").notNull(),
+  
+  // Payment processing
+  paymentIntentId: varchar("payment_intent_id", { length: 255 }),
+  payoutId: varchar("payout_id", { length: 255 }),
+  payoutDate: date("payout_date"),
+  
+  // Tax information
+  taxYear: int("tax_year"),
+  taxQuarter: int("tax_quarter"),
+  includedInTaxReport: boolean("included_in_tax_report").default(false).notNull(),
+  
+  // Notes
+  description: text("description"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorRevenueTracking = typeof doctorRevenueTracking.$inferSelect;
+export type InsertDoctorRevenueTracking = typeof doctorRevenueTracking.$inferInsert;
+
 // Export consultations schema
 export * from "./schema-consultations";
 
 // Export Avicenna-X Orchestration System schema
 export * from "./avicenna-schema";
+
+// Export intelligent matching system schema
+export * from "./matching-schema";
