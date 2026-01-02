@@ -814,3 +814,4 @@
 - [x] Integrate voice input into symptom checker form
 - [x] Integrate voice input into booking forms
 - [x] Test and verify Arabic voice recognition functionality
+- [x] Improve sheet close button positioning for better RTL layout
