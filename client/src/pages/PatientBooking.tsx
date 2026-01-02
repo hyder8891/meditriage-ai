@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { VoiceInput } from "@/components/VoiceInput";
 
 interface PatientBookingProps {
   doctorId?: number;
@@ -330,27 +331,59 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
               <Label>
                 {language === 'ar' ? 'الشكوى الرئيسية' : 'Chief Complaint'}
               </Label>
-              <Textarea
-                placeholder={language === 'ar' ? 'اذكر سبب الزيارة...' : 'Describe the reason for your visit...'}
-                value={bookingForm.chiefComplaint}
-                onChange={(e) =>
-                  setBookingForm({ ...bookingForm, chiefComplaint: e.target.value })
-                }
-                rows={3}
-              />
+              <div className="space-y-2">
+                <Textarea
+                  placeholder={language === 'ar' ? 'اذكر سبب الزيارة...' : 'Describe the reason for your visit...'}
+                  value={bookingForm.chiefComplaint}
+                  onChange={(e) =>
+                    setBookingForm({ ...bookingForm, chiefComplaint: e.target.value })
+                  }
+                  rows={3}
+                />
+                <VoiceInput
+                  onTranscript={(text) =>
+                    setBookingForm({
+                      ...bookingForm,
+                      chiefComplaint: bookingForm.chiefComplaint + (bookingForm.chiefComplaint ? " " : "") + text,
+                    })
+                  }
+                  language={language === "ar" ? "ar-SA" : "en-US"}
+                  placeholder={
+                    language === "ar"
+                      ? "انقر على الميكروفون لوصف سبب الزيارة"
+                      : "Click microphone to describe reason for visit"
+                  }
+                />
+              </div>
             </div>
             <div>
               <Label>
                 {language === 'ar' ? 'الأعراض (اختياري)' : 'Symptoms (Optional)'}
               </Label>
-              <Textarea
-                placeholder={language === 'ar' ? 'اذكر الأعراض التي تعاني منها...' : 'Describe your symptoms...'}
-                value={bookingForm.symptoms}
-                onChange={(e) =>
-                  setBookingForm({ ...bookingForm, symptoms: e.target.value })
-                }
-                rows={3}
-              />
+              <div className="space-y-2">
+                <Textarea
+                  placeholder={language === 'ar' ? 'اذكر الأعراض التي تعاني منها...' : 'Describe your symptoms...'}
+                  value={bookingForm.symptoms}
+                  onChange={(e) =>
+                    setBookingForm({ ...bookingForm, symptoms: e.target.value })
+                  }
+                  rows={3}
+                />
+                <VoiceInput
+                  onTranscript={(text) =>
+                    setBookingForm({
+                      ...bookingForm,
+                      symptoms: bookingForm.symptoms + (bookingForm.symptoms ? " " : "") + text,
+                    })
+                  }
+                  language={language === "ar" ? "ar-SA" : "en-US"}
+                  placeholder={
+                    language === "ar"
+                      ? "انقر على الميكروفون لوصف الأعراض"
+                      : "Click microphone to describe symptoms"
+                  }
+                />
+              </div>
             </div>
             <div className="bg-muted p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">

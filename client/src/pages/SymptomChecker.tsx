@@ -17,6 +17,7 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { TriageRecommendation } from "@/components/TriageRecommendation";
+import { VoiceInput } from "@/components/VoiceInput";
 
 interface Message {
   id: string;
@@ -270,15 +271,28 @@ export default function SymptomChecker() {
 
             {/* Input Area */}
             <div className="border-t p-4 bg-white">
-              <div className="flex gap-2">
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={t.placeholder}
-                  disabled={sendMessage.isPending || !isInitialized}
-                  className="flex-1 rounded-xl border-2 focus:border-primary"
-                />
+              <div className="flex gap-2 items-start">
+                <div className="flex-1 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder={t.placeholder}
+                      disabled={sendMessage.isPending || !isInitialized}
+                      className="flex-1 rounded-xl border-2 focus:border-primary"
+                    />
+                    <VoiceInput
+                      onTranscript={(text) => setInput((prev) => prev + (prev ? " " : "") + text)}
+                      language={language === "ar" ? "ar-SA" : "en-US"}
+                      placeholder={
+                        language === "ar"
+                          ? "انقر على الميكروفون للتحدث"
+                          : "Click microphone to speak"
+                      }
+                    />
+                  </div>
+                </div>
                 <Button
                   onClick={handleSend}
                   disabled={!input.trim() || sendMessage.isPending || !isInitialized}

@@ -803,3 +803,10 @@
 - [x] Refine RTL layout for calendar components
 - [x] Refine RTL layout for chart components
 - [x] Refine RTL layout for data tables
+
+## Arabic Voice Input Integration
+
+- [x] Create reusable voice input component with Arabic speech recognition
+- [x] Integrate voice input into symptom checker form
+- [x] Integrate voice input into booking forms
+- [x] Test and verify Arabic voice recognition functionality
