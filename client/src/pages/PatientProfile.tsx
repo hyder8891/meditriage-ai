@@ -10,8 +10,10 @@ import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, Shield, Bell, Settings, Activity, Mail } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function PatientProfile() {
+  const { language } = useLanguage();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
 
@@ -25,41 +27,41 @@ export default function PatientProfile() {
   // Mutations
   const updateProfile = trpc.preferences.updateProfile.useMutation({
     onSuccess: () => {
-      toast({ title: "Profile updated successfully" });
+      toast({ title: language === 'ar' ? "تم تحديث الملف الشخصي بنجاح" : "Profile updated successfully" });
       refetchProfile();
     },
     onError: (error) => {
-      toast({ title: "Failed to update profile", description: error.message, variant: "destructive" });
+      toast({ title: language === 'ar' ? "فشل تحديث الملف الشخصي" : "Failed to update profile", description: error.message, variant: "destructive" });
     },
   });
 
   const updateEmailPrefs = trpc.preferences.updateEmailPreferences.useMutation({
     onSuccess: () => {
-      toast({ title: "Email preferences updated" });
+      toast({ title: language === 'ar' ? "تم تحديث تفضيلات البريد الإلكتروني" : "Email preferences updated" });
       refetchEmailPrefs();
     },
     onError: (error) => {
-      toast({ title: "Failed to update preferences", description: error.message, variant: "destructive" });
+      toast({ title: language === 'ar' ? "فشل تحديث التفضيلات" : "Failed to update preferences", description: error.message, variant: "destructive" });
     },
   });
 
   const updateSettings = trpc.preferences.updateUserSettings.useMutation({
     onSuccess: () => {
-      toast({ title: "Settings updated successfully" });
+      toast({ title: language === 'ar' ? "تم تحديث الإعدادات بنجاح" : "Settings updated successfully" });
       refetchSettings();
     },
     onError: (error) => {
-      toast({ title: "Failed to update settings", description: error.message, variant: "destructive" });
+      toast({ title: language === 'ar' ? "فشل تحديث الإعدادات" : "Failed to update settings", description: error.message, variant: "destructive" });
     },
   });
 
   const changePassword = trpc.preferences.changePassword.useMutation({
     onSuccess: () => {
-      toast({ title: "Password changed successfully" });
+      toast({ title: language === 'ar' ? "تم تغيير كلمة المرور بنجاح" : "Password changed successfully" });
       setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     },
     onError: (error) => {
-      toast({ title: "Failed to change password", description: error.message, variant: "destructive" });
+      toast({ title: language === 'ar' ? "فشل تغيير كلمة المرور" : "Failed to change password", description: error.message, variant: "destructive" });
     },
   });
 
@@ -97,7 +99,7 @@ export default function PatientProfile() {
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast({ title: "Passwords do not match", variant: "destructive" });
+      toast({ title: language === 'ar' ? "كلمات المرور غير متطابقة" : "Passwords do not match", variant: "destructive" });
       return;
     }
     changePassword.mutate({
@@ -125,31 +127,31 @@ export default function PatientProfile() {
   return (
     <div className="container max-w-5xl py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">My Profile</h1>
-        <p className="text-muted-foreground mt-2">Manage your account settings and preferences</p>
+        <h1 className="text-3xl font-bold">{language === 'ar' ? 'ملفي الشخصي' : 'My Profile'}</h1>
+        <p className="text-muted-foreground mt-2">{language === 'ar' ? 'إدارة إعدادات حسابك وتفضيلاتك' : 'Manage your account settings and preferences'}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
-            Profile
+            {language === 'ar' ? 'الملف الشخصي' : 'Profile'}
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            Security
+            {language === 'ar' ? 'الأمان' : 'Security'}
           </TabsTrigger>
           <TabsTrigger value="notifications" className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
-            Emails
+            {language === 'ar' ? 'البريد' : 'Emails'}
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
-            Settings
+            {language === 'ar' ? 'الإعدادات' : 'Settings'}
           </TabsTrigger>
           <TabsTrigger value="activity" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
-            Activity
+            {language === 'ar' ? 'النشاط' : 'Activity'}
           </TabsTrigger>
         </TabsList>
 
@@ -157,13 +159,13 @@ export default function PatientProfile() {
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Update your personal details</CardDescription>
+              <CardTitle>{language === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</CardTitle>
+              <CardDescription>{language === 'ar' ? 'تحديث تفاصيلك الشخصية' : 'Update your personal details'}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">{language === 'ar' ? 'الاسم الكامل' : 'Full Name'}</Label>
                   <Input
                     id="name"
                     value={profileForm.name}
@@ -171,7 +173,7 @@ export default function PatientProfile() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -180,7 +182,7 @@ export default function PatientProfile() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">{language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
                   <Input
                     id="phone"
                     value={profileForm.phoneNumber}
@@ -189,9 +191,9 @@ export default function PatientProfile() {
                 </div>
                 <Separator className="my-4" />
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Emergency Contact</h3>
+                  <h3 className="text-lg font-semibold">{language === 'ar' ? 'جهة الاتصال في حالات الطوارئ' : 'Emergency Contact'}</h3>
                   <div className="space-y-2">
-                    <Label htmlFor="emergencyContactName">Emergency Contact Name</Label>
+                    <Label htmlFor="emergencyContactName">{language === 'ar' ? 'اسم جهة الاتصال في حالات الطوارئ' : 'Emergency Contact Name'}</Label>
                     <Input
                       id="emergencyContactName"
                       value={profileForm.emergencyContactName}
@@ -200,7 +202,7 @@ export default function PatientProfile() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="emergencyContact">Emergency Contact Phone</Label>
+                    <Label htmlFor="emergencyContact">{language === 'ar' ? 'هاتف جهة الاتصال في حالات الطوارئ' : 'Emergency Contact Phone'}</Label>
                     <Input
                       id="emergencyContact"
                       value={profileForm.emergencyContact}
@@ -211,7 +213,7 @@ export default function PatientProfile() {
                 </div>
                 <Button type="submit" disabled={updateProfile.isPending}>
                   {updateProfile.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
+                  {language === 'ar' ? 'حفظ التغييرات' : 'Save Changes'}
                 </Button>
               </form>
             </CardContent>

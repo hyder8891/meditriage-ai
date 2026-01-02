@@ -199,13 +199,13 @@ function LiveScribeContent() {
       setRecordingTime(0);
       toast.success(language === 'ar' ? "بدأ التسجيل" : "Recording started");
     } catch (error: any) {
-      let errorMessage = "Failed to access microphone";
+      let errorMessage = language === 'ar' ? "فشل الوصول إلى الميكروفون" : "Failed to access microphone";
       if (error.name === 'NotAllowedError') {
-        errorMessage = "Microphone access denied. Please allow microphone permissions.";
+        errorMessage = language === 'ar' ? "تم رفض الوصول إلى الميكروفون. يرجى السماح بأذونات الميكروفون." : "Microphone access denied. Please allow microphone permissions.";
       } else if (error.name === 'NotFoundError') {
         errorMessage = "No microphone found. Please connect a microphone.";
       } else if (error.name === 'NotReadableError') {
-        errorMessage = "Microphone is already in use by another application.";
+        errorMessage = language === 'ar' ? "الميكروفون قيد الاستخدام بواسطة تطبيق آخر." : "Microphone is already in use by another application.";
       }
       toast.error(errorMessage);
       console.error("Microphone access error:", error);
@@ -244,7 +244,7 @@ function LiveScribeContent() {
       });
     },
     onError: (error) => {
-      toast.error("Failed to upload audio: " + error.message);
+      toast.error(language === 'ar' ? "فشل رفع الصوت: " + error.message : "Failed to upload audio: " + error.message);
       setIsTranscribing(false);
     },
   });
@@ -269,11 +269,11 @@ function LiveScribeContent() {
         });
       };
       reader.onerror = () => {
-        toast.error("Failed to read audio file");
+        toast.error(language === 'ar' ? "فشل قراءة ملف الصوت" : "Failed to read audio file");
         setIsTranscribing(false);
       };
     } catch (error) {
-      toast.error("Failed to process audio");
+      toast.error(language === 'ar' ? "فشل معالجة الصوت" : "Failed to process audio");
       setIsTranscribing(false);
     }
   };
@@ -345,7 +345,7 @@ function LiveScribeContent() {
   };
 
   if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</div>;
   }
 
   return (
@@ -401,7 +401,7 @@ function LiveScribeContent() {
                   Recording Controls
                 </CardTitle>
                 <CardDescription>
-                  {isRecording ? "Recording in progress..." : "Start a new recording"}
+                  {isRecording ? (language === 'ar' ? 'جاري التسجيل...' : 'Recording in progress...') : (language === 'ar' ? 'بدء تسجيل جديد' : 'Start a new recording')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -432,7 +432,7 @@ function LiveScribeContent() {
                       {isRecording && !isPaused && (
                         <div className="mb-4 px-8">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-xs font-semibold text-gray-700">Audio Level:</span>
+                            <span className="text-xs font-semibold text-gray-700">{language === 'ar' ? 'مستوى الصوت:' : 'Audio Level:'}</span>
                             <Badge className={`${
                               recordingQuality === 'good' ? 'bg-green-600' :
                               recordingQuality === 'fair' ? 'bg-yellow-600' :
@@ -462,7 +462,7 @@ function LiveScribeContent() {
                         {formatTime(recordingTime)}
                       </div>
                       <p className="text-sm text-gray-600 mt-2">
-                        {isRecording ? (isPaused ? "Paused" : "Recording...") : "Ready to record"}
+                        {isRecording ? (isPaused ? (language === 'ar' ? 'متوقف مؤقتاً' : 'Paused') : (language === 'ar' ? 'جاري التسجيل...' : 'Recording...')) : (language === 'ar' ? 'جاهز للتسجيل' : 'Ready to record')}
                       </p>
                     </div>
                   </div>
@@ -519,7 +519,7 @@ function LiveScribeContent() {
                       onValueChange={(value) => setSelectedCase(value === "none" ? null : parseInt(value))}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a case" />
+                        <SelectValue placeholder={language === 'ar' ? 'اختر حالة' : 'Select a case'} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">No case selected</SelectItem>
@@ -545,9 +545,9 @@ function LiveScribeContent() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="clinician">Clinician</SelectItem>
-                        <SelectItem value="patient">Patient</SelectItem>
-                        <SelectItem value="mixed">Mixed (Both)</SelectItem>
+                        <SelectItem value="clinician">{language === 'ar' ? 'طبيب' : 'Clinician'}</SelectItem>
+                        <SelectItem value="patient">{language === 'ar' ? 'مريض' : 'Patient'}</SelectItem>
+                        <SelectItem value="mixed">{language === 'ar' ? 'مختلط (كلاهما)' : 'Mixed (Both)'}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -586,7 +586,7 @@ function LiveScribeContent() {
                       Transcription
                     </CardTitle>
                     <CardDescription>
-                      {isTranscribing ? "Transcribing audio..." : "Edit the transcribed text"}
+                      {isTranscribing ? (language === 'ar' ? 'جاري تحويل الصوت إلى نص...' : 'Transcribing audio...') : (language === 'ar' ? 'تحرير النص المحول' : 'Edit the transcribed text')}
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -607,7 +607,7 @@ function LiveScribeContent() {
                       className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100"
                     >
                       <Sparkles className="w-4 h-4 mr-2 text-purple-600" />
-                      {isGeneratingSOAP ? "Generating..." : "Generate SOAP Note"}
+                      {isGeneratingSOAP ? (language === 'ar' ? 'جاري الإنشاء...' : 'Generating...') : (language === 'ar' ? 'إنشاء ملاحظة SOAP' : 'Generate SOAP Note')}
                     </Button>
                     <Button
                       size="sm"
@@ -625,14 +625,14 @@ function LiveScribeContent() {
                   <div className="flex items-center justify-center py-12">
                     <div className="text-center">
                       <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                      <p className="text-gray-600">Transcribing audio...</p>
+                      <p className="text-gray-600">{language === 'ar' ? 'جاري تحويل الصوت إلى نص...' : 'Transcribing audio...'}</p>
                     </div>
                   </div>
                 ) : (
                   <Textarea
                     value={transcriptionText}
                     onChange={(e) => setTranscriptionText(e.target.value)}
-                    placeholder="Transcribed text will appear here. You can also type or edit manually."
+                    placeholder={language === 'ar' ? 'سيظهر النص المحول هنا. يمكنك أيضاً الكتابة أو التحرير يدوياً.' : 'Transcribed text will appear here. You can also type or edit manually.'}
                     className="min-h-[300px] font-mono text-sm"
                   />
                 )}
@@ -648,7 +648,7 @@ function LiveScribeContent() {
                   <FileText className="w-5 h-5 text-green-600" />
                   Recent Transcriptions
                 </CardTitle>
-                <CardDescription>Your transcription history</CardDescription>
+                <CardDescription>{language === 'ar' ? 'سجل النسخ الخاص بك' : 'Your transcription history'}</CardDescription>
               </CardHeader>
               <CardContent>
                 {transcriptions && transcriptions.length > 0 ? (

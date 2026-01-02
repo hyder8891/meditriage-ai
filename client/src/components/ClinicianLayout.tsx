@@ -25,6 +25,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface ClinicianLayoutProps {
@@ -144,7 +145,10 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
               style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
             />
           </div>
-          <UserProfileDropdown />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <UserProfileDropdown />
+          </div>
         </div>
       </div>
 

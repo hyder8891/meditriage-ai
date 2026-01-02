@@ -545,7 +545,7 @@ function PharmaGuardEnhancedContent() {
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
-                              <Label htmlFor="drugName">Drug Name *</Label>
+                              <Label htmlFor="drugName">{language === 'ar' ? 'اسم الدواء *' : 'Drug Name *'}</Label>
                               <Input
                                 id="drugName"
                                 value={newMed.drugName}
@@ -554,7 +554,7 @@ function PharmaGuardEnhancedContent() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor="dosage">Dosage</Label>
+                              <Label htmlFor="dosage">{language === 'ar' ? 'الجرعة' : 'Dosage'}</Label>
                               <Input
                                 id="dosage"
                                 value={newMed.dosage}
@@ -563,7 +563,7 @@ function PharmaGuardEnhancedContent() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor="frequency">Frequency</Label>
+                              <Label htmlFor="frequency">{language === 'ar' ? 'التكرار' : 'Frequency'}</Label>
                               <Input
                                 id="frequency"
                                 value={newMed.frequency}
@@ -572,7 +572,7 @@ function PharmaGuardEnhancedContent() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor="purpose">Purpose</Label>
+                              <Label htmlFor="purpose">{language === 'ar' ? 'الغرض' : 'Purpose'}</Label>
                               <Textarea
                                 id="purpose"
                                 value={newMed.purpose}
@@ -704,7 +704,7 @@ function PharmaGuardEnhancedContent() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && handlePersonalizedCheck(searchQuery)}
-                        placeholder="Enter new medication name"
+                        placeholder={language === 'ar' ? 'أدخل اسم الدواء الجديد' : 'Enter new medication name'}
                       />
                       <Button 
                         onClick={() => handlePersonalizedCheck(searchQuery)}

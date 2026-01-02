@@ -353,9 +353,9 @@ function DoctorCalendarContent() {
               ) : (
                 <div className="text-center py-12">
                   <CalendarIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">لا توجد مواعيد متاحة</p>
+                  <p className="text-muted-foreground">{language === 'ar' ? 'لا توجد مواعيد متاحة' : 'No appointments available'}</p>
                   <Button onClick={() => handleGenerateSlots(30)} className="mt-4">
-                    إنشاء مواعيد
+                    {language === 'ar' ? 'إنشاء مواعيد' : 'Generate Appointments'}
                   </Button>
                 </div>
               )}
@@ -372,21 +372,21 @@ function DoctorCalendarContent() {
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="h-5 w-5 text-yellow-500" />
-                        <h3 className="font-semibold">طلب حجز جديد</h3>
+                        <h3 className="font-semibold">{language === 'ar' ? 'طلب حجز جديد' : 'New Booking Request'}</h3>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        <strong>الشكوى الرئيسية:</strong> {request.chiefComplaint || "غير محدد"}
+                        <strong>{language === 'ar' ? 'الشكوى الرئيسية:' : 'Chief Complaint:'}</strong> {request.chiefComplaint || (language === 'ar' ? 'غير محدد' : 'Not specified')}
                       </p>
                       {request.symptoms && (
                         <p className="text-sm text-muted-foreground">
-                          <strong>الأعراض:</strong> {request.symptoms}
+                          <strong>{language === 'ar' ? 'الأعراض:' : 'Symptoms:'}</strong> {request.symptoms}
                         </p>
                       )}
                       {request.urgencyLevel && (
                         <Badge variant="outline">{request.urgencyLevel}</Badge>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        تاريخ الطلب: {format(new Date(request.createdAt), "d MMMM yyyy، HH:mm", { locale: ar })}
+                        {language === 'ar' ? 'تاريخ الطلب:' : 'Request Date:'} {format(new Date(request.createdAt), "d MMMM yyyy، HH:mm", { locale: ar })}
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -396,7 +396,7 @@ function DoctorCalendarContent() {
                         disabled={confirmRequestMutation.isPending}
                       >
                         <CheckCircle className="ml-2 h-4 w-4" />
-                        تأكيد
+                        {language === 'ar' ? 'تأكيد' : 'Confirm'}
                       </Button>
                       <Button
                         size="sm"
@@ -405,7 +405,7 @@ function DoctorCalendarContent() {
                         disabled={rejectRequestMutation.isPending}
                       >
                         <XCircle className="ml-2 h-4 w-4" />
-                        رفض
+                        {language === 'ar' ? 'رفض' : 'Reject'}
                       </Button>
                     </div>
                   </div>
@@ -416,7 +416,7 @@ function DoctorCalendarContent() {
             <Card>
               <CardContent className="py-12 text-center">
                 <CheckCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">لا توجد طلبات حجز معلقة</p>
+                <p className="text-muted-foreground">{language === 'ar' ? 'لا توجد طلبات حجز معلقة' : 'No pending booking requests'}</p>
               </CardContent>
             </Card>
           )}
@@ -425,8 +425,8 @@ function DoctorCalendarContent() {
         <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>ساعات العمل المحفوظة</CardTitle>
-              <CardDescription>ساعات العمل الأسبوعية الخاصة بك</CardDescription>
+              <CardTitle>{language === 'ar' ? 'ساعات العمل المحفوظة' : 'Saved Working Hours'}</CardTitle>
+              <CardDescription>{language === 'ar' ? 'ساعات العمل الأسبوعية الخاصة بك' : 'Your weekly working hours'}</CardDescription>
             </CardHeader>
             <CardContent>
               {workingHours && workingHours.length > 0 ? (
@@ -445,7 +445,7 @@ function DoctorCalendarContent() {
                           </p>
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          مدة الموعد: {wh.slotDuration} دقيقة
+                          {language === 'ar' ? 'مدة الموعد:' : 'Appointment Duration:'} {wh.slotDuration} {language === 'ar' ? 'دقيقة' : 'minutes'}
                         </div>
                       </div>
                     );
@@ -453,7 +453,7 @@ function DoctorCalendarContent() {
                 </div>
               ) : (
                 <p className="text-center text-muted-foreground py-8">
-                  لم يتم تعيين ساعات عمل بعد
+                  {language === 'ar' ? 'لم يتم تعيين ساعات عمل بعد' : 'No working hours set yet'}
                 </p>
               )}
             </CardContent>
