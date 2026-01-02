@@ -141,8 +141,10 @@ export default function PatientAppointments() {
     }
   };
 
+  const isRTL = language === 'ar';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header with consistent logo */}
       <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4">
@@ -164,7 +166,7 @@ export default function PatientAppointments() {
             </div>
             <div className="flex items-center gap-3">
               <Button onClick={() => setLocation('/patient/find-doctors')} className="hidden sm:flex">
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                 {language === 'ar' ? 'موعد جديد' : 'New Appointment'}
               </Button>
               <UserProfileDropdown />
@@ -199,7 +201,7 @@ export default function PatientAppointments() {
                   <Card key={consultation.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4 flex-1">
+                          <div className={`flex items-start gap-4 flex-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
                             {doctorName.charAt(0)}
                           </div>
@@ -227,14 +229,14 @@ export default function PatientAppointments() {
                           </div>
                         </div>
                         
-                        <div className="flex gap-2">
+                        <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                           {(consultation.status === 'scheduled' || consultation.status === 'waiting' || consultation.status === 'in_progress') && (
                             <Button 
                               size="sm" 
                               onClick={() => setLocation(`/consultation/${consultation.id}`)}
                               className={consultation.status === 'in_progress' ? 'bg-green-600 hover:bg-green-700 animate-pulse' : ''}
                             >
-                              <Video className="w-4 h-4 mr-2" />
+                              <Video className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                               {consultation.status === 'in_progress' 
                                 ? (language === 'ar' ? 'انضم الآن' : 'Join Now')
                                 : (language === 'ar' ? 'انضم' : 'Join')}

@@ -795,3 +795,11 @@
 - [x] Test bilingual functionality with doctor account - verified all pages display correctly in Arabic
 - [x] Verify language switcher integration in ClinicianLayout
 - [x] Test language context working across all doctor dashboard pages
+
+## Translation & RTL Enhancements
+- [x] Add Arabic translations to PatientAppointments page
+- [x] Add Arabic translations to PatientBooking page
+- [x] Add Arabic translations to PatientMedicalRecords page
+- [x] Refine RTL layout for calendar components
+- [x] Refine RTL layout for chart components
+- [x] Refine RTL layout for data tables

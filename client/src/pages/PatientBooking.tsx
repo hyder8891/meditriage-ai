@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Calendar as CalendarIcon, Clock, User, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
-import { ar } from "date-fns/locale";
+import { ar, enUS } from "date-fns/locale";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PatientBookingProps {
   doctorId?: number;
@@ -24,6 +25,7 @@ interface PatientBookingProps {
 }
 
 export default function PatientBooking({ doctorId, doctorName }: PatientBookingProps) {
+  const { language } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
   const [showBookingDialog, setShowBookingDialog] = useState(false);
@@ -52,7 +54,7 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
   // Mutations
   const createBookingMutation = trpc.calendar.createBookingRequest.useMutation({
     onSuccess: () => {
-      toast.success("تم إرسال طلب الحجز بنجاح");
+      toast.success(language === 'ar' ? "تم إرسال طلب الحجز بنجاح" : "Booking request sent successfully");
       setShowBookingDialog(false);
       setSelectedSlot(null);
       setBookingForm({ chiefComplaint: "", symptoms: "" });
@@ -60,17 +62,17 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
       refetchRequests();
     },
     onError: (error) => {
-      toast.error(`خطأ: ${error.message}`);
+      toast.error(language === 'ar' ? `خطأ: ${error.message}` : `Error: ${error.message}`);
     },
   });
 
   const cancelRequestMutation = trpc.calendar.cancelBookingRequest.useMutation({
     onSuccess: () => {
-      toast.success("تم إلغاء طلب الحجز");
+      toast.success(language === 'ar' ? "تم إلغاء طلب الحجز" : "Booking request cancelled");
       refetchRequests();
     },
     onError: (error) => {
-      toast.error(`خطأ: ${error.message}`);
+      toast.error(language === 'ar' ? `خطأ: ${error.message}` : `Error: ${error.message}`);
     },
   });
 
@@ -90,24 +92,33 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
   };
 
   const handleCancelRequest = (requestId: number) => {
-    if (confirm("هل أنت متأكد من إلغاء طلب الحجز؟")) {
+    const confirmMessage = language === 'ar' 
+      ? "هل أنت متأكد من إلغاء طلب الحجز؟"
+      : "Are you sure you want to cancel this booking request?";
+    if (confirm(confirmMessage)) {
       cancelRequestMutation.mutate({ requestId });
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { icon: any; variant: any; label: string }> = {
-      pending: { icon: AlertCircle, variant: "default", label: "قيد الانتظار" },
-      confirmed: { icon: CheckCircle2, variant: "default", label: "مؤكد" },
-      rejected: { icon: XCircle, variant: "destructive", label: "مرفوض" },
-      cancelled: { icon: XCircle, variant: "outline", label: "ملغي" },
+    const statusConfig: Record<string, { icon: any; variant: any; labelAr: string; labelEn: string }> = {
+      pending: { icon: AlertCircle, variant: "default", labelAr: "قيد الانتظار", labelEn: "Pending" },
+      confirmed: { icon: CheckCircle2, variant: "default", labelAr: "مؤكد", labelEn: "Confirmed" },
+      rejected: { icon: XCircle, variant: "destructive", labelAr: "مرفوض", labelEn: "Rejected" },
+      cancelled: { icon: XCircle, variant: "outline", labelAr: "ملغي", labelEn: "Cancelled" },
     };
-    const config = statusConfig[status] || { icon: AlertCircle, variant: "default", label: status };
+    const config = statusConfig[status] || { 
+      icon: AlertCircle, 
+      variant: "default", 
+      labelAr: status, 
+      labelEn: status 
+    };
     const Icon = config.icon;
+    const label = language === 'ar' ? config.labelAr : config.labelEn;
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
-        {config.label}
+        {label}
       </Badge>
     );
   };
@@ -124,36 +135,49 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
     return grouped;
   };
 
+  const isRTL = language === 'ar';
+  const dateLocale = language === 'ar' ? ar : enUS;
+
   if (!doctorId) {
     return (
-      <div className="container mx-auto py-12 text-center" dir="rtl">
+      <div className="container mx-auto py-12 text-center" dir={isRTL ? "rtl" : "ltr"}>
         <User className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-        <h2 className="text-2xl font-bold mb-2">اختر طبيباً</h2>
+        <h2 className="text-2xl font-bold mb-2">
+          {language === 'ar' ? 'اختر طبيباً' : 'Select a Doctor'}
+        </h2>
         <p className="text-muted-foreground">
-          يرجى اختيار طبيب لعرض المواعيد المتاحة
+          {language === 'ar' 
+            ? 'يرجى اختيار طبيب لعرض المواعيد المتاحة'
+            : 'Please select a doctor to view available appointments'}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6" dir="rtl">
+    <div className="container mx-auto py-8 space-y-6" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">حجز موعد</h1>
+          <h1 className="text-3xl font-bold">
+            {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
+          </h1>
           {doctorName && (
-            <p className="text-muted-foreground">مع {doctorName}</p>
+            <p className="text-muted-foreground">
+              {language === 'ar' ? `مع ${doctorName}` : `With ${doctorName}`}
+            </p>
           )}
         </div>
       </div>
 
-      <Tabs defaultValue="available" dir="rtl">
+      <Tabs defaultValue="available" dir={isRTL ? "rtl" : "ltr"}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="available">المواعيد المتاحة</TabsTrigger>
+          <TabsTrigger value="available">
+            {language === 'ar' ? 'المواعيد المتاحة' : 'Available Slots'}
+          </TabsTrigger>
           <TabsTrigger value="my-requests">
-            طلباتي
+            {language === 'ar' ? 'طلباتي' : 'My Requests'}
             {myRequests && myRequests.length > 0 && (
-              <Badge variant="secondary" className="mr-2">
+              <Badge variant="secondary" className={isRTL ? "mr-2" : "ml-2"}>
                 {myRequests.length}
               </Badge>
             )}
@@ -165,10 +189,10 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CalendarIcon className="h-5 w-5" />
-                المواعيد المتاحة
+                {language === 'ar' ? 'المواعيد المتاحة' : 'Available Appointments'}
               </CardTitle>
               <CardDescription>
-                اختر الموعد المناسب لك
+                {language === 'ar' ? 'اختر الموعد المناسب لك' : 'Choose a suitable appointment time'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -177,7 +201,7 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
                   {Object.entries(groupSlotsByDate(availableSlots)).map(([date, slots]) => (
                     <div key={date} className="space-y-3">
                       <h3 className="font-semibold text-lg">
-                        {format(new Date(date), "EEEE، d MMMM yyyy", { locale: ar })}
+                        {format(new Date(date), "EEEE، d MMMM yyyy", { locale: dateLocale })}
                       </h3>
                       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                         {slots.map((slot) => (
@@ -201,10 +225,12 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
                 <div className="text-center py-12">
                   <CalendarIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">
-                    لا توجد مواعيد متاحة حالياً
+                    {language === 'ar' ? 'لا توجد مواعيد متاحة حالياً' : 'No appointments available at the moment'}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    يرجى المحاولة لاحقاً أو اختيار تاريخ آخر
+                    {language === 'ar' 
+                      ? 'يرجى المحاولة لاحقاً أو اختيار تاريخ آخر'
+                      : 'Please try again later or select another date'}
                   </p>
                 </div>
               )}
@@ -224,27 +250,32 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
                       </div>
                       {request.chiefComplaint && (
                         <p className="text-sm">
-                          <strong>الشكوى:</strong> {request.chiefComplaint}
+                          <strong>{language === 'ar' ? 'الشكوى:' : 'Chief Complaint:'}</strong> {request.chiefComplaint}
                         </p>
                       )}
                       {request.symptoms && (
                         <p className="text-sm text-muted-foreground">
-                          <strong>الأعراض:</strong> {request.symptoms}
+                          <strong>{language === 'ar' ? 'الأعراض:' : 'Symptoms:'}</strong> {request.symptoms}
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        تاريخ الطلب: {format(new Date(request.createdAt), "d MMMM yyyy، HH:mm", { locale: ar })}
+                        {language === 'ar' ? 'تاريخ الطلب: ' : 'Request Date: '}
+                        {format(new Date(request.createdAt), "d MMMM yyyy، HH:mm", { locale: dateLocale })}
                       </p>
                       {request.status === "rejected" && request.rejectionReason && (
                         <div className="mt-2 p-3 bg-destructive/10 rounded-lg">
-                          <p className="text-sm font-medium text-destructive">سبب الرفض:</p>
+                          <p className="text-sm font-medium text-destructive">
+                            {language === 'ar' ? 'سبب الرفض:' : 'Rejection Reason:'}
+                          </p>
                           <p className="text-sm text-muted-foreground">{request.rejectionReason}</p>
                         </div>
                       )}
                       {request.status === "confirmed" && (
                         <div className="mt-2 p-3 bg-green-50 dark:bg-green-950 rounded-lg">
                           <p className="text-sm font-medium text-green-700 dark:text-green-300">
-                            ✓ تم تأكيد موعدك بنجاح
+                            {language === 'ar' 
+                              ? '✓ تم تأكيد موعدك بنجاح'
+                              : '✓ Your appointment has been confirmed successfully'}
                           </p>
                         </div>
                       )}
@@ -256,7 +287,7 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
                         onClick={() => handleCancelRequest(request.id)}
                         disabled={cancelRequestMutation.isPending}
                       >
-                        إلغاء
+                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
                       </Button>
                     )}
                   </div>
@@ -267,7 +298,9 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
             <Card>
               <CardContent className="py-12 text-center">
                 <CalendarIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">لا توجد طلبات حجز</p>
+                <p className="text-muted-foreground">
+                  {language === 'ar' ? 'لا توجد طلبات حجز' : 'No booking requests'}
+                </p>
               </CardContent>
             </Card>
           )}
@@ -276,13 +309,16 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
 
       {/* Booking Dialog */}
       <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
-        <DialogContent dir="rtl">
+        <DialogContent dir={isRTL ? "rtl" : "ltr"}>
           <DialogHeader>
-            <DialogTitle>تأكيد الحجز</DialogTitle>
+            <DialogTitle>
+              {language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking'}
+            </DialogTitle>
             <DialogDescription>
               {selectedSlot && (
                 <>
-                  الموعد: {format(new Date(selectedSlot.slotDate), "EEEE، d MMMM yyyy", { locale: ar })}
+                  {language === 'ar' ? 'الموعد: ' : 'Appointment: '}
+                  {format(new Date(selectedSlot.slotDate), "EEEE، d MMMM yyyy", { locale: dateLocale })}
                   {" - "}
                   {selectedSlot.startTime.slice(0, 5)}
                 </>
@@ -291,9 +327,11 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>الشكوى الرئيسية</Label>
+              <Label>
+                {language === 'ar' ? 'الشكوى الرئيسية' : 'Chief Complaint'}
+              </Label>
               <Textarea
-                placeholder="اذكر سبب الزيارة..."
+                placeholder={language === 'ar' ? 'اذكر سبب الزيارة...' : 'Describe the reason for your visit...'}
                 value={bookingForm.chiefComplaint}
                 onChange={(e) =>
                   setBookingForm({ ...bookingForm, chiefComplaint: e.target.value })
@@ -302,9 +340,11 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
               />
             </div>
             <div>
-              <Label>الأعراض (اختياري)</Label>
+              <Label>
+                {language === 'ar' ? 'الأعراض (اختياري)' : 'Symptoms (Optional)'}
+              </Label>
               <Textarea
-                placeholder="اذكر الأعراض التي تعاني منها..."
+                placeholder={language === 'ar' ? 'اذكر الأعراض التي تعاني منها...' : 'Describe your symptoms...'}
                 value={bookingForm.symptoms}
                 onChange={(e) =>
                   setBookingForm({ ...bookingForm, symptoms: e.target.value })
@@ -314,8 +354,10 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
             </div>
             <div className="bg-muted p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                <strong>ملاحظة:</strong> سيتم إرسال طلب الحجز إلى الطبيب للمراجعة. 
-                ستتلقى إشعاراً عند تأكيد أو رفض الموعد.
+                <strong>{language === 'ar' ? 'ملاحظة:' : 'Note:'}</strong>{' '}
+                {language === 'ar'
+                  ? 'سيتم إرسال طلب الحجز إلى الطبيب للمراجعة. ستتلقى إشعاراً عند تأكيد أو رفض الموعد.'
+                  : 'Your booking request will be sent to the doctor for review. You will receive a notification when the appointment is confirmed or rejected.'}
               </p>
             </div>
             <div className="flex gap-2">
@@ -324,14 +366,16 @@ export default function PatientBooking({ doctorId, doctorName }: PatientBookingP
                 disabled={createBookingMutation.isPending || !bookingForm.chiefComplaint}
                 className="flex-1"
               >
-                {createBookingMutation.isPending ? "جاري الإرسال..." : "تأكيد الحجز"}
+                {createBookingMutation.isPending 
+                  ? (language === 'ar' ? 'جاري الإرسال...' : 'Sending...')
+                  : (language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking')}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowBookingDialog(false)}
                 className="flex-1"
               >
-                إلغاء
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
               </Button>
             </div>
           </div>

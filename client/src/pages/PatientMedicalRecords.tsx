@@ -35,8 +35,10 @@ export default function PatientMedicalRecords() {
   const imagingResults: any[] = [];
   const imagingLoading = false;
 
+  const isRTL = language === 'ar';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header with consistent logo */}
       <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4">
@@ -65,15 +67,15 @@ export default function PatientMedicalRecords() {
         <Tabs defaultValue="lab" className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-3 h-auto">
             <TabsTrigger value="lab" className="min-h-[48px] text-sm md:min-h-[40px] py-2">
-              <Microscope className="w-4 h-4 mr-2" />
+              <Microscope className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
               {language === 'ar' ? 'التحاليل' : 'Lab Results'}
             </TabsTrigger>
             <TabsTrigger value="imaging" className="min-h-[48px] text-sm md:min-h-[40px] py-2">
-              <FileImage className="w-4 h-4 mr-2" />
+              <FileImage className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
               {language === 'ar' ? 'الأشعة' : 'Imaging'}
             </TabsTrigger>
             <TabsTrigger value="prescriptions" className="min-h-[48px] text-sm md:min-h-[40px] py-2">
-              <Pill className="w-4 h-4 mr-2" />
+              <Pill className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
               {language === 'ar' ? 'الوصفات' : 'Prescriptions'}
             </TabsTrigger>
           </TabsList>

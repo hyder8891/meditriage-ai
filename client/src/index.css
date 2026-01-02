@@ -207,6 +207,19 @@
     text-align: left;
   }
 
+  /* RTL support for charts (Recharts) */
+  [dir="rtl"] .recharts-wrapper {
+    direction: ltr;
+  }
+
+  [dir="rtl"] .recharts-legend-wrapper {
+    direction: rtl;
+  }
+
+  [dir="rtl"] .recharts-cartesian-axis-tick-value {
+    direction: rtl;
+  }
+
   /* Medical Emergency Colors */
   .urgency-emergency {
     @apply bg-red-100 text-red-900 border-red-300;
