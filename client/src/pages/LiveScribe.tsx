@@ -26,11 +26,13 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 function LiveScribeContent() {
+  const { language, setLanguage } = useLanguage();
   const [, setLocation] = useLocation();
   const { user, loading: authLoading } = useAuth();
   
@@ -47,7 +49,6 @@ function LiveScribeContent() {
   const [isGeneratingSOAP, setIsGeneratingSOAP] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [recordingQuality, setRecordingQuality] = useState<'good' | 'fair' | 'poor'>('good');
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar'); // Arabic first priority
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);  
@@ -61,12 +62,12 @@ function LiveScribeContent() {
   
   const createTranscriptionMutation = trpc.clinical.createTranscription.useMutation({
     onSuccess: () => {
-      toast.success("Transcription saved successfully");
+      toast.success(language === 'ar' ? "تم حفظ النسخ بنجاح" : "Transcription saved successfully");
       refetchTranscriptions();
       handleReset();
     },
     onError: (error) => {
-      toast.error("Failed to save transcription: " + error.message);
+      toast.error(language === 'ar' ? "فشل حفظ النسخ: " + error.message : "Failed to save transcription: " + error.message);
     },
   });
   
@@ -74,10 +75,10 @@ function LiveScribeContent() {
     onSuccess: (data) => {
       setTranscriptionText(data.text);
       setIsTranscribing(false);
-      toast.success("Audio transcribed successfully");
+      toast.success(language === 'ar' ? "تم تحويل الصوت إلى نص بنجاح" : "Audio transcribed successfully");
     },
     onError: (error) => {
-      toast.error("Transcription failed: " + error.message);
+      toast.error(language === 'ar' ? "فشل التحويل: " + error.message : "Transcription failed: " + error.message);
       setIsTranscribing(false);
     },
   });
@@ -87,10 +88,10 @@ function LiveScribeContent() {
       setSoapNote(data.soapNote);
       setShowSOAPModal(true);
       setIsGeneratingSOAP(false);
-      toast.success("SOAP note generated successfully");
+      toast.success(language === 'ar' ? "تم إنشاء ملاحظة SOAP بنجاح" : "SOAP note generated successfully");
     },
     onError: (error) => {
-      toast.error("Failed to generate SOAP note: " + error.message);
+      toast.error(language === 'ar' ? "فشل إنشاء ملاحظة SOAP: " + error.message : "Failed to generate SOAP note: " + error.message);
       setIsGeneratingSOAP(false);
     },
   });
@@ -196,7 +197,7 @@ function LiveScribeContent() {
       mediaRecorder.start();
       setIsRecording(true);
       setRecordingTime(0);
-      toast.success("Recording started");
+      toast.success(language === 'ar' ? "بدأ التسجيل" : "Recording started");
     } catch (error: any) {
       let errorMessage = "Failed to access microphone";
       if (error.name === 'NotAllowedError') {
@@ -216,7 +217,7 @@ function LiveScribeContent() {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsPaused(false);
-      toast.info("Recording stopped");
+      toast.info(language === 'ar' ? "تم إيقاف التسجيل" : "Recording stopped");
     }
   };
 
@@ -225,11 +226,11 @@ function LiveScribeContent() {
       if (isPaused) {
         mediaRecorderRef.current.resume();
         setIsPaused(false);
-        toast.info("Recording resumed");
+        toast.info(language === 'ar' ? "تم استئناف التسجيل" : "Recording resumed");
       } else {
         mediaRecorderRef.current.pause();
         setIsPaused(true);
-        toast.info("Recording paused");
+        toast.info(language === 'ar' ? "تم إيقاف التسجيل مؤقتًا" : "Recording paused");
       }
     }
   };
@@ -279,7 +280,7 @@ function LiveScribeContent() {
 
   const handleSave = () => {
     if (!transcriptionText.trim()) {
-      toast.error("No transcription text to save");
+      toast.error(language === 'ar' ? "لا يوجد نص لحفظه" : "No transcription text to save");
       return;
     }
     
@@ -303,7 +304,7 @@ function LiveScribeContent() {
 
   const handleGenerateSOAP = () => {
     if (!transcriptionText.trim()) {
-      toast.error("No transcription text to convert");
+      toast.error(language === 'ar' ? "لا يوجد نص لتحويله" : "No transcription text to convert");
       return;
     }
     
@@ -323,17 +324,17 @@ function LiveScribeContent() {
 
   const handleCopySOAP = () => {
     navigator.clipboard.writeText(soapNote);
-    toast.success("SOAP note copied to clipboard");
+    toast.success(language === 'ar' ? "تم نسخ ملاحظة SOAP" : "SOAP note copied to clipboard");
   };
 
   const handleSaveSOAPToClinicalNotes = async () => {
     if (!selectedCase) {
-      toast.error("Please select a case first");
+      toast.error(language === 'ar' ? "يرجى اختيار حالة أولاً" : "Please select a case first");
       return;
     }
     
     // Save SOAP note as clinical note
-    toast.success("SOAP note saved to clinical notes");
+    toast.success(language === 'ar' ? "تم حفظ ملاحظة SOAP" : "SOAP note saved to clinical notes");
     setShowSOAPModal(false);
   };
 

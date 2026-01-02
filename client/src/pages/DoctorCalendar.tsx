@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const DAYS_OF_WEEK = [
   { value: 0, label: "الأحد", labelEn: "Sunday" },
@@ -38,13 +39,14 @@ const DAYS_OF_WEEK = [
 ];
 
 const SLOT_DURATIONS = [
-  { value: 15, label: "15 دقيقة" },
-  { value: 30, label: "30 دقيقة" },
-  { value: 45, label: "45 دقيقة" },
-  { value: 60, label: "60 دقيقة" },
+  { value: 15, label: "15 دقيقة", labelEn: "15 minutes" },
+  { value: 30, label: "30 دقيقة", labelEn: "30 minutes" },
+  { value: 45, label: "45 دقيقة", labelEn: "45 minutes" },
+  { value: 60, label: "60 دقيقة", labelEn: "60 minutes" },
 ];
 
 function DoctorCalendarContent() {
+  const { language } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showWorkingHoursDialog, setShowWorkingHoursDialog] = useState(false);
   const [workingHoursForm, setWorkingHoursForm] = useState({
@@ -69,54 +71,54 @@ function DoctorCalendarContent() {
   // Mutations
   const setWorkingHoursMutation = trpc.calendar.setWorkingHours.useMutation({
     onSuccess: () => {
-      toast.success("تم حفظ ساعات العمل بنجاح");
+      toast.success(language === 'ar' ? "تم حفظ ساعات العمل بنجاح" : "Working hours saved successfully");
       refetchWorkingHours();
       setShowWorkingHoursDialog(false);
     },
     onError: (error) => {
-      toast.error(`خطأ: ${error.message}`);
+      toast.error(language === 'ar' ? `خطأ: ${error.message}` : `Error: ${error.message}`);
     },
   });
 
   const generateSlotsMutation = trpc.calendar.generateSlots.useMutation({
     onSuccess: (data) => {
-      toast.success(`تم إنشاء ${data.slotsGenerated} موعد بنجاح`);
+      toast.success(language === 'ar' ? `تم إنشاء ${data.slotsGenerated} موعد بنجاح` : `${data.slotsGenerated} slots generated successfully`);
       refetchSlots();
     },
     onError: (error) => {
-      toast.error(`خطأ: ${error.message}`);
+      toast.error(language === 'ar' ? `خطأ: ${error.message}` : `Error: ${error.message}`);
     },
   });
 
   const confirmRequestMutation = trpc.calendar.confirmBookingRequest.useMutation({
     onSuccess: () => {
-      toast.success("تم تأكيد الحجز بنجاح");
+      toast.success(language === 'ar' ? "تم تأكيد الحجز بنجاح" : "Booking confirmed successfully");
       refetchRequests();
       refetchSlots();
     },
     onError: (error) => {
-      toast.error(`خطأ: ${error.message}`);
+      toast.error(language === 'ar' ? `خطأ: ${error.message}` : `Error: ${error.message}`);
     },
   });
 
   const rejectRequestMutation = trpc.calendar.rejectBookingRequest.useMutation({
     onSuccess: () => {
-      toast.success("تم رفض الحجز");
+      toast.success(language === 'ar' ? "تم رفض الحجز" : "Booking rejected");
       refetchRequests();
       refetchSlots();
     },
     onError: (error) => {
-      toast.error(`خطأ: ${error.message}`);
+      toast.error(language === 'ar' ? `خطأ: ${error.message}` : `Error: ${error.message}`);
     },
   });
 
   const blockSlotMutation = trpc.calendar.blockSlot.useMutation({
     onSuccess: () => {
-      toast.success("تم حجب الموعد");
+      toast.success(language === 'ar' ? "تم حجب الموعد" : "Slot blocked");
       refetchSlots();
     },
     onError: (error) => {
-      toast.error(`خطأ: ${error.message}`);
+      toast.error(language === 'ar' ? `خطأ: ${error.message}` : `Error: ${error.message}`);
     },
   });
 
@@ -141,43 +143,43 @@ function DoctorCalendarContent() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { variant: any; label: string }> = {
-      available: { variant: "default", label: "متاح" },
-      booked: { variant: "secondary", label: "محجوز" },
-      blocked: { variant: "destructive", label: "محظور" },
-      completed: { variant: "outline", label: "مكتمل" },
-      cancelled: { variant: "outline", label: "ملغي" },
-      past: { variant: "outline", label: "منتهي" },
+    const statusConfig: Record<string, { variant: any; label: string; labelEn: string }> = {
+      available: { variant: "default", label: "متاح", labelEn: "Available" },
+      booked: { variant: "secondary", label: "محجوز", labelEn: "Booked" },
+      blocked: { variant: "destructive", label: "محظور", labelEn: "Blocked" },
+      completed: { variant: "outline", label: "مكتمل", labelEn: "Completed" },
+      cancelled: { variant: "outline", label: "ملغي", labelEn: "Cancelled" },
+      past: { variant: "outline", label: "منتهي", labelEn: "Past" },
     };
-    const config = statusConfig[status] || { variant: "default", label: status };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = statusConfig[status] || { variant: "default", label: status, labelEn: status };
+    return <Badge variant={config.variant}>{language === 'ar' ? config.label : config.labelEn}</Badge>;
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6" dir="rtl">
+    <div className="container mx-auto py-8 space-y-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">إدارة التقويم</h1>
-          <p className="text-muted-foreground">إدارة مواعيدك وساعات العمل</p>
+          <h1 className="text-3xl font-bold">{language === 'ar' ? 'إدارة التقويم' : 'Calendar Management'}</h1>
+          <p className="text-muted-foreground">{language === 'ar' ? 'إدارة مواعيدك وساعات العمل' : 'Manage your appointments and working hours'}</p>
         </div>
         <div className="flex gap-2">
           <Dialog open={showWorkingHoursDialog} onOpenChange={setShowWorkingHoursDialog}>
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Settings className="ml-2 h-4 w-4" />
-                ساعات العمل
+                {language === 'ar' ? 'ساعات العمل' : 'Working Hours'}
               </Button>
             </DialogTrigger>
-            <DialogContent dir="rtl">
+            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <DialogHeader>
-                <DialogTitle>إعداد ساعات العمل</DialogTitle>
+                <DialogTitle>{language === 'ar' ? 'إعداد ساعات العمل' : 'Set Working Hours'}</DialogTitle>
                 <DialogDescription>
-                  حدد ساعات العمل الأسبوعية ومدة كل موعد
+                  {language === 'ar' ? 'حدد ساعات العمل الأسبوعية ومدة كل موعد' : 'Set your weekly working hours and appointment duration'}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label>اليوم</Label>
+                  <Label>{language === 'ar' ? 'اليوم' : 'Day'}</Label>
                   <Select
                     value={workingHoursForm.dayOfWeek.toString()}
                     onValueChange={(value) =>
@@ -190,7 +192,7 @@ function DoctorCalendarContent() {
                     <SelectContent>
                       {DAYS_OF_WEEK.map((day) => (
                         <SelectItem key={day.value} value={day.value.toString()}>
-                          {day.label}
+                          {language === 'ar' ? day.label : day.labelEn}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -198,7 +200,7 @@ function DoctorCalendarContent() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>وقت البداية</Label>
+                    <Label>{language === 'ar' ? 'وقت البداية' : 'Start Time'}</Label>
                     <Input
                       type="time"
                       value={workingHoursForm.startTime.slice(0, 5)}
@@ -211,7 +213,7 @@ function DoctorCalendarContent() {
                     />
                   </div>
                   <div>
-                    <Label>وقت النهاية</Label>
+                    <Label>{language === 'ar' ? 'وقت النهاية' : 'End Time'}</Label>
                     <Input
                       type="time"
                       value={workingHoursForm.endTime.slice(0, 5)}
@@ -225,7 +227,7 @@ function DoctorCalendarContent() {
                   </div>
                 </div>
                 <div>
-                  <Label>مدة الموعد</Label>
+                  <Label>{language === 'ar' ? 'مدة الموعد' : 'Appointment Duration'}</Label>
                   <Select
                     value={workingHoursForm.slotDuration.toString()}
                     onValueChange={(value) =>
@@ -241,14 +243,14 @@ function DoctorCalendarContent() {
                     <SelectContent>
                       {SLOT_DURATIONS.map((duration) => (
                         <SelectItem key={duration.value} value={duration.value.toString()}>
-                          {duration.label}
+                          {language === 'ar' ? duration.label : duration.labelEn}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>وقت الاستراحة بين المواعيد (دقائق)</Label>
+                  <Label>{language === 'ar' ? 'وقت الاستراحة بين المواعيد (دقائق)' : 'Buffer Time Between Appointments (minutes)'}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -267,30 +269,30 @@ function DoctorCalendarContent() {
                   disabled={setWorkingHoursMutation.isPending}
                   className="w-full"
                 >
-                  حفظ
+                  {language === 'ar' ? 'حفظ' : 'Save'}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
           <Button onClick={() => handleGenerateSlots(30)}>
             <Plus className="ml-2 h-4 w-4" />
-            إنشاء مواعيد (30 يوم)
+            {language === 'ar' ? 'إنشاء مواعيد (30 يوم)' : 'Generate Slots (30 days)'}
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="calendar" dir="rtl">
+      <Tabs defaultValue="calendar" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="calendar">التقويم</TabsTrigger>
+          <TabsTrigger value="calendar">{language === 'ar' ? 'التقويم' : 'Calendar'}</TabsTrigger>
           <TabsTrigger value="requests">
-            طلبات الحجز
+            {language === 'ar' ? 'طلبات الحجز' : 'Booking Requests'}
             {pendingRequests && pendingRequests.length > 0 && (
               <Badge variant="destructive" className="mr-2">
                 {pendingRequests.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="settings">الإعدادات</TabsTrigger>
+          <TabsTrigger value="settings">{language === 'ar' ? 'الإعدادات' : 'Settings'}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="calendar" className="space-y-4">
@@ -298,7 +300,7 @@ function DoctorCalendarContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CalendarIcon className="h-5 w-5" />
-                المواعيد الأسبوعية
+                {language === 'ar' ? 'المواعيد الأسبوعية' : 'Weekly Appointments'}
               </CardTitle>
               <CardDescription>
                 {format(new Date(startDate), "d MMMM", { locale: ar })} -{" "}
@@ -318,7 +320,7 @@ function DoctorCalendarContent() {
 
                     return (
                       <div key={day.value} className="space-y-2">
-                        <h3 className="font-semibold">{day.label}</h3>
+                        <h3 className="font-semibold">{language === 'ar' ? day.label : day.labelEn}</h3>
                         <div className="grid grid-cols-4 gap-2">
                           {daySlots.map((slot) => (
                             <Card
@@ -338,7 +340,7 @@ function DoctorCalendarContent() {
                                   onClick={() => handleBlockSlot(slot.id)}
                                   className="w-full text-xs"
                                 >
-                                  حجب
+                                  {language === 'ar' ? 'حجب' : 'Block'}
                                 </Button>
                               )}
                             </Card>

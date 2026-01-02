@@ -8,8 +8,10 @@ import { Loader2, Search, User, MessageCircle, Calendar, FileText } from "lucide
 import { Link, useLocation } from "wouter";
 import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 function MyPatientsContent() {
+  const { language } = useLanguage();
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "pending" | "terminated" | undefined>("active");
@@ -29,9 +31,9 @@ function MyPatientsContent() {
     <div className="container max-w-6xl py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">My Patients</h1>
+          <h1 className="text-3xl font-bold">{language === 'ar' ? 'مرضاي' : 'My Patients'}</h1>
           <p className="text-muted-foreground">
-            Manage your connected patients and their medical records
+            {language === 'ar' ? 'إدارة مرضاك المتصلين وسجلاتهم الطبية' : 'Manage your connected patients and their medical records'}
           </p>
         </div>
       </div>
@@ -45,7 +47,7 @@ function MyPatientsContent() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search patients by name or email..."
+              placeholder={language === 'ar' ? 'ابحث عن مرضى بالاسم أو البريد الإلكتروني...' : 'Search patients by name or email...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -58,21 +60,21 @@ function MyPatientsContent() {
               size="sm"
               onClick={() => setStatusFilter("active")}
             >
-              Active
+              {language === 'ar' ? 'نشط' : 'Active'}
             </Button>
             <Button
               variant={statusFilter === "pending" ? "default" : "outline"}
               size="sm"
               onClick={() => setStatusFilter("pending")}
             >
-              Pending
+              {language === 'ar' ? 'قيد الانتظار' : 'Pending'}
             </Button>
             <Button
               variant={statusFilter === undefined ? "default" : "outline"}
               size="sm"
               onClick={() => setStatusFilter(undefined)}
             >
-              All
+              {language === 'ar' ? 'الكل' : 'All'}
             </Button>
           </div>
         </div>
@@ -87,15 +89,15 @@ function MyPatientsContent() {
         <Card className="p-12">
           <div className="text-center space-y-3">
             <User className="h-12 w-12 mx-auto text-muted-foreground" />
-            <h3 className="font-semibold text-lg">No Patients Found</h3>
+            <h3 className="font-semibold text-lg">{language === 'ar' ? 'لم يتم العثور على مرضى' : 'No Patients Found'}</h3>
             <p className="text-muted-foreground">
               {searchQuery
-                ? "No patients match your search criteria"
-                : "You don't have any connected patients yet"}
+                ? (language === 'ar' ? 'لا يوجد مرضى يطابقون معايير البحث' : 'No patients match your search criteria')
+                : (language === 'ar' ? 'ليس لديك أي مرضى متصلين بعد' : "You don't have any connected patients yet")}
             </p>
             {!searchQuery && (
               <p className="text-sm text-muted-foreground">
-                Set your status to "Available" to allow patients to connect with you
+                {language === 'ar' ? 'قم بتعيين حالتك إلى "متاح" للسماح للمرضى بالاتصال بك' : 'Set your status to "Available" to allow patients to connect with you'}
               </p>
             )}
           </div>
@@ -118,7 +120,7 @@ function MyPatientsContent() {
                     
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{patient.name || "Unnamed Patient"}</h3>
+                        <h3 className="font-semibold">{patient.name || (language === 'ar' ? 'مريض غير مسمى' : 'Unnamed Patient')}</h3>
                         <StatusBadge status={relationship.status} />
                       </div>
                       
@@ -126,7 +128,7 @@ function MyPatientsContent() {
                       
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span>
-                          Connected: {new Date(relationship.establishedAt).toLocaleDateString()}
+                          {language === 'ar' ? 'متصل:' : 'Connected:'} {new Date(relationship.establishedAt).toLocaleDateString(language === 'ar' ? 'ar-IQ' : 'en-US')}
                         </span>
                         {relationship.relationshipType && (
                           <Badge variant="outline" className="text-xs">
@@ -137,7 +139,7 @@ function MyPatientsContent() {
 
                       {relationship.notes && (
                         <p className="text-sm text-muted-foreground italic">
-                          Reason: {relationship.notes}
+                          {language === 'ar' ? 'السبب:' : 'Reason:'} {relationship.notes}
                         </p>
                       )}
                     </div>
@@ -147,7 +149,7 @@ function MyPatientsContent() {
                     <Link to={`/clinician/patients/${patient.id}`}>
                       <div className="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 text-sm font-medium cursor-pointer transition-colors">
                         <FileText className="h-4 w-4 mr-2" />
-                        View Profile
+                        {language === 'ar' ? 'عرض الملف الشخصي' : 'View Profile'}
                       </div>
                     </Link>
                     
@@ -157,7 +159,7 @@ function MyPatientsContent() {
                       onClick={() => navigate(`/clinician/messages?patient=${patient.id}`)}
                     >
                       <MessageCircle className="h-4 w-4 mr-2" />
-                      Message
+                      {language === 'ar' ? 'رسالة' : 'Message'}
                     </Button>
                     
                     <Button 
@@ -166,7 +168,7 @@ function MyPatientsContent() {
                       onClick={() => navigate(`/clinician/calendar?patient=${patient.id}`)}
                     >
                       <Calendar className="h-4 w-4 mr-2" />
-                      Schedule
+                      {language === 'ar' ? 'جدولة' : 'Schedule'}
                     </Button>
                   </div>
                 </div>
@@ -178,7 +180,7 @@ function MyPatientsContent() {
 
       {filteredPatients.length > 0 && (
         <div className="text-center text-sm text-muted-foreground">
-          Showing {filteredPatients.length} patient{filteredPatients.length !== 1 ? 's' : ''}
+          {language === 'ar' ? `عرض ${filteredPatients.length} مريض` : `Showing ${filteredPatients.length} patient${filteredPatients.length !== 1 ? 's' : ''}`}
         </div>
       )}
     </div>
@@ -194,18 +196,19 @@ export default function MyPatients() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; className: string }> = {
-    active: { label: "Active", className: "bg-green-500" },
-    pending: { label: "Pending", className: "bg-yellow-500" },
-    inactive: { label: "Inactive", className: "bg-gray-500" },
-    terminated: { label: "Terminated", className: "bg-red-500" },
+  const { language } = useLanguage();
+  const config: Record<string, { label: string; labelAr: string; className: string }> = {
+    active: { label: "Active", labelAr: "نشط", className: "bg-green-500" },
+    pending: { label: "Pending", labelAr: "قيد الانتظار", className: "bg-yellow-500" },
+    inactive: { label: "Inactive", labelAr: "غير نشط", className: "bg-gray-500" },
+    terminated: { label: "Terminated", labelAr: "منتهي", className: "bg-red-500" },
   };
 
-  const { label, className } = config[status] || { label: status, className: "bg-gray-500" };
+  const statusConfig = config[status] || { label: status, labelAr: status, className: "bg-gray-500" };
 
   return (
-    <Badge className={`${className} text-white text-xs`}>
-      {label}
+    <Badge className={`${statusConfig.className} text-white text-xs`}>
+      {language === 'ar' ? statusConfig.labelAr : statusConfig.label}
     </Badge>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Check, Crown, Users, AlertCircle, CreditCard, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const DOCTOR_PLANS = [
   {
@@ -62,7 +63,7 @@ const DOCTOR_PLANS = [
 
 export default function DoctorSubscription() {
   const { user } = useAuth();
-  const [language, setLanguage] = useState<"ar" | "en">("ar");
+  const { language, setLanguage } = useLanguage();
   
   const { data: subscription, isLoading: subLoading } = trpc.b2b2c.subscription.getCurrent.useQuery();
   const { data: usage, isLoading: usageLoading } = trpc.b2b2c.subscription.getUsageStats.useQuery();

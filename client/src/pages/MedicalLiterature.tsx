@@ -8,8 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Search, BookOpen, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 function MedicalLiteratureContent() {
+  const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -54,14 +56,14 @@ function MedicalLiteratureContent() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl" dir="rtl">
+    <div className="container mx-auto py-8 px-4 max-w-7xl" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
           <BookOpen className="h-8 w-8" />
-          البحث في الأدبيات الطبية
+          {language === 'ar' ? 'البحث في الأدبيات الطبية' : 'Medical Literature Search'}
         </h1>
         <p className="text-muted-foreground">
-          ابحث في ملايين المقالات الطبية من PubMed و PubMed Central
+          {language === 'ar' ? 'ابحث في ملايين المقالات الطبية من PubMed و PubMed Central' : 'Search millions of medical articles from PubMed and PubMed Central'}
         </p>
       </div>
 
@@ -70,14 +72,14 @@ function MedicalLiteratureContent() {
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder="ابحث عن مقالات طبية، حالات، علاجات..."
+            placeholder={language === 'ar' ? 'ابحث عن مقالات طبية، حالات، علاجات...' : 'Search for medical articles, cases, treatments...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1"
           />
           <Button type="submit" disabled={!searchQuery.trim()}>
             <Search className="h-4 w-4 ml-2" />
-            بحث
+            {language === 'ar' ? 'بحث' : 'Search'}
           </Button>
         </div>
       </form>
@@ -130,7 +132,7 @@ function MedicalLiteratureContent() {
                                 <span>•</span>
                                 <span>
                                   {article.authors[0]?.name}
-                                  {article.authors.length > 1 && ` وآخرون`}
+                                  {article.authors.length > 1 && (language === 'ar' ? ` وآخرون` : ` et al.`)}
                                 </span>
                               </>
                             )}
@@ -156,7 +158,7 @@ function MedicalLiteratureContent() {
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              عرض على PubMed
+                              {language === 'ar' ? 'عرض على PubMed' : 'View on PubMed'}
                               <ExternalLink className="ml-2 h-3 w-3" />
                             </a>
                           </Button>
@@ -173,7 +175,7 @@ function MedicalLiteratureContent() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                النص الكامل
+                                {language === 'ar' ? 'النص الكامل' : 'Full Text'}
                                 <ExternalLink className="ml-2 h-3 w-3" />
                               </a>
                             </Button>
@@ -192,17 +194,17 @@ function MedicalLiteratureContent() {
                     disabled={page === 0}
                   >
                     <ChevronLeft className="h-4 w-4 ml-2" />
-                    السابق
+                    {language === 'ar' ? 'السابق' : 'Previous'}
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    صفحة {page + 1} من {Math.ceil(pubmedResults.totalCount / pageSize)}
+                    {language === 'ar' ? `صفحة ${page + 1} من ${Math.ceil(pubmedResults.totalCount / pageSize)}` : `Page ${page + 1} of ${Math.ceil(pubmedResults.totalCount / pageSize)}`}
                   </span>
                   <Button
                     variant="outline"
                     onClick={handleNextPage}
                     disabled={!pubmedResults.hasMore}
                   >
-                    التالي
+                    {language === 'ar' ? 'التالي' : 'Next'}
                     <ChevronRight className="h-4 w-4 mr-2" />
                   </Button>
                 </div>
@@ -210,7 +212,7 @@ function MedicalLiteratureContent() {
             ) : (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  لم يتم العثور على نتائج لـ "{activeQuery}"
+                  {language === 'ar' ? `لم يتم العثور على نتائج لـ "${activeQuery}"` : `No results found for "${activeQuery}"`}
                 </CardContent>
               </Card>
             )}
@@ -233,8 +235,8 @@ function MedicalLiteratureContent() {
                   {pmcResults.pmcIds.map((pmcId) => (
                     <Card key={pmcId} className="hover:shadow-lg transition-shadow">
                       <CardHeader>
-                        <CardTitle className="text-lg">مقالة PMC {pmcId}</CardTitle>
-                        <CardDescription>النص الكامل متاح</CardDescription>
+                        <CardTitle className="text-lg">{language === 'ar' ? `مقالة PMC ${pmcId}` : `PMC Article ${pmcId}`}</CardTitle>
+                        <CardDescription>{language === 'ar' ? 'النص الكامل متاح' : 'Full text available'}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <Button
@@ -247,7 +249,7 @@ function MedicalLiteratureContent() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            عرض النص الكامل
+                            {language === 'ar' ? 'عرض النص الكامل' : 'View Full Text'}
                             <ExternalLink className="ml-2 h-3 w-3" />
                           </a>
                         </Button>
@@ -282,7 +284,7 @@ function MedicalLiteratureContent() {
             ) : (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  لم يتم العثور على مقالات بالنص الكامل لـ "{activeQuery}"
+                  {language === 'ar' ? `لم يتم العثور على مقالات بالنص الكامل لـ "${activeQuery}"` : `No full-text articles found for "${activeQuery}"`}
                 </CardContent>
               </Card>
             )}
@@ -294,9 +296,9 @@ function MedicalLiteratureContent() {
         <Card>
           <CardContent className="py-12 text-center">
             <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">ابدأ البحث</h3>
+            <h3 className="text-lg font-semibold mb-2">{language === 'ar' ? 'ابدأ البحث' : 'Start Searching'}</h3>
             <p className="text-muted-foreground">
-              أدخل مصطلحًا طبيًا أو حالة أو علاجًا للبحث في ملايين المقالات المراجعة من قبل الأقران
+              {language === 'ar' ? 'أدخل مصطلحًا طبيًا أو حالة أو علاجًا للبحث في ملايين المقالات المراجعة من قبل الأقران' : 'Enter a medical term, condition, or treatment to search millions of peer-reviewed articles'}
             </p>
           </CardContent>
         </Card>

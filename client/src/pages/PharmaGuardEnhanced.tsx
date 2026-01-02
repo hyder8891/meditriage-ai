@@ -26,10 +26,12 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 function PharmaGuardEnhancedContent() {
+  const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMeds, setSelectedMeds] = useState<string[]>([]);
@@ -73,13 +75,13 @@ function PharmaGuardEnhancedContent() {
     onSuccess: (data: any) => {
       setInteractions(data);
       if (data.interactions && data.interactions.length > 0) {
-        toast.warning(`Found ${data.interactions.length} potential interaction(s)`);
+        toast.warning(language === 'ar' ? `تم العثور على ${data.interactions.length} تفاعل محتمل` : `Found ${data.interactions.length} potential interaction(s)`);
       } else {
-        toast.success("No significant interactions detected");
+        toast.success(language === 'ar' ? "لم يتم العثور على تفاعلات مهمة" : "No significant interactions detected");
       }
     },
     onError: (error: any) => {
-      toast.error("Check failed: " + error.message);
+      toast.error(language === 'ar' ? "فشل الفحص: " + error.message : "Check failed: " + error.message);
     },
   });
 
@@ -87,21 +89,21 @@ function PharmaGuardEnhancedContent() {
     onSuccess: (data: any) => {
       setInteractions(data);
       if (!data.safe) {
-        toast.error("⚠️ Safety concerns detected!");
+        toast.error(language === 'ar' ? "⚠️ تم اكتشاف مخاوف أمان!" : "⚠️ Safety concerns detected!");
       } else if (data.interactions && data.interactions.length > 0) {
-        toast.warning(`Found ${data.interactions.length} interaction(s)`);
+        toast.warning(language === 'ar' ? `تم العثور على ${data.interactions.length} تفاعل` : `Found ${data.interactions.length} interaction(s)`);
       } else {
-        toast.success("✅ Safe to use with current medications");
+        toast.success(language === 'ar' ? "✅ آمن للاستخدام مع الأدوية الحالية" : "✅ Safe to use with current medications");
       }
     },
     onError: (error: any) => {
-      toast.error("Check failed: " + error.message);
+      toast.error(language === 'ar' ? "فشل الفحص: " + error.message : "Check failed: " + error.message);
     },
   });
 
   const addMedicationMutation = trpc.pharmaguard.addMedication.useMutation({
     onSuccess: () => {
-      toast.success("Medication added successfully");
+      toast.success(language === 'ar' ? "تمت إضافة الدواء بنجاح" : "Medication added successfully");
       patientMedsQuery.refetch();
       setIsAddMedDialogOpen(false);
       setNewMed({
@@ -116,35 +118,35 @@ function PharmaGuardEnhancedContent() {
       });
     },
     onError: (error: any) => {
-      toast.error("Failed to add medication: " + error.message);
+      toast.error(language === 'ar' ? "فشلت إضافة الدواء: " + error.message : "Failed to add medication: " + error.message);
     },
   });
 
   const removeMedicationMutation = trpc.pharmaguard.removeMedication.useMutation({
     onSuccess: () => {
-      toast.success("Medication removed");
+      toast.success(language === 'ar' ? "تم إزالة الدواء" : "Medication removed");
       patientMedsQuery.refetch();
     },
     onError: (error: any) => {
-      toast.error("Failed to remove medication: " + error.message);
+      toast.error(language === 'ar' ? "فشل إزالة الدواء: " + error.message : "Failed to remove medication: " + error.message);
     },
   });
 
   const uploadImageMutation = trpc.pharmaguard.uploadMedicineImage.useMutation({
     onSuccess: async (data) => {
-      toast.success("Image uploaded, identifying medicine...");
+      toast.success(language === 'ar' ? "تم رفع الصورة، جاري تحديد الدواء..." : "Image uploaded, identifying medicine...");
       // Trigger identification
       identifyMedicineMutation.mutate({ imageId: data.imageId });
     },
     onError: (error: any) => {
-      toast.error("Upload failed: " + error.message);
+      toast.error(language === 'ar' ? "فشل الرفع: " + error.message : "Upload failed: " + error.message);
     },
   });
 
   const identifyMedicineMutation = trpc.pharmaguard.identifyMedicine.useMutation({
     onSuccess: (data) => {
       if (data.identified) {
-        toast.success(`Identified: ${data.drugName} ${data.dosage}`);
+        toast.success(language === 'ar' ? `تم التعرف: ${data.drugName} ${data.dosage}` : `Identified: ${data.drugName} ${data.dosage}`);
         // Pre-fill the add medication form
         setNewMed({
           ...newMed,
@@ -156,7 +158,7 @@ function PharmaGuardEnhancedContent() {
         setIsImageUploadOpen(false);
         setIsAddMedDialogOpen(true);
       } else {
-        toast.warning("Could not identify medicine from image");
+        toast.warning(language === 'ar' ? "لم يتمكن من تحديد الدواء من الصورة" : "Could not identify medicine from image");
       }
     },
     onError: (error: any) => {
