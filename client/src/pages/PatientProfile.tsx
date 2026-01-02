@@ -11,6 +11,7 @@ import { trpc } from "@/lib/trpc";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, Shield, Bell, Settings, Activity, Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { VoiceInput } from "@/components/VoiceInput";
 
 export default function PatientProfile() {
   const { language } = useLanguage();
@@ -194,21 +195,35 @@ export default function PatientProfile() {
                   <h3 className="text-lg font-semibold">{language === 'ar' ? 'جهة الاتصال في حالات الطوارئ' : 'Emergency Contact'}</h3>
                   <div className="space-y-2">
                     <Label htmlFor="emergencyContactName">{language === 'ar' ? 'اسم جهة الاتصال في حالات الطوارئ' : 'Emergency Contact Name'}</Label>
-                    <Input
-                      id="emergencyContactName"
-                      value={profileForm.emergencyContactName}
-                      onChange={(e) => setProfileForm({ ...profileForm, emergencyContactName: e.target.value })}
-                      placeholder="John Doe"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="emergencyContactName"
+                        value={profileForm.emergencyContactName}
+                        onChange={(e) => setProfileForm({ ...profileForm, emergencyContactName: e.target.value })}
+                        placeholder="John Doe"
+                        className="flex-1"
+                      />
+                      <VoiceInput
+                        onTranscript={(text) => setProfileForm({ ...profileForm, emergencyContactName: profileForm.emergencyContactName + (profileForm.emergencyContactName ? ' ' : '') + text })}
+                        language={language === 'ar' ? 'ar-SA' : 'en-US'}
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="emergencyContact">{language === 'ar' ? 'هاتف جهة الاتصال في حالات الطوارئ' : 'Emergency Contact Phone'}</Label>
-                    <Input
-                      id="emergencyContact"
-                      value={profileForm.emergencyContact}
-                      onChange={(e) => setProfileForm({ ...profileForm, emergencyContact: e.target.value })}
-                      placeholder="+964 XXX XXX XXXX"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="emergencyContact"
+                        value={profileForm.emergencyContact}
+                        onChange={(e) => setProfileForm({ ...profileForm, emergencyContact: e.target.value })}
+                        placeholder="+964 XXX XXX XXXX"
+                        className="flex-1"
+                      />
+                      <VoiceInput
+                        onTranscript={(text) => setProfileForm({ ...profileForm, emergencyContact: profileForm.emergencyContact + (profileForm.emergencyContact ? ' ' : '') + text })}
+                        language={language === 'ar' ? 'ar-SA' : 'en-US'}
+                      />
+                    </div>
                   </div>
                 </div>
                 <Button type="submit" disabled={updateProfile.isPending}>

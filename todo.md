@@ -374,6 +374,10 @@
 - [ ] Add user feedback collection for model improvement
 - [ ] Create continuous training pipeline
 
+- [x] Extend voice input to emergency contact forms
+- [x] Extend voice input to medical history forms
+- [x] Extend voice input to chat with medical professionals feature
+
 ## New Issues (User Reported)
 
 - [ ] Fix dashboard loading issue - authentication works but content not displaying

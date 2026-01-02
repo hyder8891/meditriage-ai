@@ -19,6 +19,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { io, Socket } from "socket.io-client";
 import { useLocation } from "wouter";
+import { VoiceInput } from "@/components/VoiceInput";
 
 function SecureMessagingContent() {
   const { language } = useLanguage();
@@ -322,26 +323,34 @@ function SecureMessagingContent() {
                   </ScrollArea>
 
                   {/* Message Input */}
-                  <div className="flex gap-2">
-                    <Textarea
-                      placeholder={t.typeMessage}
-                      value={messageContent}
-                      onChange={(e) => setMessageContent(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      className="flex-1 min-h-[60px]"
-                    />
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                      className="self-end"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Textarea
+                        placeholder={t.typeMessage}
+                        value={messageContent}
+                        onChange={(e) => setMessageContent(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                        className="flex-1 min-h-[60px]"
+                      />
+                      <div className="flex flex-col gap-2">
+                        <VoiceInput
+                          onTranscript={(text) => setMessageContent(messageContent + (messageContent ? ' ' : '') + text)}
+                          language={language === 'ar' ? 'ar-SA' : 'en-US'}
+                        />
+                        <Button
+                          onClick={handleSendMessage}
+                          disabled={!messageContent.trim() || sendMessageMutation.isPending}
+                          size="icon"
+                        >
+                          <Send className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </>
               )}

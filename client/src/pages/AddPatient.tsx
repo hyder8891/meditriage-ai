@@ -9,6 +9,7 @@ import { ArrowLeft, Save, Mic } from "lucide-react";
 import { useLocation } from "wouter";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { SmartAudioForm } from "@/components/SmartAudioForm";
+import { VoiceInput } from "@/components/VoiceInput";
 import { toast } from "sonner";
 
 function AddPatientContent() {
@@ -229,46 +230,74 @@ function AddPatientContent() {
               {/* Medical Information */}
               <div className="space-y-2">
                 <Label htmlFor="allergies">الحساسية / Allergies</Label>
-                <Textarea
-                  id="allergies"
-                  value={formData.allergies}
-                  onChange={(e) => handleInputChange("allergies", e.target.value)}
-                  placeholder="بنسلين، فول سوداني / Penicillin, Peanuts"
-                  rows={2}
-                />
+                <div className="flex gap-2">
+                  <Textarea
+                    id="allergies"
+                    value={formData.allergies}
+                    onChange={(e) => handleInputChange("allergies", e.target.value)}
+                    placeholder="بنسلين، فول سوداني / Penicillin, Peanuts"
+                    rows={2}
+                    className="flex-1"
+                  />
+                  <VoiceInput
+                    onTranscript={(text) => handleInputChange("allergies", formData.allergies + (formData.allergies ? ', ' : '') + text)}
+                    language="ar-SA"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="medicalHistory">التاريخ الطبي / Medical History</Label>
-                <Textarea
-                  id="medicalHistory"
-                  value={formData.medicalHistory}
-                  onChange={(e) => handleInputChange("medicalHistory", e.target.value)}
-                  placeholder="السكري، ارتفاع ضغط الدم / Diabetes, Hypertension"
-                  rows={3}
-                />
+                <div className="flex gap-2">
+                  <Textarea
+                    id="medicalHistory"
+                    value={formData.medicalHistory}
+                    onChange={(e) => handleInputChange("medicalHistory", e.target.value)}
+                    placeholder="السكري، ارتفاع ضغط الدم / Diabetes, Hypertension"
+                    rows={3}
+                    className="flex-1"
+                  />
+                  <VoiceInput
+                    onTranscript={(text) => handleInputChange("medicalHistory", formData.medicalHistory + (formData.medicalHistory ? ', ' : '') + text)}
+                    language="ar-SA"
+                  />
+                </div>
               </div>
 
               {/* Emergency Contact */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="emergencyContact">جهة الاتصال للطوارئ / Emergency Contact</Label>
-                  <Input
-                    id="emergencyContact"
-                    value={formData.emergencyContact}
-                    onChange={(e) => handleInputChange("emergencyContact", e.target.value)}
-                    placeholder="فاطمة أحمد / Fatima Ahmed"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="emergencyContact"
+                      value={formData.emergencyContact}
+                      onChange={(e) => handleInputChange("emergencyContact", e.target.value)}
+                      placeholder="فاطمة أحمد / Fatima Ahmed"
+                      className="flex-1"
+                    />
+                    <VoiceInput
+                      onTranscript={(text) => handleInputChange("emergencyContact", formData.emergencyContact + (formData.emergencyContact ? ' ' : '') + text)}
+                      language="ar-SA"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="emergencyPhone">هاتف الطوارئ / Emergency Phone</Label>
-                  <Input
-                    id="emergencyPhone"
-                    value={formData.emergencyPhone}
-                    onChange={(e) => handleInputChange("emergencyPhone", e.target.value)}
-                    placeholder="+964 771 234 5678"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="emergencyPhone"
+                      value={formData.emergencyPhone}
+                      onChange={(e) => handleInputChange("emergencyPhone", e.target.value)}
+                      placeholder="+964 771 234 5678"
+                      className="flex-1"
+                    />
+                    <VoiceInput
+                      onTranscript={(text) => handleInputChange("emergencyPhone", formData.emergencyPhone + (formData.emergencyPhone ? ' ' : '') + text)}
+                      language="ar-SA"
+                    />
+                  </div>
                 </div>
               </div>
 
