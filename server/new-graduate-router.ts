@@ -191,8 +191,8 @@ export const newGraduateRouter = router({
         affiliationType: input.affiliationType,
         department: input.department,
         position: input.position,
-        startDate: input.startDate,
-        endDate: input.endDate,
+        startDate: new Date(input.startDate),
+        endDate: input.endDate ? new Date(input.endDate) : undefined,
         status: "pending",
         verificationStatus: "pending",
       });
@@ -231,7 +231,7 @@ export const newGraduateRouter = router({
       await db.insert(doctorShifts).values({
         doctorId: ctx.user.id,
         facilityId: input.facilityId,
-        shiftDate: input.shiftDate,
+        shiftDate: new Date(input.shiftDate),
         startTime: input.startTime,
         endTime: input.endTime,
         shiftType: input.shiftType,
@@ -509,8 +509,8 @@ export const newGraduateRouter = router({
   useCalculator: protectedProcedure
     .input(z.object({
       calculatorId: z.number(),
-      inputData: z.record(z.any()),
-      outputData: z.record(z.any()),
+      inputData: z.record(z.string(), z.any()),
+      outputData: z.record(z.string(), z.any()),
       patientId: z.number().optional(),
       consultationId: z.number().optional(),
       notes: z.string().optional(),

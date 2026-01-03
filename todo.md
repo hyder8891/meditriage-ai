@@ -815,3 +815,44 @@
 - [x] Integrate voice input into booking forms
 - [x] Test and verify Arabic voice recognition functionality
 - [x] Improve sheet close button positioning for better RTL layout
+
+
+## Mobile App Deployment (Android & iOS)
+
+### Android Production Deployment
+- [ ] Set up React Native project structure for Android
+- [ ] Configure Android build environment and dependencies
+- [ ] Convert web components to React Native mobile UI
+- [ ] Implement native mobile navigation
+- [ ] Configure Android app signing and keystore
+- [ ] Build production APK/AAB for Google Play Store
+- [ ] Test Android app on physical devices
+- [ ] Create Google Play Store listing and assets
+- [ ] Submit Android app for review
+
+### iOS Production Deployment
+- [ ] Set up React Native project structure for iOS
+- [ ] Configure iOS build environment and dependencies
+- [ ] Convert web components to iOS-compatible mobile UI
+- [ ] Configure iOS app signing and provisioning profiles
+- [ ] Build production IPA for Apple App Store
+- [ ] Test iOS app on physical devices
+- [ ] Create Apple App Store listing and assets
+- [ ] Submit iOS app for review
+
+### Mobile-Specific Features
+- [ ] Implement native camera integration for bio-scanner
+- [ ] Add push notifications for mobile devices
+- [ ] Implement offline mode and data sync
+- [ ] Add biometric authentication (fingerprint/face ID)
+- [ ] Optimize mobile performance and battery usage
+- [ ] Implement deep linking for emergency features
+- [ ] Add location services for emergency dispatch
+
+
+## User Reported Issues - January 2026
+
+- [x] Fix TypeScript errors in new-graduate-router.ts (doctor_id field naming)
+- [x] Review and test all application features
+- [x] Write tests for new graduate router features
+- [ ] Save checkpoint with all fixes
