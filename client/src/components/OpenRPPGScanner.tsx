@@ -126,6 +126,23 @@ export function OpenRPPGScanner({ onComplete }: OpenRPPGScannerProps) {
     frameCountRef.current = 0;
   }, []);
 
+  // Cleanup on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      console.log("[OpenRPPGScanner] Component unmounting, cleaning up resources");
+      // Stop any ongoing scanning
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      // Stop camera stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+    };
+  }, []);
+
   const startScanning = useCallback(async () => {
     try {
       setError(null);
