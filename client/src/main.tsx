@@ -68,7 +68,6 @@ const trpcClient = trpc.createClient({
       async headers() {
         // Access the token directly from the Zustand store
         const token = useAuthStore.getState().token;
-        console.log('[tRPC] Sending request with token:', token ? token.substring(0, 20) + '...' : 'null');
         return {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         };

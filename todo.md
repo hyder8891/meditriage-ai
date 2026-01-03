@@ -855,4 +855,13 @@
 - [x] Fix TypeScript errors in new-graduate-router.ts (doctor_id field naming)
 - [x] Review and test all application features
 - [x] Write tests for new graduate router features
-- [ ] Save checkpoint with all fixes
+- [x] Save checkpoint with all fixes
+
+
+## Bug Fixes - Current Sprint
+
+- [x] Remove debug overlays from production build
+- [x] Fix language switcher dropdown functionality
+- [x] Replace fake statistics with real data or remove them
+- [x] Install @testing-library/react dependencies
+- [x] Investigate memory leak issues

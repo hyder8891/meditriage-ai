@@ -67,18 +67,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     });
 
     newSocket.on('connect', () => {
-      console.log('Connected to notification server');
       // Register user for notifications
       newSocket.emit('register-user', { userId: user.id });
     });
 
     newSocket.on('disconnect', () => {
-      console.log('Disconnected from notification server');
+      // Handle disconnect
     });
 
     // Listen for new message notifications
     newSocket.on(`user:${user.id}:new-message`, (data: MessageNotification) => {
-      console.log('New message notification received:', data);
       
       // Add to notifications list
       setNotifications(prev => [data, ...prev]);
@@ -110,9 +108,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       try {
         const audio = new Audio('/notification.mp3');
         audio.volume = 0.5;
-        audio.play().catch(e => console.log('Could not play notification sound:', e));
+        audio.play().catch(() => {});
       } catch (e) {
-        console.log('Notification sound not available');
+        // Notification sound not available
       }
     });
 

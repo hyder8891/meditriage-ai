@@ -359,8 +359,7 @@ function Router() {
         <Route path={"/doc-dash"}>
           {() => <ProtectedRoute requiredRole="clinician"><MedicalLiterature /></ProtectedRoute>}
         </Route>
-        <Route path={"/debug/user"} component={DebugUser} />
-        <Route path={"/debug/auth"} component={DebugAuth} />
+
         <Route component={NotFound} />
       </Switch>
     </Suspense>

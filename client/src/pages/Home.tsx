@@ -51,11 +51,12 @@ export default function Home() {
     const steps = 60;
     const interval = duration / steps;
     
+    // TODO: Replace with real-time data from backend
     const targets = {
-      symptoms: 500000,
-      accuracy: 99,
-      response: 3,
-      conditions: 12000,
+      symptoms: 0,
+      accuracy: 0,
+      response: 0,
+      conditions: 0,
     };
 
     let step = 0;
