@@ -83,12 +83,14 @@ export const securityHeaders = helmet({
         "wss://tabibi.clinic"           // 🟢 FIX: Explicitly allow Prod Socket
       ],
       frameSrc: ["'self'", "https://accounts.google.com"],
+      frameAncestors: ["'self'", "https://*.manus.computer", "https://manus.im"], // 🟢 FIX: Allow Manus preview iframe
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
   },
   crossOriginEmbedderPolicy: false, // Allow embedding for OAuth
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow resources to be loaded
+  frameguard: false, // 🟢 FIX: Disable X-Frame-Options to allow iframe embedding in Manus preview
   hsts: {
     maxAge: 31536000, // 1 year
     includeSubDomains: true,

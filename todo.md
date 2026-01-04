@@ -905,3 +905,5 @@
 - [x] Check WebSocket security (authenticated Socket.IO connections)
 - [x] Review role-based access control (admin/clinician/patient roles properly enforced)
 - [x] Verify biometric data security (client-side processing, encrypted transmission)
+
+- [x] Fix preview not loading/displaying correctly in Management UI (remove X-Frame-Options and CSP iframe restrictions)
