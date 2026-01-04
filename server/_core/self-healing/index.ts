@@ -10,6 +10,9 @@ import {
   registerBuiltInHealthChecks,
 } from "./health-monitor";
 import { CircuitBreakerRegistry } from "./circuit-breaker";
+import { FallbackStrategyRegistry } from "./fallback-strategies";
+import { RecoveryOrchestrator } from "./recovery-orchestrator";
+import { PredictiveMonitor } from "./predictive-monitor";
 import { getDb } from "../../db";
 import { failureEvents } from "../../../drizzle/self-healing-schema";
 import { nanoid } from "nanoid";
@@ -24,11 +27,16 @@ export class SelfHealingSystem {
   private globalErrorHandler: GlobalErrorHandler;
   private healthMonitor: HealthMonitorService;
   private circuitBreakerRegistry: CircuitBreakerRegistry;
+  private fallbackRegistry: FallbackStrategyRegistry;
+  private recoveryOrchestrator: RecoveryOrchestrator;
+  private predictiveMonitor: PredictiveMonitor | null = null;
 
   private constructor() {
     this.globalErrorHandler = GlobalErrorHandler.getInstance();
     this.healthMonitor = HealthMonitorService.getInstance();
     this.circuitBreakerRegistry = CircuitBreakerRegistry.getInstance();
+    this.fallbackRegistry = FallbackStrategyRegistry.getInstance();
+    this.recoveryOrchestrator = RecoveryOrchestrator.getInstance();
   }
 
   static getInstance(): SelfHealingSystem {
@@ -67,8 +75,20 @@ export class SelfHealingSystem {
       // Initialize circuit breakers for critical services
       this.initializeCircuitBreakers();
 
+      // Initialize predictive monitoring (optional, can be enabled later)
+      // Uncomment to enable predictive monitoring:
+      // this.predictiveMonitor = new PredictiveMonitor();
+      // this.predictiveMonitor.start();
+      // console.log('[SelfHealing] Predictive monitoring activated');
+
       this.isInitialized = true;
       console.log("[SelfHealing] Self-healing system initialized successfully");
+      console.log("[SelfHealing] - Global error handler: ✓");
+      console.log("[SelfHealing] - Health monitoring: ✓");
+      console.log("[SelfHealing] - Circuit breakers: ✓");
+      console.log("[SelfHealing] - Fallback strategies: ✓");
+      console.log("[SelfHealing] - Recovery orchestration: ✓");
+      console.log("[SelfHealing] - Predictive monitoring: ⚠️  (disabled, can be enabled)");
     } catch (error) {
       console.error("[SelfHealing] Failed to initialize:", error);
       throw error;
@@ -81,6 +101,9 @@ export class SelfHealingSystem {
   shutdown(): void {
     console.log("[SelfHealing] Shutting down self-healing system...");
     this.healthMonitor.stop();
+    if (this.predictiveMonitor) {
+      this.predictiveMonitor.stop();
+    }
     this.isInitialized = false;
   }
 
@@ -189,6 +212,65 @@ export class SelfHealingSystem {
   getCircuitBreakerStates() {
     return this.circuitBreakerRegistry.getAllStates();
   }
+
+  /**
+   * Get fallback strategies
+   */
+  getFallbackStrategies() {
+    return this.fallbackRegistry.getAllStrategies();
+  }
+
+  /**
+   * Get recovery workflows
+   */
+  getRecoveryWorkflows() {
+    return this.recoveryOrchestrator.getAllWorkflows();
+  }
+
+  /**
+   * Trigger manual recovery
+   */
+  async triggerRecovery(service: string, trigger: any, context?: Record<string, any>) {
+    return await this.recoveryOrchestrator.triggerRecovery(service, trigger, context);
+  }
+
+  /**
+   * Enable predictive monitoring
+   */
+  enablePredictiveMonitoring(): void {
+    if (this.predictiveMonitor) {
+      console.log('[SelfHealing] Predictive monitoring already enabled');
+      return;
+    }
+
+    this.predictiveMonitor = new PredictiveMonitor();
+    this.predictiveMonitor.start();
+    console.log('[SelfHealing] Predictive monitoring enabled');
+  }
+
+  /**
+   * Disable predictive monitoring
+   */
+  disablePredictiveMonitoring(): void {
+    if (!this.predictiveMonitor) {
+      console.log('[SelfHealing] Predictive monitoring already disabled');
+      return;
+    }
+
+    this.predictiveMonitor.stop();
+    this.predictiveMonitor = null;
+    console.log('[SelfHealing] Predictive monitoring disabled');
+  }
+
+  /**
+   * Get predictive monitoring status
+   */
+  getPredictiveMonitoringStatus() {
+    return {
+      enabled: this.predictiveMonitor !== null,
+      status: this.predictiveMonitor ? 'active' : 'disabled'
+    };
+  }
 }
 
 // Export singleton instance
@@ -199,3 +281,6 @@ export * from "./global-error-handler";
 export * from "./retry-manager";
 export * from "./circuit-breaker";
 export * from "./health-monitor";
+export * from "./fallback-strategies";
+export * from "./recovery-orchestrator";
+export * from "./predictive-monitor";
