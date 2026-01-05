@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, email, name, role, password_hash FROM users WHERE role = 'admin' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, name, role, password_hash FROM users WHERE role = 'admin' LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "haljanabi88@gmail.com",
+      "name": "Hyder Janabi",
+      "role": "admin",
+      "password_hash": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tpassword_hash\n1\thaljanabi88@gmail.com\tHyder Janabi\tadmin\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

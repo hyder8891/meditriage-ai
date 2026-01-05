@@ -1055,3 +1055,34 @@
 - [x] Admin verification management page
 - [x] Doctor verification UI with document upload
 - [x] Unit tests for name matching logic
+
+
+## Admin Dashboard Issues (Jan 5, 2026)
+
+### System Analytics Page Fixes
+- [ ] Fix System Analytics to show real user count from database (currently shows hardcoded 1,234)
+- [ ] Fix Active Sessions to show real data (currently shows hardcoded 342)
+- [ ] Fix Total Reports to show real data (currently shows hardcoded 8,456)
+- [ ] Fix System Health percentage to connect to actual health monitoring
+- [ ] Implement User Activity chart with real daily active users data
+- [ ] Implement Feature Usage chart with real feature usage data
+
+### Admin Panel UI Development
+- [ ] Build Load Testing UI (backend ready at server/routers/load-test-router.ts)
+- [ ] Build Self-Healing UI (backend ready at server/routers/self-healing-router.ts)
+- [ ] Build Budget Tracking UI (backend ready at server/routers/budget-router.ts)
+- [ ] Build Orchestration Logs UI (backend ready at server/routers/orchestration-router.ts)
+- [ ] Build Clinical Routers UI (backend ready at server/routers/clinical-router.ts)
+
+
+
+## New Issues (Jan 5, 2026)
+- [ ] AI Assessment output not well-structured
+- [ ] AI Assessment output not fully Arabic when Arabic language selected
+- [ ] Video call not connecting between doctor and patient (shows "connecting" but no real connection)
+
+
+## Fixes Applied (Jan 5, 2026)
+- [x] AI assessment output restructured with better formatting and sections
+- [x] AI assessment fully Arabic when Arabic language selected - Added comprehensive Arabic medical term translations
+- [x] Video call connection fixed - Added TURN servers and improved ICE handling with retry logic

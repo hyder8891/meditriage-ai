@@ -1,102 +1,19 @@
+// Re-export the new comprehensive admin pages
+export { default as AdminBudget } from './AdminBudgetTracking';
+export { default as AdminOrchestration } from './AdminOrchestrationLogs';
+export { default as AdminLoadTest } from './AdminLoadTesting';
+export { default as AdminSelfHealing } from './AdminSelfHealing';
+export { default as AdminClinical } from './AdminClinicalRouters';
+
+// Keep the placeholder pages for features that don't have full implementations yet
 import AdminFeaturePage from './AdminFeaturePage';
 import { 
-  DollarSign, FileText, Activity, Zap, Stethoscope, Syringe, Brain, Mic, 
+  Syringe, Brain, Mic, 
   FileSpreadsheet, Cloud, CloudRain, Wind, MessageSquare, History, Building2, 
   Gavel, Settings, Phone, Key, UserPlus, TestTube, ClipboardList 
 } from 'lucide-react';
 
-// Analytics & Monitoring
-export function AdminBudget() {
-  return (
-    <AdminFeaturePage
-      title="Budget Tracking"
-      description="Monitor and manage system resource budgets and costs"
-      icon={<DollarSign className="h-6 w-6 text-red-500" />}
-      backendRouter="budget-router"
-      features={[
-        'Real-time budget monitoring',
-        'Cost allocation by service',
-        'Budget alerts and notifications',
-        'Historical spending analysis',
-        'Resource usage optimization'
-      ]}
-    />
-  );
-}
-
-export function AdminOrchestration() {
-  return (
-    <AdminFeaturePage
-      title="Orchestration Logs"
-      description="View and analyze system orchestration and workflow logs"
-      icon={<FileText className="h-6 w-6 text-red-500" />}
-      backendRouter="orchestration-router"
-      features={[
-        'Real-time log streaming',
-        'Advanced filtering and search',
-        'Workflow execution tracking',
-        'Error detection and alerts',
-        'Performance metrics'
-      ]}
-    />
-  );
-}
-
-export function AdminLoadTest() {
-  return (
-    <AdminFeaturePage
-      title="Load Testing"
-      description="Execute and monitor system load tests"
-      icon={<Activity className="h-6 w-6 text-red-500" />}
-      backendRouter="load-test-router"
-      features={[
-        'Configurable load test scenarios',
-        'Real-time performance metrics',
-        'Concurrent user simulation',
-        'Response time analysis',
-        'System bottleneck identification'
-      ]}
-    />
-  );
-}
-
-export function AdminSelfHealing() {
-  return (
-    <AdminFeaturePage
-      title="Self-Healing System"
-      description="Monitor and configure automatic system recovery"
-      icon={<Zap className="h-6 w-6 text-red-500" />}
-      backendRouter="self-healing-router"
-      features={[
-        'Automatic error detection',
-        'Self-recovery mechanisms',
-        'Health check monitoring',
-        'Incident response automation',
-        'System resilience metrics'
-      ]}
-    />
-  );
-}
-
 // Clinical Tools
-export function AdminClinical() {
-  return (
-    <AdminFeaturePage
-      title="Clinical Routers"
-      description="Manage clinical decision support and routing systems"
-      icon={<Stethoscope className="h-6 w-6 text-red-500" />}
-      backendRouter="clinical-router"
-      features={[
-        'Clinical pathway management',
-        'Decision support algorithms',
-        'Protocol configuration',
-        'Care coordination tools',
-        'Clinical data routing'
-      ]}
-    />
-  );
-}
-
 export function AdminTriage() {
   return (
     <AdminFeaturePage

@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, email, name, role FROM users WHERE role IN ('admin', 'super_admin') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, email, name, role FROM users WHERE role IN ('admin', 'super_admin') LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "haljanabi88@gmail.com",
+      "name": "Hyder Janabi",
+      "role": "admin"
+    },
+    {
+      "id": "900086",
+      "email": "admin@admin.com",
+      "name": "admin",
+      "role": "admin"
+    },
+    {
+      "id": "1440001",
+      "email": "admin@meditriage.ai",
+      "name": "Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "4470023",
+      "email": "test-admin@meditriage.test",
+      "name": "Test Admin",
+      "role": "admin"
+    },
+    {
+      "id": "7710054",
+      "email": "admin",
+      "name": "Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "7770186",
+      "email": "admin-test-1766928619084@test.com",
+      "name": "Test Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "7770188",
+      "email": "admin-test-1766928707278@test.com",
+      "name": "Test Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "7770190",
+      "email": "admin-test-1766928728357@test.com",
+      "name": "Test Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "7770212",
+      "email": "admin-test-1766933213529@test.com",
+      "name": "Test Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "8790278",
+      "email": "test-admin@mydoctor.test",
+      "name": "Test Admin",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\n1\thaljanabi88@gmail.com\tHyder Janabi\tadmin\n900086\tadmin@admin.com\tadmin\tadmin\n1440001\tadmin@meditriage.ai\tAdmin User\tadmin\n4470023\ttest-admin@meditriage.test\tTest Admin\tadmin\n7710054\tadmin\tAdmin User\tadmin\n7770186\tadmin-test-1766928619084@test.com\tTest Admin User\tadmin\n7770188\tadmin-test-1766928707278@test.com\tTest Admin User\tadmin\n7770190\tadmin-test-1766928728357@test.com\tTest Admin User\tadmin\n7770212\tadmin-test-1766933213529@test.com\tTest Admin User\tadmin\n8790278\ttest-admin@mydoctor.test\tTest Admin\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 193
+}

@@ -232,11 +232,41 @@ export default function ConsultationRoom() {
   };
   
   const createPeerConnection = () => {
+    // Enhanced ICE server configuration with multiple STUN servers and free TURN servers
     const configuration: RTCConfiguration = {
       iceServers: [
+        // Google STUN servers
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' },
+        // Additional public STUN servers
+        { urls: 'stun:stun.stunprotocol.org:3478' },
+        { urls: 'stun:stun.voip.blackberry.com:3478' },
+        // Free TURN servers from Open Relay Project (for NAT traversal)
+        {
+          urls: 'turn:openrelay.metered.ca:80',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        {
+          urls: 'turn:openrelay.metered.ca:443',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        {
+          urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
       ],
+      // ICE transport policy - prefer relay for better NAT traversal
+      iceTransportPolicy: 'all',
+      // Bundle policy for better performance
+      bundlePolicy: 'max-bundle',
+      // RTCP mux policy
+      rtcpMuxPolicy: 'require',
     };
     
     const pc = new RTCPeerConnection(configuration);
@@ -250,16 +280,18 @@ export default function ConsultationRoom() {
     
     // Handle remote stream
     pc.ontrack = (event) => {
-      console.log('Received remote track');
-      if (remoteVideoRef.current) {
+      console.log('Received remote track:', event.track.kind);
+      if (remoteVideoRef.current && event.streams[0]) {
         remoteVideoRef.current.srcObject = event.streams[0];
         setRemoteConnected(true);
+        setIsConnecting(false);
       }
     };
     
     // Handle ICE candidates
     pc.onicecandidate = (event) => {
       if (event.candidate && socketRef.current && remoteSocketIdRef.current) {
+        console.log('Sending ICE candidate:', event.candidate.type);
         socketRef.current.emit('ice-candidate', {
           candidate: event.candidate,
           to: remoteSocketIdRef.current,
@@ -267,18 +299,85 @@ export default function ConsultationRoom() {
       }
     };
     
+    // Handle ICE connection state changes
+    pc.oniceconnectionstatechange = () => {
+      console.log('ICE connection state:', pc.iceConnectionState);
+      switch (pc.iceConnectionState) {
+        case 'checking':
+          setIsConnecting(true);
+          break;
+        case 'connected':
+        case 'completed':
+          setIsConnecting(false);
+          setRemoteConnected(true);
+          break;
+        case 'failed':
+          console.error('ICE connection failed, attempting restart...');
+          // Attempt ICE restart
+          pc.restartIce();
+          toast.error(language === 'ar' ? 'فشل الاتصال، جاري إعادة المحاولة...' : 'Connection failed, retrying...');
+          break;
+        case 'disconnected':
+          toast.warning(language === 'ar' ? 'تم قطع الاتصال، جاري إعادة الاتصال...' : 'Disconnected, reconnecting...');
+          break;
+        case 'closed':
+          setRemoteConnected(false);
+          break;
+      }
+    };
+    
     // Handle connection state changes
     pc.onconnectionstatechange = () => {
       console.log('Connection state:', pc.connectionState);
-      if (pc.connectionState === 'connected') {
-        toast.success(language === 'ar' ? 'تم الاتصال بنجاح' : 'Connected successfully');
-      } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
-        toast.error(language === 'ar' ? 'فشل الاتصال' : 'Connection failed');
+      switch (pc.connectionState) {
+        case 'connected':
+          setIsConnecting(false);
+          setRemoteConnected(true);
+          toast.success(language === 'ar' ? 'تم الاتصال بنجاح' : 'Connected successfully');
+          break;
+        case 'failed':
+          toast.error(language === 'ar' ? 'فشل الاتصال' : 'Connection failed');
+          // Try to recover
+          handleConnectionFailure();
+          break;
+        case 'disconnected':
+          toast.warning(language === 'ar' ? 'تم قطع الاتصال' : 'Disconnected');
+          break;
       }
+    };
+    
+    // Handle ICE gathering state
+    pc.onicegatheringstatechange = () => {
+      console.log('ICE gathering state:', pc.iceGatheringState);
+    };
+    
+    // Handle signaling state changes
+    pc.onsignalingstatechange = () => {
+      console.log('Signaling state:', pc.signalingState);
     };
     
     peerConnectionRef.current = pc;
     return pc;
+  };
+  
+  // Handle connection failure with retry logic
+  const handleConnectionFailure = async () => {
+    console.log('Handling connection failure...');
+    
+    // Close existing peer connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    
+    // Wait a moment before retrying
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // If we have a remote socket ID, try to reconnect
+    if (remoteSocketIdRef.current && socketRef.current?.connected) {
+      toast.info(language === 'ar' ? 'جاري إعادة الاتصال...' : 'Reconnecting...');
+      createOffer(remoteSocketIdRef.current);
+    }
   };
   
   const createOffer = async (targetSocketId: string) => {
