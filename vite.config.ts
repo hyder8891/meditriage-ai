@@ -72,6 +72,10 @@ export default defineConfig({
   },
   server: {
     host: true,
+    strictPort: false,
+    hmr: {
+      clientPort: 3000,
+    },
     allowedHosts: [
       ".manuspre.computer",
       ".manus.computer",
@@ -84,6 +88,13 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
+      allow: ['..'],
+    },
+    cors: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
   },
 });

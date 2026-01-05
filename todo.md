@@ -7,7 +7,12 @@
 - [x] Ensure response includes all expected properties (quickReplies, differentialDiagnosis, etc.)
 - [x] Add proper BRAIN integration for analysis stage
 
-### 2. Memory Usage Critical
+### 2. Preview Panel Integration Issue
+- [x] Fix Manus preview panel not showing updates
+- [x] Fix visual editor not working in preview panel
+- [x] Ensure server configuration is compatible with Manus preview
+
+### 3. Memory Usage Critical
 - [ ] Investigate memory leak in health monitor
 - [ ] Optimize LLM response caching
 - [ ] Review and reduce memory footprint of large data structures
