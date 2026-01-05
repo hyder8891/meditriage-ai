@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Lab Result Database Helper Functions
  * 
@@ -150,7 +149,15 @@ export async function createLabResults(results: Array<{
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  await db.insert(labResults).values(results);
+  // Convert number values to strings for decimal columns
+  const convertedResults = results.map(result => ({
+    ...result,
+    numericValue: result.numericValue?.toString(),
+    referenceRangeMin: result.referenceRangeMin?.toString(),
+    referenceRangeMax: result.referenceRangeMax?.toString(),
+  }));
+
+  await db.insert(labResults).values(convertedResults);
 }
 
 /**
@@ -268,7 +275,16 @@ export async function seedReferenceRanges(ranges: Array<{
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  await db.insert(labReferenceRanges).values(ranges);
+  // Convert number values to strings for decimal columns
+  const convertedRanges = ranges.map(range => ({
+    ...range,
+    referenceMin: range.referenceMin?.toString(),
+    referenceMax: range.referenceMax?.toString(),
+    criticalLow: range.criticalLow?.toString(),
+    criticalHigh: range.criticalHigh?.toString(),
+  }));
+
+  await db.insert(labReferenceRanges).values(convertedRanges);
 }
 
 /**

@@ -8,6 +8,20 @@ let redisHealthy = true;
 let lastHealthCheck = Date.now();
 const HEALTH_CHECK_INTERVAL = 60000; // Check every 60 seconds
 
+// In-memory fallback rate limiting when Redis is unavailable
+// This provides degraded but still functional rate limiting
+const memoryRateLimits = new Map<string, { count: number; expiresAt: number }>();
+
+// Clean up expired entries periodically
+setInterval(() => {
+  const now = Date.now();
+  memoryRateLimits.forEach((value, key) => {
+    if (value.expiresAt < now) {
+      memoryRateLimits.delete(key);
+    }
+  });
+}, 60000); // Clean up every minute
+
 // Redis connection event handlers
 redis.on("error", (error) => {
   console.error("[RateLimit] Redis connection error:", error.message);
@@ -15,12 +29,10 @@ redis.on("error", (error) => {
 });
 
 redis.on("connect", () => {
-  console.log("[RateLimit] Redis connected successfully");
   redisHealthy = true;
 });
 
 redis.on("ready", () => {
-  console.log("[RateLimit] Redis ready");
   redisHealthy = true;
 });
 
@@ -30,14 +42,51 @@ redis.on("close", () => {
 });
 
 redis.on("reconnecting", () => {
-  console.log("[RateLimit] Redis reconnecting...");
+  // Reconnecting silently
 });
 
 /**
- * Rate Limiting using Redis
+ * In-memory rate limiting fallback
+ * Used when Redis is unavailable to maintain security
+ */
+function memoryRateLimit(
+  identifier: string,
+  action: string,
+  limit: number,
+  windowSeconds: number
+): void {
+  const key = `ratelimit:${action}:${identifier}`;
+  const now = Date.now();
+  const entry = memoryRateLimits.get(key);
+
+  if (!entry || entry.expiresAt < now) {
+    // First request or expired window
+    memoryRateLimits.set(key, {
+      count: 1,
+      expiresAt: now + windowSeconds * 1000,
+    });
+    return;
+  }
+
+  // Increment counter
+  entry.count++;
+
+  if (entry.count > limit) {
+    const ttl = Math.ceil((entry.expiresAt - now) / 1000);
+    throw new Error(
+      `Too many ${action} attempts. Please try again in ${ttl} seconds.`
+    );
+  }
+}
+
+/**
+ * Rate Limiting using Redis with in-memory fallback
  * 
  * Prevents brute-force attacks by limiting the number of requests
  * a user can make within a time window.
+ * 
+ * SECURITY: Falls back to in-memory rate limiting when Redis is unavailable
+ * to maintain protection against brute-force attacks.
  * 
  * @param identifier - Unique identifier (email, IP, user ID)
  * @param action - Action being rate limited (e.g., "login", "register", "reset-password")
@@ -69,43 +118,30 @@ export async function rateLimit(
         `Too many ${action} attempts. Please try again in ${ttl} seconds.`
       );
     }
-
-    console.log(
-      `[RateLimit] ${action}:${identifier} - ${current}/${limit} (window: ${windowSeconds}s)`
-    );
   } catch (error) {
     if (error instanceof Error && error.message.includes("Too many")) {
       throw error; // Re-throw rate limit errors
     }
     
-    // FAIL OPEN: Redis errors should not block user access
-    // Log the error and allow the request to proceed
-    console.error(
-      `[RateLimit] ⚠️ FAIL OPEN: Redis error for ${action}:${identifier}, allowing request to proceed`,
-      error
-    );
+    // FAIL CLOSED with in-memory fallback: Redis errors trigger memory-based rate limiting
+    // This maintains security while allowing the service to continue operating
     console.warn(
-      `[RateLimit] ⚠️ Rate limiting is currently unavailable - security degraded`
+      `[RateLimit] Redis unavailable for ${action}:${identifier}, using in-memory fallback`
     );
     
     // Mark Redis as unhealthy
     redisHealthy = false;
     
-    // Optionally: Send alert to admin (implement notifyOwner if needed)
-    // This ensures ops team knows rate limiting is down
+    // Use in-memory rate limiting as fallback
+    memoryRateLimit(identifier, action, limit, windowSeconds);
+    
+    // Alert about degraded state (throttled to avoid spam)
     if (Date.now() - lastHealthCheck > HEALTH_CHECK_INTERVAL) {
       lastHealthCheck = Date.now();
       console.error(
-        `[RateLimit] 🚨 ALERT: Redis has been unhealthy for ${HEALTH_CHECK_INTERVAL}ms - rate limiting disabled`
+        `[RateLimit] 🚨 ALERT: Redis unavailable - using in-memory rate limiting (degraded security)`
       );
-      // TODO: Uncomment when notifyOwner is available
-      // notifyOwner({
-      //   title: "Rate Limiting Service Down",
-      //   content: `Redis is unavailable. Rate limiting is currently disabled. Users can login without rate limit protection.`
-      // }).catch(console.error);
     }
-    
-    // DO NOT throw - allow request to proceed
   }
 }
 
@@ -130,9 +166,15 @@ export async function getRateLimitStatus(
       count: count ? parseInt(count) : 0,
       ttl: ttl > 0 ? ttl : 0,
     };
-  } catch (error) {
-    console.error("[RateLimit] Error getting status:", error);
-    // Fail gracefully - return zeros if Redis is down
+  } catch {
+    // Check in-memory fallback
+    const memEntry = memoryRateLimits.get(key);
+    if (memEntry && memEntry.expiresAt > Date.now()) {
+      return {
+        count: memEntry.count,
+        ttl: Math.ceil((memEntry.expiresAt - Date.now()) / 1000),
+      };
+    }
     return { count: 0, ttl: 0 };
   }
 }
@@ -151,11 +193,12 @@ export async function resetRateLimit(
 
   try {
     await redis.del(key);
-    console.log(`[RateLimit] Reset ${action}:${identifier}`);
-  } catch (error) {
-    console.error("[RateLimit] Error resetting:", error);
-    // Fail gracefully - don't throw
+  } catch {
+    // Also clear from memory fallback
   }
+  
+  // Clear from memory fallback
+  memoryRateLimits.delete(key);
 }
 
 /**
@@ -208,9 +251,7 @@ export function isRedisHealthy(): boolean {
 export async function closeRedis(): Promise<void> {
   try {
     await redis.quit();
-    console.log("[RateLimit] Redis connection closed gracefully");
-  } catch (error) {
-    console.error("[RateLimit] Error closing Redis:", error);
+  } catch {
     // Force disconnect if graceful quit fails
     redis.disconnect();
   }

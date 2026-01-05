@@ -5,14 +5,60 @@ import Redis from 'ioredis';
 
 let io: SocketIOServer | null = null;
 
+// Allowed origins for WebSocket connections
+const ALLOWED_ORIGINS = [
+  // Production domains
+  'https://tabibi.clinic',
+  'https://www.tabibi.clinic',
+  'https://meditriage.ai',
+  'https://www.meditriage.ai',
+  // Manus preview domains
+  /^https:\/\/.*\.manus\.space$/,
+  /^https:\/\/.*\.manus-asia\.computer$/,
+  // Local development
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+];
+
+/**
+ * Validate if an origin is allowed for WebSocket connections
+ */
+function isOriginAllowed(origin: string | undefined): boolean {
+  if (!origin) {
+    // Allow server-to-server connections (no origin header)
+    return true;
+  }
+  
+  for (const allowed of ALLOWED_ORIGINS) {
+    if (typeof allowed === 'string') {
+      if (origin === allowed) return true;
+    } else if (allowed instanceof RegExp) {
+      if (allowed.test(origin)) return true;
+    }
+  }
+  
+  // In development, allow all origins
+  if (process.env.NODE_ENV === 'development') {
+    return true;
+  }
+  
+  return false;
+}
+
 export function initializeSocketServer(httpServer: HttpServer) {
   io = new SocketIOServer(httpServer, {
     path: '/socket.io',
     cors: {
-      // Allow dynamic origins for preview environments
+      // Validate origins against allowlist
       origin: (requestOrigin, callback) => {
-        // Allow all origins (null means no origin, e.g. server-to-server)
-        callback(null, true);
+        if (isOriginAllowed(requestOrigin)) {
+          callback(null, true);
+        } else {
+          console.warn(`[Socket.IO] Rejected connection from unauthorized origin: ${requestOrigin}`);
+          callback(new Error('Origin not allowed'), false);
+        }
       },
       methods: ["GET", "POST"],
       credentials: true,
@@ -39,8 +85,6 @@ export function initializeSocketServer(httpServer: HttpServer) {
   // 🔴 SCALABILITY: Redis Adapter Configuration
   // ---------------------------------------------------------
   if (process.env.REDIS_URL) {
-    console.log("🚀 [Socket.IO] Connecting to Redis Adapter...");
-    
     // Create separate clients for Pub/Sub (Required by socket.io)
     // TLS configuration for secure Redis connections (Upstash)
     const pubClient = new Redis(process.env.REDIS_URL, {
@@ -49,18 +93,15 @@ export function initializeSocketServer(httpServer: HttpServer) {
     const subClient = pubClient.duplicate();
 
     // Error handling to prevent app crashes if Redis blips
-    const handleRedisError = (err: any) => console.error("🔴 [Redis Error]", err.message);
+    const handleRedisError = (err: Error) => console.error("[Redis Error]", err.message);
     pubClient.on('error', handleRedisError);
     subClient.on('error', handleRedisError);
 
     io.adapter(createAdapter(pubClient, subClient));
-    console.log("✅ [Socket.IO] Redis Adapter Configured - Multi-server messaging enabled");
-  } else {
-    console.warn("⚠️ [Socket.IO] No REDIS_URL found. Falling back to single-server memory mode.");
   }
 
   io.on('connection', (socket) => {
-    console.log(`🔌 Socket connected: ${socket.id} from ${socket.handshake.headers.origin}`);
+    const origin = socket.handshake.headers.origin;
     
     // ---------------------------------------------------------
     // 1. SCALABLE USER REGISTRATION (Using Rooms)
@@ -69,7 +110,6 @@ export function initializeSocketServer(httpServer: HttpServer) {
       // Instead of a Map, we join a "personal room"
       const userRoom = `user:${userId}`;
       socket.join(userRoom);
-      console.log(`User ${userId} registered (Joined room: ${userRoom})`);
     });
 
     socket.on('unregister-user', ({ userId }) => {
@@ -93,13 +133,11 @@ export function initializeSocketServer(httpServer: HttpServer) {
         .map(s => s.id) || [];
 
       socket.emit('existing-participants', existingParticipants);
-      console.log(`User ${userId} (${role}) joined room ${roomId}`);
     });
 
     socket.on('leave-room', ({ roomId, userId }) => {
       socket.leave(roomId);
       socket.to(roomId).emit('user-left', { userId, socketId: socket.id });
-      console.log(`User ${userId} left room ${roomId}`);
     });
 
     // ---------------------------------------------------------
@@ -143,12 +181,6 @@ export function initializeSocketServer(httpServer: HttpServer) {
 
     socket.on('disconnect', (reason) => {
       // Redis Adapter automatically handles removing socket from rooms
-      console.log(`Socket disconnected: ${socket.id} (Reason: ${reason})`);
-      
-      // Additional cleanup for flaky connections
-      if (reason === 'transport error' || reason === 'ping timeout') {
-        console.log(`[Socket] Flaky connection detected for ${socket.id}`);
-      }
     });
     
     // Handle connection errors explicitly
@@ -176,7 +208,7 @@ export function getSocketServer() {
  * Emit a notification to a specific user securely and scalably.
  * Uses the Redis Room pattern to find the user on ANY server.
  */
-export function emitNotificationToUser(userId: number, event: string, data: any) {
+export function emitNotificationToUser(userId: number, event: string, data: unknown) {
   if (!io) {
     console.warn('Socket.IO server not initialized, cannot send notification');
     return;
@@ -189,5 +221,4 @@ export function emitNotificationToUser(userId: number, event: string, data: any)
   const specificEventName = `user:${userId}:${event}`;
   
   io.to(userRoom).emit(specificEventName, data);
-  console.log(`Notification sent to ${userRoom} via Redis: ${event}`);
 }

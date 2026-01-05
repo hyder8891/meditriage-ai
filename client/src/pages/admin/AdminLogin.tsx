@@ -5,25 +5,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Shield, AlertCircle } from 'lucide-react';
+import { Shield, AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { adminLogin } = useAdminAuth();
   const [, navigate] = useLocation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
-    const success = adminLogin(username, password);
-    if (success) {
-      navigate('/admin/dashboard');
-    } else {
-      setError('Invalid credentials. Please try again.');
+    try {
+      const result = await adminLogin(username, password);
+      if (result.success) {
+        navigate('/admin/dashboard');
+      } else {
+        setError(result.error || 'Invalid credentials. Please try again.');
+      }
+    } catch {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -51,14 +59,15 @@ export default function AdminLogin() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-slate-200">Username</Label>
+              <Label htmlFor="username" className="text-slate-200">Email</Label>
               <Input
                 id="username"
                 type="text"
-                placeholder="Enter username"
+                placeholder="Enter admin email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={isSubmitting}
                 className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
               />
             </div>
@@ -72,6 +81,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isSubmitting}
                 className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
               />
             </div>
@@ -79,8 +89,16 @@ export default function AdminLogin() {
             <Button 
               type="submit" 
               className="w-full bg-red-600 hover:bg-red-700 text-white"
+              disabled={isSubmitting}
             >
-              Access Admin Panel
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                'Access Admin Panel'
+              )}
             </Button>
           </form>
 

@@ -59,8 +59,8 @@ export function SMSLogin({ role = "patient", onSuccess }: SMSLoginProps) {
         description: data.isNewUser ? "Account created successfully" : "Logged in successfully",
       });
       
-      // Store token and redirect
-      localStorage.setItem("auth_token", data.token);
+      // Note: Token is stored in httpOnly cookie by the server for security
+      // No localStorage storage to prevent XSS attacks
       
       if (onSuccess) {
         onSuccess(data.token, data.user);

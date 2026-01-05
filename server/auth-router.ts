@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { z } from "zod";
 import { router, publicProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
@@ -11,6 +10,7 @@ import {
   generateToken,
   generateRefreshToken,
   verifyRefreshToken,
+  verifyToken,
   isValidEmail,
   isValidPassword,
   generateRandomToken,
@@ -18,6 +18,9 @@ import {
 } from "./_core/auth-utils";
 import { rateLimit } from "./_core/rate-limit";
 import { sendWelcomeEmail, sendEmailVerification } from "./services/email";
+import { createLogger } from "./_core/logger";
+
+const log = createLogger('Auth');
 
 export const authRouter = router({
   /**
@@ -462,9 +465,7 @@ export const authRouter = router({
         })
         .where(eq(users.id, input.userId));
       
-      console.log(
-        `[Auth] Revoked all tokens for user ${input.userId} (version: ${decoded.tokenVersion} -> ${decoded.tokenVersion + 1})`
-      );
+      log.info(`Revoked all tokens for user ${input.userId} (version: ${decoded.tokenVersion} -> ${decoded.tokenVersion + 1})`);
       
       return {
         success: true,

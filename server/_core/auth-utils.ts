@@ -142,3 +142,93 @@ export function isValidPassword(password: string): { valid: boolean; message?: s
   
   return { valid: true };
 }
+
+
+// ============================================================================
+// Encryption Utilities for Sensitive Data (e.g., Wearable Tokens)
+// ============================================================================
+
+const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 16;
+const AUTH_TAG_LENGTH = 16;
+
+/**
+ * Get encryption key from environment or derive from JWT secret
+ * In production, use a dedicated encryption key
+ */
+function getEncryptionKey(): Buffer {
+  const key = process.env.ENCRYPTION_KEY || ENV.cookieSecret;
+  // Ensure key is exactly 32 bytes for AES-256
+  return crypto.createHash('sha256').update(key).digest();
+}
+
+/**
+ * Encrypt sensitive data (e.g., wearable access tokens)
+ * Uses AES-256-GCM for authenticated encryption
+ * 
+ * @param plaintext - The data to encrypt
+ * @returns Base64 encoded encrypted data with IV and auth tag
+ */
+export function encryptSensitiveData(plaintext: string): string {
+  const key = getEncryptionKey();
+  const iv = crypto.randomBytes(IV_LENGTH);
+  
+  const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
+  
+  let encrypted = cipher.update(plaintext, 'utf8', 'base64');
+  encrypted += cipher.final('base64');
+  
+  const authTag = cipher.getAuthTag();
+  
+  // Combine IV + AuthTag + Encrypted data
+  const combined = Buffer.concat([
+    iv,
+    authTag,
+    Buffer.from(encrypted, 'base64')
+  ]);
+  
+  return combined.toString('base64');
+}
+
+/**
+ * Decrypt sensitive data
+ * 
+ * @param encryptedData - Base64 encoded encrypted data
+ * @returns Decrypted plaintext
+ * @throws Error if decryption fails (tampered data or wrong key)
+ */
+export function decryptSensitiveData(encryptedData: string): string {
+  try {
+    const key = getEncryptionKey();
+    const combined = Buffer.from(encryptedData, 'base64');
+    
+    // Extract IV, AuthTag, and encrypted data
+    const iv = combined.subarray(0, IV_LENGTH);
+    const authTag = combined.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
+    const encrypted = combined.subarray(IV_LENGTH + AUTH_TAG_LENGTH);
+    
+    const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, iv);
+    decipher.setAuthTag(authTag);
+    
+    let decrypted = decipher.update(encrypted.toString('base64'), 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
+    
+    return decrypted;
+  } catch (error) {
+    throw new Error('Failed to decrypt data - data may be corrupted or tampered');
+  }
+}
+
+/**
+ * Check if a string appears to be encrypted (base64 with minimum length)
+ */
+export function isEncrypted(data: string): boolean {
+  if (!data || data.length < 50) return false;
+  try {
+    const decoded = Buffer.from(data, 'base64');
+    // Minimum size: IV (16) + AuthTag (16) + some encrypted data
+    return decoded.length >= IV_LENGTH + AUTH_TAG_LENGTH + 1;
+  } catch {
+    return false;
+  }
+}

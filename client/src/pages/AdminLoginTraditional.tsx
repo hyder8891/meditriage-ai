@@ -131,10 +131,15 @@ export default function AdminLoginTraditional() {
             </form>
 
             <div className="pt-4 border-t text-center text-sm text-muted-foreground">
-              <p className="mb-2">Default Credentials:</p>
-              <p className="font-mono text-xs bg-muted p-2 rounded">
-                Username: admin<br />
-                Password: admin
+              <p>Admin Features:</p>
+              <ul className="mt-2 space-y-1 text-xs">
+                <li>• Upload medical training data</li>
+                <li>• Train AI models on methodologies</li>
+                <li>• Monitor system performance</li>
+                <li>• View all triage records</li>
+              </ul>
+              <p className="mt-4 text-xs text-muted-foreground">
+                Contact your system administrator for credentials.
               </p>
             </div>
           </CardContent>

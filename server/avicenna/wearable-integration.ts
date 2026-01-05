@@ -7,6 +7,7 @@
 import { getDb } from "../db";
 import { wearableConnections, wearableDataPoints, wearableMetricsSummary } from "../../drizzle/schema";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { encryptSensitiveData, decryptSensitiveData, isEncrypted } from "../_core/auth-utils";
 
 // ============================================================================
 // Types
@@ -79,8 +80,8 @@ export async function connectWearableDevice(config: WearableConnectionConfig) {
     deviceName: config.deviceName,
     deviceModel: config.deviceModel,
     status: "active",
-    accessToken: config.accessToken, // TODO: Encrypt in production
-    refreshToken: config.refreshToken,
+    accessToken: encryptSensitiveData(config.accessToken), // Encrypted for security
+    refreshToken: config.refreshToken ? encryptSensitiveData(config.refreshToken) : undefined,
     tokenExpiresAt: config.tokenExpiresAt,
     syncEnabled: true,
     syncFrequency: 3600, // 1 hour default
@@ -165,8 +166,13 @@ export async function syncAppleWatchData(connectionId: number, userId: number): 
   let syncedCount = 0;
 
   try {
+    // Decrypt access token for API calls
+    const accessToken = conn.accessToken ? 
+      (isEncrypted(conn.accessToken) ? decryptSensitiveData(conn.accessToken) : conn.accessToken) 
+      : null;
+    
     // TODO: In production, call Apple HealthKit API here
-    // const healthKitData = await fetchHealthKitData(conn.accessToken, enabledMetrics);
+    // const healthKitData = await fetchHealthKitData(accessToken, enabledMetrics);
 
     // Mock data for demonstration
     const mockMetrics: WearableMetric[] = [
@@ -273,8 +279,13 @@ export async function syncFitbitData(connectionId: number, userId: number): Prom
   let syncedCount = 0;
 
   try {
+    // Decrypt access token for API calls
+    const accessToken = conn.accessToken ? 
+      (isEncrypted(conn.accessToken) ? decryptSensitiveData(conn.accessToken) : conn.accessToken) 
+      : null;
+    
     // TODO: In production, call Fitbit Web API here
-    // const fitbitData = await fetchFitbitData(conn.accessToken, enabledMetrics);
+    // const fitbitData = await fetchFitbitData(accessToken, enabledMetrics);
 
     // Mock data for demonstration
     const mockMetrics: WearableMetric[] = [

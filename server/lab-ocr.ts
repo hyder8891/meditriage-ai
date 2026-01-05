@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Lab Report OCR and Text Extraction Service
  * 
@@ -39,7 +38,9 @@ export async function extractTextFromLabReport(fileUrl: string, mimeType: string
       ]
     });
 
-    const extractedText = response.choices[0]?.message?.content || "";
+    const rawContent = response.choices[0]?.message?.content || "";
+    // Handle both string and array content types
+    const extractedText = typeof rawContent === 'string' ? rawContent : (Array.isArray(rawContent) && rawContent[0]?.type === 'text' ? (rawContent[0] as { type: 'text'; text: string }).text : JSON.stringify(rawContent));
     
     if (!extractedText || extractedText.trim().length === 0) {
       throw new Error("No text could be extracted from the file");
@@ -137,11 +138,13 @@ Return ONLY a JSON array of test results, no other text.`
       }
     });
 
-    const content = response.choices?.[0]?.message?.content;
-    if (!content) {
+    const rawContent = response.choices?.[0]?.message?.content;
+    if (!rawContent) {
       throw new Error("No response from AI parser");
     }
-
+    
+    // Handle both string and array content types
+    const content = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
     const parsed = JSON.parse(content);
     return parsed.results || [];
   } catch (error: any) {
@@ -218,11 +221,13 @@ Critical: ${result.criticalFlag}`
       }
     });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
+    const rawContent = response.choices[0]?.message?.content;
+    if (!rawContent) {
       throw new Error("No response from AI interpreter");
     }
-
+    
+    // Handle both string and array content types
+    const content = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
     const interpretation = JSON.parse(content);
     return {
       ...interpretation,
@@ -296,11 +301,13 @@ Consider patterns, combinations of abnormal results, and clinical significance.`
       }
     });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
+    const rawContent = response.choices[0]?.message?.content;
+    if (!rawContent) {
       throw new Error("No response from AI");
     }
-
+    
+    // Handle both string and array content types
+    const content = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
     return JSON.parse(content);
   } catch (error: any) {
     console.error("Overall interpretation error:", error);

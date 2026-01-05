@@ -28,6 +28,9 @@ import { airQualityRouter } from "./routers/air-quality-router";
 import { conversationalRouter } from "./conversational-router";
 import { conversationHistoryRouter } from "./conversation-history-router";
 import { budgetRouter } from "./budget-router";
+import { createLogger } from "./_core/logger";
+
+const log = createLogger('Auth');
 import { orchestrationRouter } from "./orchestration-router";
 import { onboardingRouter } from "./onboarding-router";
 import { loadTestRouter } from "./load-test-router";
@@ -242,9 +245,7 @@ export const appRouter = router({
           })
           .where(eq(users.id, user.id));
         
-        console.log(
-          `[Auth] Password reset successful for user ${user.id}, tokenVersion incremented to ${(user.tokenVersion || 0) + 1}`
-        );
+        log.info(`Password reset successful for user ${user.id}, tokenVersion incremented to ${(user.tokenVersion || 0) + 1}`);
         
         return {
           success: true,
@@ -306,8 +307,20 @@ export const appRouter = router({
         };
       }),
     
-    // Debug endpoint to show current user with full details
+    // Debug endpoint - protected, only available in development or for admins
     debugMe: publicProcedure.query(async ({ ctx }) => {
+      // Only allow in development mode or for authenticated admin users
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const isAdmin = ctx.user?.role === 'admin' || ctx.user?.role === 'super_admin';
+      
+      if (!isDevelopment && !isAdmin) {
+        return { 
+          authenticated: false, 
+          message: 'Debug endpoint not available in production',
+          restricted: true
+        };
+      }
+      
       if (!ctx.user) {
         return { authenticated: false, message: 'Not logged in' };
       }
