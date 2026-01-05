@@ -18,6 +18,7 @@ import {
 } from "../drizzle/schema";
 import { eq, and, or, desc, sql, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { emitNotificationToUser } from "./_core/socket-server";
 
 /**
  * B2B2C Platform Router
@@ -494,6 +495,21 @@ export const b2b2cRouter = router({
           attachments: input.attachmentUrl ? JSON.stringify([input.attachmentUrl]) : null,
           read: false,
         });
+
+        // 🔴 REAL-TIME: Emit notification to recipient via Socket.IO
+        try {
+          emitNotificationToUser(input.recipientId, 'new-message', {
+            messageId: result.insertId,
+            senderId: ctx.user.id,
+            senderName: ctx.user.name || 'User',
+            content: input.content,
+            timestamp: new Date().toISOString(),
+          });
+          console.log(`[Messaging] Real-time notification sent to user ${input.recipientId}`);
+        } catch (socketError) {
+          // Don't fail the message send if socket notification fails
+          console.error('[Messaging] Failed to send real-time notification:', socketError);
+        }
 
         return { 
           success: true, 
