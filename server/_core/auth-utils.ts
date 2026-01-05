@@ -26,7 +26,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
  */
 export function generateToken(payload: { userId: number; email: string; role: string; tokenVersion: number }): string {
   return jwt.sign(payload, ENV.cookieSecret, {
-    expiresIn: '15m',
+    expiresIn: '15m', // Reduced from 7d to 15 minutes for better security
   });
 }
 
@@ -35,6 +35,7 @@ export function generateToken(payload: { userId: number; email: string; role: st
  * Stored in an HTTP-Only cookie. Used to get new Access Tokens.
  */
 export function generateRefreshToken(payload: { userId: number; email: string; role: string; tokenVersion: number }): string {
+  // Use a separate secret if available, otherwise fallback to standard secret
   const secret = process.env.JWT_REFRESH_SECRET || ENV.cookieSecret;
   return jwt.sign(payload, secret, {
     expiresIn: '30d',
