@@ -33,6 +33,13 @@ function SecureMessagingContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize notification sound
+  useEffect(() => {
+    notificationSoundRef.current = new Audio('/notification.mp3');
+    notificationSoundRef.current.volume = 0.5;
+  }, []);
 
   const utils = trpc.useUtils();
 
@@ -125,6 +132,13 @@ function SecureMessagingContent() {
       if (data.senderId !== selectedUserId) {
         toast.info(isArabic ? 'رسالة جديدة' : 'New message', {
           description: data.senderName || (isArabic ? 'رسالة جديدة من محادثة' : 'New message from conversation'),
+        });
+      }
+      
+      // Play notification sound if user is on another tab
+      if (document.hidden && notificationSoundRef.current) {
+        notificationSoundRef.current.play().catch(err => {
+          console.log('[SecureMessaging] Failed to play notification sound:', err);
         });
       }
     });

@@ -381,6 +381,8 @@
 
 ## New Issues (User Reported)
 
+- [x] Add notification sound when new messages arrive while user is on another tab
+
 - [ ] Fix dashboard loading issue - authentication works but content not displaying
 
 - [x] "Train the brain" feature - Added to Admin navigation menu, accessible at /train-the-brain

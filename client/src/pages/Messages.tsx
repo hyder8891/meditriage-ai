@@ -22,6 +22,13 @@ function MessagesContent() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const utils = trpc.useUtils();
+  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize notification sound
+  useEffect(() => {
+    notificationSoundRef.current = new Audio('/notification.mp3');
+    notificationSoundRef.current.volume = 0.5;
+  }, []);
 
   // Get all conversations
   const { data: conversations, isLoading: conversationsLoading, error: conversationsError } = 
@@ -107,6 +114,13 @@ function MessagesContent() {
       if (data.senderId !== selectedUserId) {
         toast.info(isArabic ? 'رسالة جديدة' : 'New message', {
           description: data.senderName || (isArabic ? 'رسالة جديدة من محادثة' : 'New message from conversation'),
+        });
+      }
+      
+      // Play notification sound if user is on another tab
+      if (document.hidden && notificationSoundRef.current) {
+        notificationSoundRef.current.play().catch(err => {
+          console.log('[Messages] Failed to play notification sound:', err);
         });
       }
     });

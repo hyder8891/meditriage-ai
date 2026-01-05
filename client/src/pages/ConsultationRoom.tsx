@@ -63,6 +63,13 @@ export default function ConsultationRoom() {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const remoteSocketIdRef = useRef<string | null>(null);
+  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize notification sound
+  useEffect(() => {
+    notificationSoundRef.current = new Audio('/notification.mp3');
+    notificationSoundRef.current.volume = 0.5;
+  }, []);
   
   // Queries
   const { data: consultation, isLoading } = trpc.consultation.getById.useQuery(
@@ -183,6 +190,13 @@ export default function ConsultationRoom() {
         message,
         timestamp: new Date(timestamp),
       }]);
+      
+      // Play notification sound if message is from other user and user is on another tab
+      if (sender !== user.id && document.hidden && notificationSoundRef.current) {
+        notificationSoundRef.current.play().catch(err => {
+          console.log('[ConsultationRoom] Failed to play notification sound:', err);
+        });
+      }
     });
     
     // Initialize local media
