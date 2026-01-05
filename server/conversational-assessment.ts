@@ -20,49 +20,6 @@ const GREETING_EN = "Hello. I am AI Doctor, your intelligent medical assistant. 
 const GREETING_AR = "مرحباً. أنا طبيبك الافتراضي، مساعدك الطبي الذكي. من فضلك أخبرني، ما هي الأعراض التي تعاني منها اليوم؟";
 
 /**
- * Generate contextual quick reply options based on conversation state
- */
-function generateQuickReplies(vector: ConversationalContextVector, step: number) {
-  // If no symptoms yet, provide common symptom quick replies
-  if (vector.symptoms.length === 0) {
-    return [
-      { text: "Headache", textAr: "صداع", value: "I have a headache" },
-      { text: "Fever", textAr: "حمى", value: "I have a fever" },
-      { text: "Cough", textAr: "سعال", value: "I have a cough" },
-      { text: "Pain", textAr: "ألم", value: "I have pain" }
-    ];
-  }
-  
-  // If symptoms exist but no duration, provide duration quick replies
-  if (!vector.duration) {
-    return [
-      { text: "Today", textAr: "اليوم", value: "It started today" },
-      { text: "Few days", textAr: "عدة أيام", value: "For a few days" },
-      { text: "A week", textAr: "أسبوع", value: "About a week" },
-      { text: "Longer", textAr: "أطول", value: "More than a week" }
-    ];
-  }
-  
-  // If duration exists but no severity, provide severity quick replies
-  if (!vector.severity) {
-    return [
-      { text: "Mild", textAr: "خفيف", value: "It's mild" },
-      { text: "Moderate", textAr: "متوسط", value: "It's moderate" },
-      { text: "Severe", textAr: "شديد", value: "It's severe" },
-      { text: "Very severe", textAr: "شديد جداً", value: "It's very severe" }
-    ];
-  }
-  
-  // Generic continuation options
-  return [
-    { text: "Yes", textAr: "نعم", value: "Yes" },
-    { text: "No", textAr: "لا", value: "No" },
-    { text: "Not sure", textAr: "غير متأكد", value: "I'm not sure" },
-    { text: "Continue", textAr: "متابعة", value: "Continue" }
-  ];
-}
-
-/**
  * Start a new conversation
  */
 export async function startConversation(language: string = 'en') {
@@ -79,8 +36,8 @@ export async function startConversation(language: string = 'en') {
 
 export async function processConversationalAssessment(
   message: string, 
+  contextData: any,
   conversationHistory: any[] = [],
-  contextData: any = {},
   language: string = 'en'
 ) {
   // 1. Rehydrate
@@ -163,15 +120,12 @@ export async function processConversationalAssessment(
     // 5. Force Progress
     vector.stepCount = currentStep + 1;
 
-    // Generate contextual quick replies
-    const quickReplies = generateQuickReplies(vector, currentStep);
-
     return {
       message: data.nextQuestion,
       messageAr: data.nextQuestion, // TODO: Add Arabic translation
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
-      quickReplies
+      quickReplies: []
     };
 
   } catch (error) {
@@ -181,15 +135,12 @@ export async function processConversationalAssessment(
     vector.stepCount = currentStep + 1;
     const nextQ = FALLBACK_QUESTIONS[Math.min(vector.stepCount, 7)];
 
-    // Generate contextual quick replies for fallback
-    const quickReplies = generateQuickReplies(vector, currentStep);
-
     return {
       message: nextQ,
       messageAr: nextQ, // TODO: Add Arabic translation
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
-      quickReplies
+      quickReplies: []
     };
   }
 }
@@ -282,17 +233,6 @@ async function generateFinalRecommendation(
     // Map triage level to color
     const triageLevel = data.triageLevel || "yellow";
     
-    // Format differential diagnosis for response
-    const differentialDiagnosis = data.mostLikelyCondition ? [
-      {
-        condition: data.mostLikelyCondition.condition,
-        probability: data.mostLikelyCondition.probability,
-        reasoning: data.mostLikelyCondition.reasoning,
-        confidenceScore: Math.round((data.mostLikelyCondition.probability || 0) * 100),
-        evidenceStrength: "B"
-      }
-    ] : [];
-
     return {
       message: `Based on your symptoms, here is my assessment:\n\n${data.actionPlan}`,
       messageAr: data.actionPlan, // TODO: Add Arabic translation
@@ -302,7 +242,6 @@ async function generateFinalRecommendation(
       triageReasonAr: data.triageReason, // TODO: Add Arabic translation
       recommendations: data.recommendations || [],
       recommendationsAr: data.recommendations || [], // TODO: Add Arabic translation
-      differentialDiagnosis,
       mostLikelyCondition: data.mostLikelyCondition,
       showActions: true,
       context: vector.toJSON(),

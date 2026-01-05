@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { processConversationalAssessment } from './conversational-assessment-integrated';
+import { processConversationalAssessment } from './conversational-assessment';
 
 // Mock dependencies
 vi.mock('./_core/llm', () => ({
@@ -16,18 +16,8 @@ vi.mock('./brain/brain-enhanced', () => ({
   }
 }));
 
-vi.mock('./brain/index', () => ({
-  BRAIN: vi.fn().mockImplementation(() => ({
-    reason: vi.fn()
-  }))
-}));
-
-vi.mock('./brain/orchestrator', () => ({
-  executeAvicennaLoop: vi.fn()
-}));
-
 import { invokeLLM } from './_core/llm';
-import { BRAIN } from './brain/index';
+import { enhancedBrain } from './brain/brain-enhanced';
 
 describe('Conversational Assessment System', () => {
   beforeEach(() => {
@@ -174,8 +164,7 @@ describe('Conversational Assessment System', () => {
   describe('Analysis Stage', () => {
     it('should analyze symptoms with BRAIN when sufficient context is gathered', async () => {
       // Mock BRAIN analysis
-      const mockBrainInstance = {
-        reason: vi.fn().mockResolvedValueOnce({
+      (enhancedBrain.reason as any).mockResolvedValueOnce({
         diagnosis: {
           differentialDiagnosis: [
             {
@@ -206,9 +195,7 @@ describe('Conversational Assessment System', () => {
           requiresUrgentCare: false
         },
         accuracyMetrics: {}
-        })
-      };
-      (BRAIN as any).mockImplementation(() => mockBrainInstance);
+      });
 
       // Mock Arabic translations (multiple calls)
       (invokeLLM as any).mockResolvedValue({
@@ -225,12 +212,11 @@ describe('Conversational Assessment System', () => {
         {
           symptoms: ["headache"],
           duration: "2 days",
-          severity: "moderate",
-          stepCount: 7 // Trigger analysis stage
+          severity: "moderate" // All three required for analysis stage
         }
       );
 
-      expect(mockBrainInstance.reason).toHaveBeenCalled();
+      expect(enhancedBrain.reason).toHaveBeenCalled();
       expect(response.conversationStage).toBe('complete');
       expect(response.triageLevel).toBeDefined();
       expect(response.differentialDiagnosis).toBeDefined();
@@ -244,7 +230,7 @@ describe('Conversational Assessment System', () => {
         choices: [{ message: { content: JSON.stringify({ symptoms: [] }) } }]
       });
       
-      (BRAIN as any)().reason.mockResolvedValue({
+      (enhancedBrain.reason as any).mockResolvedValue({
         diagnosis: {
           differentialDiagnosis: [],
           redFlags: [],
@@ -264,8 +250,7 @@ describe('Conversational Assessment System', () => {
         {
           symptoms: ["headache"],
           duration: "today",
-          severity: "mild",
-          stepCount: 7 // Trigger analysis stage
+          severity: "mild" // All three present = analysis stage
         }
       );
 
@@ -276,7 +261,7 @@ describe('Conversational Assessment System', () => {
       (invokeLLM as any).mockResolvedValue({
         choices: [{ message: { content: JSON.stringify({ symptoms: [] }) } }]
       });
-      (BRAIN as any)().reason.mockResolvedValue({
+      (enhancedBrain.reason as any).mockResolvedValue({
         diagnosis: {
           differentialDiagnosis: [],
           redFlags: [],
@@ -296,8 +281,7 @@ describe('Conversational Assessment System', () => {
         {
           symptoms: ["chest pain"],
           duration: "1 hour",
-          severity: "severe",
-          stepCount: 7 // Trigger analysis stage
+          severity: "severe" // All three present = analysis stage
         }
       );
 
@@ -309,7 +293,7 @@ describe('Conversational Assessment System', () => {
         choices: [{ message: { content: JSON.stringify({ symptoms: [] }) } }]
       });
       
-      (BRAIN as any)().reason.mockResolvedValue({
+      (enhancedBrain.reason as any).mockResolvedValue({
         diagnosis: {
           differentialDiagnosis: [],
           redFlags: [],
@@ -328,8 +312,7 @@ describe('Conversational Assessment System', () => {
         {
           symptoms: ["fever"],
           duration: "2 days",
-          severity: "moderate",
-          stepCount: 7 // Trigger analysis stage
+          severity: "moderate" // All three present = analysis stage
         }
       );
 
@@ -343,7 +326,7 @@ describe('Conversational Assessment System', () => {
         choices: [{ message: { content: JSON.stringify({ symptoms: [] }) } }]
       });
       
-      (BRAIN as any)().reason.mockResolvedValue({
+      (enhancedBrain.reason as any).mockResolvedValue({
         diagnosis: {
           differentialDiagnosis: [],
           redFlags: [],
@@ -362,8 +345,7 @@ describe('Conversational Assessment System', () => {
         {
           symptoms: ["chest pain", "difficulty breathing"],
           duration: "30 minutes",
-          severity: "severe",
-          stepCount: 7 // Trigger analysis stage
+          severity: "severe" // All three present = analysis stage
         }
       );
 
@@ -376,7 +358,7 @@ describe('Conversational Assessment System', () => {
         choices: [{ message: { content: JSON.stringify({ symptoms: [] }) } }]
       });
       
-      (BRAIN as any)().reason.mockResolvedValue({
+      (enhancedBrain.reason as any).mockResolvedValue({
         diagnosis: {
           differentialDiagnosis: [],
           redFlags: [],
@@ -393,10 +375,9 @@ describe('Conversational Assessment System', () => {
         "Moderate pain for a week",
         [{ role: "assistant", content: "Hello", timestamp: Date.now() }],
         {
-          symptoms: ["pain"],
+          symptoms: ["abdominal pain"],
           duration: "1 week",
-          severity: "moderate",
-          stepCount: 7 // Trigger analysis stage
+          severity: "moderate" // All three present = analysis stage
         }
       );
 
@@ -410,7 +391,7 @@ describe('Conversational Assessment System', () => {
         choices: [{ message: { content: JSON.stringify({ symptoms: [] }) } }]
       });
       
-      (BRAIN as any)().reason.mockResolvedValue({
+      (enhancedBrain.reason as any).mockResolvedValue({
         diagnosis: {
           differentialDiagnosis: [],
           redFlags: [],
@@ -429,8 +410,7 @@ describe('Conversational Assessment System', () => {
         {
           symptoms: ["fever"],
           duration: "2 days",
-          severity: "moderate",
-          stepCount: 7 // Trigger analysis stage
+          severity: "moderate" // All three present = analysis stage
         }
       );
 

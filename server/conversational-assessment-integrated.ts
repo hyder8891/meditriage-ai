@@ -45,49 +45,6 @@ function getFallbackQuestion(index: number, language: string): string {
 }
 
 /**
- * Generate contextual quick reply options based on conversation state
- */
-function generateQuickReplies(vector: ConversationalContextVector, step: number, language: string = 'en') {
-  // If no symptoms yet, provide common symptom quick replies
-  if (vector.symptoms.length === 0) {
-    return [
-      { text: "Headache", textAr: "صداع", value: "I have a headache" },
-      { text: "Fever", textAr: "حمى", value: "I have a fever" },
-      { text: "Cough", textAr: "سعال", value: "I have a cough" },
-      { text: "Pain", textAr: "ألم", value: "I have pain" }
-    ];
-  }
-  
-  // If symptoms exist but no duration, provide duration quick replies
-  if (!vector.duration) {
-    return [
-      { text: "Today", textAr: "اليوم", value: "It started today" },
-      { text: "Few days", textAr: "عدة أيام", value: "For a few days" },
-      { text: "A week", textAr: "أسبوع", value: "About a week" },
-      { text: "Longer", textAr: "أطول", value: "More than a week" }
-    ];
-  }
-  
-  // If duration exists but no severity, provide severity quick replies
-  if (!vector.severity) {
-    return [
-      { text: "Mild", textAr: "خفيف", value: "It's mild" },
-      { text: "Moderate", textAr: "متوسط", value: "It's moderate" },
-      { text: "Severe", textAr: "شديد", value: "It's severe" },
-      { text: "Very severe", textAr: "شديد جداً", value: "It's very severe" }
-    ];
-  }
-  
-  // Generic continuation options
-  return [
-    { text: "Yes", textAr: "نعم", value: "Yes" },
-    { text: "No", textAr: "لا", value: "No" },
-    { text: "Not sure", textAr: "غير متأكد", value: "I'm not sure" },
-    { text: "Continue", textAr: "متابعة", value: "Continue" }
-  ];
-}
-
-/**
  * Start a new conversation
  */
 export async function startConversation(language: string = 'en') {
@@ -196,15 +153,12 @@ export async function processConversationalAssessment(
     // 5. Force Progress
     vector.stepCount = currentStep + 1;
 
-    // Generate contextual quick replies
-    const quickReplies = generateQuickReplies(vector, currentStep, language);
-
     return {
       message: data.nextQuestion,
       messageAr: language === 'ar' ? data.nextQuestion : data.nextQuestion,
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
-      quickReplies
+      quickReplies: []
     };
 
   } catch (error) {
@@ -214,15 +168,12 @@ export async function processConversationalAssessment(
     vector.stepCount = currentStep + 1;
     const nextQ = getFallbackQuestion(vector.stepCount, language);
     
-    // Generate contextual quick replies for fallback
-    const quickReplies = generateQuickReplies(vector, currentStep, language);
-
     return {
       message: nextQ,
       messageAr: language === 'ar' ? nextQ : FALLBACK_QUESTIONS_AR[Math.min(vector.stepCount, 9)],
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
-      quickReplies
+      quickReplies: []
     };
   }
 }
