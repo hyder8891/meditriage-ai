@@ -6,6 +6,7 @@ import { createMedicalDocument, getMedicalDocumentsByUserId } from "./db";
 import { getDb } from "./db";
 import { medicalDocuments } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { fileTypeFromBuffer } from "file-type";
 
 /**
  * Medical Records Router
@@ -40,14 +41,50 @@ export const medicalRecordsRouter = router({
       try {
         // Decode base64 to buffer
         const base64Data = input.fileData.replace(/^data:.*?;base64,/, "");
+        
+        // SECURITY FIX: Check Base64 string length BEFORE buffer allocation to prevent DoS
+        // Base64 encoding increases size by ~33%, so 10MB file = ~13.3MB Base64
+        const maxBase64Length = Math.ceil((10 * 1024 * 1024) * 1.34);
+        if (base64Data.length > maxBase64Length) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "File size exceeds 10MB limit",
+          });
+        }
+        
         const fileBuffer = Buffer.from(base64Data, "base64");
         const fileSize = fileBuffer.length;
 
-        // Validate file size (max 10MB)
+        // Double-check actual file size after decoding
         if (fileSize > 10 * 1024 * 1024) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "File size exceeds 10MB limit",
+          });
+        }
+
+        // SECURITY FIX: Validate file type using magic numbers instead of trusting user input
+        const detectedType = await fileTypeFromBuffer(fileBuffer);
+        const allowedMimeTypes = [
+          'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'text/plain'
+        ];
+        
+        const actualMimeType = detectedType?.mime || 'application/octet-stream';
+        
+        // Warn if user-provided MIME type doesn't match detected type
+        if (detectedType && input.mimeType !== actualMimeType) {
+          console.warn(`[Security] MIME type mismatch: user provided ${input.mimeType}, detected ${actualMimeType}`);
+        }
+        
+        // Block if detected type is not in allowed list
+        if (detectedType && !allowedMimeTypes.includes(actualMimeType)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `File type ${actualMimeType} is not allowed. Allowed types: images, PDF, Word documents, text files.`,
           });
         }
 
@@ -57,8 +94,8 @@ export const medicalRecordsRouter = router({
         const sanitizedFileName = input.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
         const fileKey = `medical-records/${ctx.user.id}/${timestamp}-${randomSuffix}-${sanitizedFileName}`;
 
-        // Upload to S3
-        const { url } = await storagePut(fileKey, fileBuffer, input.mimeType);
+        // Upload to S3 using detected MIME type for security
+        const { url } = await storagePut(fileKey, fileBuffer, actualMimeType);
 
         // Save metadata to database
         await createMedicalDocument({

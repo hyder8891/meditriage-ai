@@ -59,8 +59,8 @@ export const securityHeaders = helmet({
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "'unsafe-inline'",
-        "'unsafe-eval'",
+        // SECURITY FIX: Removed 'unsafe-inline' and 'unsafe-eval' to prevent XSS
+        // Use nonces or hashes for inline scripts if needed
         "https://accounts.google.com",
         "https://apis.google.com",
         "https://manus-analytics.com", // Analytics
@@ -322,9 +322,17 @@ export function detectSuspiciousActivity(req: Request): {
 } {
   const reasons: string[] = [];
   
+  // SECURITY FIX: Limit input length before regex testing to prevent ReDoS
+  const queryString = JSON.stringify(req.query) + JSON.stringify(req.body);
+  const MAX_INPUT_LENGTH = 10000; // 10KB limit
+  
+  if (queryString.length > MAX_INPUT_LENGTH) {
+    reasons.push('Request payload too large for security scanning');
+    return { suspicious: true, reasons };
+  }
+  
   // Check for SQL injection patterns
   const sqlPatterns = /(union|select|insert|update|delete|drop|create|alter|exec|script)/i;
-  const queryString = JSON.stringify(req.query) + JSON.stringify(req.body);
   
   if (sqlPatterns.test(queryString)) {
     reasons.push('Potential SQL injection attempt detected');

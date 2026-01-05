@@ -288,14 +288,14 @@ export const authRouter = router({
         userId: user.id,
         email: user.email!,
         role: user.role,
-        tokenVersion: user.tokenVersion || 0,
+        tokenVersion: user.tokenVersion,
       });
 
       const refreshToken = generateRefreshToken({
         userId: user.id,
         email: user.email!,
         role: user.role,
-        tokenVersion: user.tokenVersion || 0,
+        tokenVersion: user.tokenVersion,
       });
 
       return {
@@ -411,7 +411,7 @@ export const authRouter = router({
         userId: user.id,
         email: user.email!,
         role: user.role,
-        tokenVersion: user.tokenVersion || 0,
+        tokenVersion: user.tokenVersion,
       });
 
       return {
