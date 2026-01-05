@@ -5065,3 +5065,57 @@ export * from "./avicenna-schema";
 
 // Export intelligent matching system schema
 export * from "./matching-schema";
+
+
+/**
+ * Doctor Verification Requests - Tracks doctor registration approval workflow
+ */
+export const doctorVerificationRequests = mysqlTable("doctor_verification_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(), // The doctor user requesting verification
+  
+  // Request status
+  status: mysqlEnum("status", ["pending", "under_review", "approved", "rejected", "requires_more_info"]).default("pending").notNull(),
+  
+  // Personal information
+  fullName: varchar("full_name", { length: 255 }).notNull(),
+  dateOfBirth: date("date_of_birth"),
+  nationalIdNumber: varchar("national_id_number", { length: 100 }),
+  
+  // Professional information
+  medicalLicenseNumber: varchar("medical_license_number", { length: 100 }).notNull(),
+  licenseIssuingAuthority: varchar("license_issuing_authority", { length: 255 }).notNull(),
+  licenseIssueDate: date("license_issue_date").notNull(),
+  licenseExpiryDate: date("license_expiry_date"),
+  specialty: varchar("specialty", { length: 100 }),
+  subspecialty: varchar("subspecialty", { length: 100 }),
+  yearsOfExperience: int("years_of_experience"),
+  
+  // Education
+  medicalSchool: varchar("medical_school", { length: 255 }),
+  graduationYear: int("graduation_year"),
+  
+  // Documents (S3 keys)
+  nationalIdDocumentKey: varchar("national_id_document_key", { length: 512 }),
+  nationalIdDocumentUrl: varchar("national_id_document_url", { length: 1024 }),
+  medicalLicenseDocumentKey: varchar("medical_license_document_key", { length: 512 }),
+  medicalLicenseDocumentUrl: varchar("medical_license_document_url", { length: 1024 }),
+  medicalDegreeDocumentKey: varchar("medical_degree_document_key", { length: 512 }),
+  medicalDegreeDocumentUrl: varchar("medical_degree_document_url", { length: 1024 }),
+  additionalDocumentsJson: text("additional_documents_json"), // JSON array of additional documents
+  
+  // Admin review
+  reviewedBy: int("reviewed_by"), // Admin user ID who reviewed
+  reviewedAt: timestamp("reviewed_at"),
+  reviewNotes: text("review_notes"),
+  rejectionReason: text("rejection_reason"),
+  additionalInfoRequested: text("additional_info_requested"),
+  
+  // Timestamps
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorVerificationRequest = typeof doctorVerificationRequests.$inferSelect;
+export type InsertDoctorVerificationRequest = typeof doctorVerificationRequests.$inferInsert;

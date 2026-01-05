@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, sender_id, recipient_id, SUBSTRING(content, 1, 50) as content_preview, `read`, created_at FROM messages ORDER BY created_at DESC LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, sender_id, recipient_id, SUBSTRING(content, 1, 50) as content_preview, `read`, created_at FROM messages ORDER BY created_at DESC LIMIT 15;",
+  "rows": [
+    {
+      "id": "450017",
+      "sender_id": "3630002",
+      "recipient_id": "900067",
+      "content_preview": "hi",
+      "read": "0",
+      "created_at": "2026-01-05 13:44:53"
+    },
+    {
+      "id": "450016",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message for read status",
+      "read": "1",
+      "created_at": "2026-01-05 12:20:27"
+    },
+    {
+      "id": "450015",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content_preview": "Test message from patient to doctor",
+      "read": "1",
+      "created_at": "2026-01-05 12:20:27"
+    },
+    {
+      "id": "450014",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-05 12:20:27"
+    },
+    {
+      "id": "450012",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message for read status",
+      "read": "1",
+      "created_at": "2026-01-05 12:06:52"
+    },
+    {
+      "id": "450010",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-05 12:06:52"
+    },
+    {
+      "id": "450011",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content_preview": "Test message from patient to doctor",
+      "read": "1",
+      "created_at": "2026-01-05 12:06:52"
+    },
+    {
+      "id": "450007",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content_preview": "Test message from patient to doctor",
+      "read": "1",
+      "created_at": "2026-01-05 12:04:19"
+    },
+    {
+      "id": "450006",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-05 12:04:19"
+    },
+    {
+      "id": "450008",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message for read status",
+      "read": "1",
+      "created_at": "2026-01-05 12:04:19"
+    },
+    {
+      "id": "450003",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content_preview": "Test message from patient to doctor",
+      "read": "1",
+      "created_at": "2026-01-05 10:34:29"
+    },
+    {
+      "id": "450004",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message for read status",
+      "read": "1",
+      "created_at": "2026-01-05 10:34:29"
+    },
+    {
+      "id": "450002",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-05 10:34:29"
+    },
+    {
+      "id": "420010",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content_preview": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-04 11:57:46"
+    },
+    {
+      "id": "420011",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content_preview": "Test message from patient to doctor",
+      "read": "1",
+      "created_at": "2026-01-04 11:57:46"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsender_id\trecipient_id\tcontent_preview\tread\tcreated_at\n450017\t3630002\t900067\thi\t0\t2026-01-05 13:44:53\n450016\t900067\t2100016\tTest message for read status\t1\t2026-01-05 12:20:27\n450015\t2100016\t900067\tTest message from patient to doctor\t1\t2026-01-05 12:20:27\n450014\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-05 12:20:27\n450012\t900067\t2100016\tTest message for read status\t1\t2026-01-05 12:06:52\n450010\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-05 12:06:52\n450011\t2100016\t900067\tTest message from patient to doctor\t1\t2026-01-05 12:06:52\n450007\t2100016\t900067\tTest message from patient to doctor\t1\t2026-01-05 12:04:19\n450006\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-05 12:04:19\n450008\t900067\t2100016\tTest message for read status\t1\t2026-01-05 12:04:19\n450003\t2100016\t900067\tTest message from patient to doctor\t1\t2026-01-05 10:34:29\n450004\t900067\t2100016\tTest message for read status\t1\t2026-01-05 10:34:29\n450002\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-05 10:34:29\n420010\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-04 11:57:46\n420011\t2100016\t900067\tTest message from patient to doctor\t1\t2026-01-04 11:57:46\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

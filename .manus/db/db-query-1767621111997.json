@@ -1,0 +1,58 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'messages';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'messages';",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "sender_id"
+    },
+    {
+      "COLUMN_NAME": "recipient_id"
+    },
+    {
+      "COLUMN_NAME": "subject"
+    },
+    {
+      "COLUMN_NAME": "content"
+    },
+    {
+      "COLUMN_NAME": "encrypted"
+    },
+    {
+      "COLUMN_NAME": "read"
+    },
+    {
+      "COLUMN_NAME": "read_at"
+    },
+    {
+      "COLUMN_NAME": "thread_id"
+    },
+    {
+      "COLUMN_NAME": "reply_to_id"
+    },
+    {
+      "COLUMN_NAME": "case_id"
+    },
+    {
+      "COLUMN_NAME": "attachments"
+    },
+    {
+      "COLUMN_NAME": "deleted_by_sender"
+    },
+    {
+      "COLUMN_NAME": "deleted_by_recipient"
+    },
+    {
+      "COLUMN_NAME": "created_at"
+    },
+    {
+      "COLUMN_NAME": "updated_at"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\nsender_id\nrecipient_id\nsubject\ncontent\nencrypted\nread\nread_at\nthread_id\nreply_to_id\ncase_id\nattachments\ndeleted_by_sender\ndeleted_by_recipient\ncreated_at\nupdated_at\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

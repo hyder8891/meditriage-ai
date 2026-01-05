@@ -6,7 +6,7 @@ import {
   Zap, Stethoscope, Syringe, Brain, Mic, FileSpreadsheet, 
   Cloud, CloudRain, Wind, MessageSquare, History, Building2, 
   Gavel, Settings as SettingsIcon, Phone, Key, UserPlus, 
-  TestTube, ClipboardList, LogOut, Shield, Menu, X 
+  TestTube, ClipboardList, LogOut, Shield, Menu, X, BadgeCheck 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -38,6 +38,7 @@ const navigationSections: NavSection[] = [
     items: [
       { label: 'Patients', path: '/admin/patients', icon: Users },
       { label: 'Doctors', path: '/admin/doctors', icon: UserCog },
+      { label: 'Doctor Verification', path: '/admin/verification-queue', icon: BadgeCheck },
     ]
   },
   {

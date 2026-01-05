@@ -17,7 +17,8 @@ import {
   X,
   Home,
   Stethoscope,
-  BookOpen
+  BookOpen,
+  BadgeCheck
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -72,6 +73,7 @@ export function ClinicianLayout({ children }: ClinicianLayoutProps) {
     { icon: Pill, label: language === 'ar' ? 'الأدوية' : 'Medications', path: '/clinician/medications' },
     { icon: Users, label: language === 'ar' ? 'المرضى' : 'Patients', path: '/clinician/my-patients' },
     { icon: MessageSquare, label: language === 'ar' ? 'الرسائل' : 'Messages', path: '/clinician/messages', badge: unreadCount },
+    { icon: BadgeCheck, label: language === 'ar' ? 'التحقق من الهوية' : 'Verification', path: '/clinician/verification' },
   ];
 
   // Bottom nav items for mobile (most important 4)

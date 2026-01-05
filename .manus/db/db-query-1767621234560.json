@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, name, role, email FROM users WHERE id IN (900067, 3630002);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, name, role, email FROM users WHERE id IN (900067, 3630002);",
+  "rows": [
+    {
+      "id": "900067",
+      "name": "Hhwaljanabi",
+      "role": "clinician",
+      "email": "Hhwaljanabi@yahoo.com"
+    },
+    {
+      "id": "3630002",
+      "name": "Wen Li",
+      "role": "patient",
+      "email": "nanjingunitedgroup@gmail.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\trole\temail\n900067\tHhwaljanabi\tclinician\tHhwaljanabi@yahoo.com\n3630002\tWen Li\tpatient\tnanjingunitedgroup@gmail.com\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

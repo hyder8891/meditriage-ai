@@ -9,6 +9,7 @@ import { getLoginUrl } from "./const";
 import "./index.css";
 import { useAuthStore } from "@/hooks/useAuth";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { getValidToken } from "@/lib/tokenRefresh";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,7 +42,11 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  window.location.href = getLoginUrl();
+  // Only redirect if we don't have a refresh token
+  const { refreshToken } = useAuthStore.getState();
+  if (!refreshToken) {
+    window.location.href = getLoginUrl();
+  }
 };
 
 queryClient.getQueryCache().subscribe(event => {
@@ -66,8 +71,8 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       async headers() {
-        // Access the token directly from the Zustand store
-        const token = useAuthStore.getState().token;
+        // Get a valid token, refreshing if necessary
+        const token = await getValidToken();
         return {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         };

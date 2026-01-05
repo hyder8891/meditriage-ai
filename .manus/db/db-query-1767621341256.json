@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, email, role, openId FROM users WHERE name LIKE '%Hhwal%' OR email LIKE '%Hhwal%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, name, email, role, openId FROM users WHERE name LIKE '%Hhwal%' OR email LIKE '%Hhwal%';",
+  "rows": [
+    {
+      "id": "900067",
+      "name": "Hhwaljanabi",
+      "email": "Hhwaljanabi@yahoo.com",
+      "role": "clinician",
+      "openId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId\n900067\tHhwaljanabi\tHhwaljanabi@yahoo.com\tclinician\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

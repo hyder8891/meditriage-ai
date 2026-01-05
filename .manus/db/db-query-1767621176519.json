@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, name, role FROM users WHERE name LIKE '%Hhwal%' OR name LIKE '%janabi%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT id, name, role FROM users WHERE name LIKE '%Hhwal%' OR name LIKE '%janabi%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Hyder Janabi",
+      "role": "admin"
+    },
+    {
+      "id": "900067",
+      "name": "Hhwaljanabi",
+      "role": "clinician"
+    },
+    {
+      "id": "3630036",
+      "name": "Hyder Janabi",
+      "role": "patient"
+    },
+    {
+      "id": "8790057",
+      "name": "Hyder Janabi",
+      "role": "patient"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\trole\n1\tHyder Janabi\tadmin\n900067\tHhwaljanabi\tclinician\n3630036\tHyder Janabi\tpatient\n8790057\tHyder Janabi\tpatient\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

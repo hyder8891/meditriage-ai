@@ -5,7 +5,7 @@ interface User {
   id: number;
   name: string | null;
   email: string | null;
-  role: "patient" | "clinician" | "admin";
+  role: "patient" | "clinician" | "admin" | "super_admin" | "doctor" | "nurse" | "clinic_admin";
   verified: boolean;
   emailVerified: boolean;
   licenseNumber?: string | null;

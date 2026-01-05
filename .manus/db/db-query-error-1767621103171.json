@@ -1,0 +1,8 @@
+{
+  "query": "SELECT m.id, m.senderId, m.recipientId, m.content, m.read, m.createdAt,\n       s.name as senderName, s.role as senderRole,\n       r.name as recipientName, r.role as recipientRole\nFROM messages m\nLEFT JOIN users s ON m.senderId = s.id\nLEFT JOIN users r ON m.recipientId = r.id\nORDER BY m.createdAt DESC\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT m.id, m.senderId, m.recipientId, m.content, m.read, m.createdAt,\n       s.name as senderName, s.role as senderRole,\n       r.name as recipientName, r.role as recipientRole\nFROM messages m\nLEFT JOIN users s ON m.senderId = s.id\nLEFT JOIN users r ON m.recipientId = r.id\nORDER BY m.createdAt DESC\nLIMIT 20;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'm.senderid' in 'on clause'"
+  ]
+}

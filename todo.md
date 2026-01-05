@@ -991,3 +991,36 @@
 ## Messaging System Bugs (Jan 5, 2026)
 - [x] BUG: Messages from patients not showing in doctor dashboard
 - [x] BUG: No message history visible in doctor dashboard, only notification page
+
+
+## Bugs & Issues - January 2026
+
+- [ ] Fix messaging system bug - messages sent from patients to doctors show notification but no actual messages appear in the conversation
+- [ ] Ensure messaging fix works for ALL patient-doctor pairs, not just specific users
+
+## Registration System Enhancements
+
+### OAuth Provider Integration
+- [x] Add Google OAuth sign-in/sign-up (Already implemented in useFirebaseAuth)
+- [x] Add Apple OAuth sign-in/sign-up (Already implemented in useFirebaseAuth)
+- [x] Add SMS verification for phone-based registration (Already implemented)
+- [x] Update login/registration UI to show OAuth provider buttons (Already implemented)
+
+### Doctor Registration Approval Workflow
+- [x] Create document submission form for doctor registration (medical license, ID, certifications)
+- [x] Implement document upload and storage for doctor verification
+- [x] Create admin approval queue for pending doctor registrations
+- [x] Add approval/rejection workflow with notifications
+- [x] Create doctor verification status tracking (pending, under_review, approved, rejected, requires_more_info)
+- [ ] Update doctor profile to show verification badge after approval
+
+
+
+## Messaging System Fix (Jan 5, 2026)
+- [x] Identified root cause: JWT access tokens expire after 15 minutes, frontend wasn't refreshing them
+- [x] Created tokenRefresh.ts utility for automatic token refresh
+- [x] Updated main.tsx to use getValidToken() which auto-refreshes expired tokens
+- [x] Token refresh mechanism now uses the stored refreshToken (30-day expiry) to get new access tokens
+- [x] All messaging tests passing (5/5)
+- [x] Token refresh tests passing (16/16)
+- [ ] User needs to log out and log back in to get a fresh token with the new refresh mechanism
