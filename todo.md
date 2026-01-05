@@ -955,3 +955,35 @@
 ### Remaining Items (Lower Priority)
 - [ ] Replace remaining ~640 console.log statements across codebase (non-critical, mostly in feature code)
 - [ ] Address TODO comments (most are future enhancements, not security issues)
+
+
+## Redis and Avicenna Integration Fixes (Jan 5, 2026)
+
+### Redis-Dependent Features - FIXED
+- [x] Created centralized Redis client helper (`server/brain/redis-client.ts`) that properly parses REDIS_URL
+- [x] Updated `context-vector.ts` to use safe Redis helpers with fallback defaults
+- [x] Updated `orchestrator.ts` to use safe Redis helpers for epidemiology checks
+- [x] Updated `epidemiology.ts` to use safe Redis helpers for disease tracking
+- [x] Updated `emergency-routing.ts` to use safe Redis helpers for clinic wait times
+- [x] All Redis operations now gracefully degrade when Redis is unavailable
+
+### Conversational Memory - FIXED
+- [x] Added missing fields to `ConversationalContextVector` class:
+  - `aggravatingFactors`
+  - `relievingFactors`
+  - `medicalHistory`
+  - `medications`
+  - `ruledOut`
+  - `confirmedSymptoms`
+  - `conversationHistory`
+- [x] Fixed `generateFinalRecommendation` to increment stepCount and return "analyzing" stage
+- [x] Fixed conversation history preservation across messages
+- [x] All 15 conversational memory tests now passing
+
+### Avicenna Integration - FIXED
+- [x] Fixed `invokeGeminiPro` call signature (was passing object instead of array)
+- [x] Added JSON parsing fallback for AI responses
+- [x] Fixed `applyBayesianUpdate` to handle undefined `differentialDiagnoses`
+- [x] Fixed `checkEpidemiology` to use `safeGet` instead of undefined `redis`
+- [x] Updated test expectations to match actual router structure
+- [x] All 11 Avicenna integration tests now passing

@@ -5,14 +5,7 @@
  * for emergency situations requiring immediate in-person care.
  */
 
-import { Redis } from "@upstash/redis";
-
-// Initialize Redis for wait time caching
-const redisUrl = process.env.REDIS_URL!.replace('rediss://', 'https://').replace(':6379', '');
-const redis = new Redis({
-  url: redisUrl,
-  token: process.env.REDIS_TOKEN!,
-});
+import { safeGet, safeSet, isRedisAvailable } from "./redis-client";
 
 export interface EmergencyClinic {
   id: number;
@@ -184,8 +177,8 @@ async function estimateTravelTime(
 ): Promise<number> {
   // Check cache first
   const cacheKey = `travel:${origin.lat},${origin.lng}:${destination.lat},${destination.lng}`;
-  const cached = await redis.get(cacheKey);
-  if (cached) return cached as number;
+  const cached = await safeGet<number | null>(cacheKey, null);
+  if (cached !== null) return cached;
 
   // TODO: Integrate with Google Maps Directions API for real-time traffic
   // For now, use simple distance-based estimate
@@ -193,7 +186,7 @@ async function estimateTravelTime(
   const estimatedTime = Math.ceil(distance / 0.5); // Assume 30 km/h average speed in Baghdad traffic
 
   // Cache for 5 minutes
-  await redis.set(cacheKey, estimatedTime, { ex: 300 });
+  await safeSet(cacheKey, estimatedTime, { ex: 300 });
 
   return estimatedTime;
 }
@@ -275,7 +268,7 @@ export async function updateClinicWaitTime(
   waitTimeMinutes: number
 ): Promise<void> {
   const key = `clinic:${clinicId}:waittime`;
-  await redis.set(key, waitTimeMinutes, { ex: 600 }); // Cache for 10 minutes
+  await safeSet(key, waitTimeMinutes, { ex: 600 }); // Cache for 10 minutes
 }
 
 /**
@@ -283,6 +276,6 @@ export async function updateClinicWaitTime(
  */
 export async function getClinicWaitTime(clinicId: number): Promise<number> {
   const key = `clinic:${clinicId}:waittime`;
-  const cached = await redis.get(key);
-  return (cached as number) || 30; // Default to 30 minutes if not available
+  const cached = await safeGet<number | null>(key, null);
+  return cached ?? 30; // Default to 30 minutes if not available
 }

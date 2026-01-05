@@ -15,15 +15,8 @@
 import { getDb } from "../db";
 
 const db = await getDb();
-import { Redis } from "@upstash/redis";
 import type { LocalRisk } from "./orchestrator";
-
-// Convert rediss:// to https:// for Upstash SDK
-const redisUrl = process.env.REDIS_URL!.replace('rediss://', 'https://').replace(':6379', '');
-const redis = new Redis({
-  url: redisUrl,
-  token: process.env.REDIS_TOKEN!,
-});
+import { getRedisClient, safeGet, safeSet, safeIncr, safeExpire, isRedisAvailable } from "./redis-client";
 
 // ============================================================================
 // Types
@@ -69,8 +62,10 @@ export async function recordSymptomReport(
     // Store in database for long-term analysis
     // TODO: Insert into anonymized_symptom_reports table
 
-    // Update Redis heatmap in real-time
-    await updateRealtimeHeatmap(city, symptoms, severity, urgency);
+    // Update Redis heatmap in real-time (if Redis is available)
+    if (isRedisAvailable()) {
+      await updateRealtimeHeatmap(city, symptoms, severity, urgency);
+    }
 
     console.log(`[Epidemiology] Symptom report recorded successfully`);
   } catch (error) {
@@ -88,18 +83,18 @@ export async function getLocalRisks(city: string): Promise<LocalRisk[]> {
 
     // Check Redis cache first
     const cacheKey = `city:${city.toLowerCase()}:risks`;
-    const cached = await redis.get(cacheKey);
+    const cached = await safeGet<LocalRisk[] | null>(cacheKey, null);
 
     if (cached && Array.isArray(cached)) {
       console.log(`[Epidemiology] Found ${cached.length} local risks in cache`);
-      return cached as LocalRisk[];
+      return cached;
     }
 
     // Calculate risks from recent data
     const risks = await calculateLocalRisks(city);
 
-    // Cache for 5 minutes
-    await redis.set(cacheKey, JSON.stringify(risks), { ex: 300 });
+    // Cache for 5 minutes (if Redis is available)
+    await safeSet(cacheKey, JSON.stringify(risks), { ex: 300 });
 
     console.log(`[Epidemiology] Calculated ${risks.length} local risks`);
     return risks;
@@ -115,6 +110,11 @@ export async function getLocalRisks(city: string): Promise<LocalRisk[]> {
  */
 export async function analyzeDiseasePatternsJob(): Promise<void> {
   console.log("[Epidemiology Job] Starting disease pattern analysis...");
+
+  if (!isRedisAvailable()) {
+    console.warn("[Epidemiology Job] Redis not available, skipping analysis");
+    return;
+  }
 
   try {
     // Get all cities with recent activity
@@ -144,7 +144,7 @@ export async function analyzeDiseasePatternsJob(): Promise<void> {
         growthRate: c.growthRate,
       }));
 
-      await redis.set(`city:${city.toLowerCase()}:risks`, JSON.stringify(risks), { ex: 300 });
+      await safeSet(`city:${city.toLowerCase()}:risks`, JSON.stringify(risks), { ex: 300 });
     }
 
     console.log("[Epidemiology Job] Disease pattern analysis complete");
@@ -163,6 +163,9 @@ async function updateRealtimeHeatmap(
   severity: number,
   urgency: string
 ): Promise<void> {
+  const redis = getRedisClient();
+  if (!redis) return;
+
   const timestamp = Date.now();
   const cityKey = city.toLowerCase();
 
@@ -171,24 +174,28 @@ async function updateRealtimeHeatmap(
     const symptomKey = `heatmap:${cityKey}:${symptom.toLowerCase()}`;
     
     // Increment counter
-    await redis.incr(symptomKey);
+    await safeIncr(symptomKey);
     
     // Set expiration to 24 hours
-    await redis.expire(symptomKey, 86400);
+    await safeExpire(symptomKey, 86400);
     
     // Add to sorted set for time-series analysis
-    const timeSeriesKey = `heatmap:${cityKey}:${symptom.toLowerCase()}:timeseries`;
-    await redis.zadd(timeSeriesKey, { score: timestamp, member: `${timestamp}:${severity}` });
-    
-    // Keep only last 24 hours
-    const oneDayAgo = timestamp - 86400000;
-    await redis.zremrangebyscore(timeSeriesKey, 0, oneDayAgo);
+    try {
+      const timeSeriesKey = `heatmap:${cityKey}:${symptom.toLowerCase()}:timeseries`;
+      await redis.zadd(timeSeriesKey, { score: timestamp, member: `${timestamp}:${severity}` });
+      
+      // Keep only last 24 hours
+      const oneDayAgo = timestamp - 86400000;
+      await redis.zremrangebyscore(timeSeriesKey, 0, oneDayAgo);
+    } catch (error) {
+      console.warn("[Epidemiology] Error updating time series:", error);
+    }
   }
 
   // Update city-level urgency counter
   const urgencyKey = `heatmap:${cityKey}:urgency:${urgency.toLowerCase()}`;
-  await redis.incr(urgencyKey);
-  await redis.expire(urgencyKey, 86400);
+  await safeIncr(urgencyKey);
+  await safeExpire(urgencyKey, 86400);
 }
 
 // ============================================================================
@@ -196,59 +203,67 @@ async function updateRealtimeHeatmap(
 // ============================================================================
 
 async function calculateLocalRisks(city: string): Promise<LocalRisk[]> {
+  const redis = getRedisClient();
+  if (!redis) return [];
+
   const cityKey = city.toLowerCase();
   const risks: LocalRisk[] = [];
 
-  // Get all symptom keys for this city
-  const pattern = `heatmap:${cityKey}:*`;
-  const keys = await redis.keys(pattern);
+  try {
+    // Get all symptom keys for this city
+    const pattern = `heatmap:${cityKey}:*`;
+    const keys = await redis.keys(pattern);
 
-  if (!keys || keys.length === 0) {
+    if (!keys || keys.length === 0) {
+      return [];
+    }
+
+    // Group symptoms into disease clusters
+    const symptomCounts: Record<string, number> = {};
+
+    for (const key of keys) {
+      if (key.includes(":timeseries") || key.includes(":urgency:")) continue;
+
+      const symptom = key.split(":")[2];
+      const count = await redis.get(key);
+      
+      if (count && typeof count === "number") {
+        symptomCounts[symptom] = count;
+      }
+    }
+
+    // Map symptoms to diseases (simplified version)
+    const diseaseClusters = mapSymptomsToDiseases(symptomCounts);
+
+    // Calculate risk levels and growth rates
+    for (const [disease, caseCount] of Object.entries(diseaseClusters)) {
+      const growthRate = await calculateGrowthRate(cityKey, disease);
+      const riskLevel = determineRiskLevel(caseCount, growthRate);
+
+      risks.push({
+        disease,
+        caseCount,
+        riskLevel,
+        growthRate,
+      });
+    }
+
+    // Sort by risk level and case count
+    risks.sort((a, b) => {
+      const riskOrder = { critical: 4, high: 3, moderate: 2, low: 1 };
+      const aOrder = riskOrder[a.riskLevel];
+      const bOrder = riskOrder[b.riskLevel];
+      
+      if (aOrder !== bOrder) return bOrder - aOrder;
+      return b.caseCount - a.caseCount;
+    });
+
+    // Return top 5
+    return risks.slice(0, 5);
+  } catch (error) {
+    console.error("[Epidemiology] Error calculating local risks:", error);
     return [];
   }
-
-  // Group symptoms into disease clusters
-  const symptomCounts: Record<string, number> = {};
-
-  for (const key of keys) {
-    if (key.includes(":timeseries") || key.includes(":urgency:")) continue;
-
-    const symptom = key.split(":")[2];
-    const count = await redis.get(key);
-    
-    if (count && typeof count === "number") {
-      symptomCounts[symptom] = count;
-    }
-  }
-
-  // Map symptoms to diseases (simplified version)
-  const diseaseClusters = mapSymptomsToDiseases(symptomCounts);
-
-  // Calculate risk levels and growth rates
-  for (const [disease, caseCount] of Object.entries(diseaseClusters)) {
-    const growthRate = await calculateGrowthRate(cityKey, disease);
-    const riskLevel = determineRiskLevel(caseCount, growthRate);
-
-    risks.push({
-      disease,
-      caseCount,
-      riskLevel,
-      growthRate,
-    });
-  }
-
-  // Sort by risk level and case count
-  risks.sort((a, b) => {
-    const riskOrder = { critical: 4, high: 3, moderate: 2, low: 1 };
-    const aOrder = riskOrder[a.riskLevel];
-    const bOrder = riskOrder[b.riskLevel];
-    
-    if (aOrder !== bOrder) return bOrder - aOrder;
-    return b.caseCount - a.caseCount;
-  });
-
-  // Return top 5
-  return risks.slice(0, 5);
 }
 
 function mapSymptomsToDiseases(symptomCounts: Record<string, number>): Record<string, number> {
@@ -290,13 +305,13 @@ async function calculateGrowthRate(cityKey: string, disease: string): Promise<nu
   try {
     // Get current count (last 24 hours)
     const currentKey = `disease_count:${cityKey}:${disease}:current`;
-    const current = await redis.get(currentKey);
-    const currentCount = current ? parseInt(current as string) : 0;
+    const current = await safeGet<string | null>(currentKey, null);
+    const currentCount = current ? parseInt(current) : 0;
 
     // Get previous count (24-48 hours ago)
     const previousKey = `disease_count:${cityKey}:${disease}:previous`;
-    const previous = await redis.get(previousKey);
-    const previousCount = previous ? parseInt(previous as string) : 0;
+    const previous = await safeGet<string | null>(previousKey, null);
+    const previousCount = previous ? parseInt(previous) : 0;
 
     if (previousCount === 0) {
       return currentCount > 0 ? 100 : 0; // New disease
@@ -329,49 +344,57 @@ function determineRiskLevel(caseCount: number, growthRate: number): "low" | "mod
 // ============================================================================
 
 async function calculateDiseaseClusters(city: string): Promise<DiseaseCluster[]> {
+  const redis = getRedisClient();
+  if (!redis) return [];
+
   const cityKey = city.toLowerCase();
   
-  // Get symptom counts
-  const pattern = `heatmap:${cityKey}:*`;
-  const keys = await redis.keys(pattern);
+  try {
+    // Get symptom counts
+    const pattern = `heatmap:${cityKey}:*`;
+    const keys = await redis.keys(pattern);
 
-  if (!keys || keys.length === 0) {
+    if (!keys || keys.length === 0) {
+      return [];
+    }
+
+    const symptomCounts: Record<string, number> = {};
+
+    for (const key of keys) {
+      if (key.includes(":timeseries") || key.includes(":urgency:")) continue;
+
+      const symptom = key.split(":")[2];
+      const count = await redis.get(key);
+      
+      if (count && typeof count === "number") {
+        symptomCounts[symptom] = count;
+      }
+    }
+
+    // Map to diseases
+    const diseaseCounts = mapSymptomsToDiseases(symptomCounts);
+
+    // Build clusters
+    const clusters: DiseaseCluster[] = [];
+
+    for (const [disease, caseCount] of Object.entries(diseaseCounts)) {
+      const growthRate = await calculateGrowthRate(cityKey, disease);
+      const riskLevel = determineRiskLevel(caseCount, growthRate);
+
+      clusters.push({
+        disease,
+        caseCount,
+        severityAvg: 5, // TODO: Calculate from actual severity data
+        growthRate,
+        riskLevel,
+      });
+    }
+
+    return clusters;
+  } catch (error) {
+    console.error("[Epidemiology] Error calculating disease clusters:", error);
     return [];
   }
-
-  const symptomCounts: Record<string, number> = {};
-
-  for (const key of keys) {
-    if (key.includes(":timeseries") || key.includes(":urgency:")) continue;
-
-    const symptom = key.split(":")[2];
-    const count = await redis.get(key);
-    
-    if (count && typeof count === "number") {
-      symptomCounts[symptom] = count;
-    }
-  }
-
-  // Map to diseases
-  const diseaseCounts = mapSymptomsToDiseases(symptomCounts);
-
-  // Build clusters
-  const clusters: DiseaseCluster[] = [];
-
-  for (const [disease, caseCount] of Object.entries(diseaseCounts)) {
-    const growthRate = await calculateGrowthRate(cityKey, disease);
-    const riskLevel = determineRiskLevel(caseCount, growthRate);
-
-    clusters.push({
-      disease,
-      caseCount,
-      severityAvg: 5, // TODO: Calculate from actual severity data
-      growthRate,
-      riskLevel,
-    });
-  }
-
-  return clusters;
 }
 
 // ============================================================================
@@ -379,6 +402,9 @@ async function calculateDiseaseClusters(city: string): Promise<DiseaseCluster[]>
 // ============================================================================
 
 async function getActiveCities(): Promise<string[]> {
+  const redis = getRedisClient();
+  if (!redis) return ["Baghdad"];
+
   try {
     // Get all heatmap keys
     const keys = await redis.keys("heatmap:*");

@@ -9,16 +9,9 @@
 import { getDb } from "../db";
 
 const db = await getDb();
-import { Redis } from "@upstash/redis";
 import { invokeGeminiFlash } from "../_core/gemini-dual";
 import type { SymptomInput, ContextVector } from "./orchestrator";
-
-// Convert rediss:// to https:// for Upstash SDK
-const redisUrl = process.env.REDIS_URL!.replace('rediss://', 'https://').replace(':6379', '');
-const redis = new Redis({
-  url: redisUrl,
-  token: process.env.REDIS_TOKEN!,
-});
+import { safeGet, safeSet, safeIncr, safeExpire, isRedisAvailable } from "./redis-client";
 
 // ============================================================================
 // Context Aggregation
@@ -148,9 +141,9 @@ async function fetchLabTrends(userId: number): Promise<any> {
 async function fetchUserGeolocation(userId: number): Promise<{ city: string; lat: number; lng: number } | undefined> {
   try {
     // Check Redis cache first (updated by mobile app or browser geolocation)
-    const cached = await redis.get(`user:${userId}:geo`);
+    const cached = await safeGet<{ city: string; lat: number; lng: number } | null>(`user:${userId}:geo`, null);
     if (cached && typeof cached === "object") {
-      return cached as any;
+      return cached;
     }
 
     // Fallback to user profile city if available
@@ -254,7 +247,7 @@ function getDefaultEnvironmentalFactors() {
 async function fetchFinancialConstraints(userId: number): Promise<any> {
   try {
     // Check if user has clicked "Budget" filter recently
-    const budgetClicks = await redis.get(`user:${userId}:budget_filter_clicks`);
+    const budgetClicks = await safeGet<string | null>(`user:${userId}:budget_filter_clicks`, null);
     
     // Check user subscription tier
     const subscription = await db.query.subscriptions.findFirst({
@@ -434,7 +427,7 @@ async function storeContextVector(contextVector: ContextVector): Promise<void> {
   try {
     // Store in Redis with 24-hour expiration
     const key = `context_vector:${contextVector.userId}:${Date.now()}`;
-    await redis.set(key, JSON.stringify(contextVector), { ex: 86400 });
+    await safeSet(key, JSON.stringify(contextVector), { ex: 86400 });
 
     // TODO: Store in patient_context_vectors table for long-term analysis
   } catch (error) {
@@ -449,8 +442,8 @@ async function storeContextVector(contextVector: ContextVector): Promise<void> {
 export async function trackBudgetFilterClick(userId: number): Promise<void> {
   try {
     const key = `user:${userId}:budget_filter_clicks`;
-    await redis.incr(key);
-    await redis.expire(key, 2592000); // 30 days
+    await safeIncr(key);
+    await safeExpire(key, 2592000); // 30 days
   } catch (error) {
     console.error("[Context Vector] Error tracking budget filter click:", error);
   }
@@ -463,7 +456,7 @@ export async function trackBudgetFilterClick(userId: number): Promise<void> {
 export async function updateWearableData(userId: number, data: any): Promise<void> {
   try {
     const key = `user:${userId}:wearable`;
-    await redis.set(key, JSON.stringify(data), { ex: 3600 }); // 1 hour expiration
+    await safeSet(key, JSON.stringify(data), { ex: 3600 }); // 1 hour expiration
     console.log(`[Context Vector] Updated wearable data for user ${userId}`);
   } catch (error) {
     console.error("[Context Vector] Error updating wearable data:", error);
@@ -480,7 +473,7 @@ export async function updateUserGeolocation(
 ): Promise<void> {
   try {
     const key = `user:${userId}:geo`;
-    await redis.set(key, JSON.stringify(location), { ex: 86400 }); // 24 hours
+    await safeSet(key, JSON.stringify(location), { ex: 86400 }); // 24 hours
     console.log(`[Context Vector] Updated geolocation for user ${userId}: ${location.city}`);
   } catch (error) {
     console.error("[Context Vector] Error updating geolocation:", error);

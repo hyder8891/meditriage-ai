@@ -109,15 +109,32 @@ export async function processConversationalAssessment(
         data = { nextQuestion: content, extracted: {} };
     }
 
-    // 4. Update Memory
-    if (data.extracted) {
-      if (data.extracted.symptoms) vector.addSymptoms(data.extracted.symptoms);
-      if (data.extracted.duration) vector.duration = data.extracted.duration;
-      if (data.extracted.severity) vector.severity = data.extracted.severity;
-      if (data.extracted.location) vector.location = data.extracted.location;
+    // 4. Update Memory - handle both 'extracted' and 'extractedData' field names
+    const extracted = data.extracted || data.extractedData || {};
+    if (extracted) {
+      if (extracted.symptoms) vector.addSymptoms(extracted.symptoms);
+      if (extracted.duration) vector.duration = extracted.duration;
+      if (extracted.severity) vector.severity = extracted.severity;
+      if (extracted.location) vector.location = extracted.location;
+      if (extracted.aggravatingFactors) {
+        vector.aggravatingFactors = Array.from(new Set([...vector.aggravatingFactors, ...extracted.aggravatingFactors]));
+      }
+      if (extracted.relievingFactors) {
+        vector.relievingFactors = Array.from(new Set([...vector.relievingFactors, ...extracted.relievingFactors]));
+      }
+      if (extracted.medicalHistory) {
+        vector.medicalHistory = Array.from(new Set([...vector.medicalHistory, ...extracted.medicalHistory]));
+      }
+      if (extracted.medications) {
+        vector.medications = Array.from(new Set([...vector.medications, ...extracted.medications]));
+      }
     }
 
-    // 5. Force Progress
+    // 5. Update conversation history
+    vector.addToHistory('user', message);
+    vector.addToHistory('assistant', data.nextQuestion || data.nextQuestionAr || "Could you tell me more?");
+
+    // 6. Force Progress
     vector.stepCount = currentStep + 1;
 
     return {
@@ -131,9 +148,11 @@ export async function processConversationalAssessment(
   } catch (error) {
     console.error("[AVICENNA] AI Error:", error);
     
-    // Auto-Recovery
+    // Auto-Recovery - preserve conversation history
+    vector.addToHistory('user', message);
     vector.stepCount = currentStep + 1;
     const nextQ = FALLBACK_QUESTIONS[Math.min(vector.stepCount, 7)];
+    vector.addToHistory('assistant', nextQ);
 
     return {
       message: nextQ,
@@ -154,6 +173,10 @@ async function generateFinalRecommendation(
   language: string
 ) {
   console.log('[AI DOCTOR] Generating comprehensive diagnosis using BRAIN + Avicenna-X...');
+  
+  // Increment step count for final step
+  vector.stepCount = vector.stepCount + 1;
+  vector.addToHistory('user', lastMessage);
   
   const systemPrompt = `
     ROLE: AI Doctor (Intelligent Medical Assistant)
@@ -233,10 +256,13 @@ async function generateFinalRecommendation(
     // Map triage level to color
     const triageLevel = data.triageLevel || "yellow";
     
+    // Add assistant response to history
+    vector.addToHistory('assistant', data.actionPlan || 'Assessment complete');
+    
     return {
       message: `Based on your symptoms, here is my assessment:\n\n${data.actionPlan}`,
       messageAr: data.actionPlan, // TODO: Add Arabic translation
-      conversationStage: "complete" as const,
+      conversationStage: "analyzing" as const,
       triageLevel,
       triageReason: data.triageReason,
       triageReasonAr: data.triageReason, // TODO: Add Arabic translation
@@ -252,10 +278,12 @@ async function generateFinalRecommendation(
     console.error('[AVICENNA] Error generating final recommendation:', error);
     
     // Fallback response
+    vector.addToHistory('assistant', 'Based on your symptoms, I recommend consulting with a healthcare professional.');
+    
     return {
       message: "Based on your symptoms, I recommend consulting with a healthcare professional for proper evaluation and treatment.",
       messageAr: "بناءً على أعراضك، أوصي بالتشاور مع أخصائي رعاية صحية للتقييم والعلاج المناسب.",
-      conversationStage: "complete" as const,
+      conversationStage: "analyzing" as const,
       triageLevel: "yellow" as const,
       triageReason: "Unable to complete full assessment",
       recommendations: [

@@ -9,21 +9,16 @@
  */
 
 import { getDb } from "../db";
-import { Redis } from "@upstash/redis";
 import { invokeGeminiPro, invokeGeminiFlash } from "../_core/gemini-dual";
 import type { User } from "../../drizzle/schema";
 import { medicalGuardrails } from "../../drizzle/avicenna-schema";
 import { eq } from "drizzle-orm";
 import { routeToEmergencyClinic, type EmergencyRoute } from "./emergency-routing";
 import { getLabContextForDiagnosis } from "./lab-integration";
+import { safeGet, safeSet, isRedisAvailable } from "./redis-client";
 
-// Initialize Redis for epidemiology tracking
-// Convert rediss:// to https:// for Upstash SDK
-const redisUrl = process.env.REDIS_URL!.replace('rediss://', 'https://').replace(':6379', '');
-const redis = new Redis({
-  url: redisUrl,
-  token: process.env.REDIS_TOKEN!,
-});
+// Initialize database connection
+const db = await getDb();
 
 // ============================================================================
 // Types
@@ -226,12 +221,14 @@ export async function executeAvicennaLoop(
 // ============================================================================
 
 async function gatherContext(userId: number, input: SymptomInput): Promise<ContextVector> {
+  // Get geolocation first since it's needed for environmental factors
+  const geolocation = await fetchGeolocation(userId);
+  
   // Parallel data fetching for speed
-  const [user, medicalHistory, labContext, geolocation, financialPrefs, environmentalFactors] = await Promise.all([
+  const [user, medicalHistory, labContext, financialPrefs, environmentalFactors] = await Promise.all([
     db.query.users.findFirst({ where: (users, { eq }) => eq(users.id, userId) }),
     fetchMedicalHistory(userId),
     fetchRecentLabReports(userId),
-    fetchGeolocation(userId),
     fetchFinancialPreferences(userId),
     fetchEnvironmentalFactors(userId, geolocation),
   ]);
@@ -284,8 +281,8 @@ async function fetchRecentLabReports(userId: number): Promise<string> {
 
 async function fetchGeolocation(userId: number): Promise<{ city: string; lat: number; lng: number } | undefined> {
   // Try Redis cache first
-  const cached = await redis.get(`user:${userId}:geo`);
-  if (cached) return cached as any;
+  const cached = await safeGet<{ city: string; lat: number; lng: number } | null>(`user:${userId}:geo`, null);
+  if (cached) return cached;
 
   // Default to Baghdad if not available
   return { city: "Baghdad", lat: 33.3152, lng: 44.3661 };
@@ -437,10 +434,10 @@ function calculateSeverity(input: SymptomInput): number {
 async function checkEpidemiology(city: string): Promise<LocalRisk[]> {
   // Check Redis for disease spikes
   const risksKey = `city:${city.toLowerCase()}:risks`;
-  const risks = await redis.get(risksKey);
+  const risks = await safeGet<LocalRisk[] | null>(risksKey, null);
 
-  if (risks) {
-    return risks as LocalRisk[];
+  if (risks && Array.isArray(risks)) {
+    return risks;
   }
 
   // If no data, return empty (background job will populate)
@@ -669,39 +666,38 @@ Provide a structured diagnosis with:
 
 Return as JSON.`;
 
-  const response = await invokeGeminiPro({
-    messages: [{ role: "user", content: prompt }],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "diagnosis",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            primaryDiagnosis: { type: "string" },
-            confidence: { type: "number" },
-            differentialDiagnoses: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  diagnosis: { type: "string" },
-                  probability: { type: "number" },
-                },
-                required: ["diagnosis", "probability"],
-              },
-            },
-            severity: { type: "string", enum: ["LOW", "MODERATE", "HIGH", "EMERGENCY"] },
-            reasoning: { type: "array", items: { type: "string" } },
-          },
-          required: ["primaryDiagnosis", "confidence", "differentialDiagnoses", "severity", "reasoning"],
-        },
-      },
-    },
-  });
+  const response = await invokeGeminiPro(
+    [{ role: "user", content: prompt }],
+    { temperature: 0.7 }
+  );
 
-  const result = JSON.parse(response.choices[0].message.content);
+  // Parse the response - it's a string, not a choices array
+  let result;
+  try {
+    // Try to extract JSON from the response
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      result = JSON.parse(jsonMatch[0]);
+    } else {
+      // Fallback if no JSON found
+      result = {
+        primaryDiagnosis: "Unable to determine",
+        confidence: 50,
+        differentialDiagnoses: [],
+        severity: "MODERATE",
+        reasoning: ["AI analysis returned non-JSON response"],
+      };
+    }
+  } catch (e) {
+    console.error('[Avicenna-X] Failed to parse AI response:', e);
+    result = {
+      primaryDiagnosis: "Unable to determine",
+      confidence: 50,
+      differentialDiagnoses: [],
+      severity: "MODERATE",
+      reasoning: ["AI analysis parsing failed"],
+    };
+  }
   
   return {
     ...result,
@@ -711,6 +707,14 @@ Return as JSON.`;
 }
 
 function applyBayesianUpdate(diagnosis: HybridDiagnosis, localRisks: LocalRisk[]): HybridDiagnosis {
+  // Ensure differentialDiagnoses is an array
+  if (!diagnosis.differentialDiagnoses || !Array.isArray(diagnosis.differentialDiagnoses)) {
+    return {
+      ...diagnosis,
+      differentialDiagnoses: [],
+    };
+  }
+  
   // Boost probabilities for diseases with local spikes
   const updatedDifferentials = diagnosis.differentialDiagnoses.map(diff => {
     const localRisk = localRisks.find(r => 
