@@ -1,0 +1,9 @@
+{
+  "query": "-- Add doctor verification status fields to users table\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `verification_status` enum('unverified','pending_documents','pending_review','verified','rejected') DEFAULT 'unverified';\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `admin_verified` boolean NOT NULL DEFAULT false;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `admin_verified_by` int;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `admin_verified_at` timestamp NULL;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `documents_submitted_at` timestamp NULL;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `auto_verified_at` timestamp NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute -- Add doctor verification status fields to users table\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `verification_status` enum('unverified','pending_documents','pending_review','verified','rejected') DEFAULT 'unverified';\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `admin_verified` boolean NOT NULL DEFAULT false;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `admin_verified_by` int;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `admin_verified_at` timestamp NULL;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `documents_submitted_at` timestamp NULL;\nALTER TABLE `users` ADD COLUMN IF NOT EXISTS `auto_verified_at` timestamp NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3218
+}

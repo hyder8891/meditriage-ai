@@ -112,7 +112,9 @@ const SecureAdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const SecureAdminPatients = lazy(() => import("./pages/admin/AdminPatients"));
 const SecureAdminDoctors = lazy(() => import("./pages/admin/AdminDoctors"));
 const DoctorVerification = lazy(() => import("./pages/DoctorVerification"));
+const DoctorVerificationNew = lazy(() => import("./pages/DoctorVerificationNew"));
 const AdminVerificationQueue = lazy(() => import("./pages/AdminVerificationQueue"));
+const AdminDoctorVerification = lazy(() => import("./pages/admin/AdminDoctorVerification"));
 
 // Import all admin feature pages
 import * as AdminFeatures from "./pages/admin/index";
@@ -216,9 +218,12 @@ function Router() {
           {() => <ProtectedRoute requiredRole="clinician"><DoctorSubscription /></ProtectedRoute>}
         </Route>
         <Route path="/clinician/verification">
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorVerification /></ProtectedRoute>}
+          {() => <ProtectedRoute requiredRole="clinician"><DoctorVerificationNew /></ProtectedRoute>}
         </Route>
         <Route path="/doctor/verification">
+          {() => <ProtectedRoute requiredRole="clinician"><DoctorVerificationNew /></ProtectedRoute>}
+        </Route>
+        <Route path="/clinician/verification-old">
           {() => <ProtectedRoute requiredRole="clinician"><DoctorVerification /></ProtectedRoute>}
         </Route>
         <Route path={"/patient/medications"} component={PatientMedications} />
@@ -290,6 +295,9 @@ function Router() {
         <Route path={"/admin/doctors"} component={SecureAdminDoctors} />
         <Route path="/admin/verification-queue">
           {() => <ProtectedRoute requiredRole="admin"><AdminVerificationQueue /></ProtectedRoute>}
+        </Route>
+        <Route path="/admin/doctor-verification">
+          {() => <ProtectedRoute requiredRole="admin"><AdminDoctorVerification /></ProtectedRoute>}
         </Route>
         
         {/* Analytics & Monitoring */}

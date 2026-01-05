@@ -1027,3 +1027,31 @@
 - [x] All messaging tests passing (5/5)
 - [x] Token refresh tests passing (16/16)
 - [ ] User needs to log out and log back in to get a fresh token with the new refresh mechanism
+
+
+## Doctor Verification System
+- [ ] Add doctor verification status fields to database schema (verified, verification_status, admin_verified)
+- [ ] Create doctor_documents table for storing uploaded ID and certificate info
+- [ ] Implement document upload endpoints with S3 storage
+- [ ] Build LLM-based document processing to extract name and info from documents
+- [ ] Implement automatic name matching verification between ID and medical certificate
+- [ ] Auto-fill doctor profile from extracted document data
+- [ ] Lock doctor dashboard features until verification is complete
+- [ ] Create verification pending UI for unverified doctors
+- [ ] Implement admin panel to view pending doctor verifications
+- [ ] Add admin bypass verification functionality (manual approval)
+- [ ] Create document upload UI for doctors
+- [ ] Show verification status in doctor profile
+
+
+## Doctor Verification System
+- [x] Database schema for doctor verification documents
+- [x] Document upload endpoint with S3 storage
+- [x] LLM-based document info extraction (Iraqi ID & Medical Certificate)
+- [x] Name matching algorithm with Arabic support
+- [x] Automatic verification when names match (85%+ threshold)
+- [x] Dashboard locking for unverified doctors
+- [x] Admin bypass verification functionality
+- [x] Admin verification management page
+- [x] Doctor verification UI with document upload
+- [x] Unit tests for name matching logic

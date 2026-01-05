@@ -26,6 +26,14 @@ export const users = mysqlTable("users", {
   specialty: varchar("specialty", { length: 100 }),
   verified: boolean("verified").default(false).notNull(),
   
+  // Doctor verification status (document-based verification)
+  verificationStatus: mysqlEnum("verification_status", ["unverified", "pending_documents", "pending_review", "verified", "rejected"]).default("unverified"),
+  adminVerified: boolean("admin_verified").default(false).notNull(), // Admin bypass flag
+  adminVerifiedBy: int("admin_verified_by"), // Admin who manually verified
+  adminVerifiedAt: timestamp("admin_verified_at"),
+  documentsSubmittedAt: timestamp("documents_submitted_at"),
+  autoVerifiedAt: timestamp("auto_verified_at"), // When auto-verification passed
+  
   // Doctor availability status (for B2B2C platform)
   availabilityStatus: mysqlEnum("availability_status", ["available", "busy", "offline"]).default("offline"),
   currentPatientCount: int("current_patient_count").default(0), // Number of patients in queue
@@ -5119,3 +5127,56 @@ export const doctorVerificationRequests = mysqlTable("doctor_verification_reques
 
 export type DoctorVerificationRequest = typeof doctorVerificationRequests.$inferSelect;
 export type InsertDoctorVerificationRequest = typeof doctorVerificationRequests.$inferInsert;
+
+
+/**
+ * Doctor Verification Documents - Stores uploaded ID and medical certificate documents
+ * Used for automatic verification by matching names on both documents
+ */
+export const doctorVerificationDocuments = mysqlTable("doctor_verification_documents", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(), // The doctor user
+  
+  // Document type
+  documentType: mysqlEnum("document_type", ["national_id", "medical_certificate"]).notNull(),
+  
+  // File storage
+  fileKey: varchar("file_key", { length: 512 }).notNull(), // S3 key
+  fileUrl: varchar("file_url", { length: 1024 }).notNull(), // S3 URL
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  fileSize: int("file_size").notNull(), // in bytes
+  mimeType: varchar("mime_type", { length: 100 }).notNull(),
+  
+  // Extracted information from document (via LLM/OCR)
+  extractedName: varchar("extracted_name", { length: 255 }),
+  extractedNameArabic: varchar("extracted_name_arabic", { length: 255 }),
+  extractedDateOfBirth: date("extracted_date_of_birth"),
+  extractedIdNumber: varchar("extracted_id_number", { length: 100 }),
+  extractedLicenseNumber: varchar("extracted_license_number", { length: 100 }),
+  extractedSpecialty: varchar("extracted_specialty", { length: 100 }),
+  extractedIssuingAuthority: varchar("extracted_issuing_authority", { length: 255 }),
+  extractedIssueDate: date("extracted_issue_date"),
+  extractedExpiryDate: date("extracted_expiry_date"),
+  extractedMedicalSchool: varchar("extracted_medical_school", { length: 255 }),
+  extractedGraduationYear: int("extracted_graduation_year"),
+  extractedRawData: text("extracted_raw_data"), // Full JSON of all extracted data
+  
+  // Processing status
+  processingStatus: mysqlEnum("processing_status", ["pending", "processing", "completed", "failed"]).default("pending").notNull(),
+  processingError: text("processing_error"),
+  processedAt: timestamp("processed_at"),
+  
+  // Verification status
+  verificationStatus: mysqlEnum("verification_status", ["pending", "verified", "rejected", "needs_review"]).default("pending").notNull(),
+  verificationNotes: text("verification_notes"),
+  
+  // Name matching result (for automatic verification)
+  nameMatchScore: decimal("name_match_score", { precision: 5, scale: 2 }), // 0-100 similarity score
+  nameMatchPassed: boolean("name_match_passed"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DoctorVerificationDocument = typeof doctorVerificationDocuments.$inferSelect;
+export type InsertDoctorVerificationDocument = typeof doctorVerificationDocuments.$inferInsert;
