@@ -987,3 +987,7 @@
 - [x] Fixed `checkEpidemiology` to use `safeGet` instead of undefined `redis`
 - [x] Updated test expectations to match actual router structure
 - [x] All 11 Avicenna integration tests now passing
+
+## Messaging System Bugs (Jan 5, 2026)
+- [x] BUG: Messages from patients not showing in doctor dashboard
+- [x] BUG: No message history visible in doctor dashboard, only notification page

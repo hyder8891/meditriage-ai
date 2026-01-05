@@ -1,0 +1,8 @@
+{
+  "query": "SELECT m.*, \n  s.name as sender_name, s.role as sender_role, s.phoneNumber as sender_phone,\n  r.name as recipient_name, r.role as recipient_role, r.phoneNumber as recipient_phone\nFROM messages m\nLEFT JOIN users s ON m.sender_id = s.id\nLEFT JOIN users r ON m.recipient_id = r.id\nORDER BY m.created_at DESC\nLIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT m.*, \n  s.name as sender_name, s.role as sender_role, s.phoneNumber as sender_phone,\n  r.name as recipient_name, r.role as recipient_role, r.phoneNumber as recipient_phone\nFROM messages m\nLEFT JOIN users s ON m.sender_id = s.id\nLEFT JOIN users r ON m.recipient_id = r.id\nORDER BY m.created_at DESC\nLIMIT 20",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 's.phonenumber' in 'field list'"
+  ]
+}

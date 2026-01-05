@@ -1,0 +1,130 @@
+{
+  "query": "SELECT m.id, m.sender_id, m.recipient_id, m.content, m.read, m.created_at,\n  s.name as sender_name, s.role as sender_role,\n  r.name as recipient_name, r.role as recipient_role\nFROM messages m\nLEFT JOIN users s ON m.sender_id = s.id\nLEFT JOIN users r ON m.recipient_id = r.id\nORDER BY m.created_at DESC\nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT m.id, m.sender_id, m.recipient_id, m.content, m.read, m.created_at,\n  s.name as sender_name, s.role as sender_role,\n  r.name as recipient_name, r.role as recipient_role\nFROM messages m\nLEFT JOIN users s ON m.sender_id = s.id\nLEFT JOIN users r ON m.recipient_id = r.id\nORDER BY m.created_at DESC\nLIMIT 10",
+  "rows": [
+    {
+      "id": "450014",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-05 12:20:27",
+      "sender_name": "Hhwaljanabi",
+      "sender_role": "clinician",
+      "recipient_name": "Sara Mohammed",
+      "recipient_role": "patient"
+    },
+    {
+      "id": "450015",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content": "Test message from patient to doctor",
+      "read": "0",
+      "created_at": "2026-01-05 12:20:27",
+      "sender_name": "Sara Mohammed",
+      "sender_role": "patient",
+      "recipient_name": "Hhwaljanabi",
+      "recipient_role": "clinician"
+    },
+    {
+      "id": "450016",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content": "Test message for read status",
+      "read": "1",
+      "created_at": "2026-01-05 12:20:27",
+      "sender_name": "Hhwaljanabi",
+      "sender_role": "clinician",
+      "recipient_name": "Sara Mohammed",
+      "recipient_role": "patient"
+    },
+    {
+      "id": "450012",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content": "Test message for read status",
+      "read": "1",
+      "created_at": "2026-01-05 12:06:52",
+      "sender_name": "Hhwaljanabi",
+      "sender_role": "clinician",
+      "recipient_name": "Sara Mohammed",
+      "recipient_role": "patient"
+    },
+    {
+      "id": "450010",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-05 12:06:52",
+      "sender_name": "Hhwaljanabi",
+      "sender_role": "clinician",
+      "recipient_name": "Sara Mohammed",
+      "recipient_role": "patient"
+    },
+    {
+      "id": "450011",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content": "Test message from patient to doctor",
+      "read": "0",
+      "created_at": "2026-01-05 12:06:52",
+      "sender_name": "Sara Mohammed",
+      "sender_role": "patient",
+      "recipient_name": "Hhwaljanabi",
+      "recipient_role": "clinician"
+    },
+    {
+      "id": "450007",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content": "Test message from patient to doctor",
+      "read": "0",
+      "created_at": "2026-01-05 12:04:19",
+      "sender_name": "Sara Mohammed",
+      "sender_role": "patient",
+      "recipient_name": "Hhwaljanabi",
+      "recipient_role": "clinician"
+    },
+    {
+      "id": "450008",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content": "Test message for read status",
+      "read": "1",
+      "created_at": "2026-01-05 12:04:19",
+      "sender_name": "Hhwaljanabi",
+      "sender_role": "clinician",
+      "recipient_name": "Sara Mohammed",
+      "recipient_role": "patient"
+    },
+    {
+      "id": "450006",
+      "sender_id": "900067",
+      "recipient_id": "2100016",
+      "content": "Test message from doctor to patient",
+      "read": "0",
+      "created_at": "2026-01-05 12:04:19",
+      "sender_name": "Hhwaljanabi",
+      "sender_role": "clinician",
+      "recipient_name": "Sara Mohammed",
+      "recipient_role": "patient"
+    },
+    {
+      "id": "450003",
+      "sender_id": "2100016",
+      "recipient_id": "900067",
+      "content": "Test message from patient to doctor",
+      "read": "0",
+      "created_at": "2026-01-05 10:34:29",
+      "sender_name": "Sara Mohammed",
+      "sender_role": "patient",
+      "recipient_name": "Hhwaljanabi",
+      "recipient_role": "clinician"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsender_id\trecipient_id\tcontent\tread\tcreated_at\tsender_name\tsender_role\trecipient_name\trecipient_role\n450014\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-05 12:20:27\tHhwaljanabi\tclinician\tSara Mohammed\tpatient\n450015\t2100016\t900067\tTest message from patient to doctor\t0\t2026-01-05 12:20:27\tSara Mohammed\tpatient\tHhwaljanabi\tclinician\n450016\t900067\t2100016\tTest message for read status\t1\t2026-01-05 12:20:27\tHhwaljanabi\tclinician\tSara Mohammed\tpatient\n450012\t900067\t2100016\tTest message for read status\t1\t2026-01-05 12:06:52\tHhwaljanabi\tclinician\tSara Mohammed\tpatient\n450010\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-05 12:06:52\tHhwaljanabi\tclinician\tSara Mohammed\tpatient\n450011\t2100016\t900067\tTest message from patient to doctor\t0\t2026-01-05 12:06:52\tSara Mohammed\tpatient\tHhwaljanabi\tclinician\n450007\t2100016\t900067\tTest message from patient to doctor\t0\t2026-01-05 12:04:19\tSara Mohammed\tpatient\tHhwaljanabi\tclinician\n450008\t900067\t2100016\tTest message for read status\t1\t2026-01-05 12:04:19\tHhwaljanabi\tclinician\tSara Mohammed\tpatient\n450006\t900067\t2100016\tTest message from doctor to patient\t0\t2026-01-05 12:04:19\tHhwaljanabi\tclinician\tSara Mohammed\tpatient\n450003\t2100016\t900067\tTest message from patient to doctor\t0\t2026-01-05 10:34:29\tSara Mohammed\tpatient\tHhwaljanabi\tclinician\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}
