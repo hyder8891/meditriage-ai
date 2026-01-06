@@ -1205,3 +1205,15 @@
 - [x] Remove all Find a Doctor references and functionality from patient dashboard
 - [x] Ensure bio-scanner uses back camera with flashlight enabled on mobile devices
 - [x] Redesign homepage from scratch - patient-focused, attractive, image-rich, Arabic-first with dual language support
+
+
+## Clinic Finder Feature (Iraq)
+- [x] Research and collect comprehensive clinic data for all cities in Iraq
+- [x] Create clinics database schema with city/area/governorate information
+- [x] Populate clinic data for all major cities and areas in Iraq
+- [x] Implement IP-based geolocation to detect user's city/area
+- [x] Create clinic finder API endpoints (search by location, specialty, etc.)
+- [x] Build ClinicCard UI component for displaying clinic information
+- [x] Integrate "Find a Clinic" card into AI assessment results page
+- [x] Show nearby clinics based on user's IP-detected location
+- [x] Add clinic details (name, address, phone, specialties, hours, ratings)

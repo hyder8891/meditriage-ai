@@ -26,6 +26,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
+import { ClinicFinderCard } from "@/components/ClinicCard";
 
 interface ConditionDetail {
   condition: string;
@@ -63,6 +64,14 @@ export function TriageRecommendation({
   const [conditionDetails, setConditionDetails] = useState<any>(null);
   
   const getConditionDetailsMutation = trpc.symptomCheckerStructured.getConditionDetails.useMutation();
+  
+  // Fetch nearby clinics based on user location
+  const { data: nearbyClinicsData, isLoading: clinicsLoading } = trpc.clinicFinder.getNearbyClinics.useQuery({
+    limit: 5,
+    urgencyLevel: recommendations.urgencyLevel === 'emergency' ? 'critical' : 
+                  recommendations.urgencyLevel === 'urgent' ? 'urgent' : 
+                  recommendations.urgencyLevel === 'routine' ? 'standard' : 'non-urgent',
+  });
 
   const t = {
     finalAssessment: language === "ar" ? "التقييم النهائي" : "Final Assessment",
@@ -368,6 +377,25 @@ export function TriageRecommendation({
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* Find a Clinic Card */}
+          {nearbyClinicsData && nearbyClinicsData.clinics && nearbyClinicsData.clinics.length > 0 && (
+            <div className="mt-4">
+              <ClinicFinderCard
+                governorate={nearbyClinicsData.location.governorate}
+                governorateArabic={nearbyClinicsData.location.governorateArabic}
+                city={nearbyClinicsData.location.city}
+                clinics={nearbyClinicsData.clinics as any}
+                isArabic={language === 'ar'}
+                urgencyLevel={
+                  recommendations.urgencyLevel === 'emergency' ? 'critical' : 
+                  recommendations.urgencyLevel === 'urgent' ? 'urgent' : 
+                  recommendations.urgencyLevel === 'routine' ? 'standard' : 'non-urgent'
+                }
+                onViewAll={() => window.location.href = '/care-locator'}
+              />
             </div>
           )}
 

@@ -5210,3 +5210,144 @@ export const familyMembers = mysqlTable("family_members", {
 
 export type FamilyMember = typeof familyMembers.$inferSelect;
 export type InsertFamilyMember = typeof familyMembers.$inferInsert;
+
+
+/**
+ * Iraq Clinics/Hospitals - Comprehensive database of healthcare facilities in Iraq
+ * Used for "Find a Clinic" feature in AI assessment results
+ */
+export const iraqClinics = mysqlTable("iraq_clinics", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Basic information
+  name: varchar("name", { length: 255 }).notNull(),
+  nameArabic: varchar("name_arabic", { length: 255 }),
+  
+  // Location
+  governorate: varchar("governorate", { length: 100 }).notNull(), // e.g., Baghdad, Basra, Erbil
+  governorateArabic: varchar("governorate_arabic", { length: 100 }),
+  city: varchar("city", { length: 100 }).notNull(),
+  cityArabic: varchar("city_arabic", { length: 100 }),
+  district: varchar("district", { length: 100 }), // Subdistrict/area
+  districtArabic: varchar("district_arabic", { length: 100 }),
+  address: text("address"),
+  addressArabic: text("address_arabic"),
+  
+  // Coordinates for mapping
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  
+  // Contact information
+  phone: varchar("phone", { length: 50 }),
+  phone2: varchar("phone2", { length: 50 }),
+  email: varchar("email", { length: 255 }),
+  website: varchar("website", { length: 500 }),
+  
+  // Facility type
+  facilityType: mysqlEnum("facility_type", [
+    "teaching_hospital",
+    "general_hospital",
+    "private_hospital",
+    "military_hospital",
+    "maternity_hospital",
+    "children_hospital",
+    "specialized_hospital",
+    "medical_city",
+    "clinic",
+    "health_center",
+    "emergency_center"
+  ]).notNull(),
+  
+  // Specialties (JSON array)
+  specialties: text("specialties"), // ["cardiology", "orthopedics", "pediatrics", etc.]
+  
+  // Capacity
+  bedCount: int("bed_count"),
+  hasEmergency: boolean("has_emergency").default(false),
+  has24Hours: boolean("has_24_hours").default(false),
+  
+  // Operating hours (JSON object)
+  operatingHours: text("operating_hours"), // { "mon": "08:00-20:00", "tue": "08:00-20:00", ... }
+  
+  // Services offered (JSON array)
+  services: text("services"), // ["xray", "lab", "pharmacy", "surgery", etc.]
+  
+  // Insurance accepted (JSON array)
+  insuranceAccepted: text("insurance_accepted"),
+  
+  // Ratings and reviews
+  rating: decimal("rating", { precision: 2, scale: 1 }), // 0.0 - 5.0
+  reviewCount: int("review_count").default(0),
+  
+  // Status
+  isActive: boolean("is_active").default(true).notNull(),
+  isVerified: boolean("is_verified").default(false),
+  
+  // Metadata
+  source: varchar("source", { length: 100 }), // Where the data came from
+  lastUpdated: timestamp("last_updated"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IraqClinic = typeof iraqClinics.$inferSelect;
+export type InsertIraqClinic = typeof iraqClinics.$inferInsert;
+
+/**
+ * Iraq Governorates - Reference table for governorates with coordinates
+ * Used for IP-based geolocation matching
+ */
+export const iraqGovernorates = mysqlTable("iraq_governorates", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  nameArabic: varchar("name_arabic", { length: 100 }).notNull(),
+  
+  // Capital city
+  capital: varchar("capital", { length: 100 }).notNull(),
+  capitalArabic: varchar("capital_arabic", { length: 100 }),
+  
+  // Center coordinates (for distance calculations)
+  latitude: decimal("latitude", { precision: 10, scale: 7 }).notNull(),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }).notNull(),
+  
+  // Region (for grouping)
+  region: mysqlEnum("region", ["central", "southern", "northern", "kurdistan", "western"]).notNull(),
+  
+  // Population and area
+  population: int("population"),
+  areaKm2: int("area_km2"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type IraqGovernorate = typeof iraqGovernorates.$inferSelect;
+export type InsertIraqGovernorate = typeof iraqGovernorates.$inferInsert;
+
+/**
+ * User Location Cache - Cache IP-based location lookups
+ */
+export const userLocationCache = mysqlTable("user_location_cache", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  ipAddress: varchar("ip_address", { length: 45 }).notNull(), // IPv4 or IPv6
+  
+  // Detected location
+  country: varchar("country", { length: 100 }),
+  countryCode: varchar("country_code", { length: 5 }),
+  governorate: varchar("governorate", { length: 100 }),
+  city: varchar("city", { length: 100 }),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  
+  // Matched governorate ID
+  governorateId: int("governorate_id"),
+  
+  // Cache metadata
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type UserLocationCache = typeof userLocationCache.$inferSelect;
+export type InsertUserLocationCache = typeof userLocationCache.$inferInsert;

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `iraq_governorates` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name` varchar(100) NOT NULL,\n  `name_arabic` varchar(100) NOT NULL,\n  `capital` varchar(100) NOT NULL,\n  `capital_arabic` varchar(100),\n  `latitude` decimal(10,7) NOT NULL,\n  `longitude` decimal(10,7) NOT NULL,\n  `region` enum('central','southern','northern','kurdistan','western') NOT NULL,\n  `population` int,\n  `area_km2` int,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `iraq_governorates_id` PRIMARY KEY(`id`),\n  CONSTRAINT `iraq_governorates_name_unique` UNIQUE(`name`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `iraq_governorates` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name` varchar(100) NOT NULL,\n  `name_arabic` varchar(100) NOT NULL,\n  `capital` varchar(100) NOT NULL,\n  `capital_arabic` varchar(100),\n  `latitude` decimal(10,7) NOT NULL,\n  `longitude` decimal(10,7) NOT NULL,\n  `region` enum('central','southern','northern','kurdistan','western') NOT NULL,\n  `population` int,\n  `area_km2` int,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `iraq_governorates_id` PRIMARY KEY(`id`),\n  CONSTRAINT `iraq_governorates_name_unique` UNIQUE(`name`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 188
+}
