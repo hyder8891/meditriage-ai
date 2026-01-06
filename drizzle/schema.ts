@@ -5180,3 +5180,33 @@ export const doctorVerificationDocuments = mysqlTable("doctor_verification_docum
 
 export type DoctorVerificationDocument = typeof doctorVerificationDocuments.$inferSelect;
 export type InsertDoctorVerificationDocument = typeof doctorVerificationDocuments.$inferInsert;
+
+
+/**
+ * Family Health Vault - Store family member health records
+ */
+export const familyMembers = mysqlTable("family_members", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(), // Owner of this family member record
+  
+  // Basic info
+  name: varchar("name", { length: 255 }).notNull(),
+  relationship: varchar("relationship", { length: 50 }).notNull(), // spouse, child, parent, sibling, etc.
+  dateOfBirth: date("date_of_birth"),
+  bloodType: varchar("blood_type", { length: 10 }),
+  
+  // Health info (JSON arrays)
+  allergies: text("allergies"), // JSON array of allergies
+  conditions: text("conditions"), // JSON array of chronic conditions
+  medications: text("medications"), // JSON array of current medications
+  
+  // Emergency contact
+  emergencyContact: varchar("emergency_contact", { length: 20 }),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FamilyMember = typeof familyMembers.$inferSelect;
+export type InsertFamilyMember = typeof familyMembers.$inferInsert;

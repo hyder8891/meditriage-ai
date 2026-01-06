@@ -98,6 +98,15 @@ const PatientVitalsViewer = lazy(() => import("./pages/clinician/PatientVitalsVi
 const VitalsTrends = lazy(() => import("./pages/VitalsTrends"));
 const LoadTestDashboard = lazy(() => import("./pages/LoadTestDashboard"));
 const PatientAppointments = lazy(() => import("./pages/PatientAppointments"));
+const PatientPharmaGuard = lazy(() => import("./pages/patient/PatientPharmaGuard"));
+const LabResultsExplainer = lazy(() => import("./pages/patient/LabResultsExplainer"));
+const MedicalReportAnalysis = lazy(() => import("./pages/patient/MedicalReportAnalysis"));
+const PatientMedicalLiterature = lazy(() => import("./pages/patient/PatientMedicalLiterature"));
+const ConditionLibrary = lazy(() => import("./pages/patient/ConditionLibrary"));
+const TreatmentGuide = lazy(() => import("./pages/patient/TreatmentGuide"));
+const SecondOpinionPrep = lazy(() => import("./pages/patient/SecondOpinionPrep"));
+const HealthScoreDashboard = lazy(() => import("./pages/patient/HealthScoreDashboard"));
+const FamilyHealthVault = lazy(() => import("./pages/patient/FamilyHealthVault"));
 const SmartMatching = lazy(() => import("./pages/SmartMatching"));
 const DoctorAvailability = lazy(() => import("./pages/DoctorAvailability"));
 const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
@@ -266,6 +275,33 @@ function Router() {
         </Route>
         <Route path="/patient/profile">
           {() => <ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/pharmaguard">
+          {() => <ProtectedRoute requiredRole="patient"><PatientPharmaGuard /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/lab-results">
+          {() => <ProtectedRoute requiredRole="patient"><LabResultsExplainer /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/report-analysis">
+          {() => <ProtectedRoute requiredRole="patient"><MedicalReportAnalysis /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/health-library">
+          {() => <ProtectedRoute requiredRole="patient"><PatientMedicalLiterature /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/condition-library">
+          {() => <ProtectedRoute requiredRole="patient"><ConditionLibrary /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/treatment-guide">
+          {() => <ProtectedRoute requiredRole="patient"><TreatmentGuide /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/second-opinion-prep">
+          {() => <ProtectedRoute requiredRole="patient"><SecondOpinionPrep /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/health-score">
+          {() => <ProtectedRoute requiredRole="patient"><HealthScoreDashboard /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/family-vault">
+          {() => <ProtectedRoute requiredRole="patient"><FamilyHealthVault /></ProtectedRoute>}
         </Route>
         <Route path="/clinician/profile">
           {() => <ProtectedRoute requiredRole="clinician"><DoctorProfile /></ProtectedRoute>}

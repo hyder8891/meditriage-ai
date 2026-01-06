@@ -402,6 +402,272 @@ export const medicalAssistantRouter = router({
     }),
 
   /**
+   * Explain a medical condition in patient-friendly language
+   */
+  explainCondition: publicProcedure
+    .input(z.object({
+      conditionName: z.string().min(1),
+      language: z.string().default("en")
+    }))
+    .mutation(async ({ input }) => {
+      const isArabic = input.language === 'ar';
+      
+      const systemPrompt = isArabic
+        ? `أنت مثقف صحي يشرح الحالات الطبية بلغة بسيطة وسهلة الفهم للمرضى. قدم معلومات دقيقة وموثوقة مع التأكيد على أهمية استشارة الطبيب.`
+        : `You are a health educator explaining medical conditions in simple, easy-to-understand language for patients. Provide accurate, reliable information while emphasizing the importance of consulting a doctor.`;
+      
+      const query = isArabic
+        ? `اشرح حالة "${input.conditionName}" بلغة بسيطة يفهمها المريض. قدم:
+1. نظرة عامة عن الحالة
+2. الأعراض الشائعة (كقائمة)
+3. الأسباب المحتملة
+4. خيارات العلاج
+5. طرق الوقاية
+6. متى يجب مراجعة الطبيب
+
+أجب بصيغة JSON مع الحقول: overview, symptoms (array), causes, treatment, prevention, whenToSeeDoctor`
+        : `Explain the condition "${input.conditionName}" in simple language that a patient can understand. Provide:
+1. Overview of the condition
+2. Common symptoms (as a list)
+3. Possible causes
+4. Treatment options
+5. Prevention methods
+6. When to see a doctor
+
+Respond in JSON format with fields: overview, symptoms (array), causes, treatment, prevention, whenToSeeDoctor`;
+      
+      const llmResponse = await invokeLLM({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: query }
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "condition_explanation",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                overview: { type: "string" },
+                symptoms: { type: "array", items: { type: "string" } },
+                causes: { type: "string" },
+                treatment: { type: "string" },
+                prevention: { type: "string" },
+                whenToSeeDoctor: { type: "string" }
+              },
+              required: ["overview", "symptoms", "causes", "treatment", "prevention", "whenToSeeDoctor"],
+              additionalProperties: false
+            }
+          }
+        }
+      });
+      
+      const response = llmResponse.choices[0].message.content;
+      const responseStr = typeof response === 'string' ? response : JSON.stringify(response);
+      
+      try {
+        return JSON.parse(responseStr);
+      } catch (e) {
+        return {
+          overview: responseStr,
+          symptoms: [],
+          causes: "",
+          treatment: "",
+          prevention: "",
+          whenToSeeDoctor: ""
+        };
+      }
+    }),
+
+  /**
+   * Explain a treatment in patient-friendly language
+   */
+  explainTreatment: publicProcedure
+    .input(z.object({
+      treatmentName: z.string().min(1),
+      language: z.string().default("en")
+    }))
+    .mutation(async ({ input }) => {
+      const isArabic = input.language === 'ar';
+      
+      const systemPrompt = isArabic
+        ? `أنت مثقف صحي يشرح العلاجات الطبية بلغة بسيطة وسهلة الفهم للمرضى. قدم معلومات دقيقة وموثوقة مع التأكيد على أهمية استشارة الطبيب.`
+        : `You are a health educator explaining medical treatments in simple, easy-to-understand language for patients. Provide accurate, reliable information while emphasizing the importance of consulting a doctor.`;
+      
+      const query = isArabic
+        ? `اشرح علاج "${input.treatmentName}" بلغة بسيطة يفهمها المريض. قدم:
+1. ماذا تتوقع من هذا العلاج
+2. ما يجب فعله قبل العلاج
+3. ما يحدث أثناء العلاج
+4. ما يجب فعله بعد العلاج
+5. الآثار الجانبية المحتملة (كقائمة)
+6. أسئلة مهمة لطرحها على طبيبك (كقائمة)
+
+أجب بصيغة JSON مع الحقول: whatToExpect, beforeTreatment, duringTreatment, afterTreatment, sideEffects (array), questionsToAsk (array)`
+        : `Explain the treatment "${input.treatmentName}" in simple language that a patient can understand. Provide:
+1. What to expect from this treatment
+2. What to do before treatment
+3. What happens during treatment
+4. What to do after treatment
+5. Possible side effects (as a list)
+6. Important questions to ask your doctor (as a list)
+
+Respond in JSON format with fields: whatToExpect, beforeTreatment, duringTreatment, afterTreatment, sideEffects (array), questionsToAsk (array)`;
+      
+      const llmResponse = await invokeLLM({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: query }
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "treatment_explanation",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                whatToExpect: { type: "string" },
+                beforeTreatment: { type: "string" },
+                duringTreatment: { type: "string" },
+                afterTreatment: { type: "string" },
+                sideEffects: { type: "array", items: { type: "string" } },
+                questionsToAsk: { type: "array", items: { type: "string" } }
+              },
+              required: ["whatToExpect", "beforeTreatment", "duringTreatment", "afterTreatment", "sideEffects", "questionsToAsk"],
+              additionalProperties: false
+            }
+          }
+        }
+      });
+      
+      const response = llmResponse.choices[0].message.content;
+      const responseStr = typeof response === 'string' ? response : JSON.stringify(response);
+      
+      try {
+        return JSON.parse(responseStr);
+      } catch (e) {
+        return {
+          whatToExpect: responseStr,
+          beforeTreatment: "",
+          duringTreatment: "",
+          afterTreatment: "",
+          sideEffects: [],
+          questionsToAsk: []
+        };
+      }
+    }),
+
+  /**
+   * Generate second opinion preparation questions
+   */
+  generateSecondOpinionQuestions: protectedProcedure
+    .input(z.object({
+      diagnosis: z.string().min(1),
+      symptoms: z.string().optional(),
+      currentTreatment: z.string().optional(),
+      concerns: z.array(z.string()).optional(),
+      additionalInfo: z.string().optional(),
+      language: z.string().default("en")
+    }))
+    .mutation(async ({ input }) => {
+      const isArabic = input.language === 'ar';
+      
+      const systemPrompt = isArabic
+        ? `أنت مساعد طبي يساعد المرضى على تحضير أسئلة للحصول على رأي طبي ثانٍ. قدم أسئلة ذكية ومفيدة تساعد المريض على فهم حالته بشكل أفضل.`
+        : `You are a medical assistant helping patients prepare questions for getting a second medical opinion. Provide smart, helpful questions that help the patient better understand their condition.`;
+      
+      let context = isArabic
+        ? `التشخيص: ${input.diagnosis}`
+        : `Diagnosis: ${input.diagnosis}`;
+      
+      if (input.symptoms) {
+        context += isArabic ? `\nالأعراض: ${input.symptoms}` : `\nSymptoms: ${input.symptoms}`;
+      }
+      if (input.currentTreatment) {
+        context += isArabic ? `\nالعلاج الحالي: ${input.currentTreatment}` : `\nCurrent Treatment: ${input.currentTreatment}`;
+      }
+      if (input.concerns && input.concerns.length > 0) {
+        context += isArabic ? `\nالمخاوف: ${input.concerns.join(', ')}` : `\nConcerns: ${input.concerns.join(', ')}`;
+      }
+      if (input.additionalInfo) {
+        context += isArabic ? `\nمعلومات إضافية: ${input.additionalInfo}` : `\nAdditional Info: ${input.additionalInfo}`;
+      }
+      
+      const query = isArabic
+        ? `بناءً على المعلومات التالية:\n${context}\n\nقم بإنشاء 8-10 أسئلة مهمة يمكن للمريض طرحها على طبيب آخر للحصول على رأي ثانٍ. يجب أن تكون الأسئلة:\n- محددة وواضحة\n- تغطي التشخيص والعلاج والتوقعات\n- تساعد المريض على اتخاذ قرار مستنير\n\nأجب بصيغة JSON مع حقل questions (array of strings)`
+        : `Based on the following information:\n${context}\n\nGenerate 8-10 important questions the patient can ask another doctor for a second opinion. The questions should be:\n- Specific and clear\n- Cover diagnosis, treatment, and prognosis\n- Help the patient make an informed decision\n\nRespond in JSON format with a questions field (array of strings)`;
+      
+      const llmResponse = await invokeLLM({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: query }
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "second_opinion_questions",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                questions: { type: "array", items: { type: "string" } }
+              },
+              required: ["questions"],
+              additionalProperties: false
+            }
+          }
+        }
+      });
+      
+      const response = llmResponse.choices[0].message.content;
+      const responseStr = typeof response === 'string' ? response : JSON.stringify(response);
+      
+      try {
+        return JSON.parse(responseStr);
+      } catch (e) {
+        return { questions: [] };
+      }
+    }),
+
+  /**
+   * Simplify a medical article abstract for patients
+   */
+  simplifyArticle: publicProcedure
+    .input(z.object({
+      title: z.string(),
+      abstract: z.string(),
+      language: z.string().default("en")
+    }))
+    .mutation(async ({ input }) => {
+      const isArabic = input.language === 'ar';
+      
+      const systemPrompt = isArabic
+        ? `أنت مثقف صحي يبسط الأبحاث الطبية للمرضى العاديين. حول الملخصات العلمية المعقدة إلى معلومات سهلة الفهم.`
+        : `You are a health educator who simplifies medical research for regular patients. Convert complex scientific abstracts into easy-to-understand information.`;
+      
+      const query = isArabic
+        ? `بسّط هذا البحث الطبي للمريض العادي:\n\nالعنوان: ${input.title}\n\nالملخص: ${input.abstract}\n\nقدم:\n1. ملخص بسيط (2-3 جمل) لما يدور حوله البحث\n2. النتائج الرئيسية بلغة بسيطة\n3. ماذا يعني هذا للمريض العادي\n4. أي تحذيرات أو قيود`
+        : `Simplify this medical research for a regular patient:\n\nTitle: ${input.title}\n\nAbstract: ${input.abstract}\n\nProvide:\n1. A simple summary (2-3 sentences) of what the research is about\n2. Key findings in simple language\n3. What this means for the average patient\n4. Any caveats or limitations`;
+      
+      const llmResponse = await invokeLLM({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: query }
+        ]
+      });
+      
+      const response = llmResponse.choices[0].message.content;
+      const responseStr = typeof response === 'string' ? response : JSON.stringify(response);
+      
+      return {
+        simplifiedSummary: responseStr,
+        timestamp: new Date().toISOString()
+      };
+    }),
+
+  /**
    * Interpret lab results (educational purposes only)
    */
   interpretLabResults: protectedProcedure

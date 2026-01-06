@@ -19,9 +19,16 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-
   Plus,
   Menu,
+  Pill,
+  TestTube,
+  FileSearch,
+  Library,
+  Stethoscope,
+  HelpCircle,
+  BarChart3,
+  UsersRound,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -45,9 +52,8 @@ export default function PatientPortal() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Patient Tools - Removed clinical tools (X-Ray, Lab Interpretation)
-  // Bio-Scanner (Optic-Vitals) is now available for patients
-  const patientTools = [
+  // Core Patient Tools
+  const coreTools = [
     {
       icon: Heart,
       title: language === 'ar' ? 'قياس النبض' : 'Optic-Vitals',
@@ -77,6 +83,84 @@ export default function PatientPortal() {
       path: '/patient/appointments',
     },
   ];
+
+  // AI Health Tools (Priority 1)
+  const aiHealthTools = [
+    {
+      icon: Pill,
+      title: language === 'ar' ? 'فحص التفاعلات الدوائية' : 'PharmaGuard',
+      desc: language === 'ar' ? 'تحقق من تفاعلات الأدوية' : 'Check drug interactions',
+      color: 'from-orange-500 to-amber-500',
+      path: '/patient/pharmaguard',
+    },
+    {
+      icon: TestTube,
+      title: language === 'ar' ? 'شرح نتائج المختبر' : 'Lab Results Explainer',
+      desc: language === 'ar' ? 'فهم نتائج تحاليلك' : 'Understand your lab results',
+      color: 'from-cyan-500 to-teal-500',
+      path: '/patient/lab-results',
+    },
+    {
+      icon: FileSearch,
+      title: language === 'ar' ? 'تحليل التقارير الطبية' : 'Report Analysis',
+      desc: language === 'ar' ? 'الذكاء الاصطناعي يقرأ تقاريرك' : 'AI reads your medical reports',
+      color: 'from-indigo-500 to-violet-500',
+      path: '/patient/report-analysis',
+    },
+  ];
+
+  // Health Education Tools (Priority 2)
+  const educationTools = [
+    {
+      icon: Library,
+      title: language === 'ar' ? 'مكتبة الأمراض' : 'Condition Library',
+      desc: language === 'ar' ? 'تعرف على الأمراض والحالات' : 'Learn about diseases & conditions',
+      color: 'from-emerald-500 to-green-500',
+      path: '/patient/condition-library',
+    },
+    {
+      icon: Stethoscope,
+      title: language === 'ar' ? 'دليل العلاج' : 'Treatment Guide',
+      desc: language === 'ar' ? 'ماذا تتوقع من العلاجات' : 'What to expect from treatments',
+      color: 'from-pink-500 to-rose-500',
+      path: '/patient/treatment-guide',
+    },
+    {
+      icon: BookOpen,
+      title: language === 'ar' ? 'الأبحاث الطبية' : 'Health Library',
+      desc: language === 'ar' ? 'أبحاث طبية مبسطة' : 'Simplified medical research',
+      color: 'from-blue-500 to-indigo-500',
+      path: '/patient/health-library',
+    },
+  ];
+
+  // Advanced Tools (Priority 3)
+  const advancedTools = [
+    {
+      icon: HelpCircle,
+      title: language === 'ar' ? 'تحضير رأي ثاني' : 'Second Opinion Prep',
+      desc: language === 'ar' ? 'أسئلة لطبيب آخر' : 'Prepare questions for another doctor',
+      color: 'from-violet-500 to-purple-500',
+      path: '/patient/second-opinion-prep',
+    },
+    {
+      icon: BarChart3,
+      title: language === 'ar' ? 'مؤشر الصحة' : 'Health Score',
+      desc: language === 'ar' ? 'تتبع صحتك العامة' : 'Track your overall wellness',
+      color: 'from-teal-500 to-cyan-500',
+      path: '/patient/health-score',
+    },
+    {
+      icon: UsersRound,
+      title: language === 'ar' ? 'سجلات العائلة' : 'Family Health Vault',
+      desc: language === 'ar' ? 'إدارة سجلات أفراد العائلة' : 'Manage family members\' records',
+      color: 'from-rose-500 to-pink-500',
+      path: '/patient/family-vault',
+    },
+  ];
+
+  // Combined for backward compatibility
+  const patientTools = coreTools;
 
   // Navigation items
   const navItems = [
@@ -271,13 +355,13 @@ export default function PatientPortal() {
           </Card>
         </div>
 
-        {/* AI Tools Grid */}
-        <Card>
+        {/* Core Tools Grid */}
+        <Card className="mb-4 sm:mb-6">
           <CardHeader className="p-4 sm:p-5 md:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-xl sm:text-2xl">
-                  {language === 'ar' ? 'أدواتي' : 'My Tools'}
+                  {language === 'ar' ? 'أدواتي الأساسية' : 'My Core Tools'}
                 </CardTitle>
                 <p className="text-slate-600 text-xs sm:text-sm mt-1">
                   {language === 'ar' ? 'إدارة رعايتك الصحية' : 'Manage your healthcare'}
@@ -288,10 +372,118 @@ export default function PatientPortal() {
           </CardHeader>
           <CardContent className="p-4 sm:p-5 md:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              {patientTools.map((tool, idx) => (
+              {coreTools.map((tool, idx) => (
                 <Card 
                   key={idx} 
                   data-tour={tool.path === '/patient/bio-scanner' ? 'bio-scanner' : undefined}
+                  className="border-2 hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto"
+                  onClick={(e) => { e.stopPropagation(); setLocation(tool.path); }}
+                >
+                  <CardContent className="p-4 sm:p-5">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
+                      <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-1">{tool.title}</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">{tool.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Health Tools */}
+        <Card className="mb-4 sm:mb-6">
+          <CardHeader className="p-4 sm:p-5 md:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl sm:text-2xl">
+                  {language === 'ar' ? 'أدوات الذكاء الاصطناعي' : 'AI Health Tools'}
+                </CardTitle>
+                <p className="text-slate-600 text-xs sm:text-sm mt-1">
+                  {language === 'ar' ? 'تحليل ذكي لصحتك' : 'Smart analysis for your health'}
+                </p>
+              </div>
+              <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-500" />
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-5 md:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {aiHealthTools.map((tool, idx) => (
+                <Card 
+                  key={idx} 
+                  className="border-2 hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto"
+                  onClick={(e) => { e.stopPropagation(); setLocation(tool.path); }}
+                >
+                  <CardContent className="p-4 sm:p-5">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
+                      <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-1">{tool.title}</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">{tool.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Health Education Tools */}
+        <Card className="mb-4 sm:mb-6">
+          <CardHeader className="p-4 sm:p-5 md:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl sm:text-2xl">
+                  {language === 'ar' ? 'التثقيف الصحي' : 'Health Education'}
+                </CardTitle>
+                <p className="text-slate-600 text-xs sm:text-sm mt-1">
+                  {language === 'ar' ? 'تعلم عن صحتك' : 'Learn about your health'}
+                </p>
+              </div>
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-5 md:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {educationTools.map((tool, idx) => (
+                <Card 
+                  key={idx} 
+                  className="border-2 hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto"
+                  onClick={(e) => { e.stopPropagation(); setLocation(tool.path); }}
+                >
+                  <CardContent className="p-4 sm:p-5">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
+                      <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-1">{tool.title}</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">{tool.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Advanced Tools */}
+        <Card>
+          <CardHeader className="p-4 sm:p-5 md:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl sm:text-2xl">
+                  {language === 'ar' ? 'أدوات متقدمة' : 'Advanced Tools'}
+                </CardTitle>
+                <p className="text-slate-600 text-xs sm:text-sm mt-1">
+                  {language === 'ar' ? 'ميزات إضافية لرعاية شاملة' : 'Extra features for comprehensive care'}
+                </p>
+              </div>
+              <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-5 md:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {advancedTools.map((tool, idx) => (
+                <Card 
+                  key={idx} 
                   className="border-2 hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto"
                   onClick={(e) => { e.stopPropagation(); setLocation(tool.path); }}
                 >

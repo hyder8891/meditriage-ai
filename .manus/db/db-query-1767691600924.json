@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `family_members` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `relationship` varchar(50) NOT NULL,\n  `date_of_birth` date,\n  `blood_type` varchar(10),\n  `allergies` text,\n  `conditions` text,\n  `medications` text,\n  `emergency_contact` varchar(20),\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `family_members_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute CREATE TABLE IF NOT EXISTS `family_members` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `relationship` varchar(50) NOT NULL,\n  `date_of_birth` date,\n  `blood_type` varchar(10),\n  `allergies` text,\n  `conditions` text,\n  `medications` text,\n  `emergency_contact` varchar(20),\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `family_members_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 567
+}

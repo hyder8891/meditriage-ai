@@ -49,6 +49,7 @@ import { medicationsRouter } from "./medications-router";
 import { newGraduateRouter } from "./new-graduate-router";
 import { matchingRouter } from "./matching-router";
 import { doctorVerificationRouter } from "./doctor-verification-router";
+import { familyVaultRouter } from "./family-vault-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
@@ -131,6 +132,7 @@ export const appRouter = router({
   newGraduate: newGraduateRouter,
   matching: matchingRouter,
   doctorVerification: doctorVerificationRouter,
+  familyVault: familyVaultRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),
