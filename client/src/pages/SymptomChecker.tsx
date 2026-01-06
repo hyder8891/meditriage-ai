@@ -45,6 +45,8 @@ export default function SymptomChecker() {
   const [context, setContext] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<Recommendations | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize conversation on mount
@@ -145,11 +147,33 @@ export default function SymptomChecker() {
     }
   };
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
+  };
+
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    scrollToBottom();
   }, [messages]);
+
+  // Also scroll when loading state changes (to show typing indicator)
+  useEffect(() => {
+    if (sendMessage.isPending || startConversation.isPending) {
+      scrollToBottom();
+    }
+  }, [sendMessage.isPending, startConversation.isPending]);
+
+  // Keep input focused on mobile to prevent keyboard from hiding
+  const handleInputFocus = () => {
+    // Small delay to ensure scroll happens after keyboard appears
+    setTimeout(() => {
+      scrollToBottom();
+      inputRef.current?.focus();
+    }, 100);
+  };
 
   // Initialize conversation on component mount
   useEffect(() => {
@@ -266,6 +290,9 @@ export default function SymptomChecker() {
                     </div>
                   </div>
                 )}
+                
+                {/* Scroll anchor - always at the bottom */}
+                <div ref={messagesEndRef} className="h-1" />
               </div>
             </ScrollArea>
 
@@ -275,12 +302,15 @@ export default function SymptomChecker() {
                 <div className="flex-1 space-y-2">
                   <div className="flex gap-2">
                     <Input
+                      ref={inputRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={handleKeyPress}
+                      onFocus={handleInputFocus}
                       placeholder={t.placeholder}
                       disabled={sendMessage.isPending || !isInitialized}
                       className="flex-1 rounded-xl border-2 focus:border-primary"
+                      autoComplete="off"
                     />
                     <VoiceInput
                       onTranscript={(text) => setInput((prev) => prev + (prev ? " " : "") + text)}

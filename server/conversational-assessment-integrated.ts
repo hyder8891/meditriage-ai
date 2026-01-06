@@ -233,20 +233,45 @@ export async function processConversationalAssessment(
       ]
     });
     
-    // Robust Parsing
+    // Robust Parsing - Extract only the nextQuestion text, never show raw JSON to user
     let content = response.choices[0]?.message?.content || "";
     // Handle array content (extract text from first element)
     if (Array.isArray(content)) {
-      const textContent = content.find(c => c.type === "text");
+      const textContent = content.find((c: any) => c.type === "text");
       content = textContent?.text || "";
     }
-    const cleanJson = typeof content === "string" ? content.replace(/```json|```/g, '').trim() : "";
+    
+    // Clean up any markdown code blocks
+    let cleanContent = typeof content === "string" ? content.replace(/```json|```/g, '').trim() : "";
+    
     let data;
     try {
-        data = cleanJson ? JSON.parse(cleanJson) : { nextQuestion: "Could you tell me more?", extracted: {} };
+      // Try to parse as JSON
+      data = cleanContent ? JSON.parse(cleanContent) : { nextQuestion: getFallbackQuestion(currentStep + 1, language), extracted: {} };
+      
+      // Validate that nextQuestion exists and is a string
+      if (!data.nextQuestion || typeof data.nextQuestion !== 'string') {
+        data.nextQuestion = getFallbackQuestion(currentStep + 1, language);
+      }
+      
+      // CRITICAL: If nextQuestion still looks like JSON, extract just the text
+      if (data.nextQuestion.startsWith('{') || data.nextQuestion.includes('extracted')) {
+        data.nextQuestion = getFallbackQuestion(currentStep + 1, language);
+      }
     } catch (e) {
-        // AI returned plain text? Use it as the question.
-        data = { nextQuestion: content, extracted: {} };
+      // AI returned plain text - check if it contains JSON-like content
+      if (cleanContent.includes('nextQuestion') || cleanContent.includes('extracted')) {
+        // Try to extract nextQuestion using regex
+        const match = cleanContent.match(/nextQuestion["']?\s*:\s*["']([^"']+)["']/s);
+        if (match && match[1]) {
+          data = { nextQuestion: match[1], extracted: {} };
+        } else {
+          data = { nextQuestion: getFallbackQuestion(currentStep + 1, language), extracted: {} };
+        }
+      } else {
+        // It's truly plain text, use it as the question
+        data = { nextQuestion: cleanContent || getFallbackQuestion(currentStep + 1, language), extracted: {} };
+      }
     }
 
     // 4. Update Memory

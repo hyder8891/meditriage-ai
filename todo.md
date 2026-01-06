@@ -1189,3 +1189,7 @@
 - [x] Add evidence array to response for medical references
 - [x] Write unit tests for probability normalization
 - [x] Replace old TriageDisplay component with new AssessmentResultCard
+
+- [x] Fix AI response showing raw JSON instead of natural conversational text
+- [x] Keep keyboard visible while typing in chat interface
+- [x] Auto-scroll to show new messages without manual scrolling
