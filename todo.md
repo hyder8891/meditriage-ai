@@ -1148,3 +1148,14 @@
 
 ### Database Tables Added
 - family_members - Store family member health records
+
+- [ ] Remove Find a Doctor feature from patient dashboard
+- [ ] Remove My Appointments feature from patient dashboard
+- [ ] Fix Health Library functionality not working
+
+
+## January 2026 Updates
+
+- [x] Remove Find a Doctor feature from patient dashboard
+- [x] Remove My Appointments feature from patient dashboard
+- [x] Health Library NCBI API verified working

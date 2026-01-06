@@ -75,13 +75,6 @@ export default function PatientPortal() {
       color: 'from-green-500 to-emerald-500',
       path: '/patient/medical-records',
     },
-    {
-      icon: Calendar,
-      title: language === 'ar' ? 'مواعيدي' : 'My Appointments',
-      desc: language === 'ar' ? 'إدارة المواعيد الطبية' : 'Manage medical appointments',
-      color: 'from-purple-500 to-indigo-500',
-      path: '/patient/appointments',
-    },
   ];
 
   // AI Health Tools (Priority 1)
@@ -165,9 +158,8 @@ export default function PatientPortal() {
   // Navigation items
   const navItems = [
     { icon: Activity, label: language === 'ar' ? 'لوحة التحكم' : 'Dashboard', path: '/patient/portal' },
-    { icon: Search, label: language === 'ar' ? 'ابحث عن طبيب' : 'Find Doctors', path: '/patient/find-doctors' },
     { icon: Users, label: language === 'ar' ? 'أطبائي' : 'My Doctors', path: '/patient/my-doctors' },
-    { icon: BookOpen, label: language === 'ar' ? 'الأدبيات الطبية' : 'Medical Literature', path: '/medical-literature' },
+    { icon: BookOpen, label: language === 'ar' ? 'المكتبة الصحية' : 'Health Library', path: '/patient/health-library' },
     { icon: MessageSquare, label: language === 'ar' ? 'الرسائل' : 'Messages', path: '/patient/messages' },
     { icon: Crown, label: language === 'ar' ? 'الاشتراك' : 'Subscription', path: '/patient/subscription' },
   ];
@@ -220,13 +212,13 @@ export default function PatientPortal() {
                   <Activity className="w-4 h-4 mr-2" />
                   {language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                 </Button>
-                <Button variant="ghost" onClick={() => setLocation('/patient/find-doctors')}>
-                  <Search className="w-4 h-4 mr-2" />
-                  {language === 'ar' ? 'ابحث عن طبيب' : 'Find Doctors'}
-                </Button>
                 <Button variant="ghost" onClick={() => setLocation('/patient/my-doctors')}>
                   <Users className="w-4 h-4 mr-2" />
                   {language === 'ar' ? 'أطبائي' : 'My Doctors'}
+                </Button>
+                <Button variant="ghost" onClick={() => setLocation('/patient/health-library')}>
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  {language === 'ar' ? 'المكتبة الصحية' : 'Health Library'}
                 </Button>
                 <Button variant="ghost" onClick={() => setLocation('/patient/messages')}>
                   <MessageSquare className="w-4 h-4 mr-2" />
@@ -305,7 +297,7 @@ export default function PatientPortal() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
+        <div className="mb-4 sm:mb-6 md:mb-8">
           {/* Start AI Assessment */}
           <Card data-tour="ai-assessment" className="border-2 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto" onClick={(e) => { e.stopPropagation(); setLocation('/symptom-checker'); }}>
             <CardContent className="p-4 sm:p-5 md:p-6">
@@ -329,30 +321,6 @@ export default function PatientPortal() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Find Doctor */}
-          <Card data-tour="find-doctor" className="border-2 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto" onClick={(e) => { e.stopPropagation(); setLocation('/patient/find-doctors'); }}>
-            <CardContent className="p-4 sm:p-5 md:p-6">
-              <div className="flex items-start justify-between mb-3 sm:mb-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Search className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                </div>
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2">
-                {language === 'ar' ? 'ابحث عن طبيب' : 'Find a Doctor'}
-              </h3>
-              <p className="text-sm sm:text-base text-slate-600 mb-3 sm:mb-4">
-                {language === 'ar' 
-                  ? 'تصفح واختر من بين مئات الأطباء المعتمدين'
-                  : 'Browse and choose from hundreds of certified doctors'}
-              </p>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500">
-                <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>{language === 'ar' ? '500+ طبيب متاح' : '500+ doctors available'}</span>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Core Tools Grid */}
@@ -371,7 +339,7 @@ export default function PatientPortal() {
             </div>
           </CardHeader>
           <CardContent className="p-4 sm:p-5 md:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {coreTools.map((tool, idx) => (
                 <Card 
                   key={idx} 

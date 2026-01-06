@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,20 +51,27 @@ function PatientMedicalLiteratureContent() {
     { id: "immunity", label: language === 'ar' ? 'المناعة' : 'Immunity', query: "immune system boost natural" },
   ];
 
-  // Search mutation
-  const searchMutation = trpc.ncbi.searchPubMed.useMutation({
-    onSuccess: (data) => {
-      setSearchResults(data.articles || []);
-      setIsSearching(false);
-      if (data.articles?.length === 0) {
-        toast.info(language === 'ar' ? 'لم يتم العثور على نتائج' : 'No results found');
-      }
-    },
-    onError: (error) => {
-      toast.error(language === 'ar' ? 'فشل البحث: ' + error.message : 'Search failed: ' + error.message);
-      setIsSearching(false);
-    },
-  });
+  // Search state
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  
+  // Search query
+  const { data: searchData, isLoading: searchLoading, error: searchError, refetch } = trpc.ncbi.searchPubMed.useQuery(
+    { query: searchTerm || "", retmax: 10 },
+    { 
+      enabled: !!searchTerm,
+      onSuccess: (data) => {
+        setSearchResults(data.articles || []);
+        setIsSearching(false);
+        if (data.articles?.length === 0) {
+          toast.info(language === 'ar' ? 'لم يتم العثور على نتائج' : 'No results found');
+        }
+      },
+      onError: (error: any) => {
+        toast.error(language === 'ar' ? 'فشل البحث: ' + error.message : 'Search failed: ' + error.message);
+        setIsSearching(false);
+      },
+    }
+  );
 
   // Simplify mutation
   const simplifyMutation = trpc.medicalAssistant.simplifyArticle.useMutation({
@@ -79,19 +87,38 @@ function PatientMedicalLiteratureContent() {
 
   // Handle search
   const handleSearch = (query?: string) => {
-    const searchTerm = query || searchQuery;
-    if (!searchTerm.trim()) {
+    const term = query || searchQuery;
+    if (!term.trim()) {
       toast.error(language === 'ar' ? 'الرجاء إدخال كلمة بحث' : 'Please enter a search term');
       return;
     }
     setIsSearching(true);
     setSelectedArticle(null);
     setSimplifiedSummary("");
-    searchMutation.mutate({
-      query: searchTerm,
-      maxResults: 10,
-    });
+    setSearchTerm(term);
   };
+  
+  // Update results when search data changes
+  React.useEffect(() => {
+    if (searchData) {
+      setSearchResults(searchData.articles || []);
+      setIsSearching(false);
+      if (searchData.articles?.length === 0) {
+        toast.info(language === 'ar' ? 'لم يتم العثور على نتائج' : 'No results found');
+      }
+    }
+  }, [searchData, language]);
+  
+  React.useEffect(() => {
+    if (searchError) {
+      toast.error(language === 'ar' ? 'فشل البحث' : 'Search failed');
+      setIsSearching(false);
+    }
+  }, [searchError, language]);
+  
+  React.useEffect(() => {
+    setIsSearching(searchLoading);
+  }, [searchLoading]);
 
   // Handle article selection
   const handleSelectArticle = (article: any) => {
