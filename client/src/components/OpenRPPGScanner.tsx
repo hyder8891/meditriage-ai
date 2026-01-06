@@ -155,14 +155,39 @@ export function OpenRPPGScanner({ onComplete }: OpenRPPGScannerProps) {
 
       console.log("[OpenRPPGScanner] Requesting camera access...");
 
-      // Request camera access (front camera for face detection)
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          facingMode: "user",
-        },
-      });
+      // Request camera access (back camera for finger-based measurement)
+      // Using environment (back) camera with torch for better blood flow detection
+      let stream: MediaStream;
+      try {
+        // First try back camera with torch
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            facingMode: { exact: "environment" },
+          },
+        });
+        
+        // Try to enable torch/flashlight for better results
+        const track = stream.getVideoTracks()[0];
+        const capabilities = track.getCapabilities?.() as MediaTrackCapabilities & { torch?: boolean };
+        if (capabilities?.torch) {
+          await (track as MediaStreamTrack & { applyConstraints: (constraints: MediaTrackConstraints & { advanced?: Array<{ torch?: boolean }> }) => Promise<void> }).applyConstraints({
+            advanced: [{ torch: true }]
+          });
+          console.log("[OpenRPPGScanner] Torch enabled for better measurement");
+        }
+      } catch (backCamError) {
+        console.log("[OpenRPPGScanner] Back camera not available, falling back to front camera");
+        // Fallback to front camera if back camera fails
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            facingMode: "user",
+          },
+        });
+      }
 
       streamRef.current = stream;
 

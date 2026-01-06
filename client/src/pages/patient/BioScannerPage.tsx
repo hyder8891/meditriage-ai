@@ -137,13 +137,13 @@ export default function BioScannerPage() {
               <CardContent className="space-y-3 text-sm text-slate-600">
                 <p>
                   {language === 'ar'
-                    ? 'تستخدم هذه التقنية كاميرا هاتفك لقياس التغيرات الدقيقة في لون بشرتك الناتجة عن تدفق الدم.'
-                    : 'This technology uses your phone camera to detect subtle color changes in your skin caused by blood flow.'}
+                    ? 'تستخدم هذه التقنية الكاميرا الخلفية لهاتفك مع الفلاش لقياس تدفق الدم عبر إصبعك.'
+                    : 'This technology uses your phone\'s back camera with flashlight to measure blood flow through your finger.'}
                 </p>
                 <p>
                   {language === 'ar'
-                    ? 'عندما ينبض قلبك، يزداد حجم الدم في الأوعية الدموية تحت الجلد، مما يسبب تغيرات طفيفة في اللون الأخضر.'
-                    : 'When your heart beats, blood volume in vessels under your skin increases, causing subtle changes in green color.'}
+                    ? 'عندما ينبض قلبك، يتغير حجم الدم في إصبعك، ويكشف الفلاش هذه التغيرات بدقة.'
+                    : 'When your heart beats, blood volume in your finger changes, and the flashlight helps detect these changes accurately.'}
                 </p>
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                   <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
@@ -151,10 +151,10 @@ export default function BioScannerPage() {
                     {language === 'ar' ? 'للحصول على أفضل النتائج:' : 'For Best Results:'}
                   </h4>
                   <ul className="space-y-1 text-blue-800 dark:text-blue-300 text-sm">
-                    <li>• {language === 'ar' ? 'استخدم إضاءة جيدة (ضوء طبيعي أفضل)' : 'Use good lighting (natural light is best)'}</li>
-                    <li>• {language === 'ar' ? 'ابق ثابتاً أثناء القياس' : 'Stay still during measurement'}</li>
-                    <li>• {language === 'ar' ? 'ضع وجهك في إطار الكاميرا' : 'Keep your face in the camera frame'}</li>
-                    <li>• {language === 'ar' ? 'تجنب الحركة الزائدة' : 'Avoid excessive movement'}</li>
+                    <li>• {language === 'ar' ? 'ضع إصبعك برفق على الكاميرا الخلفية والفلاش' : 'Gently place your finger over the back camera and flash'}</li>
+                    <li>• {language === 'ar' ? 'سيضيء الفلاش تلقائياً لقياس أفضل' : 'The flash will turn on automatically for better measurement'}</li>
+                    <li>• {language === 'ar' ? 'ابق ثابتاً ولا تحرك إصبعك أثناء القياس' : 'Stay still and don\'t move your finger during measurement'}</li>
+                    <li>• {language === 'ar' ? 'انتظر 15 ثانية للحصول على نتيجة دقيقة' : 'Wait 15 seconds for an accurate result'}</li>
                   </ul>
                 </div>
               </CardContent>
