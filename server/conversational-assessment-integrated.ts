@@ -440,7 +440,11 @@ function buildArabicDiagnosisResponse(
 ) {
   // Translate condition name to Arabic
   const conditionAr = primaryDiagnosis ? translateToArabic(primaryDiagnosis.condition) : "غير محدد";
-  const confidencePercent = primaryDiagnosis ? Math.round(primaryDiagnosis.probability * 100) : 0;
+  // Fix: Handle both 0-1 (decimal) and 0-100 (percentage) probability formats
+  const rawProbability = primaryDiagnosis?.probability || 0;
+  const confidencePercent = rawProbability > 1 
+    ? Math.min(Math.round(rawProbability), 100)  // Already a percentage, cap at 100
+    : Math.round(rawProbability * 100);           // Convert decimal to percentage
   
   // Build triage level text
   const triageLevelText = {
@@ -473,7 +477,8 @@ ${triageLevelText}
 `;
     diagnosis.differentialDiagnosis.slice(1, 4).forEach((dd: any, idx: number) => {
       const ddAr = translateToArabic(dd.condition);
-      message += `${idx + 2}. **${ddAr}** - ${Math.round(dd.probability * 100)}%
+      const ddProb = dd.probability > 1 ? Math.min(Math.round(dd.probability), 100) : Math.round(dd.probability * 100);
+      message += `${idx + 2}. **${ddAr}** - ${ddProb}%
 `;
     });
     message += `
@@ -589,6 +594,11 @@ ${triageLevelText}
     recommendationsAr.push(...diagnosis.recommendations.immediateActions);
   }
   
+  // Normalize probability for mostLikelyCondition
+  const normalizedProbability = primaryDiagnosis?.probability 
+    ? (primaryDiagnosis.probability > 1 ? primaryDiagnosis.probability / 100 : primaryDiagnosis.probability)
+    : 0;
+
   return {
     message: message,
     messageAr: message,
@@ -600,14 +610,23 @@ ${triageLevelText}
     recommendationsAr: recommendationsAr,
     mostLikelyCondition: primaryDiagnosis ? {
       condition: conditionAr,
-      probability: primaryDiagnosis.probability,
+      probability: normalizedProbability,
       reasoning: primaryDiagnosis.reasoning || "بناءً على تحليل الأعراض المذكورة"
     } : null,
     differentialDiagnosis: diagnosis.differentialDiagnosis.map((dd: any) => ({
       condition: translateToArabic(dd.condition),
-      probability: dd.probability,
+      probability: dd.probability > 1 ? dd.probability / 100 : dd.probability,
       reasoning: dd.reasoning
     })),
+    redFlags: diagnosis.redFlags || [],
+    structuredRecommendations: diagnosis.recommendations ? {
+      immediateActions: diagnosis.recommendations.immediateActions || [],
+      tests: diagnosis.recommendations.tests || [],
+      imaging: diagnosis.recommendations.imaging || [],
+      referrals: diagnosis.recommendations.referrals || [],
+      lifestyle: diagnosis.recommendations.lifestyle || []
+    } : undefined,
+    evidence: brainResult.evidence || [],
     brainCaseId: brainResult.caseId,
     showActions: true,
     context: vector.toJSON(),
@@ -628,7 +647,11 @@ function buildEnglishDiagnosisResponse(
   triageLevel: 'green' | 'yellow' | 'red',
   vector: ConversationalContextVector
 ) {
-  const confidencePercent = primaryDiagnosis ? Math.round(primaryDiagnosis.probability * 100) : 0;
+  // Fix: Handle both 0-1 (decimal) and 0-100 (percentage) probability formats
+  const rawProbability = primaryDiagnosis?.probability || 0;
+  const confidencePercent = rawProbability > 1 
+    ? Math.min(Math.round(rawProbability), 100)  // Already a percentage, cap at 100
+    : Math.round(rawProbability * 100);           // Convert decimal to percentage
   
   // Build triage level text
   const triageLevelText = {
@@ -660,7 +683,8 @@ ${triageLevelText}
     message += `### Other Possible Conditions
 `;
     diagnosis.differentialDiagnosis.slice(1, 4).forEach((dd: any, idx: number) => {
-      message += `${idx + 2}. **${dd.condition}** - ${Math.round(dd.probability * 100)}%
+      const ddProb = dd.probability > 1 ? Math.min(Math.round(dd.probability), 100) : Math.round(dd.probability * 100);
+      message += `${idx + 2}. **${dd.condition}** - ${ddProb}%
 `;
     });
     message += `
@@ -776,6 +800,11 @@ ${triageLevelText}
   // Build Arabic version of the message
   const messageAr = buildArabicDiagnosisResponse(diagnosis, primaryDiagnosis, orchestrationResult, brainResult, triageLevel, vector).message;
   
+  // Normalize probability for mostLikelyCondition
+  const normalizedProbability = primaryDiagnosis?.probability 
+    ? (primaryDiagnosis.probability > 1 ? primaryDiagnosis.probability / 100 : primaryDiagnosis.probability)
+    : 0;
+
   return {
     message: message,
     messageAr: messageAr,
@@ -787,14 +816,23 @@ ${triageLevelText}
     recommendationsAr: recommendations,
     mostLikelyCondition: primaryDiagnosis ? {
       condition: primaryDiagnosis.condition,
-      probability: primaryDiagnosis.probability,
+      probability: normalizedProbability,
       reasoning: primaryDiagnosis.reasoning || "Based on analysis of reported symptoms"
     } : null,
     differentialDiagnosis: diagnosis.differentialDiagnosis.map((dd: any) => ({
       condition: dd.condition,
-      probability: dd.probability,
+      probability: dd.probability > 1 ? dd.probability / 100 : dd.probability,
       reasoning: dd.reasoning
     })),
+    redFlags: diagnosis.redFlags || [],
+    structuredRecommendations: diagnosis.recommendations ? {
+      immediateActions: diagnosis.recommendations.immediateActions || [],
+      tests: diagnosis.recommendations.tests || [],
+      imaging: diagnosis.recommendations.imaging || [],
+      referrals: diagnosis.recommendations.referrals || [],
+      lifestyle: diagnosis.recommendations.lifestyle || []
+    } : undefined,
+    evidence: brainResult.evidence || [],
     brainCaseId: brainResult.caseId,
     showActions: true,
     context: vector.toJSON(),

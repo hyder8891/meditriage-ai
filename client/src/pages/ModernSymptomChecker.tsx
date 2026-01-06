@@ -15,10 +15,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Send, AlertTriangle, CheckCircle2, AlertCircle, Stethoscope, Calendar } from "lucide-react";
+import { Loader2, Send, AlertTriangle, CheckCircle2, AlertCircle, Stethoscope, Calendar, Mic, MicOff } from "lucide-react";
 import { useLocation } from "wouter";
 import { Streamdown } from "streamdown";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { AssessmentResultCard } from "@/components/AssessmentResultCard";
 
 // ============================================================================
 // Types
@@ -36,6 +37,20 @@ interface QuickReplyChip {
   value: string;
 }
 
+interface DifferentialDiagnosis {
+  condition: string;
+  probability: number;
+  reasoning?: string;
+}
+
+interface StructuredRecommendations {
+  immediateActions?: string[];
+  tests?: string[];
+  imaging?: string[];
+  referrals?: string[];
+  lifestyle?: string[];
+}
+
 interface AssessmentResponse {
   message: string;
   messageAr?: string;
@@ -50,6 +65,23 @@ interface AssessmentResponse {
     probability: number;
     reasoning: string;
   } | null;
+  differentialDiagnosis?: DifferentialDiagnosis[];
+  redFlags?: string[];
+  structuredRecommendations?: StructuredRecommendations;
+  resourceMatch?: {
+    metadata: {
+      name?: string;
+      specialty?: string;
+      location?: string;
+      estimatedWaitTime?: number;
+    };
+    score: number;
+  };
+  evidence?: Array<{
+    title: string;
+    source: string;
+    relevance?: number;
+  }>;
   showActions?: boolean;
   conversationStage: "greeting" | "gathering" | "analyzing" | "complete";
   context?: any; // Context returned from backend
@@ -215,35 +247,23 @@ export default function ModernSymptomChecker() {
               </div>
             )}
 
-            {/* Triage Display */}
-            {currentResponse?.triageLevel && (
-              <TriageDisplay
-                level={currentResponse.triageLevel}
-                reason={currentResponse.triageReason || ""}
-                recommendations={currentResponse.recommendations || []}
-                mostLikelyCondition={currentResponse.mostLikelyCondition}
+            {/* Assessment Result Card - Beautiful Structured Display */}
+            {currentResponse?.triageLevel && currentResponse?.showActions && (
+              <AssessmentResultCard
+                result={{
+                  triageLevel: currentResponse.triageLevel,
+                  triageReason: currentResponse.triageReason,
+                  triageReasonAr: currentResponse.triageReasonAr,
+                  mostLikelyCondition: currentResponse.mostLikelyCondition,
+                  differentialDiagnosis: currentResponse.differentialDiagnosis,
+                  recommendations: currentResponse.recommendations,
+                  recommendationsAr: currentResponse.recommendationsAr,
+                  redFlags: currentResponse.redFlags,
+                  structuredRecommendations: currentResponse.structuredRecommendations,
+                  resourceMatch: currentResponse.resourceMatch,
+                  evidence: currentResponse.evidence,
+                }}
               />
-            )}
-
-            {/* Action Buttons */}
-            {currentResponse?.showActions && (
-              <div className="flex gap-3 mt-6">
-                <Button
-                  onClick={() => setLocation("/patient/care-locator")}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 min-h-[48px] text-base md:min-h-[40px] md:text-sm"
-                >
-                  <Stethoscope className="w-4 h-4 mr-2" />
-                  {isArabic ? "ابحث عن طبيب" : "Find a Doctor"}
-                </Button>
-                <Button
-                  onClick={() => setLocation("/patient/appointments")}
-                  variant="outline"
-                  className="flex-1 min-h-[48px] text-base md:min-h-[40px] md:text-sm"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {isArabic ? "احجز موعد" : "Book Appointment"}
-                </Button>
-              </div>
             )}
 
             <div ref={messagesEndRef} />
@@ -344,95 +364,4 @@ function TypingIndicator() {
   );
 }
 
-interface TriageDisplayProps {
-  level: "green" | "yellow" | "red";
-  reason: string;
-  recommendations: string[];
-  mostLikelyCondition?: {
-    condition: string;
-    probability: number;
-    reasoning: string;
-  } | null;
-}
-
-function TriageDisplay({ level, reason, recommendations, mostLikelyCondition }: TriageDisplayProps) {
-  const { language } = useLanguage();
-  const isArabic = language === 'ar';
-  const triageConfig = {
-    green: {
-      icon: CheckCircle2,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200",
-      label: "Routine Care",
-      labelAr: "رعاية روتينية"
-    },
-    yellow: {
-      icon: AlertCircle,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-      borderColor: "border-yellow-200",
-      label: "Urgent Care",
-      labelAr: "رعاية عاجلة"
-    },
-    red: {
-      icon: AlertTriangle,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      borderColor: "border-red-200",
-      label: "Emergency",
-      labelAr: "طوارئ"
-    }
-  };
-
-  const config = triageConfig[level];
-  const Icon = config.icon;
-
-  return (
-    <Card className={`${config.bgColor} ${config.borderColor} border-2 p-6 mt-6`}>
-      {/* Triage Level */}
-      <div className="flex items-center gap-3 mb-4">
-        <Icon className={`w-8 h-8 ${config.color}`} />
-        <div>
-          <h3 className={`text-xl font-bold ${config.color}`}>
-            {isArabic ? config.labelAr : config.label}
-          </h3>
-          <p className="text-sm text-gray-600">{reason}</p>
-        </div>
-      </div>
-
-      {/* Most Likely Condition */}
-      {mostLikelyCondition && (
-        <div className="mb-4">
-          <h4 className="font-semibold text-gray-900 mb-2">
-            {isArabic ? "التشخيص الأكثر احتمالاً:" : "Most Likely Condition:"}
-          </h4>
-          <div className="bg-white rounded-lg p-4 border-2 border-gray-300">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-semibold text-lg text-gray-900">{mostLikelyCondition.condition}</span>
-              <Badge variant="secondary" className="text-base">{Math.round(mostLikelyCondition.probability * 100)}%</Badge>
-            </div>
-            <p className="text-sm text-gray-700 leading-relaxed">{mostLikelyCondition.reasoning}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Recommendations */}
-      {recommendations.length > 0 && (
-        <div>
-          <h4 className="font-semibold text-gray-900 mb-2">
-            {isArabic ? "التوصيات:" : "Recommendations:"}
-          </h4>
-          <ul className="space-y-1">
-            {recommendations.map((rec, idx) => (
-              <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
-                <span className="text-blue-600 mt-1">•</span>
-                <span>{rec}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </Card>
-  );
-}
+// TriageDisplay has been replaced by AssessmentResultCard component for better structure and visuals
