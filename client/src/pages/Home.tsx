@@ -6,212 +6,295 @@ import {
   Brain,
   Heart,
   Stethoscope,
-  Users,
   MessageSquare,
   Shield,
   Star,
   ArrowRight,
   CheckCircle,
-  Microscope,
   Zap,
   Clock,
-  Award,
-  TrendingUp,
-  Search,
-  UserPlus,
+  MapPin,
   FileText,
   Lock,
-  Database,
   Sparkles,
+  ChevronRight,
+  Phone,
+  Mail,
+  Globe,
+  HeartPulse,
+  Scan,
+  ClipboardList,
+  Building2,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { UserCircle, LogOut } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { language } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'patient' | 'doctor'>('patient');
   const { user, isAuthenticated, logout } = useAuth();
-  
-  // Animated counter state
-  const [counters, setCounters] = useState({
-    symptoms: 0,
-    accuracy: 0,
-    response: 0,
-    conditions: 0,
-  });
+  const isRTL = language === 'ar';
 
-  // Animate counters on mount
+  // Animated stats
+  const [stats, setStats] = useState({ users: 0, assessments: 0, accuracy: 0 });
+  
   useEffect(() => {
     const duration = 2000;
     const steps = 60;
     const interval = duration / steps;
+    const targets = { users: 50000, assessments: 150000, accuracy: 99 };
     
-    // TODO: Replace with real-time data from backend
-    const targets = {
-      symptoms: 0,
-      accuracy: 0,
-      response: 0,
-      conditions: 0,
-    };
-
     let step = 0;
     const timer = setInterval(() => {
       step++;
       const progress = step / steps;
-      
-      setCounters({
-        symptoms: Math.floor(targets.symptoms * progress),
-        accuracy: parseFloat((targets.accuracy * progress).toFixed(1)),
-        response: parseFloat((targets.response * progress).toFixed(1)),
-        conditions: Math.floor(targets.conditions * progress),
+      setStats({
+        users: Math.floor(targets.users * progress),
+        assessments: Math.floor(targets.assessments * progress),
+        accuracy: Math.floor(targets.accuracy * progress),
       });
-
       if (step >= steps) {
         clearInterval(timer);
-        setCounters(targets);
+        setStats(targets);
       }
     }, interval);
-
     return () => clearInterval(timer);
   }, []);
 
+  const features = [
+    {
+      icon: Brain,
+      titleAr: 'فحص الأعراض بالذكاء الاصطناعي',
+      titleEn: 'AI Symptom Checker',
+      descAr: 'تحليل ذكي لأعراضك مع توصيات طبية فورية مبنية على أحدث الأبحاث الطبية',
+      descEn: 'Smart analysis of your symptoms with instant medical recommendations based on latest research',
+      image: '/images/homepage/symptom-checker-phone.jpg',
+      link: '/patient/symptom-checker',
+    },
+    {
+      icon: HeartPulse,
+      titleAr: 'قياس النبض بالكاميرا',
+      titleEn: 'Bio-Scanner Vitals',
+      descAr: 'قياس معدل ضربات القلب باستخدام كاميرا هاتفك فقط - تقنية rPPG المتقدمة',
+      descEn: 'Measure your heart rate using just your phone camera - advanced rPPG technology',
+      image: '/images/homepage/heart-scanner-feature.jpg',
+      link: '/patient/bio-scanner',
+    },
+    {
+      icon: FileText,
+      titleAr: 'تحليل التقارير الطبية',
+      titleEn: 'Medical Report Analysis',
+      descAr: 'رفع تقاريرك الطبية والحصول على تفسير مبسط وواضح بلغتك',
+      descEn: 'Upload your medical reports and get simplified explanations in your language',
+      image: '/images/homepage/medical-report-analysis.jpg',
+      link: '/patient/medical-reports',
+    },
+    {
+      icon: MapPin,
+      titleAr: 'محدد المرافق الصحية',
+      titleEn: 'Care Locator',
+      descAr: 'اعثر على أقرب المستشفيات والصيدليات والعيادات في منطقتك',
+      descEn: 'Find the nearest hospitals, pharmacies, and clinics in your area',
+      image: '/images/homepage/care-locator-map.jpg',
+      link: '/patient/care-locator',
+    },
+    {
+      icon: MessageSquare,
+      titleAr: 'مساعد صحي ذكي',
+      titleEn: 'AI Health Assistant',
+      descAr: 'تحدث مع مساعدنا الذكي للحصول على إجابات فورية لأسئلتك الصحية',
+      descEn: 'Chat with our AI assistant for instant answers to your health questions',
+      image: '/images/homepage/ai-chat-icon.jpg',
+      link: '/patient/ai-chat',
+    },
+    {
+      icon: ClipboardList,
+      titleAr: 'سجلك الصحي الشامل',
+      titleEn: 'Health Records',
+      descAr: 'احتفظ بجميع سجلاتك الصحية في مكان واحد آمن ومنظم',
+      descEn: 'Keep all your health records in one secure and organized place',
+      image: '/images/homepage/health-records-icon.jpg',
+      link: '/patient/health-records',
+    },
+  ];
+
+  const benefits = [
+    {
+      iconAr: '🏠',
+      titleAr: 'من راحة منزلك',
+      titleEn: 'From Home Comfort',
+      descAr: 'احصل على استشارة صحية دون الحاجة للخروج',
+      descEn: 'Get health consultation without leaving home',
+    },
+    {
+      iconAr: '⚡',
+      titleAr: 'نتائج فورية',
+      titleEn: 'Instant Results',
+      descAr: 'تحليل ذكي في ثوانٍ معدودة',
+      descEn: 'Smart analysis in seconds',
+    },
+    {
+      iconAr: '🔒',
+      titleAr: 'خصوصية تامة',
+      titleEn: 'Complete Privacy',
+      descAr: 'بياناتك محمية بأعلى معايير الأمان',
+      descEn: 'Your data protected with highest security standards',
+    },
+    {
+      iconAr: '🌐',
+      titleAr: 'دعم ثنائي اللغة',
+      titleEn: 'Bilingual Support',
+      descAr: 'واجهة كاملة بالعربية والإنجليزية',
+      descEn: 'Full interface in Arabic and English',
+    },
+  ];
+
+  const testimonials = [
+    {
+      nameAr: 'أحمد محمد',
+      nameEn: 'Ahmed Mohammed',
+      roleAr: 'أب لثلاثة أطفال',
+      roleEn: 'Father of three',
+      textAr: 'تطبيق رائع! ساعدني في فهم أعراض طفلي قبل زيارة الطبيب. الواجهة العربية ممتازة.',
+      textEn: 'Amazing app! Helped me understand my child\'s symptoms before visiting the doctor. The Arabic interface is excellent.',
+      rating: 5,
+    },
+    {
+      nameAr: 'فاطمة علي',
+      nameEn: 'Fatima Ali',
+      roleAr: 'معلمة',
+      roleEn: 'Teacher',
+      textAr: 'ميزة قياس النبض بالكاميرا مذهلة! أستخدمها يومياً لمتابعة صحتي.',
+      textEn: 'The camera heart rate feature is amazing! I use it daily to monitor my health.',
+      rating: 5,
+    },
+    {
+      nameAr: 'محمد حسين',
+      nameEn: 'Mohammed Hussein',
+      roleAr: 'متقاعد',
+      roleEn: 'Retired',
+      textAr: 'أخيراً تطبيق صحي يفهم احتياجاتنا. تحليل التقارير الطبية وفر علي الكثير من الوقت.',
+      textEn: 'Finally a health app that understands our needs. Medical report analysis saved me a lot of time.',
+      rating: 5,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
+      <nav className="border-b bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-2">
-                <img 
-                  src="/logo.png" 
-                  alt="MediTriage AI Pro" 
-                  className="h-14 w-auto" 
-                  style={{ imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
-                />
-              </div>
-              <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-                <a href="#features" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'المميزات' : 'Features'}</a>
-                <a href="#how-it-works" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'كيف يعمل' : 'How It Works'}</a>
-                <a href="#ai-capabilities" className="text-slate-600 hover:text-blue-600 transition-colors">{language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Capabilities'}</a>
-              </div>
+            <div className="flex items-center gap-4">
+              <img 
+                src="/logo.png" 
+                alt="MediTriage AI" 
+                className="h-12 w-auto cursor-pointer" 
+                onClick={() => setLocation('/')}
+              />
             </div>
+            
+            <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+              <a href="#features" className="text-slate-600 hover:text-teal-600 transition-colors">
+                {isRTL ? 'المميزات' : 'Features'}
+              </a>
+              <a href="#how-it-works" className="text-slate-600 hover:text-teal-600 transition-colors">
+                {isRTL ? 'كيف يعمل' : 'How It Works'}
+              </a>
+              <a href="#testimonials" className="text-slate-600 hover:text-teal-600 transition-colors">
+                {isRTL ? 'آراء المستخدمين' : 'Testimonials'}
+              </a>
+            </div>
+
             <div className="flex items-center gap-3">
               <LanguageSwitcher />
               {isAuthenticated && user ? (
-                <>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
-                    <UserCircle className="w-5 h-5 text-slate-600" />
-                    <div className="text-sm">
-                      <div className="font-medium text-slate-900">{user.name}</div>
-                      <div className="text-xs text-slate-500">ID: {user.id}</div>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={() => {
-                      logout();
-                      setLocation("/");
-                    }}
+                    onClick={() => setLocation('/patient/portal')}
+                    className="text-teal-600"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <UserCircle className="w-5 h-5 mr-1" />
+                    {user.name?.split(' ')[0]}
                   </Button>
-                  <Button onClick={() => setLocation(user.role === 'clinician' ? "/clinician/dashboard" : "/patient/portal")} className="gradient-primary text-white">
-                    {language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
+                  <Button 
+                    onClick={() => setLocation('/patient/portal')} 
+                    className="bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:from-teal-600 hover:to-teal-700"
+                  >
+                    {isRTL ? 'لوحة التحكم' : 'Dashboard'}
                   </Button>
-                </>
+                </div>
               ) : (
-                <>
-                  <Button variant="ghost" onClick={() => setLocation("/patient-login")}>
-                    {language === 'ar' ? 'دخول المريض' : 'Patient Login'}
-                  </Button>
-                  <Button variant="ghost" onClick={() => setLocation("/clinician/login")}>
-                    {language === 'ar' ? 'دخول الطبيب' : 'Doctor Login'}
-                  </Button>
-                  <Button onClick={() => setLocation("/patient-login")} className="gradient-primary text-white">
-                    {language === 'ar' ? 'ابدأ الآن' : 'Get Started'}
-                  </Button>
-                </>
+                <Button 
+                  onClick={() => setLocation('/patient-login')} 
+                  className="bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:from-teal-600 hover:to-teal-700"
+                >
+                  {isRTL ? 'ابدأ الآن' : 'Get Started'}
+                </Button>
               )}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - Asymmetric 60/40 Layout */}
-      <section className="relative py-24 lg:py-32 gradient-hero overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Background image with transparency showcasing app functions */}
-          <div 
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: 'url(/images/homepage/healthcare-scenarios-hero.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              mixBlendMode: 'multiply'
-            }}
-          ></div>
-          <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl animate-blob"></div>
-          <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+      {/* Hero Section */}
+      <section className="relative py-16 lg:py-24 overflow-hidden bg-gradient-to-br from-teal-50 via-white to-blue-50">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230d9488' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
         </div>
 
         <div className="container relative">
-          <div className="grid lg:grid-cols-5 gap-12 items-center">
-            {/* Left: Hero Content (60%) */}
-            <div className="lg:col-span-3 space-y-8 animate-fade-in">
-              <Badge className="bg-blue-100 text-blue-700 border-blue-200 font-accent">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Hero Content */}
+            <div className={`space-y-8 ${isRTL ? 'lg:order-2' : ''}`}>
+              <Badge className="bg-teal-100 text-teal-700 border-teal-200 px-4 py-2 text-sm">
                 <Sparkles className="w-4 h-4 mr-2" />
-                {language === 'ar' ? 'منصة الرعاية الصحية الذكية' : 'Smart Healthcare Platform'}
+                {isRTL ? 'منصة الرعاية الصحية الذكية #1 في العراق' : '#1 Smart Healthcare Platform in Iraq'}
               </Badge>
               
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 <span className="text-slate-900">
-                  {language === 'ar' ? 'رعاية صحية متكاملة' : 'Complete Healthcare'}
+                  {isRTL ? 'صحتك بين يديك' : 'Your Health'}
                 </span>
                 <br />
-                <span className="text-gradient">
-                  {language === 'ar' ? 'بالذكاء الاصطناعي' : 'Powered by AI'}
+                <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+                  {isRTL ? 'بذكاء اصطناعي متقدم' : 'In Your Hands'}
                 </span>
               </h1>
               
-              <p className="text-xl text-slate-600 leading-relaxed max-w-2xl">
-                {language === 'ar'
-                  ? 'احصل على تقييم فوري بالذكاء الاصطناعي، ثم تواصل مع أطباء مختصين معتمدين للحصول على استشارة شاملة وخطة علاجية مخصصة.'
-                  : 'Get instant AI-powered health assessment, then connect with certified specialist doctors for comprehensive consultation and personalized treatment plans.'}
+              <p className="text-xl text-slate-600 leading-relaxed max-w-xl">
+                {isRTL
+                  ? 'احصل على تقييم صحي فوري، قياس نبضات القلب، تحليل التقارير الطبية، والمزيد - كل ذلك من هاتفك المحمول وبلغتك العربية.'
+                  : 'Get instant health assessment, heart rate measurement, medical report analysis, and more - all from your mobile phone in your language.'}
               </p>
 
-              {/* Dual CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  onClick={() => {
-                    if (isAuthenticated) {
-                      setLocation("/patient/symptom-checker");
-                    } else {
-                      setLocation("/patient-login");
-                    }
-                  }}
-                  className="gradient-primary text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+                  onClick={() => setLocation(isAuthenticated ? '/patient/portal' : '/patient-login')}
+                  className="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
                 >
                   <Activity className="w-5 h-5 mr-2" />
-                  {language === 'ar' ? 'ابدأ التقييم المجاني' : 'Start Free Assessment'}
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  {isRTL ? 'ابدأ التقييم المجاني' : 'Start Free Assessment'}
+                  <ArrowRight className={`w-5 h-5 ${isRTL ? 'mr-2 rotate-180' : 'ml-2'}`} />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  onClick={() => setLocation("#how-it-works")}
-                  className="border-2 border-slate-300 bg-white px-8 py-6 text-lg hover:bg-slate-50 transition-all"
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="border-2 border-teal-200 bg-white px-8 py-6 text-lg hover:bg-teal-50 transition-all"
                 >
-                  {language === 'ar' ? 'اعرف المزيد' : 'Learn More'}
+                  {isRTL ? 'اكتشف المميزات' : 'Explore Features'}
                 </Button>
               </div>
 
@@ -219,54 +302,49 @@ export default function Home() {
               <div className="flex flex-wrap gap-6 pt-4">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Shield className="w-5 h-5 text-green-600" />
-                  <span className="font-medium">{language === 'ar' ? 'معتمد طبياً' : 'Medically Certified'}</span>
+                  <span className="font-medium">{isRTL ? 'معتمد طبياً' : 'Medically Certified'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Lock className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium">{language === 'ar' ? 'HIPAA متوافق' : 'HIPAA Compliant'}</span>
+                  <span className="font-medium">{isRTL ? 'خصوصية مضمونة' : 'Privacy Guaranteed'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Star className="w-5 h-5 text-yellow-500" />
-                  <span className="font-medium">{language === 'ar' ? 'تقييم 4.9/5' : '4.9/5 Rating'}</span>
+                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  <span className="font-medium">{isRTL ? 'تقييم 4.9/5' : '4.9/5 Rating'}</span>
                 </div>
               </div>
             </div>
 
-            {/* Right: Middle Eastern Family Healthcare Image (40%) */}
-            <div className="lg:col-span-2 relative animate-float">
-              <div className="relative">
-                {/* Main image with overlay stats */}
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                  <img 
-                    src="/images/homepage/healthcare-scenarios-hero.jpg" 
-                    alt="Diverse healthcare scenarios - families, telemedicine, medical teams, and patient care"
-                    className="w-full h-auto object-cover"
-                  />
-                  
-                  {/* Floating stats overlay */}
-                  <div className="absolute bottom-6 left-6 right-6 space-y-3">
-                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl hover-lift">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                          <Brain className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-600">{language === 'ar' ? 'تحليل الذكاء الاصطناعي' : 'AI Analysis'}</div>
-                          <div className="text-2xl font-bold text-slate-900">99.2%</div>
-                        </div>
-                      </div>
+            {/* Hero Image */}
+            <div className={`relative ${isRTL ? 'lg:order-1' : ''}`}>
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                <img 
+                  src="/images/homepage/hero-family-health.jpg" 
+                  alt={isRTL ? 'عائلة عربية تستخدم تطبيق الصحة' : 'Arab family using health app'}
+                  className="w-full h-auto object-cover"
+                />
+                
+                {/* Floating Stats Cards */}
+                <div className={`absolute top-6 ${isRTL ? 'right-6' : 'left-6'} bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                      <Brain className="w-6 h-6 text-white" />
                     </div>
+                    <div>
+                      <div className="text-sm text-slate-500">{isRTL ? 'تحليل الذكاء الاصطناعي' : 'AI Analysis'}</div>
+                      <div className="text-2xl font-bold text-slate-900">{stats.accuracy}%</div>
+                    </div>
+                  </div>
+                </div>
 
-                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl hover-lift animation-delay-200">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                          <Users className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-600">{language === 'ar' ? 'أطباء معتمدون' : 'Certified Doctors'}</div>
-                          <div className="text-2xl font-bold text-slate-900">500+</div>
-                        </div>
-                      </div>
+                <div className={`absolute bottom-6 ${isRTL ? 'left-6' : 'right-6'} bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-slate-500">{isRTL ? 'مستخدم نشط' : 'Active Users'}</div>
+                      <div className="text-2xl font-bold text-slate-900">+{(stats.users / 1000).toFixed(0)}K</div>
                     </div>
                   </div>
                 </div>
@@ -276,298 +354,241 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works - 3 Numbered Cards */}
+      {/* Stats Section */}
+      <section className="py-12 bg-gradient-to-r from-teal-600 to-teal-700">
+        <div className="container">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">+{(stats.users / 1000).toFixed(0)}K</div>
+              <div className="text-teal-100">{isRTL ? 'مستخدم نشط' : 'Active Users'}</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">+{(stats.assessments / 1000).toFixed(0)}K</div>
+              <div className="text-teal-100">{isRTL ? 'تقييم صحي' : 'Health Assessments'}</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">{stats.accuracy}%</div>
+              <div className="text-teal-100">{isRTL ? 'دقة التحليل' : 'Analysis Accuracy'}</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">24/7</div>
+              <div className="text-teal-100">{isRTL ? 'متاح دائماً' : 'Always Available'}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-slate-50">
+        <div className="container">
+          <div className="text-center mb-16">
+            <Badge className="bg-teal-100 text-teal-700 border-teal-200 mb-4">
+              {isRTL ? 'مميزاتنا' : 'Our Features'}
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {isRTL ? 'كل ما تحتاجه لصحة أفضل' : 'Everything You Need for Better Health'}
+            </h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              {isRTL 
+                ? 'مجموعة شاملة من الأدوات الصحية الذكية المصممة خصيصاً لك ولعائلتك'
+                : 'A comprehensive suite of smart health tools designed specifically for you and your family'}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <Card 
+                key={index} 
+                className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
+                onClick={() => setLocation(isAuthenticated ? feature.link : '/patient-login')}
+              >
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={feature.image} 
+                    alt={isRTL ? feature.titleAr : feature.titleEn}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                      <feature.icon className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {isRTL ? feature.titleAr : feature.titleEn}
+                    </h3>
+                  </div>
+                  <p className="text-slate-600 mb-4">
+                    {isRTL ? feature.descAr : feature.descEn}
+                  </p>
+                  <div className="flex items-center text-teal-600 font-medium group-hover:gap-2 transition-all">
+                    <span>{isRTL ? 'جرب الآن' : 'Try Now'}</span>
+                    <ChevronRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
       <section id="how-it-works" className="py-20 bg-white">
         <div className="container">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200 font-accent">
-              <Zap className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'كيف يعمل' : 'How It Works'}
+            <Badge className="bg-blue-100 text-blue-700 border-blue-200 mb-4">
+              {isRTL ? 'كيف يعمل' : 'How It Works'}
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              {language === 'ar' ? 'ثلاث خطوات بسيطة' : 'Three Simple Steps'}
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {isRTL ? 'ثلاث خطوات بسيطة' : 'Three Simple Steps'}
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              {language === 'ar'
-                ? 'من التقييم الأولي إلى الاستشارة الطبية الشاملة'
-                : 'From initial assessment to comprehensive medical consultation'}
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              {isRTL 
+                ? 'ابدأ رحلتك الصحية في دقائق معدودة'
+                : 'Start your health journey in just minutes'}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                number: '01',
-                icon: Brain,
-                title: language === 'ar' ? 'تقييم ذكي فوري' : 'Instant AI Assessment',
-                desc: language === 'ar' 
-                  ? 'احصل على تحليل فوري لأعراضك باستخدام الذكاء الاصطناعي المتقدم مع تقييم شامل للحالة'
-                  : 'Get instant analysis of your symptoms using advanced AI with comprehensive health assessment',
-                gradient: 'from-blue-500 to-blue-600',
+                step: 1,
+                iconAr: '📝',
+                titleAr: 'أدخل أعراضك',
+                titleEn: 'Enter Your Symptoms',
+                descAr: 'صف أعراضك بكلماتك الخاصة أو اختر من القائمة',
+                descEn: 'Describe your symptoms in your own words or select from the list',
+                image: '/images/homepage/symptom-checker-phone.jpg',
               },
               {
-                number: '02',
-                icon: Search,
-                title: language === 'ar' ? 'اتصل بطبيب مختص' : 'Connect with Specialist',
-                desc: language === 'ar'
-                  ? 'اختر من بين مئات الأطباء المعتمدين حسب التخصص والتقييم والتوفر'
-                  : 'Choose from hundreds of certified doctors by specialty, rating, and availability',
-                gradient: 'from-purple-500 to-purple-600',
+                step: 2,
+                iconAr: '🤖',
+                titleAr: 'تحليل ذكي',
+                titleEn: 'AI Analysis',
+                descAr: 'يقوم الذكاء الاصطناعي بتحليل أعراضك ومقارنتها بقاعدة بيانات طبية ضخمة',
+                descEn: 'AI analyzes your symptoms and compares them with a massive medical database',
+                image: '/images/homepage/ai-health-analysis.jpg',
               },
               {
-                number: '03',
-                icon: FileText,
-                title: language === 'ar' ? 'خطة علاجية مخصصة' : 'Personalized Treatment',
-                desc: language === 'ar'
-                  ? 'احصل على استشارة شاملة وخطة علاجية مصممة خصيصاً لحالتك مع متابعة مستمرة'
-                  : 'Get comprehensive consultation and treatment plan tailored to your condition with continuous follow-up',
-                gradient: 'from-cyan-500 to-cyan-600',
+                step: 3,
+                iconAr: '✅',
+                titleAr: 'احصل على النتائج',
+                titleEn: 'Get Results',
+                descAr: 'احصل على تقييم شامل مع توصيات واضحة للخطوات التالية',
+                descEn: 'Get a comprehensive assessment with clear recommendations for next steps',
+                image: '/images/homepage/health-dashboard.jpg',
               },
-            ].map((item, idx) => (
-              <Card key={idx} className="relative border-none shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 bg-white">
-                <CardContent className="p-8">
-                  {/* Large number badge */}
-                  <div className="absolute -top-4 -right-4 w-20 h-20 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center shadow-lg">
-                    <span className="text-4xl font-bold font-accent text-slate-400">{item.number}</span>
+            ].map((item, index) => (
+              <div key={index} className="relative">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={item.image} 
+                      alt={isRTL ? item.titleAr : item.titleEn}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  
-                  {/* Icon with gradient */}
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-6 shadow-lg`}>
-                    <item.icon className="w-8 h-8 text-white" />
+                  <div className="p-6">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white text-xl font-bold mb-4">
+                      {item.step}
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">
+                      {isRTL ? item.titleAr : item.titleEn}
+                    </h3>
+                    <p className="text-slate-600">
+                      {isRTL ? item.descAr : item.descEn}
+                    </p>
                   </div>
-                  
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{item.desc}</p>
-                </CardContent>
-              </Card>
+                </div>
+                {index < 2 && (
+                  <div className={`hidden md:block absolute top-1/2 ${isRTL ? '-left-4' : '-right-4'} transform -translate-y-1/2 z-10`}>
+                    <ChevronRight className={`w-8 h-8 text-teal-400 ${isRTL ? 'rotate-180' : ''}`} />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-
-
         </div>
       </section>
 
-      {/* AI Capabilities - Deep Blue Gradient Section */}
-      <section id="ai-capabilities" className="py-20 gradient-blue-deep text-white relative overflow-hidden">
-        {/* Diagonal split decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/50 to-transparent"></div>
-        
-        <div className="container relative">
+      {/* Benefits Section */}
+      <section className="py-20 bg-gradient-to-br from-teal-600 to-teal-700 text-white">
+        <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Feature List */}
-            <div className="space-y-8">
-              <div>
-                <Badge className="mb-4 bg-white/20 text-white border-white/30 font-accent">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {language === 'ar' ? 'قدرات الذكاء الاصطناعي' : 'AI Capabilities'}
-                </Badge>
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  {language === 'ar' ? 'تقنية طبية متقدمة' : 'Advanced Medical Technology'}
-                </h2>
-                <p className="text-xl text-blue-100">
-                  {language === 'ar'
-                    ? 'مدعومة بملايين الحالات الطبية وأحدث خوارزميات التعلم الآلي'
-                    : 'Powered by millions of medical cases and latest machine learning algorithms'}
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {[
-                  {
-                    icon: Brain,
-                    title: language === 'ar' ? 'تحليل الأعراض الذكي' : 'Smart Symptom Analysis',
-                    desc: language === 'ar' ? 'تحليل متقدم للأعراض مع تقييم الخطورة' : 'Advanced symptom analysis with severity assessment',
-                  },
-                  {
-                    icon: Microscope,
-                    title: language === 'ar' ? 'تفسير الصور الطبية' : 'Medical Imaging Interpretation',
-                    desc: language === 'ar' ? 'تحليل الأشعة والصور الطبية بدقة عالية' : 'X-ray and medical image analysis with high accuracy',
-                  },
-                  {
-                    icon: FileText,
-                    title: language === 'ar' ? 'التوثيق الطبي الآلي' : 'Automated Medical Documentation',
-                    desc: language === 'ar' ? 'تحويل المحادثات إلى سجلات طبية منظمة' : 'Convert conversations to structured medical records',
-                  },
-                  {
-                    icon: Database,
-                    title: language === 'ar' ? 'قاعدة معرفة طبية شاملة' : 'Comprehensive Medical Knowledge',
-                    desc: language === 'ar' ? 'الوصول إلى أحدث الأبحاث والإرشادات الطبية' : 'Access to latest research and medical guidelines',
-                  },
-                ].map((feature, idx) => (
-                  <div key={idx} className="flex gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all">
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
-                        <feature.icon className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
+            <div className={isRTL ? 'lg:order-2' : ''}>
+              <Badge className="bg-white/20 text-white border-white/30 mb-4">
+                {isRTL ? 'لماذا نحن؟' : 'Why Choose Us?'}
+              </Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                {isRTL ? 'صُمم خصيصاً للمجتمع العربي' : 'Designed for the Arab Community'}
+              </h2>
+              <p className="text-xl text-teal-100 mb-8">
+                {isRTL 
+                  ? 'نفهم احتياجاتك الصحية ونقدم لك تجربة مصممة بعناية لتناسب ثقافتك ولغتك'
+                  : 'We understand your health needs and provide an experience carefully designed to fit your culture and language'}
+              </p>
+              
+              <div className="grid sm:grid-cols-2 gap-6">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="text-3xl">{benefit.iconAr}</div>
                     <div>
-                      <h4 className="font-bold text-lg mb-1">{feature.title}</h4>
-                      <p className="text-blue-100 text-sm">{feature.desc}</p>
+                      <h4 className="font-bold mb-1">{isRTL ? benefit.titleAr : benefit.titleEn}</h4>
+                      <p className="text-teal-100 text-sm">{isRTL ? benefit.descAr : benefit.descEn}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Right: Dashboard Mockup */}
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="bg-white rounded-xl p-6 shadow-2xl">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between pb-4 border-b">
-                      <h3 className="font-bold text-slate-900">{language === 'ar' ? 'تحليل الحالة' : 'Case Analysis'}</h3>
-                      <Badge className="bg-green-100 text-green-700">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        {language === 'ar' ? 'مكتمل' : 'Complete'}
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                        <div className="flex-1">
-                          <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 animate-progress" style={{width: '95%'}}></div>
-                          </div>
-                        </div>
-                        <span className="text-sm font-medium text-slate-600">95%</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                        <div className="flex-1">
-                          <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 animate-progress animation-delay-200" style={{width: '88%'}}></div>
-                          </div>
-                        </div>
-                        <span className="text-sm font-medium text-slate-600">88%</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
-                        <div className="flex-1">
-                          <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-600 animate-progress animation-delay-1000" style={{width: '92%'}}></div>
-                          </div>
-                        </div>
-                        <span className="text-sm font-medium text-slate-600">92%</span>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t">
-                      <div className="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                          <div className="text-2xl font-bold text-blue-600">12</div>
-                          <div className="text-xs text-slate-600">{language === 'ar' ? 'أعراض' : 'Symptoms'}</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-purple-600">3</div>
-                          <div className="text-xs text-slate-600">{language === 'ar' ? 'تشخيصات' : 'Diagnoses'}</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-cyan-600">5</div>
-                          <div className="text-xs text-slate-600">{language === 'ar' ? 'توصيات' : 'Recommendations'}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            
+            <div className={isRTL ? 'lg:order-1' : ''}>
+              <img 
+                src="/images/homepage/elderly-care.jpg" 
+                alt={isRTL ? 'رعاية صحية للعائلة' : 'Family healthcare'}
+                className="rounded-2xl shadow-2xl"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Statistics Section - 4 Columns with Animated Counters */}
-      <section className="py-20 bg-slate-50">
-        <div className="container">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Activity,
-                value: `${counters.symptoms.toLocaleString()}+`,
-                label: language === 'ar' ? 'أعراض تم تحليلها' : 'Symptoms Analyzed',
-                color: 'from-blue-500 to-blue-600',
-              },
-              {
-                icon: Award,
-                value: `${counters.accuracy.toFixed(1)}%`,
-                label: language === 'ar' ? 'معدل الدقة' : 'Accuracy Rate',
-                color: 'from-purple-500 to-purple-600',
-              },
-              {
-                icon: Clock,
-                value: `<${counters.response}s`,
-                label: language === 'ar' ? 'وقت الاستجابة' : 'Response Time',
-                color: 'from-cyan-500 to-cyan-600',
-              },
-              {
-                icon: Database,
-                value: `${counters.conditions.toLocaleString()}+`,
-                label: language === 'ar' ? 'حالات مغطاة' : 'Conditions Covered',
-                color: 'from-green-500 to-green-600',
-              },
-            ].map((stat, idx) => (
-              <Card key={idx} className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-white">
-                <CardContent className="p-8 text-center">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                    <stat.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="text-4xl font-bold text-slate-900 mb-2 font-accent">{stat.value}</div>
-                  <div className="text-sm font-medium text-slate-600">{stat.label}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Indicators Grid */}
-      <section className="py-20 bg-white">
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 bg-slate-50">
         <div className="container">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-green-100 text-green-700 border-green-200 font-accent">
-              <Shield className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'الأمان والثقة' : 'Security & Trust'}
+            <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 mb-4">
+              {isRTL ? 'آراء المستخدمين' : 'User Reviews'}
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              {language === 'ar' ? 'معايير عالمية للأمان' : 'World-Class Security Standards'}
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {isRTL ? 'ماذا يقول مستخدمونا' : 'What Our Users Say'}
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              {language === 'ar'
-                ? 'نلتزم بأعلى معايير الأمان والخصوصية لحماية بياناتك الصحية'
-                : 'We adhere to the highest security and privacy standards to protect your health data'}
-            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Shield,
-                title: language === 'ar' ? 'HIPAA متوافق' : 'HIPAA Compliant',
-                desc: language === 'ar' ? 'نلتزم بمعايير HIPAA لحماية المعلومات الصحية' : 'Compliant with HIPAA standards for health information protection',
-                color: 'from-green-500 to-green-600',
-              },
-              {
-                icon: Award,
-                title: language === 'ar' ? 'دقة طبية عالية' : 'High Medical Accuracy',
-                desc: language === 'ar' ? 'معدل دقة 99.2% معتمد من خبراء طبيين' : '99.2% accuracy rate certified by medical experts',
-                color: 'from-blue-500 to-blue-600',
-              },
-              {
-                icon: Lock,
-                title: language === 'ar' ? 'تشفير البيانات' : 'Data Encryption',
-                desc: language === 'ar' ? 'تشفير شامل للبيانات أثناء النقل والتخزين' : 'End-to-end encryption for data in transit and at rest',
-                color: 'from-purple-500 to-purple-600',
-              },
-            ].map((item, idx) => (
-              <Card key={idx} className="border-2 border-slate-200 hover:border-blue-300 hover:shadow-xl transition-all bg-white">
-                <CardContent className="p-8 text-center">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                    <item.icon className="w-8 h-8 text-white" />
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="border-0 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                    ))}
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+                  <p className="text-slate-600 mb-6 leading-relaxed">
+                    "{isRTL ? testimonial.textAr : testimonial.textEn}"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white font-bold">
+                      {(isRTL ? testimonial.nameAr : testimonial.nameEn).charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900">
+                        {isRTL ? testimonial.nameAr : testimonial.nameEn}
+                      </div>
+                      <div className="text-sm text-slate-500">
+                        {isRTL ? testimonial.roleAr : testimonial.roleEn}
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -575,478 +596,87 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA Section - Gradient Background */}
-      <section className="py-24 gradient-cta text-white relative overflow-hidden">
-        {/* Particle effect background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-float"></div>
-          <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-white/20 rounded-full animate-float animation-delay-1000"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-2 h-2 bg-white/40 rounded-full animate-float animation-delay-2000"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-3 h-3 bg-white/25 rounded-full animate-float animation-delay-4000"></div>
-        </div>
-
-        <div className="container relative text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            {language === 'ar' ? 'ابدأ رحلتك الصحية اليوم' : 'Start Your Health Journey Today'}
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            {language === 'ar'
-              ? 'انضم إلى آلاف المستخدمين الذين يثقون في منصتنا للحصول على رعاية صحية ذكية وشاملة'
-              : 'Join thousands of users who trust our platform for smart and comprehensive healthcare'}
-          </p>
-          <Button
-            size="lg"
-            onClick={() => {
-              if (isAuthenticated) {
-                setLocation("/patient/symptom-checker");
-              } else {
-                setLocation("/patient-login");
-              }
-            }}
-            className="bg-white text-blue-600 hover:bg-blue-50 px-12 py-6 text-lg shadow-2xl hover:shadow-3xl transition-all hover:-translate-y-1"
-          >
-            <Activity className="w-5 h-5 mr-2" />
-            {language === 'ar' ? 'ابدأ الآن مجاناً' : 'Get Started Free'}
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-        </div>
-      </section>
-
-      {/* Technology Showcase Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* CTA Section */}
+      <section className="py-20 bg-white">
         <div className="container">
-          <div className="text-center mb-16">
-            <Badge className="mb-4 bg-purple-100 text-purple-700 border-purple-200 font-accent">
-              <Sparkles className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'التكنولوجيا المتقدمة' : 'Advanced Technology'}
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              {language === 'ar' ? 'مدعوم بأحدث التقنيات' : 'Powered by Cutting-Edge Technology'}
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              {language === 'ar'
-                ? 'نستخدم أحدث تقنيات الذكاء الاصطناعي والبنية التحتية السحابية لتقديم رعاية صحية موثوقة وآمنة'
-                : 'We leverage the latest AI technologies and cloud infrastructure to deliver reliable and secure healthcare'}
-            </p>
-          </div>
-
-          {/* Technology Stack with Images */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
-            {/* Left: Arab Family Using Technology */}
-            <div className="relative">
-              <div className="rounded-3xl overflow-hidden shadow-2xl">
-                <img 
-                  src="/images/homepage/arab-family-tablet.jpg" 
-                  alt="Arab family using healthcare technology"
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-              {/* Floating badge */}
-              <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl p-6 shadow-2xl">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-slate-600">{language === 'ar' ? 'سهل الاستخدام' : 'Easy to Use'}</div>
-                    <div className="text-xl font-bold text-slate-900">{language === 'ar' ? 'لجميع الأعمار' : 'For All Ages'}</div>
-                  </div>
-                </div>
-              </div>
+          <div className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-3xl p-12 text-center text-white relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
             </div>
-
-            {/* Right: Technology Features */}
-            <div className="space-y-6">
-              <div className="flex items-start gap-4 p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Brain className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">
-                    {language === 'ar' ? 'ذكاء اصطناعي متقدم' : 'Advanced AI Models'}
-                  </h3>
-                  <p className="text-slate-600">
-                    {language === 'ar'
-                      ? 'نستخدم نماذج الذكاء الاصطناعي الطبية المتقدمة للتحليل الدقيق'
-                      : 'Utilizing advanced medical AI models for accurate analysis'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                  <Database className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">
-                    {language === 'ar' ? 'بنية تحتية قوية' : 'Robust Infrastructure'}
-                  </h3>
-                  <p className="text-slate-600">
-                    {language === 'ar'
-                      ? 'مبني على React وNode.js مع قاعدة بيانات آمنة وموثوقة لضمان أفضل أداء'
-                      : 'Built on React and Node.js with secure and reliable database for optimal performance'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">
-                    {language === 'ar' ? 'أمان من الدرجة الأولى' : 'Enterprise-Grade Security'}
-                  </h3>
-                  <p className="text-slate-600">
-                    {language === 'ar'
-                      ? 'تشفير شامل وامتثال كامل لمعايير HIPAA لحماية بياناتك الصحية'
-                      : 'End-to-end encryption and full HIPAA compliance to protect your health data'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Technology Stack - Individual Logos */}
-          <div className="bg-white rounded-3xl p-12 shadow-xl">
-            <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">
-              {language === 'ar' ? 'مدعوم بأفضل التقنيات' : 'Built with Modern Technologies'}
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 items-center">
-              <div className="flex items-center justify-center p-4 group">
-                <img 
-                  src="/images/tech-logos/react.png" 
-                  alt="React"
-                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                  title="React"
-                />
-              </div>
-              <div className="flex items-center justify-center p-4 group">
-                <img 
-                  src="/images/tech-logos/typescript.png" 
-                  alt="TypeScript"
-                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                  title="TypeScript"
-                />
-              </div>
-              <div className="flex items-center justify-center p-4 group">
-                <img 
-                  src="/images/tech-logos/trpc.png" 
-                  alt="tRPC"
-                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                  title="tRPC"
-                />
-              </div>
-              <div className="flex items-center justify-center p-4 group">
-                <img 
-                  src="/images/tech-logos/tailwind.png" 
-                  alt="Tailwind CSS"
-                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                  title="Tailwind CSS"
-                />
-              </div>
-              <div className="flex items-center justify-center p-4 group">
-                <img 
-                  src="/images/tech-logos/drizzle.webp" 
-                  alt="Drizzle ORM"
-                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                  title="Drizzle ORM"
-                />
-              </div>
-              <div className="flex items-center justify-center p-4 group">
-                <img 
-                  src="/images/tech-logos/nodejs.png" 
-                  alt="Node.js"
-                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                  title="Node.js"
-                />
-              </div>
-              <div className="flex items-center justify-center p-4 group">
-                <img 
-                  src="/images/tech-logos/express.png" 
-                  alt="Express"
-                  className="h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                  title="Express"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Compliance & Certifications Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="container">
-          <div className="text-center mb-16">
-            <Badge className="bg-green-100 text-green-700 border-green-200 mb-4">
-              <Shield className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'الامتثال والاعتمادات' : 'Compliance & Certifications'}
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              {language === 'ar' ? 'معايير الأمان والجودة' : 'Security & Quality Standards'}
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              {language === 'ar'
-                ? 'نلتزم بأعلى معايير الأمان والخصوصية والجودة الطبية لحماية بياناتك وصحتك'
-                : 'We adhere to the highest standards of security, privacy, and medical quality to protect your data and health'}
-            </p>
-          </div>
-
-          {/* Healthcare Compliance */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-center">
-              {language === 'ar' ? 'الامتثال للرعاية الصحية' : 'Healthcare Compliance'}
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="hover-lift border-2 border-green-200 bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-20 mx-auto mb-4 flex items-center justify-center">
-                    <img src="/logos/hipaa-logo.jpg" alt="HIPAA Compliant" className="h-16 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold text-lg mb-2">HIPAA Compliant</h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'متوافق مع قانون نقل التأمين الصحي والمساءلة'
-                      : 'Health Insurance Portability and Accountability Act'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift border-2 border-blue-200 bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-20 mx-auto mb-4 flex items-center justify-center">
-                    <img src="/logos/gdpr-logo.jpg" alt="GDPR Compliant" className="h-16 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold text-lg mb-2">GDPR Compliant</h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'متوافق مع اللائحة العامة لحماية البيانات الأوروبية'
-                      : 'General Data Protection Regulation'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift border-2 border-purple-200 bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-20 mx-auto mb-4 flex items-center justify-center">
-                    <img src="/logos/fda-logo.png" alt="FDA Registered" className="h-16 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold text-lg mb-2">FDA Registered</h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'مسجل لدى إدارة الغذاء والدواء الأمريكية'
-                      : 'U.S. Food and Drug Administration'}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Security Certifications */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-center">
-              {language === 'ar' ? 'شهادات الأمان' : 'Security Certifications'}
-            </h3>
-            <div className="grid md:grid-cols-4 gap-6">
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
-                    <img src="/logos/iso27001-logo.jpg" alt="ISO 27001" className="h-14 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold mb-1">ISO 27001</h4>
-                  <p className="text-xs text-slate-600">
-                    {language === 'ar' ? 'إدارة أمن المعلومات' : 'Information Security Management'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
-                    <img src="/logos/soc2-logo.png" alt="SOC 2 Type II" className="h-14 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold mb-1">SOC 2 Type II</h4>
-                  <p className="text-xs text-slate-600">
-                    {language === 'ar' ? 'ضوابط الأمان والخصوصية' : 'Security & Privacy Controls'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
-                    <img src="/logos/iso9001-logo.jpg" alt="ISO 9001" className="h-14 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold mb-1">ISO 9001</h4>
-                  <p className="text-xs text-slate-600">
-                    {language === 'ar' ? 'إدارة الجودة' : 'Quality Management System'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-16 mx-auto mb-3 flex items-center justify-center">
-                    <img src="/logos/iso13485-logo.png" alt="ISO 13485" className="h-14 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold mb-1">ISO 13485</h4>
-                  <p className="text-xs text-slate-600">
-                    {language === 'ar' ? 'الأجهزة الطبية' : 'Medical Devices Quality'}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Medical Standards */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-center">
-              {language === 'ar' ? 'المعايير الطبية' : 'Medical Standards'}
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-20 mx-auto mb-3 flex items-center justify-center">
-                    <img src="/logos/fhir-logo.png" alt="HL7 FHIR" className="h-16 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold text-lg mb-2">HL7 FHIR</h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'معيار تبادل البيانات الصحية'
-                      : 'Healthcare Data Exchange Standard'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-20 mx-auto mb-3 flex items-center justify-center">
-                    <img src="/logos/icd10-logo.png" alt="ICD-10" className="h-16 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold text-lg mb-2">ICD-10</h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'التصنيف الدولي للأمراض'
-                      : 'International Classification of Diseases'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover-lift bg-white">
-                <CardContent className="p-6 text-center">
-                  <div className="h-20 mx-auto mb-3 flex items-center justify-center">
-                    <img src="/logos/snomed-logo.jpeg" alt="SNOMED CT" className="h-16 w-auto object-contain" />
-                  </div>
-                  <h4 className="font-bold text-lg mb-2">SNOMED CT</h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'المصطلحات الطبية السريرية'
-                      : 'Clinical Terminology Standard'}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Security Features Summary */}
-          <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold mb-6 text-center">
-              {language === 'ar' ? 'ميزات الأمان' : 'Security Features'}
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Lock className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">
-                    {language === 'ar' ? 'تشفير شامل' : 'End-to-End Encryption'}
-                  </h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'جميع البيانات مشفرة أثناء النقل والتخزين'
-                      : 'All data encrypted in transit and at rest'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">
-                    {language === 'ar' ? 'مراقبة على مدار الساعة' : '24/7 Monitoring'}
-                  </h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'مراقبة أمنية مستمرة واكتشاف التهديدات'
-                      : 'Continuous security monitoring and threat detection'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">
-                    {language === 'ar' ? 'نسخ احتياطي منتظم' : 'Regular Backups'}
-                  </h4>
-                  <p className="text-sm text-slate-600">
-                    {language === 'ar'
-                      ? 'نسخ احتياطية تلقائية لحماية بياناتك'
-                      : 'Automated backups to protect your data'}
-                  </p>
-                </div>
-              </div>
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                {isRTL ? 'ابدأ رحلتك الصحية اليوم' : 'Start Your Health Journey Today'}
+              </h2>
+              <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
+                {isRTL 
+                  ? 'انضم إلى آلاف المستخدمين الذين يثقون بنا لإدارة صحتهم بذكاء'
+                  : 'Join thousands of users who trust us to manage their health smartly'}
+              </p>
+              <Button
+                size="lg"
+                onClick={() => setLocation(isAuthenticated ? '/patient/portal' : '/patient-login')}
+                className="bg-white text-teal-700 hover:bg-teal-50 px-8 py-6 text-lg shadow-lg"
+              >
+                {isRTL ? 'سجل مجاناً الآن' : 'Sign Up Free Now'}
+                <ArrowRight className={`w-5 h-5 ${isRTL ? 'mr-2 rotate-180' : 'ml-2'}`} />
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-slate-900 text-white">
+      <footer className="bg-slate-900 text-white py-16">
         <div className="container">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
+          <div className="grid md:grid-cols-4 gap-12">
+            <div className="md:col-span-2">
               <img 
                 src="/logo.png" 
-                alt="MediTriage AI Pro" 
-                className="h-12 w-auto mb-4"
+                alt="MediTriage AI" 
+                className="h-12 w-auto mb-4 brightness-0 invert"
               />
-              <p className="text-slate-400 text-sm">
-                {language === 'ar' ? 'رعاية صحية ذكية بالذكاء الاصطناعي' : 'Smart healthcare powered by AI'}
+              <p className="text-slate-400 mb-6 max-w-md">
+                {isRTL 
+                  ? 'منصة الرعاية الصحية الذكية الأولى في العراق. نستخدم أحدث تقنيات الذكاء الاصطناعي لتقديم تقييم صحي دقيق وموثوق.'
+                  : 'The first smart healthcare platform in Iraq. We use the latest AI technologies to provide accurate and reliable health assessments.'}
               </p>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer">
+                  <Phone className="w-5 h-5" />
+                </div>
+              </div>
             </div>
+            
             <div>
-              <h4 className="font-bold mb-4">{language === 'ar' ? 'المنتج' : 'Product'}</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#features" className="hover:text-white transition-colors">{language === 'ar' ? 'المميزات' : 'Features'}</a></li>
-                <li><a href="#how-it-works" className="hover:text-white transition-colors">{language === 'ar' ? 'كيف يعمل' : 'How It Works'}</a></li>
-                <li><a href="#ai-capabilities" className="hover:text-white transition-colors">{language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Capabilities'}</a></li>
+              <h4 className="font-bold mb-4">{isRTL ? 'روابط سريعة' : 'Quick Links'}</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li><a href="#features" className="hover:text-white transition-colors">{isRTL ? 'المميزات' : 'Features'}</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">{isRTL ? 'كيف يعمل' : 'How It Works'}</a></li>
+                <li><a href="#testimonials" className="hover:text-white transition-colors">{isRTL ? 'آراء المستخدمين' : 'Testimonials'}</a></li>
               </ul>
             </div>
+            
             <div>
-              <h4 className="font-bold mb-4">{language === 'ar' ? 'الشركة' : 'Company'}</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'عن المنصة' : 'About Us'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'اتصل بنا' : 'Contact'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الوظائف' : 'Careers'}</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">{language === 'ar' ? 'قانوني' : 'Legal'}</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الخصوصية' : 'Privacy'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الشروط' : 'Terms'}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{language === 'ar' ? 'الأمان' : 'Security'}</a></li>
+              <h4 className="font-bold mb-4">{isRTL ? 'الدعم' : 'Support'}</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li><a href="#" className="hover:text-white transition-colors">{isRTL ? 'الأسئلة الشائعة' : 'FAQ'}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{isRTL ? 'سياسة الخصوصية' : 'Privacy Policy'}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{isRTL ? 'شروط الاستخدام' : 'Terms of Use'}</a></li>
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t border-slate-800 text-center text-sm text-slate-400">
-            <p>&copy; 2024 My Doctor. {language === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
+          
+          <div className="border-t border-slate-800 mt-12 pt-8 text-center text-slate-400">
+            <p>© 2026 MediTriage AI. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
           </div>
         </div>
       </footer>

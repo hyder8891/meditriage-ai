@@ -1197,3 +1197,4 @@
 ## January 6, 2026 Updates
 - [x] Remove all Find a Doctor references and functionality from patient dashboard
 - [x] Ensure bio-scanner uses back camera with flashlight enabled on mobile devices
+- [x] Redesign homepage from scratch - patient-focused, attractive, image-rich, Arabic-first with dual language support
