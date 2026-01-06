@@ -15,7 +15,7 @@ import { Brain, Activity, AlertTriangle, FileText, TrendingUp, Loader2, BarChart
 import { SmartAudioForm } from '../components/SmartAudioForm';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
-import { ClinicianLayout } from '../components/ClinicianLayout';
+import { PatientLayout } from '../components/PatientLayout';
 
 function BRAINAnalysisContent() {
   const [, navigate] = useLocation();
@@ -440,8 +440,8 @@ function BRAINAnalysisContent() {
 
 export default function BRAINAnalysis() {
   return (
-    <ClinicianLayout>
+    <PatientLayout>
       <BRAINAnalysisContent />
-    </ClinicianLayout>
+    </PatientLayout>
   );
 }

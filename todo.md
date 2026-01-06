@@ -1254,3 +1254,27 @@
 - [x] Clean up App.tsx imports and routes
 - [x] Clean up routers.ts imports
 - [x] Keep only patient dashboard functionality
+
+## DocDash Removal & Admin Dashboard Rebuild
+
+### DocDash Removal
+- [ ] Remove all DocDash-related directories and files
+- [ ] Remove all DocDash links from navigation and routing
+- [ ] Clean up any DocDash imports and references
+
+### Admin Dashboard Rebuild
+- [ ] Recreate Admin Dashboard from scratch with heavy/comprehensive approach
+- [ ] Align Admin Dashboard design with Patient Dashboard approach
+- [ ] Implement comprehensive admin analytics and metrics
+- [ ] Add detailed user management interface
+- [ ] Add system monitoring and health checks
+- [ ] Add audit logs and compliance tracking
+
+
+## AI Assessment & Find Clinic Enhancements
+- [x] Fix AI Assessment outcome - remove literature citations from results
+- [ ] Improve AI Assessment output quality and clarity
+- [x] Enhance Find Clinic feature with 2200+ facilities (seeded database)
+- [x] Add better search functionality to Find Clinic
+- [x] Add filtering options to Find Clinic (by type, specialty, city, distance)
+- [x] Improve facility display and information presentation

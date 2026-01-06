@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total, type FROM facilities GROUP BY type UNION ALL SELECT COUNT(*) as total, 'ALL' as type FROM facilities;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UdiNgsaUofG98U.a273b31256ed --database hfH9ioTEzRzswFjESim83C --execute SELECT COUNT(*) as total, type FROM facilities GROUP BY type UNION ALL SELECT COUNT(*) as total, 'ALL' as type FROM facilities;",
+  "rows": [
+    {
+      "total": "0",
+      "type": "ALL"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\ttype\n0\tALL\n",
+  "stderr": "",
+  "execution_time_ms": 230
+}

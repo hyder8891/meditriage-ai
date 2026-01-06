@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, BookOpen, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClinicianLayout } from "@/components/ClinicianLayout";
+import { PatientLayout } from "@/components/PatientLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 function MedicalLiteratureContent() {
@@ -309,8 +309,8 @@ function MedicalLiteratureContent() {
 
 export default function MedicalLiterature() {
   return (
-    <ClinicianLayout>
+    <PatientLayout>
       <MedicalLiteratureContent />
-    </ClinicianLayout>
+    </PatientLayout>
   );
 }

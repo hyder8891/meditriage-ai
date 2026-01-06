@@ -20,7 +20,10 @@ import {
   Calendar,
   FileText,
   CreditCard,
-  ChevronDown
+  ChevronDown,
+  BarChart3,
+  Users,
+  Shield
 } from "lucide-react";
 
 export function UserProfileDropdown() {
@@ -44,8 +47,6 @@ export function UserProfileDropdown() {
   // Get avatar color based on role
   const getAvatarColor = () => {
     switch (user.role) {
-      case "clinician":
-        return "bg-blue-600";
       case "patient":
         return "bg-green-600";
       case "admin":
@@ -76,7 +77,7 @@ export function UserProfileDropdown() {
             <span className="text-sm font-medium text-slate-900">{user.name}</span>
             <span className="text-xs text-slate-500 capitalize">
               {language === 'ar' 
-                ? (user.role === 'admin' ? 'مدير' : user.role === 'clinician' ? 'طبيب' : 'مريض')
+                ? (user.role === 'admin' ? 'مدير' : 'مريض')
                 : user.role
               }
             </span>
@@ -112,36 +113,7 @@ export function UserProfileDropdown() {
               <MessageSquare className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'الرسائل' : 'Messages'}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocation("/patient/my-doctors")}>
-              <FileText className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              <span>{language === 'ar' ? 'أطبائي' : 'My Doctors'}</span>
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/patient/subscription")}>
-              <CreditCard className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              <span>{language === 'ar' ? 'الاشتراك' : 'Subscription'}</span>
-            </DropdownMenuItem>
-          </>
-        )}
-        
-        {user.role === "clinician" && (
-          <>
-            <DropdownMenuItem onClick={() => setLocation("/clinician/dashboard")}>
-              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              <span>{language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocation("/clinician/profile")}>
-              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              <span>{language === 'ar' ? 'ملفي الشخصي' : 'My Profile'}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocation("/clinician/patients")}>
-              <FileText className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              <span>{language === 'ar' ? 'مرضاي' : 'My Patients'}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocation("/clinician/messages")}>
-              <MessageSquare className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              <span>{language === 'ar' ? 'الرسائل' : 'Messages'}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocation("/clinician/subscription")}>
               <CreditCard className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'الاشتراك' : 'Subscription'}</span>
             </DropdownMenuItem>
@@ -151,12 +123,20 @@ export function UserProfileDropdown() {
         {user.role === "admin" && (
           <>
             <DropdownMenuItem onClick={() => setLocation("/admin/dashboard")}>
-              <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <BarChart3 className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'لوحة المدير' : 'Admin Dashboard'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/admin/users")}>
-              <FileText className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <Users className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'إدارة المستخدمين' : 'Manage Users'}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation("/admin/analytics")}>
+              <BarChart3 className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'التحليلات' : 'Analytics'}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation("/admin/settings")}>
+              <Shield className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <span>{language === 'ar' ? 'إعدادات النظام' : 'System Settings'}</span>
             </DropdownMenuItem>
           </>
         )}

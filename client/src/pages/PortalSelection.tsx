@@ -104,10 +104,10 @@ export default function PortalSelection() {
 
                 <Button
                   size="lg"
-                  onClick={() => setLocation('/clinician/login')}
+                  onClick={() => setLocation('/admin/login')}
                   className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-0 shadow-lg group"
                 >
-                  {language === 'en' ? 'Access Clinician Portal' : 'الوصول إلى بوابة الأطباء'}
+                  {language === 'en' ? 'Access Admin Portal' : 'الوصول إلى بوابة المدير'}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </CardContent>

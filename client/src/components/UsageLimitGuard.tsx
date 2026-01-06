@@ -6,7 +6,7 @@ import { Link } from "wouter";
 interface UsageLimitGuardProps {
   children: ReactNode;
   feature: "consultation" | "doctor_connection";
-  userRole: "patient" | "doctor" | "clinician";
+  userRole: "patient" | "admin";
   language?: "ar" | "en";
 }
 
@@ -56,19 +56,6 @@ export function UsageLimitGuard({ children, feature, userRole, language = "ar" }
     }
   }
 
-  if (feature === "doctor_connection" && (userRole === "doctor" || userRole === "clinician")) {
-    const limit = usage?.patientsLimit || 100;
-    const connected = usage?.patientsConnected || 0;
-    
-    if (limit !== -1 && connected >= limit) {
-      limitReached = true;
-      limitMessage = language === "ar"
-        ? `لقد وصلت إلى حد المرضى (${connected}/${limit}). قم بالترقية إلى Premium للحصول على مرضى غير محدودين!`
-        : `You've reached your patient limit (${connected}/${limit}). Upgrade to Premium for unlimited patients!`;
-      upgradeUrl = "/clinician/subscription";
-    }
-  }
-
   // If limit reached, show upgrade prompt instead of children
   if (limitReached) {
     return (
@@ -108,7 +95,7 @@ export function UsageLimitGuard({ children, feature, userRole, language = "ar" }
             </div>
           </Link>
 
-          <Link to={userRole === "patient" ? "/patient/portal" : "/clinician/dashboard"}>
+          <Link to={userRole === "patient" ? "/patient/portal" : "/admin/dashboard"}>
             <div className="w-full mt-3 py-3 bg-slate-100 text-slate-600 rounded-lg font-semibold hover:bg-slate-200 transition cursor-pointer text-center">
               {language === "ar" ? "العودة إلى لوحة التحكم" : "Back to Dashboard"}
             </div>

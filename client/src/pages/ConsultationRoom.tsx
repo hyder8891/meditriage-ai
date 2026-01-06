@@ -92,7 +92,7 @@ export default function ConsultationRoom() {
       toast.success(language === 'ar' ? 'انتهت الاستشارة' : 'Consultation ended');
       // Cleanup before leaving
       cleanupConnection();
-      setLocation(user?.role === 'clinician' ? '/clinician/dashboard' : '/patient/portal');
+      setLocation(user?.role === 'admin' ? '/admin/dashboard' : '/patient/portal');
     },
   });
   
@@ -543,8 +543,8 @@ export default function ConsultationRoom() {
     );
   }
   
-  const isDoctor = user?.role === 'clinician' || user?.role === 'admin';
-  const otherParticipantName = isDoctor 
+  const isAdmin = user?.role === 'admin';
+  const otherParticipantName = isAdmin 
     ? (consultation as any).patient?.name || 'Patient'
     : (consultation as any).doctor?.name || 'Doctor';
   
@@ -554,7 +554,7 @@ export default function ConsultationRoom() {
       <header className="bg-gray-800 border-b border-gray-700 p-4">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <AppLogo href={user?.role === 'clinician' ? '/clinician/dashboard' : '/patient/portal'} size="sm" showText={false} />
+            <AppLogo href={user?.role === 'admin' ? '/admin/dashboard' : '/patient/portal'} size="sm" showText={false} />
             <div>
               <h1 className="text-white font-semibold">
                 {language === 'ar' ? 'استشارة فيديو' : 'Video Consultation'}

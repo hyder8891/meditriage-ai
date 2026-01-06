@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, like, and, or, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import {
   cases,
@@ -163,17 +163,94 @@ export async function addFacility(facilityData: InsertFacility) {
   return result[0].insertId;
 }
 
-export async function searchFacilities(type?: string, city?: string) {
+export async function searchFacilities(
+  type?: string, 
+  city?: string, 
+  specialty?: string,
+  searchQuery?: string,
+  limit: number = 100
+) {
   const db = await getDb();
   if (!db) return [];
   
-  if (type) {
-    return await db.select().from(facilities)
-      .where(eq(facilities.type, type as any))
-      .limit(50);
+  // Build dynamic where conditions
+  const conditions = [];
+  
+  if (type && type !== 'all') {
+    conditions.push(eq(facilities.type, type as any));
   }
   
-  return await db.select().from(facilities).limit(50);
+  if (city && city !== 'all') {
+    conditions.push(eq(facilities.city, city));
+  }
+  
+  if (specialty && specialty !== 'all') {
+    conditions.push(like(facilities.specialties, `%${specialty}%`));
+  }
+  
+  if (searchQuery && searchQuery.trim()) {
+    const query = `%${searchQuery.trim()}%`;
+    conditions.push(
+      or(
+        like(facilities.name, query),
+        like(facilities.address, query),
+        like(facilities.specialties, query),
+        like(facilities.services, query)
+      )
+    );
+  }
+  
+  if (conditions.length > 0) {
+    return await db.select().from(facilities)
+      .where(and(...conditions))
+      .limit(limit);
+  }
+  
+  return await db.select().from(facilities).limit(limit);
+}
+
+// Get all unique cities from facilities
+export async function getFacilityCities() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.selectDistinct({ city: facilities.city })
+    .from(facilities)
+    .where(sql`${facilities.city} IS NOT NULL`);
+  
+  return result.map(r => r.city).filter(Boolean).sort();
+}
+
+// Get all unique specialties from facilities
+export async function getFacilitySpecialties() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.selectDistinct({ specialty: facilities.specialties })
+    .from(facilities)
+    .where(sql`${facilities.specialties} IS NOT NULL`);
+  
+  return result.map(r => r.specialty).filter(Boolean).sort();
+}
+
+// Get facility statistics
+export async function getFacilityStats() {
+  const db = await getDb();
+  if (!db) return { total: 0, hospitals: 0, clinics: 0, emergency: 0, specialist: 0 };
+  
+  const [total] = await db.select({ count: sql<number>`count(*)` }).from(facilities);
+  const [hospitals] = await db.select({ count: sql<number>`count(*)` }).from(facilities).where(eq(facilities.type, 'hospital'));
+  const [clinics] = await db.select({ count: sql<number>`count(*)` }).from(facilities).where(eq(facilities.type, 'clinic'));
+  const [emergency] = await db.select({ count: sql<number>`count(*)` }).from(facilities).where(eq(facilities.type, 'emergency'));
+  const [specialist] = await db.select({ count: sql<number>`count(*)` }).from(facilities).where(eq(facilities.type, 'specialist'));
+  
+  return {
+    total: total?.count || 0,
+    hospitals: hospitals?.count || 0,
+    clinics: clinics?.count || 0,
+    emergency: emergency?.count || 0,
+    specialist: specialist?.count || 0
+  };
 }
 
 export async function getEmergencyFacilities() {

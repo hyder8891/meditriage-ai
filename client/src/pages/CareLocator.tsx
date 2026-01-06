@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,14 +28,17 @@ import {
   Loader2,
   Image as ImageIcon,
   MessageSquare,
+  Building2,
+  Stethoscope,
+  Activity,
+  Filter,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { ArrowLeft as ArrowLeftIcon } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { AppLogo } from "@/components/AppLogo";
-import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 interface FacilityWithDistance {
   id: string | number;
@@ -54,18 +57,23 @@ interface FacilityWithDistance {
   distance?: number;
   photoReference?: string;
   openNow?: boolean;
+  emergencyServices?: number;
 }
 
 function CareLocatorContent() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [facilityType, setFacilityType] = useState<string>("");
+  const [facilityType, setFacilityType] = useState<string>("all");
+  const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>("all");
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
-  const [sortBy, setSortBy] = useState<'distance' | 'rating'>('distance');
+  const [sortBy, setSortBy] = useState<'distance' | 'rating' | 'name'>('distance');
   const [useRealData, setUseRealData] = useState(false);
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [resultsLimit, setResultsLimit] = useState(50);
 
   // Get user location
   useEffect(() => {
@@ -89,6 +97,15 @@ function CareLocatorContent() {
     }
   }, []);
 
+  // Query for facility statistics
+  const { data: facilityStats } = trpc.clinical.getFacilityStats.useQuery();
+
+  // Query for available cities
+  const { data: availableCities } = trpc.clinical.getFacilityCities.useQuery();
+
+  // Query for available specialties
+  const { data: availableSpecialties } = trpc.clinical.getFacilitySpecialties.useQuery();
+
   // Query for real facilities using Google Places API
   const { data: realFacilities, isLoading: realLoading, refetch: refetchReal } = trpc.clinical.searchRealFacilities.useQuery(
     {
@@ -102,11 +119,14 @@ function CareLocatorContent() {
     }
   );
 
-  // Query for database facilities (fallback)
+  // Query for database facilities with enhanced filtering
   const { data: dbFacilities, isLoading: dbLoading, refetch: refetchDb } = trpc.clinical.searchFacilities.useQuery(
     {
-      type: (facilityType === "all" || !facilityType) ? "" : facilityType as any,
-      city: undefined,
+      type: facilityType as any,
+      city: selectedCity === "all" ? undefined : selectedCity,
+      specialty: selectedSpecialty === "all" ? undefined : selectedSpecialty,
+      searchQuery: searchQuery || undefined,
+      limit: resultsLimit,
     },
     {
       enabled: !useRealData,
@@ -119,7 +139,6 @@ function CareLocatorContent() {
   const fetchFacilityDetails = async (placeId: string) => {
     setDetailsLoading(true);
     try {
-      // Use trpc client directly without hooks
       const response = await fetch('/api/trpc/clinical.getFacilityDetails?input=' + encodeURIComponent(JSON.stringify({ placeId })));
       const data = await response.json();
       if (data.result?.data) {
@@ -152,28 +171,34 @@ function CareLocatorContent() {
   const isLoading = useRealData ? realLoading : dbLoading;
 
   // Add distance to facilities and sort
-  const facilitiesWithDistance: FacilityWithDistance[] = (facilities || []).map((facility: any) => {
-    let distance: number | undefined;
-    if (userLocation && facility.latitude && facility.longitude) {
-      distance = calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        parseFloat(facility.latitude),
-        parseFloat(facility.longitude)
-      );
-    }
-    return { ...facility, distance };
-  }).sort((a: FacilityWithDistance, b: FacilityWithDistance) => {
-    if (sortBy === 'distance') {
-      if (!a.distance) return 1;
-      if (!b.distance) return -1;
-      return a.distance - b.distance;
-    } else {
-      const ratingA = parseFloat(a.rating || '0');
-      const ratingB = parseFloat(b.rating || '0');
-      return ratingB - ratingA;
-    }
-  });
+  const facilitiesWithDistance: FacilityWithDistance[] = useMemo(() => {
+    if (!facilities) return [];
+    
+    return (facilities || []).map((facility: any) => {
+      let distance: number | undefined;
+      if (userLocation && facility.latitude && facility.longitude) {
+        distance = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          parseFloat(facility.latitude),
+          parseFloat(facility.longitude)
+        );
+      }
+      return { ...facility, distance };
+    }).sort((a: FacilityWithDistance, b: FacilityWithDistance) => {
+      if (sortBy === 'distance') {
+        if (!a.distance) return 1;
+        if (!b.distance) return -1;
+        return a.distance - b.distance;
+      } else if (sortBy === 'rating') {
+        const ratingA = parseFloat(a.rating || '0');
+        const ratingB = parseFloat(b.rating || '0');
+        return ratingB - ratingA;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    });
+  }, [facilities, userLocation, sortBy]);
 
   const handleSearch = () => {
     if (useRealData) {
@@ -183,6 +208,10 @@ function CareLocatorContent() {
     }
   };
 
+  const handleLoadMore = () => {
+    setResultsLimit(prev => prev + 50);
+  };
+
   const getTypeColor = (type: string) => {
     switch (type) {
       case "hospital": return "bg-red-600";
@@ -190,6 +219,16 @@ function CareLocatorContent() {
       case "emergency": return "bg-orange-600";
       case "specialist": return "bg-purple-600";
       default: return "bg-gray-600";
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "hospital": return <Hospital className="w-5 h-5" />;
+      case "clinic": return <Building2 className="w-5 h-5" />;
+      case "emergency": return <Activity className="w-5 h-5" />;
+      case "specialist": return <Stethoscope className="w-5 h-5" />;
+      default: return <Hospital className="w-5 h-5" />;
     }
   };
 
@@ -216,25 +255,35 @@ function CareLocatorContent() {
   const t = {
     title: language === 'ar' ? 'محدد موقع الرعاية' : 'Care Locator',
     subtitle: language === 'ar' ? 'ابحث عن المرافق الطبية في جميع أنحاء العراق' : 'Find medical facilities across Iraq',
+    facilitiesCount: language === 'ar' ? 'أكثر من 2000 منشأة صحية' : '2,000+ Healthcare Facilities',
     back: language === 'ar' ? 'رجوع' : 'Back',
     emergencyServices: language === 'ar' ? 'خدمات الطوارئ' : 'Emergency Services',
     searchFilters: language === 'ar' ? 'مرشحات البحث' : 'Search Filters',
+    advancedFilters: language === 'ar' ? 'مرشحات متقدمة' : 'Advanced Filters',
     findNearYou: language === 'ar' ? 'ابحث عن المرافق القريبة منك' : 'Find facilities near you',
-    searchPlaceholder: language === 'ar' ? 'ابحث عن المستشفيات والعيادات...' : 'Search for hospitals, clinics...',
+    searchPlaceholder: language === 'ar' ? 'ابحث عن المستشفيات والعيادات...' : 'Search hospitals, clinics, specialties...',
     facilityType: language === 'ar' ? 'نوع المرفق' : 'Facility Type',
     allTypes: language === 'ar' ? 'جميع الأنواع' : 'All Types',
     hospital: language === 'ar' ? 'مستشفى' : 'Hospital',
     clinic: language === 'ar' ? 'عيادة' : 'Clinic',
     emergencyType: language === 'ar' ? 'طوارئ' : 'Emergency',
     specialist: language === 'ar' ? 'متخصص' : 'Specialist',
+    city: language === 'ar' ? 'المدينة' : 'City',
+    allCities: language === 'ar' ? 'جميع المدن' : 'All Cities',
+    specialty: language === 'ar' ? 'التخصص' : 'Specialty',
+    allSpecialties: language === 'ar' ? 'جميع التخصصات' : 'All Specialties',
     sortBy: language === 'ar' ? 'ترتيب حسب' : 'Sort By',
     distance: language === 'ar' ? 'المسافة' : 'Distance',
     rating: language === 'ar' ? 'التقييم' : 'Rating',
+    name: language === 'ar' ? 'الاسم' : 'Name',
     searchFacilities: language === 'ar' ? 'البحث عن المرافق' : 'Search Facilities',
     useRealData: language === 'ar' ? 'استخدام بيانات حقيقية' : 'Use Real Data',
     quickStats: language === 'ar' ? 'إحصائيات سريعة' : 'Quick Stats',
     totalFacilities: language === 'ar' ? 'إجمالي المرافق' : 'Total Facilities',
+    hospitals: language === 'ar' ? 'المستشفيات' : 'Hospitals',
+    clinics: language === 'ar' ? 'العيادات' : 'Clinics',
     emergencyCenters: language === 'ar' ? 'مراكز الطوارئ' : 'Emergency Centers',
+    specialists: language === 'ar' ? 'المتخصصين' : 'Specialists',
     loading: language === 'ar' ? 'جاري التحميل...' : 'Loading facilities...',
     noFacilities: language === 'ar' ? 'لم يتم العثور على مرافق' : 'No facilities found',
     adjustFilters: language === 'ar' ? 'حاول تعديل مرشحات البحث' : 'Try adjusting your search filters',
@@ -249,52 +298,61 @@ function CareLocatorContent() {
     photos: language === 'ar' ? 'الصور' : 'Photos',
     reviews: language === 'ar' ? 'التقييمات' : 'Reviews',
     openingHours: language === 'ar' ? 'ساعات العمل' : 'Opening Hours',
+    loadMore: language === 'ar' ? 'تحميل المزيد' : 'Load More',
+    showing: language === 'ar' ? 'عرض' : 'Showing',
+    results: language === 'ar' ? 'نتيجة' : 'results',
+    hasEmergency: language === 'ar' ? 'خدمات طوارئ' : 'Emergency Services',
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => setLocation("/clinician/dashboard")}
+              onClick={() => setLocation("/patient/portal")}
+              className="hover:bg-green-100"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               {t.back}
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <MapPin className="w-8 h-8 text-green-600" />
+                <div className="p-2 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl text-white">
+                  <MapPin className="w-6 h-6" />
+                </div>
                 {t.title}
               </h1>
-              <p className="text-gray-600 mt-1">{t.subtitle}</p>
+              <p className="text-gray-600 mt-1">{t.subtitle} • <span className="text-green-600 font-semibold">{t.facilitiesCount}</span></p>
             </div>
           </div>
         </div>
 
         {/* Emergency Banner */}
-        <Card className="mb-6 border-red-200 bg-red-50">
+        <Card className="mb-6 border-red-200 bg-gradient-to-r from-red-50 to-orange-50 shadow-md">
           <CardContent className="py-4">
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="p-2 bg-red-100 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+              </div>
               <div className="flex-1">
                 <p className="text-sm text-red-900 font-semibold mb-2">
                   {t.emergencyServices}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="flex items-center gap-2 text-sm text-red-800">
+                  <div className="flex items-center gap-2 text-sm text-red-800 bg-white/50 rounded-lg px-3 py-2">
                     <Phone className="w-4 h-4" />
-                    <span>Iraqi Red Crescent: <strong>115</strong></span>
+                    <span>Iraqi Red Crescent: <strong className="text-red-600">115</strong></span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-red-800">
+                  <div className="flex items-center gap-2 text-sm text-red-800 bg-white/50 rounded-lg px-3 py-2">
                     <Phone className="w-4 h-4" />
-                    <span>Civil Defense: <strong>115</strong></span>
+                    <span>Civil Defense: <strong className="text-red-600">115</strong></span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-red-800">
+                  <div className="flex items-center gap-2 text-sm text-red-800 bg-white/50 rounded-lg px-3 py-2">
                     <Phone className="w-4 h-4" />
-                    <span>Police: <strong>104</strong></span>
+                    <span>Police: <strong className="text-red-600">104</strong></span>
                   </div>
                 </div>
               </div>
@@ -302,33 +360,34 @@ function CareLocatorContent() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Search Filters */}
           <div className="lg:col-span-1">
-            <Card className="card-modern lg:sticky lg:top-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Search className="w-5 h-5" />
+            <Card className="lg:sticky lg:top-6 shadow-lg border-0 bg-white/80 backdrop-blur">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Filter className="w-5 h-5 text-green-600" />
                   {t.searchFilters}
                 </CardTitle>
                 <CardDescription>{t.findNearYou}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Search Input */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">{t.searchPlaceholder}</label>
                   <Input
                     placeholder={t.searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="min-h-[48px] text-base md:min-h-[40px] md:text-sm"
+                    className="min-h-[48px] text-base border-2 focus:border-green-500"
                   />
                 </div>
 
+                {/* Facility Type */}
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-gray-700">{t.facilityType}</label>
                   <Select value={facilityType} onValueChange={setFacilityType}>
-                    <SelectTrigger>
+                    <SelectTrigger className="min-h-[44px]">
                       <SelectValue placeholder={t.allTypes} />
                     </SelectTrigger>
                     <SelectContent>
@@ -341,35 +400,84 @@ function CareLocatorContent() {
                   </Select>
                 </div>
 
+                {/* City Filter */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">{t.sortBy}</label>
-                  <Select value={sortBy} onValueChange={(v) => setSortBy(v as 'distance' | 'rating')}>
-                    <SelectTrigger>
-                      <SelectValue />
+                  <label className="text-sm font-semibold text-gray-700">{t.city}</label>
+                  <Select value={selectedCity} onValueChange={setSelectedCity}>
+                    <SelectTrigger className="min-h-[44px]">
+                      <SelectValue placeholder={t.allCities} />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="distance">{t.distance}</SelectItem>
-                      <SelectItem value="rating">{t.rating}</SelectItem>
+                    <SelectContent className="max-h-60">
+                      <SelectItem value="all">{t.allCities}</SelectItem>
+                      {availableCities?.map((city) => (
+                        <SelectItem key={city} value={city || ""}>{city}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="flex items-center gap-2 pt-2">
-                  <input
-                    type="checkbox"
-                    id="useRealData"
-                    checked={useRealData}
-                    onChange={(e) => setUseRealData(e.target.checked)}
-                    className="rounded"
-                  />
-                  <label htmlFor="useRealData" className="text-sm text-gray-700 cursor-pointer">
-                    {t.useRealData} (Google Places)
-                  </label>
-                </div>
+                {/* Advanced Filters Toggle */}
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                  className="w-full justify-between text-gray-600 hover:text-gray-900"
+                >
+                  {t.advancedFilters}
+                  {showAdvancedFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </Button>
+
+                {showAdvancedFilters && (
+                  <div className="space-y-4 pt-2 border-t">
+                    {/* Specialty Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700">{t.specialty}</label>
+                      <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
+                        <SelectTrigger className="min-h-[44px]">
+                          <SelectValue placeholder={t.allSpecialties} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          <SelectItem value="all">{t.allSpecialties}</SelectItem>
+                          {availableSpecialties?.map((specialty) => (
+                            <SelectItem key={specialty} value={specialty || ""}>{specialty}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Sort By */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700">{t.sortBy}</label>
+                      <Select value={sortBy} onValueChange={(v) => setSortBy(v as 'distance' | 'rating' | 'name')}>
+                        <SelectTrigger className="min-h-[44px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="distance">{t.distance}</SelectItem>
+                          <SelectItem value="rating">{t.rating}</SelectItem>
+                          <SelectItem value="name">{t.name}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Real Data Toggle */}
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                      <input
+                        type="checkbox"
+                        id="useRealData"
+                        checked={useRealData}
+                        onChange={(e) => setUseRealData(e.target.checked)}
+                        className="rounded border-gray-300"
+                      />
+                      <label htmlFor="useRealData" className="text-sm text-gray-700 cursor-pointer">
+                        {t.useRealData} (Google Places)
+                      </label>
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   onClick={handleSearch}
-                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 min-h-[48px] text-base md:min-h-[40px] md:text-sm"
+                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 min-h-[48px] text-base shadow-lg"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -380,17 +488,25 @@ function CareLocatorContent() {
                   {t.searchFacilities}
                 </Button>
 
-                {/* Quick Stats */}
-                <div className="pt-4 border-t space-y-2">
-                  <p className="text-xs font-semibold text-gray-500 uppercase">{t.quickStats}</p>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">{t.totalFacilities}</span>
-                      <span className="font-semibold">{facilitiesWithDistance?.length || 0}</span>
+                {/* Statistics */}
+                <div className="pt-4 border-t space-y-3">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.quickStats}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-blue-600">{facilityStats?.total || 0}</p>
+                      <p className="text-xs text-blue-700">{t.totalFacilities}</p>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">{t.emergencyCenters}</span>
-                      <span className="font-semibold">{emergencyFacilities?.length || 0}</span>
+                    <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-red-600">{facilityStats?.hospitals || 0}</p>
+                      <p className="text-xs text-red-700">{t.hospitals}</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-green-600">{facilityStats?.clinics || 0}</p>
+                      <p className="text-xs text-green-700">{t.clinics}</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-orange-600">{facilityStats?.emergency || 0}</p>
+                      <p className="text-xs text-orange-700">{t.emergencyCenters}</p>
                     </div>
                   </div>
                 </div>
@@ -400,295 +516,182 @@ function CareLocatorContent() {
 
           {/* Results */}
           <div className="lg:col-span-2 space-y-4">
+            {/* Results Header */}
+            {!isLoading && facilitiesWithDistance.length > 0 && (
+              <div className="flex items-center justify-between px-2">
+                <p className="text-sm text-gray-600">
+                  {t.showing} <span className="font-semibold text-gray-900">{facilitiesWithDistance.length}</span> {t.results}
+                </p>
+              </div>
+            )}
+
             {isLoading ? (
-              <Card className="card-modern">
-                <CardContent className="py-12 text-center">
-                  <Loader2 className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
+              <Card className="shadow-lg border-0">
+                <CardContent className="py-16 text-center">
+                  <Loader2 className="w-12 h-12 text-green-500 mx-auto mb-4 animate-spin" />
                   <p className="text-gray-500">{t.loading}</p>
                 </CardContent>
               </Card>
             ) : facilitiesWithDistance && facilitiesWithDistance.length > 0 ? (
-              facilitiesWithDistance.map((facility) => {
-                const services = facility.services ? JSON.parse(facility.services) : [];
-                const specialties = facility.specialties ? JSON.parse(facility.specialties) : [];
-                
-                return (
-                  <Card key={facility.id} className="card-modern hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
+              <>
+                {facilitiesWithDistance.map((facility) => {
+                  let services: string[] = [];
+                  try {
+                    services = facility.services ? JSON.parse(facility.services) : [];
+                  } catch {
+                    services = facility.services ? [facility.services] : [];
+                  }
+                  
+                  return (
+                    <Card key={facility.id} className="shadow-md border-0 hover:shadow-xl transition-all duration-300 bg-white overflow-hidden">
+                      <div className="flex">
+                        {/* Type indicator bar */}
+                        <div className={`w-1.5 ${getTypeColor(facility.type)}`} />
+                        
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <CardTitle className="flex items-center gap-2">
-                              <Hospital className="w-5 h-5 text-green-600" />
-                              {facility.name}
-                            </CardTitle>
-                            {facility.rating && (
-                              <div className="flex items-center gap-1 text-sm">
-                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                <span className="font-semibold">{facility.rating}</span>
+                          <CardHeader className="pb-2">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                  <CardTitle className="flex items-center gap-2 text-lg">
+                                    <div className={`p-1.5 rounded-lg ${getTypeColor(facility.type)} text-white`}>
+                                      {getTypeIcon(facility.type)}
+                                    </div>
+                                    <span className="truncate">{facility.name}</span>
+                                  </CardTitle>
+                                  {facility.rating && (
+                                    <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full">
+                                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                      <span className="font-semibold text-sm text-yellow-700">{facility.rating}</span>
+                                    </div>
+                                  )}
+                                  {facility.emergencyServices === 1 && (
+                                    <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
+                                      <Activity className="w-3 h-3 mr-1" />
+                                      {t.hasEmergency}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <CardDescription className="flex items-start gap-2">
+                                  <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
+                                  <span className="text-gray-600">{facility.address}</span>
+                                </CardDescription>
+                                {facility.distance && (
+                                  <p className="text-sm text-green-600 font-medium mt-1 flex items-center gap-1">
+                                    <Navigation className="w-3 h-3" />
+                                    {facility.distance.toFixed(1)} {t.kmAway}
+                                  </p>
+                                )}
+                              </div>
+                              <Badge className={`${getTypeColor(facility.type)} text-white flex-shrink-0`}>
+                                {facility.type}
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-0 space-y-3">
+                            <div className="grid md:grid-cols-2 gap-3">
+                              {facility.phone && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                  <Phone className="w-4 h-4 text-green-600" />
+                                  <a href={`tel:${facility.phone}`} className="hover:text-green-600 transition-colors">
+                                    {facility.phone}
+                                  </a>
+                                </div>
+                              )}
+                              {facility.hours && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                  <Clock className="w-4 h-4 text-blue-600" />
+                                  <span>{facility.hours}</span>
+                                </div>
+                              )}
+                              {facility.specialties && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 md:col-span-2">
+                                  <Stethoscope className="w-4 h-4 text-purple-600" />
+                                  <span className="font-medium">{facility.specialties}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {services.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5">
+                                {services.slice(0, 5).map((service, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs bg-gray-100 text-gray-700">
+                                    {service}
+                                  </Badge>
+                                ))}
+                                {services.length > 5 && (
+                                  <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-500">
+                                    +{services.length - 5} more
+                                  </Badge>
+                                )}
                               </div>
                             )}
-                          </div>
-                          <CardDescription className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4" />
-                            {facility.address}
-                            {facility.distance && (
-                              <span className="text-blue-600 font-medium ml-2">
-                                ({facility.distance.toFixed(1)} {t.kmAway})
-                              </span>
-                            )}
-                          </CardDescription>
-                        </div>
-                        <Badge className={`${getTypeColor(facility.type)} text-white`}>
-                          {facility.type}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        {facility.phone && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Phone className="w-4 h-4" />
-                            <a href={`tel:${facility.phone}`} className="hover:text-green-600">
-                              {facility.phone}
-                            </a>
-                          </div>
-                        )}
-                        {facility.hours && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Clock className="w-4 h-4 text-gray-600" />
-                            <span className="text-gray-600">{facility.hours}</span>
-                            {facility.openNow !== undefined && (
-                              facility.openNow ? (
-                                <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
-                                  <CheckCircle className="w-3 h-3 mr-1" />
-                                  {t.openNow}
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="text-red-600 border-red-600 text-xs">
-                                  <XCircle className="w-3 h-3 mr-1" />
-                                  {t.closed}
-                                </Badge>
-                              )
-                            )}
-                          </div>
-                        )}
-                        {facility.website && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Globe className="w-4 h-4" />
-                            <a 
-                              href={facility.website} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="hover:text-green-600 truncate"
-                            >
-                              {t.website}
-                            </a>
-                          </div>
-                        )}
-                      </div>
 
-                      {/* Services */}
-                      {services.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold text-gray-500 uppercase">{t.services}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {services.map((service: string, index: number) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {service}
-                              </Badge>
-                            ))}
-                          </div>
+                            <div className="flex gap-2 pt-2">
+                              <Button
+                                size="sm"
+                                onClick={() => getDirections(facility)}
+                                className="flex-1 bg-green-600 hover:bg-green-700"
+                              >
+                                <Navigation className="w-4 h-4 mr-1" />
+                                {t.getDirections}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => viewOnMap(facility)}
+                                className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
+                              >
+                                <MapPinned className="w-4 h-4 mr-1" />
+                                {t.viewOnMap}
+                              </Button>
+                              {facility.website && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => window.open(facility.website!, '_blank')}
+                                  className="border-gray-200"
+                                >
+                                  <Globe className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </CardContent>
                         </div>
-                      )}
-
-                      {/* Specialties */}
-                      {specialties.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {specialties.map((specialty: string, index: number) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {specialty}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Action Buttons */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
-                        <Button
-                          variant="default"
-                          className="w-full min-h-[44px] text-base md:text-sm"
-                          onClick={() => getDirections(facility)}
-                        >
-                          <Navigation className="w-4 h-4 mr-2" />
-                          {t.getDirections}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full min-h-[44px] text-base md:text-sm"
-                          onClick={() => viewOnMap(facility)}
-                        >
-                          <MapPinned className="w-4 h-4 mr-2" />
-                          {t.viewOnMap}
-                        </Button>
-                        {useRealData && typeof facility.id === 'string' && (
-                          <Button
-                            variant="outline"
-                            className="w-full min-h-[44px] text-base md:text-sm"
-                            onClick={() => fetchFacilityDetails(facility.id as string)}
-                          >
-                            <ImageIcon className="w-4 h-4 mr-2" />
-                            {t.viewDetails}
-                          </Button>
-                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })
+                    </Card>
+                  );
+                })}
+
+                {/* Load More Button */}
+                {facilitiesWithDistance.length >= resultsLimit && (
+                  <div className="text-center pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={handleLoadMore}
+                      className="px-8"
+                    >
+                      {t.loadMore}
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
-              <Card className="card-modern">
-                <CardContent className="py-12 text-center">
+              <Card className="shadow-lg border-0">
+                <CardContent className="py-16 text-center">
                   <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-2">{t.noFacilities}</p>
-                  <p className="text-sm text-gray-400">
-                    {t.adjustFilters}
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">{t.noFacilities}</h3>
+                  <p className="text-gray-500">{t.adjustFilters}</p>
                 </CardContent>
               </Card>
             )}
           </div>
         </div>
       </div>
-
-      {/* Facility Details Modal */}
-      <Dialog open={!!selectedFacility} onOpenChange={() => setSelectedFacility(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <Hospital className="w-6 h-6 text-green-600" />
-              {selectedFacility?.name}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedFacility?.address}
-            </DialogDescription>
-          </DialogHeader>
-          {detailsLoading ? (
-            <div className="py-12 text-center">
-              <Loader2 className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
-              <p className="text-gray-500">Loading details...</p>
-            </div>
-          ) : selectedFacility && (
-            <div className="space-y-4 mt-4">
-              {/* Contact Information */}
-              <div className="grid md:grid-cols-2 gap-4">
-                {selectedFacility.phone && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="w-4 h-4 text-gray-600" />
-                    <a href={`tel:${selectedFacility.phone}`} className="hover:text-green-600">
-                      {selectedFacility.phone}
-                    </a>
-                  </div>
-                )}
-                {selectedFacility.website && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Globe className="w-4 h-4 text-gray-600" />
-                    <a 
-                      href={selectedFacility.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="hover:text-green-600 truncate"
-                    >
-                      Visit Website
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              {/* Rating */}
-              {selectedFacility.rating && (
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold text-lg">{selectedFacility.rating}</span>
-                </div>
-              )}
-
-              {/* Opening Hours */}
-              {selectedFacility.hours && (
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-blue-600" />
-                    {t.openingHours}
-                  </h4>
-                  <p className="text-sm text-gray-600 whitespace-pre-line">
-                    {selectedFacility.hours}
-                  </p>
-                </div>
-              )}
-
-              {/* Reviews */}
-              {selectedFacility.reviews && selectedFacility.reviews.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-purple-600" />
-                    {t.reviews}
-                  </h4>
-                  <div className="space-y-3">
-                    {selectedFacility.reviews.map((review: any, index: number) => (
-                      <Card key={index} className="bg-gray-50">
-                        <CardContent className="pt-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-sm">{review.author}</span>
-                            <div className="flex items-center gap-1">
-                              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                              <span className="text-xs">{review.rating}</span>
-                            </div>
-                          </div>
-                          <p className="text-xs text-gray-600 mb-1">{review.text}</p>
-                          <p className="text-xs text-gray-400">{review.date}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
 
 export default function CareLocator() {
-  const [, setLocation] = useLocation();
-  
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header with consistent logo */}
-      <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLocation("/patient/portal")}
-                className="gap-2"
-              >
-                <ArrowLeftIcon className="w-4 h-4" />
-                Back
-              </Button>
-              <AppLogo href="/patient/portal" size="md" showText={true} />
-              <h1 className="text-xl font-semibold text-gray-800 hidden md:block">
-                Find Healthcare Facilities
-              </h1>
-            </div>
-            <UserProfileDropdown />
-          </div>
-        </div>
-      </nav>
-      <CareLocatorContent />
-    </div>
-  );
+  return <CareLocatorContent />;
 }

@@ -9,7 +9,7 @@ import { trpc } from "@/lib/trpc";
 import { useToast } from "@/hooks/use-toast";
 
 interface SMSLoginProps {
-  role?: "patient" | "clinician";
+  role?: "patient" | "admin";
   onSuccess?: (token: string, user: any) => void;
 }
 
@@ -66,7 +66,7 @@ export function SMSLogin({ role = "patient", onSuccess }: SMSLoginProps) {
         onSuccess(data.token, data.user);
       } else {
         // Default redirect based on role
-        window.location.href = data.user.role === "clinician" ? "/clinician/dashboard" : "/patient/portal";
+        window.location.href = data.user.role === "admin" ? "/admin/dashboard" : "/patient/portal";
       }
     },
     onError: (error) => {

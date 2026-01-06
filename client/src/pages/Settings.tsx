@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings as SettingsIcon, User, Bell, Lock, Globe } from "lucide-react";
 import { toast } from "sonner";
-import { ClinicianLayout } from "@/components/ClinicianLayout";
+
 
 function SettingsContent() {
   const { user } = useAuth();
@@ -130,8 +130,6 @@ function SettingsContent() {
                   value={
                     user?.role === "admin"
                       ? "مدير"
-                      : user?.role === "clinician"
-                      ? "طبيب"
                       : "مريض"
                   }
                   disabled
@@ -315,17 +313,5 @@ function SettingsContent() {
 }
 
 export default function Settings() {
-  const { user } = useAuth();
-
-  // If clinician/admin, wrap with ClinicianLayout
-  if (user?.role === "clinician" || user?.role === "admin") {
-    return (
-      <ClinicianLayout>
-        <SettingsContent />
-      </ClinicianLayout>
-    );
-  }
-
-  // For patients, render without layout
   return <SettingsContent />;
 }

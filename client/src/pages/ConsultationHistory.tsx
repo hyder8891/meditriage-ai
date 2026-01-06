@@ -46,8 +46,8 @@ export default function ConsultationHistory() {
   const filteredConsultations = completedConsultations.filter(c => {
     if (!searchQuery) return true;
     
-    const isDoctor = user?.role === 'clinician' || user?.role === 'admin';
-    const otherPartyName = isDoctor
+    const isAdmin = user?.role === 'admin';
+    const otherPartyName = isAdmin
       ? ('patient' in c ? c.patient?.name : '')
       : ('doctor' in c ? c.doctor?.name : '');
     
@@ -63,7 +63,7 @@ export default function ConsultationHistory() {
     setShowDetailsDialog(true);
   };
   
-  const isDoctor = user?.role === 'clinician' || user?.role === 'admin';
+  const isAdmin = user?.role === 'admin';
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
@@ -75,14 +75,14 @@ export default function ConsultationHistory() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setLocation(isDoctor ? '/clinician/dashboard' : '/patient/portal')}
+                onClick={() => setLocation(isAdmin ? '/admin/dashboard' : '/patient/portal')}
                 className="gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 {language === 'ar' ? 'رجوع' : 'Back'}
               </Button>
               <AppLogo 
-                href={isDoctor ? '/clinician/dashboard' : '/patient/portal'} 
+                href={isAdmin ? '/admin/dashboard' : '/patient/portal'} 
                 size="md" 
                 showText={true} 
               />
@@ -211,7 +211,7 @@ export default function ConsultationHistory() {
                   : (language === 'ar' ? 'لم تكمل أي استشارات بعد' : "You haven't completed any consultations yet")}
               </p>
               {!searchQuery && (
-                <Button onClick={() => setLocation(isDoctor ? '/clinician/dashboard' : '/patient/symptom-checker')}>
+                <Button onClick={() => setLocation(isAdmin ? '/admin/dashboard' : '/patient/symptom-checker')}>
                   {language === 'ar' ? 'ابدأ استشارة' : 'Start Consultation'}
                 </Button>
               )}

@@ -167,7 +167,7 @@ export default function HomeEnhanced() {
               >
                 <Button 
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
-                  onClick={() => setLocation('/clinician-login')}
+                  onClick={() => setLocation('/patient-login')}
                 >
                   {strings.homepage.modernHero.ctaPrimary}
                 </Button>
@@ -236,7 +236,7 @@ export default function HomeEnhanced() {
                 <Button 
                   size="lg"
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-6 text-lg group"
-                  onClick={() => setLocation('/clinician-login')}
+                  onClick={() => setLocation('/patient-login')}
                 >
                   {strings.homepage.modernHero.ctaPrimary}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -417,7 +417,7 @@ export default function HomeEnhanced() {
               <Button 
                 size="lg"
                 className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-6 text-lg"
-                onClick={() => setLocation('/clinician-login')}
+                onClick={() => setLocation('/patient-login')}
               >
                 {strings.homepage.ctaSection.btnDemo}
               </Button>

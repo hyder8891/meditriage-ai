@@ -28,9 +28,8 @@ export function AppLogo({
   // Smart navigation: if href not provided, determine based on user role
   const navigationHref = href || (() => {
     if (!user) return "/";
-    // Admin users go to clinician dashboard (functional tools), not admin user management
-    if (user.role === 'admin' || user.role === 'clinician') {
-      return "/clinician/dashboard";
+    if (user.role === 'admin') {
+      return "/admin/dashboard";
     }
     return "/patient/portal";
   })();

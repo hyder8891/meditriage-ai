@@ -53,7 +53,7 @@ export function NotificationBadge() {
                   className="cursor-pointer p-4 transition-colors hover:bg-accent"
                   onClick={() => {
                     markAsRead(notification.messageId);
-                    window.location.href = '/clinician/messages';
+                    window.location.href = '/patient/messages';
                   }}
                 >
                   <div className="flex items-start justify-between gap-2">

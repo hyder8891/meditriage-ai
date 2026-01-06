@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Send, User, Circle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { PatientLayout } from "@/components/PatientLayout";
-import { ClinicianLayout } from "@/components/ClinicianLayout";
+
 import { useLanguage } from "@/contexts/LanguageContext";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
@@ -361,15 +361,6 @@ export default function Messages() {
   const { user } = useAuth();
   const { language } = useLanguage();
   const isArabic = language === 'ar';
-  
-  // Wrap with appropriate layout based on user role
-  if (user?.role === 'clinician' || user?.role === 'admin') {
-    return (
-      <ClinicianLayout>
-        <MessagesContent />
-      </ClinicianLayout>
-    );
-  }
   
   return (
     <PatientLayout title={isArabic ? 'الرسائل' : 'Messages'}>

@@ -21,8 +21,8 @@ export default function PatientLogin() {
   // Redirect if already authenticated (but allow admin to stay)
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role === 'clinician') {
-        setLocation('/clinician/dashboard');
+      if (user.role === 'admin') {
+        setLocation('/admin/dashboard');
       } else if (user.role === 'patient') {
         setLocation('/patient/portal');
       }
@@ -105,8 +105,8 @@ export default function PatientLogin() {
                 <Button variant="ghost" onClick={() => setLocation("/patient-login")}>
                   {language === 'ar' ? 'دخول المريض' : 'Patient Login'}
                 </Button>
-                <Button variant="ghost" onClick={() => setLocation("/clinician/login")}>
-                  {language === 'ar' ? 'دخول الطبيب' : 'Doctor Login'}
+                <Button variant="ghost" onClick={() => setLocation("/admin/login")}>
+                  {language === 'ar' ? 'دخول المدير' : 'Admin Login'}
                 </Button>
               </div>
             </div>
@@ -163,8 +163,8 @@ export default function PatientLogin() {
               <Button variant="ghost" onClick={() => setLocation("/patient-login")}>
                 {language === 'ar' ? 'دخول المريض' : 'Patient Login'}
               </Button>
-              <Button variant="ghost" onClick={() => setLocation("/clinician/login")}>
-                {language === 'ar' ? 'دخول الطبيب' : 'Doctor Login'}
+              <Button variant="ghost" onClick={() => setLocation("/admin/login")}>
+                {language === 'ar' ? 'دخول المدير' : 'Admin Login'}
               </Button>
             </div>
           </div>

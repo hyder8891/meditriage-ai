@@ -21,6 +21,9 @@ import {
   searchFacilities,
   getEmergencyFacilities,
   addFacility,
+  getFacilityCities,
+  getFacilitySpecialties,
+  getFacilityStats,
   createTranscription,
   getTranscriptionById,
   getTranscriptionsByClinicianId,
@@ -403,14 +406,41 @@ Provide structured JSON output with this exact format:
   // Care Locator (Iraq-specific)
   searchFacilities: protectedProcedure
     .input(z.object({
-      type: z.enum(["hospital", "clinic", "emergency", "specialist"]).or(z.literal("")).optional(),
+      type: z.enum(["hospital", "clinic", "emergency", "specialist", "all"]).or(z.literal("")).optional(),
       city: z.string().optional(),
+      specialty: z.string().optional(),
+      searchQuery: z.string().optional(),
+      limit: z.number().optional().default(100),
     }))
     .query(async ({ input }) => {
-      const facilityType = (input.type === "" || !input.type) 
+      const facilityType = (input.type === "" || !input.type || input.type === "all") 
         ? undefined 
-        : (input.type as "hospital" | "clinic" | "emergency" | "specialist");
-      return await searchFacilities(facilityType, input.city);
+        : input.type;
+      return await searchFacilities(
+        facilityType, 
+        input.city, 
+        input.specialty, 
+        input.searchQuery,
+        input.limit
+      );
+    }),
+
+  // Get available cities for filtering
+  getFacilityCities: protectedProcedure
+    .query(async () => {
+      return await getFacilityCities();
+    }),
+
+  // Get available specialties for filtering
+  getFacilitySpecialties: protectedProcedure
+    .query(async () => {
+      return await getFacilitySpecialties();
+    }),
+
+  // Get facility statistics
+  getFacilityStats: protectedProcedure
+    .query(async () => {
+      return await getFacilityStats();
     }),
 
   // Search real hospitals using Google Places API
