@@ -48,7 +48,6 @@ import { appointmentsRouter } from "./appointments-router";
 import { medicationsRouter } from "./medications-router";
 import { newGraduateRouter } from "./new-graduate-router";
 import { matchingRouter } from "./matching-router";
-import { doctorVerificationRouter } from "./doctor-verification-router";
 import { familyVaultRouter } from "./family-vault-router";
 import { clinicFinderRouter } from "./clinic-finder-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -132,7 +131,6 @@ export const appRouter = router({
   medications: medicationsRouter,
   newGraduate: newGraduateRouter,
   matching: matchingRouter,
-  doctorVerification: doctorVerificationRouter,
   familyVault: familyVaultRouter,
   clinicFinder: clinicFinderRouter,
   auth: router({

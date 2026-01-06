@@ -31,7 +31,6 @@ import { toast } from "sonner";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
-import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -212,10 +211,6 @@ function ClinicianDashboardContent() {
         </div>
       </header>
 
-      {/* Availability Toggle */}
-      <div className="p-4 sm:p-6 pb-0">
-        <DoctorAvailabilityToggle />
-      </div>
 
       {/* Stats Cards */}
       <div className="p-4 sm:p-6">

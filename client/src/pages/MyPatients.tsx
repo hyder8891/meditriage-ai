@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, User, MessageCircle, Calendar, FileText } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { DoctorAvailabilityToggle } from "@/components/DoctorAvailabilityToggle";
 import { ClinicianLayout } from "@/components/ClinicianLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -38,8 +37,6 @@ function MyPatientsContent() {
         </div>
       </div>
 
-      {/* Availability Toggle */}
-      <DoctorAvailabilityToggle />
 
       {/* Search and Filters */}
       <Card className="p-4">

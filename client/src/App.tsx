@@ -63,7 +63,6 @@ const XRayAnalysis = lazy(() => import("./pages/XRayAnalysis"));
 const MedicalReportsAnalysis = lazy(() => import("./pages/clinician/MedicalReportsAnalysis"));
 const SOAPTemplates = lazy(() => import("./pages/SOAPTemplates"));
 const ClinicianCalendar = lazy(() => import("./pages/ClinicianCalendar"));
-const DoctorCalendar = lazy(() => import("./pages/DoctorCalendar"));
 const PatientBooking = lazy(() => import("./pages/PatientBooking"));
 const MedicationManagement = lazy(() => import("./pages/MedicationManagement"));
 const PatientMedications = lazy(() => import("./pages/PatientMedications"));
@@ -77,12 +76,9 @@ const Reports = lazy(() => import("./pages/Reports"));
 const PatientDetail = lazy(() => import("./pages/PatientDetail"));
 const MyPatients = lazy(() => import("./pages/MyPatients"));
 
-const MyDoctors = lazy(() => import("./pages/MyDoctors"));
 const Messages = lazy(() => import("./pages/Messages"));
 const PatientSubscription = lazy(() => import("./pages/PatientSubscription"));
-const DoctorSubscription = lazy(() => import("./pages/DoctorSubscription"));
 const PatientProfile = lazy(() => import("./pages/PatientProfile"));
-const DoctorProfile = lazy(() => import("./pages/DoctorProfile"));
 const DebugUser = lazy(() => import("./pages/DebugUser"));
 const DebugAuth = lazy(() => import("./pages/DebugAuth"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
@@ -108,10 +104,8 @@ const SecondOpinionPrep = lazy(() => import("./pages/patient/SecondOpinionPrep")
 const HealthScoreDashboard = lazy(() => import("./pages/patient/HealthScoreDashboard"));
 const FamilyHealthVault = lazy(() => import("./pages/patient/FamilyHealthVault"));
 const SmartMatching = lazy(() => import("./pages/SmartMatching"));
-const DoctorAvailability = lazy(() => import("./pages/DoctorAvailability"));
 const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
-const MyDoctor = lazy(() => import("./pages/MyDoctor"));
 const SelfHealingDashboard = lazy(() => import("./pages/SelfHealingDashboard"));
 const TrainTheBrain = lazy(() => import("./pages/TrainTheBrain"));
 const MedicalLiterature = lazy(() => import("./pages/MedicalLiterature"));
@@ -119,11 +113,7 @@ const Certificates = lazy(() => import("./pages/Certificates"));
 const SecureAdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const SecureAdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const SecureAdminPatients = lazy(() => import("./pages/admin/AdminPatients"));
-const SecureAdminDoctors = lazy(() => import("./pages/admin/AdminDoctors"));
-const DoctorVerification = lazy(() => import("./pages/DoctorVerification"));
-const DoctorVerificationNew = lazy(() => import("./pages/DoctorVerificationNew"));
 const AdminVerificationQueue = lazy(() => import("./pages/AdminVerificationQueue"));
-const AdminDoctorVerification = lazy(() => import("./pages/admin/AdminDoctorVerification"));
 
 // Import all admin feature pages
 import * as AdminFeatures from "./pages/admin/index";
@@ -153,9 +143,6 @@ function Router() {
           {() => <ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>}
         </Route>      <Route path={"/clinician/reasoning"}>
           {() => <ProtectedRoute requiredRole="clinician"><ClinicalReasoning /></ProtectedRoute>}
-        </Route>
-        <Route path={"/clinician/mydoctor"}>
-          {() => <ProtectedRoute requiredRole="clinician"><MyDoctor /></ProtectedRoute>}
         </Route>
         <Route path={"/patient/symptom-checker"} component={ModernSymptomChecker} />
         <Route path={"/patient/symptom-checker-old"} component={PatientSymptomChecker} />
@@ -188,7 +175,7 @@ function Router() {
           {() => <ProtectedRoute requiredRole="clinician"><MedicalReportsAnalysis /></ProtectedRoute>}
         </Route>
         <Route path={"/clinician/calendar"}>
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorCalendar /></ProtectedRoute>}
+          {() => <ProtectedRoute requiredRole="clinician"><ClinicianCalendar /></ProtectedRoute>}
         </Route>
         <Route path={"/patient/booking/:doctorId"}>
           {(params) => <ProtectedRoute><PatientBooking doctorId={parseInt(params.doctorId)} /></ProtectedRoute>}
@@ -218,22 +205,9 @@ function Router() {
           {() => <ProtectedRoute requiredRole="clinician"><MyPatients /></ProtectedRoute>}
         </Route>
 
-        <Route path={"/patient/my-doctors"} component={MyDoctors} />
         <Route path={"/messages"} component={Messages} />
         <Route path={"/patient/messages"} component={Messages} />
         <Route path={"/patient/subscription"} component={PatientSubscription} />
-        <Route path={"/clinician/subscription"}>
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorSubscription /></ProtectedRoute>}
-        </Route>
-        <Route path="/clinician/verification">
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorVerificationNew /></ProtectedRoute>}
-        </Route>
-        <Route path="/doctor/verification">
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorVerificationNew /></ProtectedRoute>}
-        </Route>
-        <Route path="/clinician/verification-old">
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorVerification /></ProtectedRoute>}
-        </Route>
         <Route path={"/patient/medications"} component={PatientMedications} />
         <Route path="/patient/portal">
           {() => <ProtectedRoute requiredRole="patient"><PatientPortal /></ProtectedRoute>}
@@ -261,9 +235,6 @@ function Router() {
         </Route>
         <Route path="/patient/smart-matching">
           {() => <ProtectedRoute requiredRole="patient"><SmartMatching /></ProtectedRoute>}
-        </Route>
-        <Route path="/clinician/availability">
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorAvailability /></ProtectedRoute>}
         </Route>
         <Route path="/consultation/:id" component={ConsultationRoom} />
         <Route path="/patient/consultation-history">
@@ -302,9 +273,6 @@ function Router() {
         <Route path="/patient/family-vault">
           {() => <ProtectedRoute requiredRole="patient"><FamilyHealthVault /></ProtectedRoute>}
         </Route>
-        <Route path="/clinician/profile">
-          {() => <ProtectedRoute requiredRole="clinician"><DoctorProfile /></ProtectedRoute>}
-        </Route>
         <Route path={"/clinician/patient-vitals"}>
           {() => <ProtectedRoute requiredRole="clinician"><PatientVitalsViewer /></ProtectedRoute>}
         </Route>
@@ -327,12 +295,8 @@ function Router() {
         <Route path={"/admin/secret-login"} component={SecureAdminLogin} />
         <Route path={"/admin/dashboard"} component={SecureAdminDashboard} />
         <Route path={"/admin/patients"} component={SecureAdminPatients} />
-        <Route path={"/admin/doctors"} component={SecureAdminDoctors} />
         <Route path="/admin/verification-queue">
           {() => <ProtectedRoute requiredRole="admin"><AdminVerificationQueue /></ProtectedRoute>}
-        </Route>
-        <Route path="/admin/doctor-verification">
-          {() => <ProtectedRoute requiredRole="admin"><AdminDoctorVerification /></ProtectedRoute>}
         </Route>
         
         {/* Analytics & Monitoring */}
@@ -408,9 +372,6 @@ function Router() {
         <Route path={"/train-the-brain"} component={TrainTheBrain} />
         <Route path={"/brain-performance"} component={BrainPerformance} />
         <Route path={"/medical-literature"}>
-          {() => <ProtectedRoute requiredRole="clinician"><MedicalLiterature /></ProtectedRoute>}
-        </Route>
-        <Route path={"/doc-dash"}>
           {() => <ProtectedRoute requiredRole="clinician"><MedicalLiterature /></ProtectedRoute>}
         </Route>
 

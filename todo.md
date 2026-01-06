@@ -1244,3 +1244,13 @@
 - [x] Create pagination API endpoint in clinic-finder-router
 - [x] Add "View More" button to SmartClinicRecommendations component
 - [x] Add "View All Facilities" link to care locator page
+
+
+## Doctor Dashboard Removal
+- [x] Remove all doctor dashboard related files (DoctorAvailability, DoctorCalendar, DoctorProfile, DoctorSubscription, DoctorVerification, DoctorVerificationNew, FindDoctor, MyDoctor, MyDoctors)
+- [x] Remove admin doctor pages (AdminDoctorVerification, AdminDoctors)
+- [x] Remove doctor verification router and tests
+- [x] Remove doctor-related images
+- [x] Clean up App.tsx imports and routes
+- [x] Clean up routers.ts imports
+- [x] Keep only patient dashboard functionality
