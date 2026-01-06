@@ -1217,3 +1217,30 @@
 - [x] Integrate "Find a Clinic" card into AI assessment results page
 - [x] Show nearby clinics based on user's IP-detected location
 - [x] Add clinic details (name, address, phone, specialties, hours, ratings)
+
+
+## Triage Results & Clinic Recommendations Improvements (Jan 2026)
+
+### Clearer Outcomes Display
+- [x] Create TriageResultsSummary component with visual hierarchy
+- [x] Reduce text, improve readability with color-coded urgency
+- [x] Add numbered next steps with clear visual indicators
+- [x] Add compact red flag symptoms display
+
+### Smart Clinic Matching
+- [x] Add serviceCategories field to iraq_clinics table
+- [x] Create getSmartClinicRecommendations function in clinics.ts
+- [x] Map AI recommendations to clinic service categories (X-ray → imaging, blood test → laboratory)
+- [x] Create SmartClinicRecommendations component
+- [x] Integrate smart matching into TriageRecommendation component
+
+### Comprehensive Iraq Clinic Database
+- [x] Fetch 9,316 healthcare facilities from OpenStreetMap Overpass API (free)
+- [x] Import clinics with proper categorization by governorate
+- [x] Add service categories for smart matching
+
+### Expandable Clinic List
+- [x] Add getClinicsWithPagination function for "View More" functionality
+- [x] Create pagination API endpoint in clinic-finder-router
+- [x] Add "View More" button to SmartClinicRecommendations component
+- [x] Add "View All Facilities" link to care locator page
