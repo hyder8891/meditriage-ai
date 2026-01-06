@@ -117,15 +117,7 @@ function getArabicSteps() {
         align: "start" as const,
       },
     },
-    {
-      element: '[data-tour="find-doctor"]',
-      popover: {
-        title: "البحث عن طبيب 👨‍⚕️",
-        description: "ابحث عن أفضل الأطباء والعيادات في العراق. يمكنك تصفية النتائج حسب التخصص، الموقع، التقييمات، وحجز المواعيد مباشرة.",
-        side: "bottom" as const,
-        align: "start" as const,
-      },
-    },
+
     {
       element: '[data-tour="bio-scanner"]',
       popover: {
@@ -191,15 +183,7 @@ function getEnglishSteps() {
         align: "start" as const,
       },
     },
-    {
-      element: '[data-tour="find-doctor"]',
-      popover: {
-        title: "Find a Doctor 👨‍⚕️",
-        description: "Search for the best doctors and clinics in Iraq. Filter results by specialty, location, ratings, and book appointments directly.",
-        side: "bottom" as const,
-        align: "start" as const,
-      },
-    },
+
     {
       element: '[data-tour="bio-scanner"]',
       popover: {

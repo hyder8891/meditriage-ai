@@ -1193,3 +1193,6 @@
 - [x] Fix AI response showing raw JSON instead of natural conversational text
 - [x] Keep keyboard visible while typing in chat interface
 - [x] Auto-scroll to show new messages without manual scrolling
+
+## January 6, 2026 Updates
+- [x] Remove all Find a Doctor references and functionality from patient dashboard

@@ -211,7 +211,7 @@ export default function ConsultationHistory() {
                   : (language === 'ar' ? 'لم تكمل أي استشارات بعد' : "You haven't completed any consultations yet")}
               </p>
               {!searchQuery && (
-                <Button onClick={() => setLocation(isDoctor ? '/clinician/dashboard' : '/patient/find-doctors')}>
+                <Button onClick={() => setLocation(isDoctor ? '/clinician/dashboard' : '/patient/symptom-checker')}>
                   {language === 'ar' ? 'ابدأ استشارة' : 'Start Consultation'}
                 </Button>
               )}

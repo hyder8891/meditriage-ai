@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Activity,
-  Search,
   Users,
   MessageSquare,
   Crown,
@@ -70,13 +69,7 @@ export function PatientLayout({ children, showBackButton = true, title }: Patien
                 <Activity className="w-4 h-4 mr-2" />
                 {isArabic ? 'لوحة التحكم' : 'Dashboard'}
               </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation('/patient/find-doctors')}
-              >
-                <Search className="w-4 h-4 mr-2" />
-                {isArabic ? 'ابحث عن طبيب' : 'Find Doctors'}
-              </Button>
+
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation('/patient/my-doctors')}

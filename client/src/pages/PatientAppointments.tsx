@@ -165,10 +165,7 @@ export default function PatientAppointments() {
               </h1>
             </div>
             <div className="flex items-center gap-3">
-              <Button onClick={() => setLocation('/patient/find-doctors')} className="hidden sm:flex">
-                <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {language === 'ar' ? 'موعد جديد' : 'New Appointment'}
-              </Button>
+
               <UserProfileDropdown />
             </div>
           </div>
@@ -277,9 +274,9 @@ export default function PatientAppointments() {
               <p className="text-slate-600 mb-4">
                 {language === 'ar' ? 'ليس لديك أي مواعيد قادمة' : "You don't have any upcoming appointments"}
               </p>
-              <Button onClick={() => setLocation('/patient/find-doctors')}>
+              <Button onClick={() => setLocation('/patient/care-locator')}>
                 <Plus className="w-4 h-4 mr-2" />
-                {language === 'ar' ? 'احجز موعدك الأول' : 'Book Your First Appointment'}
+                {language === 'ar' ? 'ابحث عن عيادة' : 'Find a Clinic'}
               </Button>
             </CardContent>
           </Card>
@@ -287,19 +284,7 @@ export default function PatientAppointments() {
 
         {/* Quick Actions */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/patient/find-doctors')}>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <User className="w-5 h-5 text-blue-600" />
-                {language === 'ar' ? 'ابحث عن طبيب' : 'Find a Doctor'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-600">
-                {language === 'ar' ? 'ابحث عن طبيب واحجز موعد' : 'Search for a doctor and book an appointment'}
-              </p>
-            </CardContent>
-          </Card>
+
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/patient/care-locator')}>
             <CardHeader>

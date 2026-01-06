@@ -87,7 +87,6 @@ export interface AssessmentResult {
 
 interface AssessmentResultCardProps {
   result: AssessmentResult;
-  onFindDoctor?: () => void;
   onBookAppointment?: () => void;
   onCallEmergency?: () => void;
 }
@@ -144,7 +143,6 @@ const triageConfig = {
 
 export function AssessmentResultCard({ 
   result, 
-  onFindDoctor,
   onBookAppointment,
   onCallEmergency 
 }: AssessmentResultCardProps) {
@@ -181,13 +179,7 @@ export function AssessmentResultCard({
     return "text-red-600";
   };
 
-  const handleFindDoctor = () => {
-    if (onFindDoctor) {
-      onFindDoctor();
-    } else {
-      setLocation("/patient/care-locator");
-    }
-  };
+
 
   const handleBookAppointment = () => {
     if (onBookAppointment) {
@@ -584,16 +576,8 @@ export function AssessmentResultCard({
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
-              onClick={handleFindDoctor}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white gap-2 h-12"
-            >
-              <Stethoscope className="w-5 h-5" />
-              {isArabic ? "ابحث عن طبيب" : "Find a Doctor"}
-            </Button>
-            <Button
               onClick={handleBookAppointment}
-              variant="outline"
-              className="flex-1 gap-2 h-12"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white gap-2 h-12"
             >
               <Calendar className="w-5 h-5" />
               {isArabic ? "احجز موعد" : "Book Appointment"}

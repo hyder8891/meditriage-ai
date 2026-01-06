@@ -385,9 +385,9 @@ function MedicalReportAnalysisContent() {
               <Upload className="w-4 h-4 mr-2" />
               {language === 'ar' ? 'تحليل تقرير آخر' : 'Analyze Another Report'}
             </Button>
-            <Button variant="outline" onClick={() => setLocation('/patient/find-doctors')}>
+            <Button variant="outline" onClick={() => setLocation('/patient/care-locator')}>
               <Stethoscope className="w-4 h-4 mr-2" />
-              {language === 'ar' ? 'استشر طبيب' : 'Consult a Doctor'}
+              {language === 'ar' ? 'ابحث عن عيادة' : 'Find a Clinic'}
             </Button>
           </div>
         </div>

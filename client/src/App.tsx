@@ -76,7 +76,7 @@ const AddPatient = lazy(() => import("./pages/AddPatient"));
 const Reports = lazy(() => import("./pages/Reports"));
 const PatientDetail = lazy(() => import("./pages/PatientDetail"));
 const MyPatients = lazy(() => import("./pages/MyPatients"));
-const FindDoctor = lazy(() => import("./pages/FindDoctor"));
+
 const MyDoctors = lazy(() => import("./pages/MyDoctors"));
 const Messages = lazy(() => import("./pages/Messages"));
 const PatientSubscription = lazy(() => import("./pages/PatientSubscription"));
@@ -217,8 +217,7 @@ function Router() {
         <Route path={"/clinician/my-patients"}>
           {() => <ProtectedRoute requiredRole="clinician"><MyPatients /></ProtectedRoute>}
         </Route>
-        <Route path="/patient/find-doctor" component={FindDoctor} />
-        <Route path="/patient/find-doctors" component={FindDoctor} />
+
         <Route path={"/patient/my-doctors"} component={MyDoctors} />
         <Route path={"/messages"} component={Messages} />
         <Route path={"/patient/messages"} component={Messages} />
