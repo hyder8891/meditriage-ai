@@ -46,6 +46,7 @@
 - [ ] Emergency mode with high-contrast UI
 - [x] Logo integration (caduceus-based design)
 - [x] Add full compliance section with certifications and trust badges to Home.tsx
+- [x] Add expandable FAQ section with privacy, data security, and AI assessment questions
 
 ### 7. Security & Compliance
 - [x] HIPAA compliance measures

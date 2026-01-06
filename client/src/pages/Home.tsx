@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import {
   Activity,
@@ -207,6 +213,9 @@ export default function Home() {
               </a>
               <a href="#testimonials" className="text-slate-600 hover:text-teal-600 transition-colors">
                 {isRTL ? 'آراء المستخدمين' : 'Testimonials'}
+              </a>
+              <a href="#faq" className="text-slate-600 hover:text-teal-600 transition-colors">
+                {isRTL ? 'الأسئلة الشائعة' : 'FAQ'}
               </a>
             </div>
 
@@ -596,6 +605,131 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 bg-white">
+        <div className="container">
+          <div className="text-center mb-16">
+            <Badge className="bg-teal-100 text-teal-700 border-teal-200 mb-4">
+              {isRTL ? 'الأسئلة الشائعة' : 'FAQ'}
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {isRTL ? 'أسئلة شائعة' : 'Frequently Asked Questions'}
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              {isRTL 
+                ? 'إجابات على الأسئلة الأكثر شيوعاً حول الخصوصية والأمان وكيفية عمل التقييم بالذكاء الاصطناعي'
+                : 'Answers to the most common questions about privacy, security, and how our AI assessment works'}
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto">
+            <Accordion type="single" collapsible className="w-full">
+              {/* Privacy Questions */}
+              <AccordionItem value="privacy-1" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'كيف تحمون خصوصية بياناتي الصحية؟' : 'How do you protect my health data privacy?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'نحن ملتزمون بأعلى معايير الخصوصية. جميع بياناتك الصحية مشفرة باستخدام تشفير AES-256 أثناء النقل والتخزين. لا نشارك بياناتك مع أي طرف ثالث دون موافقتك الصريحة. يمكنك حذف بياناتك في أي وقت من إعدادات حسابك.'
+                    : 'We are committed to the highest privacy standards. All your health data is encrypted using AES-256 encryption during transit and storage. We never share your data with third parties without your explicit consent. You can delete your data at any time from your account settings.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="privacy-2" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'هل تبيعون بياناتي لشركات التأمين أو الإعلانات؟' : 'Do you sell my data to insurance companies or advertisers?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'لا، نحن لا نبيع بياناتك أبداً. نموذج عملنا لا يعتمد على بيع البيانات. بياناتك الصحية ملك لك وحدك، ونستخدمها فقط لتقديم الخدمات الصحية التي طلبتها.'
+                    : 'No, we never sell your data. Our business model does not rely on selling data. Your health data belongs to you alone, and we only use it to provide the health services you requested.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="privacy-3" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'من يمكنه الوصول إلى سجلاتي الصحية؟' : 'Who can access my health records?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'أنت فقط من يمكنه الوصول إلى سجلاتك الصحية الكاملة. في حالة الطوارئ، يمكنك اختيار مشاركة معلومات محددة مع مقدمي الرعاية الصحية. جميع عمليات الوصول مسجلة ويمكنك مراجعتها في أي وقت.'
+                    : 'Only you can access your complete health records. In emergencies, you can choose to share specific information with healthcare providers. All access is logged and you can review it at any time.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Security Questions */}
+              <AccordionItem value="security-1" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'ما هي إجراءات الأمان المستخدمة لحماية بياناتي؟' : 'What security measures are used to protect my data?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'نستخدم طبقات متعددة من الأمان تشمل: تشفير SSL/TLS لجميع الاتصالات، مصادقة ثنائية العوامل، جدران حماية متقدمة، مراقبة أمنية على مدار الساعة، ونسخ احتياطي مشفر. نحن متوافقون مع معايير HIPAA وGDPR.'
+                    : 'We use multiple layers of security including: SSL/TLS encryption for all communications, two-factor authentication, advanced firewalls, 24/7 security monitoring, and encrypted backups. We are compliant with HIPAA and GDPR standards.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="security-2" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'أين يتم تخزين بياناتي؟' : 'Where is my data stored?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'يتم تخزين بياناتك في مراكز بيانات آمنة ومعتمدة تتوافق مع أعلى معايير الأمان الدولية (ISO 27001). نستخدم خوادم موزعة جغرافياً لضمان توفر الخدمة واستمراريتها.'
+                    : 'Your data is stored in secure, certified data centers that comply with the highest international security standards (ISO 27001). We use geographically distributed servers to ensure service availability and continuity.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* AI Assessment Questions */}
+              <AccordionItem value="ai-1" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'كيف يعمل التقييم الصحي بالذكاء الاصطناعي؟' : 'How does the AI health assessment work?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'يستخدم نظامنا نماذج ذكاء اصطناعي متقدمة مدربة على ملايين الحالات الطبية الموثقة. عند إدخال أعراضك، يقوم النظام بتحليلها ومقارنتها مع قاعدة بيانات طبية شاملة لتقديم تقييم أولي وتوصيات مناسبة.'
+                    : 'Our system uses advanced AI models trained on millions of documented medical cases. When you enter your symptoms, the system analyzes them and compares them with a comprehensive medical database to provide an initial assessment and appropriate recommendations.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="ai-2" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'هل يمكن للذكاء الاصطناعي أن يحل محل الطبيب؟' : 'Can AI replace a doctor?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'لا، الذكاء الاصطناعي لا يحل محل الطبيب. نظامنا مصمم كأداة مساعدة لتقديم تقييم أولي وتوجيهك نحو الرعاية المناسبة. نوصي دائماً باستشارة طبيب مختص للتشخيص النهائي والعلاج.'
+                    : 'No, AI does not replace a doctor. Our system is designed as a supportive tool to provide initial assessment and guide you toward appropriate care. We always recommend consulting a qualified physician for final diagnosis and treatment.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="ai-3" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'ما مدى دقة التقييم الصحي بالذكاء الاصطناعي؟' : 'How accurate is the AI health assessment?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'نظامنا يحقق دقة تزيد عن 95% في تحديد مستوى الخطورة الصحيحة. ومع ذلك، نؤكد أن هذا تقييم أولي ويجب التحقق منه من قبل متخصص طبي. نقوم بتحديث وتحسين نماذجنا باستمرار بناءً على أحدث الأبحاث الطبية.'
+                    : 'Our system achieves over 95% accuracy in identifying the correct severity level. However, we emphasize that this is an initial assessment and should be verified by a medical professional. We continuously update and improve our models based on the latest medical research.'}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="ai-4" className="border border-slate-200 rounded-lg mb-4 px-6 bg-white shadow-sm">
+                <AccordionTrigger className="text-lg font-semibold text-slate-900 hover:no-underline">
+                  {isRTL ? 'هل يتعلم الذكاء الاصطناعي من بياناتي الشخصية؟' : 'Does the AI learn from my personal data?'}
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed">
+                  {isRTL 
+                    ? 'نستخدم بيانات مجهولة الهوية ومجمعة فقط لتحسين نماذجنا. بياناتك الشخصية لا تُستخدم مباشرة في تدريب الذكاء الاصطناعي. يمكنك إلغاء الاشتراك في مشاركة البيانات المجهولة من إعدادات الخصوصية.'
+                    : 'We only use anonymized and aggregated data to improve our models. Your personal data is not directly used in AI training. You can opt out of sharing anonymized data from your privacy settings.'}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-white">
         <div className="container">
@@ -668,7 +802,7 @@ export default function Home() {
             <div>
               <h4 className="font-bold mb-4">{isRTL ? 'الدعم' : 'Support'}</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">{isRTL ? 'الأسئلة الشائعة' : 'FAQ'}</a></li>
+                <li><a href="#faq" className="hover:text-white transition-colors">{isRTL ? 'الأسئلة الشائعة' : 'FAQ'}</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">{isRTL ? 'سياسة الخصوصية' : 'Privacy Policy'}</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">{isRTL ? 'شروط الاستخدام' : 'Terms of Use'}</a></li>
               </ul>
