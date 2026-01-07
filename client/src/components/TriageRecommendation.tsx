@@ -394,7 +394,7 @@ export function TriageRecommendation({
                   recommendations.urgencyLevel === 'urgent' ? 'urgent' : 
                   recommendations.urgencyLevel === 'routine' ? 'standard' : 'non-urgent'
                 }
-                onViewAll={() => window.location.href = '/care-locator'}
+                onViewAll={() => window.location.href = '/patient/care-locator'}
               />
             </div>
           )}

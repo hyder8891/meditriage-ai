@@ -224,6 +224,7 @@
 - [x] Add clinic/hospital recommendations at end of assessment
 - [x] Display clinics/hospitals in Arabic when Arabic language is selected
 - [x] Ensure entire assessment flow maintains consistent Arabic language
+- [x] Fix AI assessment outcome to be fully Arabic when Arabic language is selected
 
 - [x] Protect /medical-literature route to require clinician authentication
 - [x] Add sidebar navigation to Medical Literature page using ClinicianLayout
@@ -1293,3 +1294,7 @@
 - [x] Add better search functionality to Find Clinic
 - [x] Add filtering options to Find Clinic (by type, specialty, city, distance)
 - [x] Improve facility display and information presentation
+
+- [x] Fix 404 error when viewing more clinics
+- [x] Remove Find Doctor feature from the app
+- [ ] Create fully Arabic presentation without citations

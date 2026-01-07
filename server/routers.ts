@@ -448,9 +448,23 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { messages, language } = input;
         
+        const arabicEnforcement = language === 'ar' ? `
+
+**CRITICAL ARABIC LANGUAGE REQUIREMENT**:
+- You MUST respond ENTIRELY in Arabic language (العربية)
+- ALL text MUST be in Arabic including:
+  * All questions and follow-up questions
+  * All medical terms (use Arabic medical terminology)
+  * All explanations and descriptions
+  * All options and choices
+- Do NOT use ANY English words, phrases, or medical terms
+- Use Arabic medical terms: "التهاب الحلق" not "Pharyngitis", "تحليل دم" not "blood test"
+- The patient is Arabic-speaking and expects ALL content in Arabic
+- NEVER switch to English mid-conversation` : '';
+        
         const systemMessage = {
           role: 'system' as const,
-          content: SYSTEM_PROMPT_TRIAGE + '\n\n' + IRAQI_MEDICAL_CONTEXT_PROMPT + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
+          content: SYSTEM_PROMPT_TRIAGE + '\n\n' + IRAQI_MEDICAL_CONTEXT_PROMPT + arabicEnforcement,
         };
         
         const fullMessages = messages[0]?.role === 'system' 
@@ -481,9 +495,23 @@ export const appRouter = router({
         const { messages, language } = input;
         
         // Add system prompt if not present
+        const arabicEnforcementChat = language === 'ar' ? `
+
+**CRITICAL ARABIC LANGUAGE REQUIREMENT**:
+- You MUST respond ENTIRELY in Arabic language (العربية)
+- ALL text MUST be in Arabic including:
+  * All questions and follow-up questions
+  * All medical terms (use Arabic medical terminology)
+  * All explanations and descriptions
+  * All options and choices
+- Do NOT use ANY English words, phrases, or medical terms
+- Use Arabic medical terms: "التهاب الحلق" not "Pharyngitis", "تحليل دم" not "blood test"
+- The patient is Arabic-speaking and expects ALL content in Arabic
+- NEVER switch to English mid-conversation` : '';
+        
         const systemMessage = {
           role: 'system' as const,
-          content: SYSTEM_PROMPT_TRIAGE + '\n\n' + IRAQI_MEDICAL_CONTEXT_PROMPT + (language === 'ar' ? '\n\n**MANDATORY**: You MUST respond in pure Arabic only. No English words whatsoever. All questions, explanations, and options must be in Arabic.' : ''),
+          content: SYSTEM_PROMPT_TRIAGE + '\n\n' + IRAQI_MEDICAL_CONTEXT_PROMPT + arabicEnforcementChat,
         };
         
         const fullMessages = messages[0]?.role === 'system' 
@@ -508,15 +536,30 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { conversationHistory, language } = input;
 
+        const arabicAdviceEnforcement = language === 'ar' ? `
+
+**CRITICAL ARABIC LANGUAGE REQUIREMENT**:
+- ALL content in your JSON response MUST be in Arabic (العربية)
+- chiefComplaint: Must be in Arabic
+- symptoms: All items must be in Arabic
+- assessment: Must be entirely in Arabic
+- recommendations: Must be entirely in Arabic
+- redFlags: All items must be in Arabic
+- disclaimer: Must be in Arabic
+- Do NOT use ANY English words or medical terms
+- Use Arabic medical terminology throughout` : '';
+
         const response = await invokeLLM({
           messages: [
             {
               role: 'system',
-              content: SYSTEM_PROMPT_FINAL_ADVICE + (language === 'ar' ? '\n\nRespond in Arabic.' : ''),
+              content: SYSTEM_PROMPT_FINAL_ADVICE + arabicAdviceEnforcement,
             },
             {
               role: 'user',
-              content: `Based on this conversation, generate a comprehensive medical report:\n\n${conversationHistory}`,
+              content: language === 'ar' 
+                ? `بناءً على هذه المحادثة، قم بإنشاء تقرير طبي شامل باللغة العربية:\n\n${conversationHistory}`
+                : `Based on this conversation, generate a comprehensive medical report:\n\n${conversationHistory}`,
             },
           ],
           response_format: {

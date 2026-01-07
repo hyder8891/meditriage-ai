@@ -274,9 +274,20 @@ export class BRAIN {
     recommendations: any;
     confidence: number;
   }> {
-    // Language-specific instructions
+    // Language-specific instructions - CRITICAL for Arabic output
     const languageInstruction = context.language === 'ar' 
-      ? 'IMPORTANT: Respond in Arabic language. All medical terms, diagnoses, recommendations, and explanations must be in Arabic.'
+      ? `CRITICAL LANGUAGE REQUIREMENT - ARABIC ONLY:
+- You MUST respond ENTIRELY in Arabic language (العربية)
+- ALL text in your JSON response MUST be in Arabic including:
+  * condition names (e.g., "التهاب الحلق" not "Pharyngitis")
+  * reasoning text
+  * supportingEvidence items
+  * redFlags items
+  * ALL recommendations (immediateActions, tests, imaging, referrals)
+- Do NOT use ANY English words, phrases, or medical terms
+- Use Arabic medical terminology (e.g., "تحليل دم كامل" not "CBC")
+- If you cannot express something in Arabic, use Arabic transliteration
+- The patient is Arabic-speaking and expects ALL content in Arabic`
       : '';
     
     // Optimized prompt for faster response while maintaining clinical quality
@@ -300,7 +311,22 @@ ${context.redFlagCheck && context.redFlagCheck.hasRedFlags ? `\n⚠️ **RED FLA
 
 **Task:** Generate top 5 differential diagnoses with probabilities (sum ≤100%), brief reasoning, red flags, and key recommendations. Consider Iraqi context (common: diabetes, HTN, infectious diseases).
 
-**JSON Response:**
+${context.language === 'ar' ? `**JSON Response (ALL TEXT MUST BE IN ARABIC):**
+\`\`\`json
+{
+  "differentialDiagnosis": [
+    {"condition": "اسم الحالة بالعربية", "icd10": "Code", "probability": 0.35, "reasoning": "شرح موجز بالعربية", "supportingEvidence": ["نقطة 1 بالعربية", "نقطة 2 بالعربية"]}
+  ],
+  "redFlags": ["علامة تحذيرية 1", "علامة تحذيرية 2"],
+  "recommendations": {
+    "immediateActions": ["إجراء فوري 1"],
+    "tests": ["فحص 1"],
+    "imaging": ["أشعة 1"],
+    "referrals": ["تحويل لأخصائي 1"]
+  },
+  "confidence": 0.75
+}
+\`\`\`` : `**JSON Response:**
 \`\`\`json
 {
   "differentialDiagnosis": [
@@ -315,12 +341,21 @@ ${context.redFlagCheck && context.redFlagCheck.hasRedFlags ? `\n⚠️ **RED FLA
   },
   "confidence": 0.75
 }
-\`\`\``;
+\`\`\``}`;
 
     try {
       // Use Gemini Pro for deep clinical reasoning with grounding
       const systemContent = context.language === 'ar'
-        ? 'أنت BRAIN، نظام ذكاء اصطناعي طبي متقدم. قدم تقييمات طبية دقيقة مبنية على الأدلة. يجب أن تكون جميع الاستجابات باللغة العربية بتنسيق JSON صالح.'
+        ? `أنت BRAIN، نظام ذكاء اصطناعي طبي متقدم.
+
+تعليمات إلزامية:
+- يجب أن تكون جميع الاستجابات باللغة العربية فقط
+- لا تستخدم أي كلمات إنجليزية على الإطلاق
+- استخدم المصطلحات الطبية العربية (مثل: "التهاب الحلق" وليس "Pharyngitis")
+- استخدم أسماء الفحوصات بالعربية (مثل: "تحليل دم كامل" وليس "CBC")
+- استخدم أسماء التخصصات بالعربية (مثل: "طبيب قلب" وليس "Cardiologist")
+- قدم تقييمات طبية دقيقة مبنية على الأدلة
+- يجب أن يكون الرد بتنسيق JSON صالح`
         : 'You are BRAIN, an advanced medical AI system. Provide evidence-based, accurate medical assessments with PubMed citations. Always respond in valid JSON format.';
       
       const responseText = await invokeGeminiPro(
@@ -336,7 +371,10 @@ ${context.redFlagCheck && context.redFlagCheck.hasRedFlags ? `\n⚠️ **RED FLA
           thinkingLevel: 'high',
           grounding: true,
           systemInstruction: context.language === 'ar'
-            ? 'استخدم التفكير المتسلسل. تحقق من المعلومات مقابل الإرشادات الطبية الحالية باستخدام بحث Google. قدم توصيات مبنية على الأدلة مع الاستشهادات. يجب أن تكون جميع الاستجابات باللغة العربية.'
+            ? `استخدم التفكير المتسلسل. تحقق من المعلومات مقابل الإرشادات الطبية الحالية.
+
+إلزامي: يجب أن تكون جميع الاستجابات باللغة العربية فقط. لا تستخدم أي كلمات إنجليزية في الرد.
+استخدم المصطلحات الطبية العربية لجميع التشخيصات والفحوصات والتوصيات.`
             : 'Use Chain-of-Thought reasoning. Verify information against current medical guidelines using Google Search. Provide evidence-based recommendations with citations.'
         }
       );
@@ -354,21 +392,24 @@ ${context.redFlagCheck && context.redFlagCheck.hasRedFlags ? `\n⚠️ **RED FLA
     } catch (error) {
       console.error('[BRAIN] Error generating diagnosis:', error);
       
-      // Return fallback diagnosis
+      // Return fallback diagnosis with language-appropriate content
+      const isArabic = context.language === 'ar';
       return {
         differentialDiagnosis: context.knowledgeBaseDiagnoses.slice(0, 3).map((d: any) => ({
           condition: d.diagnosis.conceptName,
           icd10: d.diagnosis.conceptId,
           probability: d.confidence,
           reasoning: d.reasoning,
-          supportingEvidence: ['Knowledge base match']
+          supportingEvidence: isArabic ? ['تطابق مع قاعدة البيانات الطبية'] : ['Knowledge base match']
         })),
-        redFlags: ['Unable to generate comprehensive assessment - please consult physician'],
+        redFlags: isArabic 
+          ? ['تعذر إنشاء تقييم شامل - يرجى استشارة الطبيب']
+          : ['Unable to generate comprehensive assessment - please consult physician'],
         recommendations: {
-          immediateActions: ['Seek medical attention'],
+          immediateActions: isArabic ? ['طلب الرعاية الطبية'] : ['Seek medical attention'],
           tests: [],
           imaging: [],
-          referrals: ['General practitioner']
+          referrals: isArabic ? ['طبيب عام'] : ['General practitioner']
         },
         confidence: 0.5
       };

@@ -70,13 +70,7 @@ export function PatientLayout({ children, showBackButton = true, title }: Patien
                 {isArabic ? 'لوحة التحكم' : 'Dashboard'}
               </Button>
 
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation('/patient/my-doctors')}
-              >
-                <Users className="w-4 h-4 mr-2" />
-                {isArabic ? 'أطبائي' : 'My Doctors'}
-              </Button>
+
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation('/patient/messages')}

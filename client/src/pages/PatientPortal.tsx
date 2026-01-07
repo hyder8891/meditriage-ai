@@ -158,7 +158,7 @@ export default function PatientPortal() {
   // Navigation items
   const navItems = [
     { icon: Activity, label: language === 'ar' ? 'لوحة التحكم' : 'Dashboard', path: '/patient/portal' },
-    { icon: Users, label: language === 'ar' ? 'أطبائي' : 'My Doctors', path: '/patient/my-doctors' },
+
     { icon: BookOpen, label: language === 'ar' ? 'المكتبة الصحية' : 'Health Library', path: '/patient/health-library' },
     { icon: MessageSquare, label: language === 'ar' ? 'الرسائل' : 'Messages', path: '/patient/messages' },
     { icon: Crown, label: language === 'ar' ? 'الاشتراك' : 'Subscription', path: '/patient/subscription' },
@@ -212,10 +212,7 @@ export default function PatientPortal() {
                   <Activity className="w-4 h-4 mr-2" />
                   {language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                 </Button>
-                <Button variant="ghost" onClick={() => setLocation('/patient/my-doctors')}>
-                  <Users className="w-4 h-4 mr-2" />
-                  {language === 'ar' ? 'أطبائي' : 'My Doctors'}
-                </Button>
+
                 <Button variant="ghost" onClick={() => setLocation('/patient/health-library')}>
                   <BookOpen className="w-4 h-4 mr-2" />
                   {language === 'ar' ? 'المكتبة الصحية' : 'Health Library'}
