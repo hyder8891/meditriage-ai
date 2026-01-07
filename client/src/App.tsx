@@ -88,6 +88,7 @@ const SecureAdminPatients = lazy(() => import("./pages/admin/AdminPatients"));
 const AdminVerificationQueue = lazy(() => import("./pages/AdminVerificationQueue"));
 const PatientBooking = lazy(() => import("./pages/PatientBooking"));
 const PatientSymptomChecker = lazy(() => import("./pages/PatientSymptomChecker"));
+const EnhancedSymptomChecker = lazy(() => import("./pages/EnhancedSymptomChecker"));
 
 // Import all admin feature pages
 import * as AdminFeatures from "./pages/admin/index";
@@ -196,7 +197,8 @@ function Router() {
         </Route>
         <Route path={"/test-notifications"} component={TestNotifications} />
         <Route path={"/symptom-checker"} component={SymptomChecker} />
-        <Route path={"/symptom-checker-structured"} component={SymptomCheckerStructured} />
+ <Route path={"/symptom-checker-structured"} component={SymptomCheckerStructured} />
+        <Route path={"/enhanced-symptom-checker"} component={EnhancedSymptomChecker} />
         <Route path={"/brain-analysis"} component={BRAINAnalysis} />
         <Route path={"/brain-dashboard"} component={BRAINDashboard} />
         <Route path={"/training-dashboard"} component={TrainingDashboard} />

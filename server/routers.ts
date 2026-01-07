@@ -26,6 +26,7 @@ import { weatherRouter } from "./routers/weather-router";
 import { ncbiRouter } from "./ncbi-router";
 import { airQualityRouter } from "./routers/air-quality-router";
 import { conversationalRouter } from "./conversational-router";
+import { enhancedConversationalRouter } from "./enhanced-conversational-router";
 import { conversationHistoryRouter } from "./conversation-history-router";
 import { budgetRouter } from "./budget-router";
 import { createLogger } from "./_core/logger";
@@ -113,6 +114,7 @@ export const appRouter = router({
   ncbi: ncbiRouter,
   airQuality: airQualityRouter,
   conversational: conversationalRouter,
+  enhancedConversational: enhancedConversationalRouter,
   conversationHistory: conversationHistoryRouter,
   budget: budgetRouter,
   orchestration: orchestrationRouter,
