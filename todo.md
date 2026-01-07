@@ -1342,3 +1342,10 @@
 - [ ] Create severity-based routing logic
 - [ ] Implement recommendation scoring system
 
+
+## Medical Imaging Feature for Patient Dashboard
+- [x] Create dedicated Medical Imaging page for patients
+- [x] Add Medical Imaging card to patient dashboard (PatientPortal.tsx)
+- [x] Add route for /patient/medical-imaging
+- [x] Support multiple imaging modalities (X-ray, MRI, CT, Ultrasound, etc.)
+- [x] Add navigation link in patient portal

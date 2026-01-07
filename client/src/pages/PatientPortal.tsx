@@ -29,6 +29,7 @@ import {
   HelpCircle,
   BarChart3,
   UsersRound,
+  Scan,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -99,6 +100,13 @@ export default function PatientPortal() {
       desc: language === 'ar' ? 'الذكاء الاصطناعي يقرأ تقاريرك' : 'AI reads your medical reports',
       color: 'from-indigo-500 to-violet-500',
       path: '/patient/report-analysis',
+    },
+    {
+      icon: Scan,
+      title: language === 'ar' ? 'تحليل الصور الطبية' : 'Medical Imaging',
+      desc: language === 'ar' ? 'تحليل الأشعة والصور الطبية' : 'Analyze X-rays, MRI, CT scans',
+      color: 'from-purple-500 to-fuchsia-500',
+      path: '/patient/medical-imaging',
     },
   ];
 

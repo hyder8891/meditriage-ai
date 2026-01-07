@@ -75,6 +75,7 @@ const TreatmentGuide = lazy(() => import("./pages/patient/TreatmentGuide"));
 const SecondOpinionPrep = lazy(() => import("./pages/patient/SecondOpinionPrep"));
 const HealthScoreDashboard = lazy(() => import("./pages/patient/HealthScoreDashboard"));
 const FamilyHealthVault = lazy(() => import("./pages/patient/FamilyHealthVault"));
+const MedicalImaging = lazy(() => import("./pages/patient/MedicalImaging"));
 const SmartMatching = lazy(() => import("./pages/SmartMatching"));
 const ConsultationRoom = lazy(() => import("./pages/ConsultationRoom"));
 const ConsultationHistory = lazy(() => import("./pages/ConsultationHistory"));
@@ -182,6 +183,9 @@ function Router() {
         </Route>
         <Route path="/patient/family-vault">
           {() => <ProtectedRoute requiredRole="patient"><FamilyHealthVault /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/medical-imaging">
+          {() => <ProtectedRoute requiredRole="patient"><MedicalImaging /></ProtectedRoute>}
         </Route>
         <Route path={"/patient/booking/:doctorId"}>
           {(params) => <ProtectedRoute><PatientBooking doctorId={parseInt(params.doctorId)} /></ProtectedRoute>}
