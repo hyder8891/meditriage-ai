@@ -233,6 +233,7 @@
 
 ## Current Issues
 
+- [x] BUG: AI assessment showing clinic names and references in chat message instead of structured output panel (Fixed - removed clinic data from markdown message, now only in structured resourceMatch field)
 - [x] Fix AI chat language inconsistency - AI switches to English mid-conversation when user writes in Arabic
 - [x] Add clinic/hospital recommendations at end of assessment
 - [x] Display clinics/hospitals in Arabic when Arabic language is selected
