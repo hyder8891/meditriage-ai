@@ -4,7 +4,7 @@
  */
 
 import mysql from 'mysql2/promise';
-import { invokeLLM } from '../../_core/llm';
+import { invokeGemini } from '../../_core/gemini';
 import { getDatabaseConfig } from '../../_core/db-config';
 
 // CRITICAL FIX: Parse DATABASE_URL into explicit connection parameters
@@ -168,7 +168,7 @@ export class TrainingPipeline {
   private async processTrainingCase(conn: mysql.PoolConnection, trainingCase: any): Promise<void> {
     try {
       // Use LLM to analyze the case
-      const response = await invokeLLM({
+      const response = await invokeGemini({
         messages: [
           {
             role: 'system',

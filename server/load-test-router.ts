@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 
 // Store active load tests in memory
 const activeTests = new Map<string, LoadTestSession>();
@@ -179,7 +179,7 @@ async function simulatePatient(sessionId: string, testCaseId: string): Promise<v
     
     testCase.input = triagePrompt;
     
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: 'system', content: 'You are a medical triage AI assistant.' },
         { role: 'user', content: triagePrompt }
@@ -246,7 +246,7 @@ async function simulateDoctor(sessionId: string, testCaseId: string): Promise<vo
     const query = queries[Math.floor(Math.random() * queries.length)];
     testCase.input = query;
     
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: 'system', content: 'You are a clinical decision support AI.' },
         { role: 'user', content: query }

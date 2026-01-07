@@ -1,4 +1,4 @@
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 import { ConversationalContextVector } from "./conversational-context-vector";
 import { BRAIN } from "./brain/index";
 import { executeAvicennaLoop } from "./brain/orchestrator";
@@ -250,7 +250,7 @@ export async function processConversationalAssessment(
   `;
 
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message }

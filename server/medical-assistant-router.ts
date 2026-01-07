@@ -5,7 +5,7 @@
 
 import { router, protectedProcedure, publicProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 import { getDrugInfo } from "./pubchem";
 import { getDrugSafetyInfo } from "./openfda";
 import { searchClinicalTrials } from "./clinicaltrials";
@@ -223,7 +223,7 @@ export const medicalAssistantRouter = router({
       messages.push({ role: "user", content: input.message });
       
       // Get LLM response
-      const llmResponse = await invokeLLM({ messages });
+      const llmResponse = await invokeGemini({ messages });
       
       const assistantMessage = llmResponse.choices[0].message.content;
       const contentStr = typeof assistantMessage === 'string' ? assistantMessage : JSON.stringify(assistantMessage);
@@ -251,7 +251,7 @@ export const medicalAssistantRouter = router({
         ? `Tell me about ${input.condition}. Specifically: ${input.specificQuestion}`
         : `Provide comprehensive information about ${input.condition}, including causes, symptoms, diagnosis, treatment options, and prognosis.`;
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: buildMedicalAssistantPrompt() },
           { role: "user", content: query }
@@ -313,7 +313,7 @@ export const medicalAssistantRouter = router({
       
       const contextInfo = drugInfo ? `\n\nDrug Information from PubChem:\n${JSON.stringify(drugInfo.description, null, 2)}` : '';
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: buildMedicalAssistantPrompt() + contextInfo },
           { role: "user", content: query }
@@ -347,7 +347,7 @@ export const medicalAssistantRouter = router({
       term: z.string().min(1)
     }))
     .mutation(async ({ input }) => {
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: "You are a medical educator explaining medical terminology in simple, accessible language." },
           { role: "user", content: `Explain the medical term "${input.term}" in simple language that a patient can understand. Include: definition, common usage, related terms, and when someone might encounter this term.` }
@@ -383,7 +383,7 @@ export const medicalAssistantRouter = router({
         medicalHistory: input.personalizeFor.conditions
       } : {};
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: buildMedicalAssistantPrompt(context) },
           { role: "user", content: `Provide evidence-based health tips and recommendations about ${input.topic}. Include practical, actionable advice that can be implemented in daily life.` }
@@ -436,7 +436,7 @@ export const medicalAssistantRouter = router({
 
 Respond in JSON format with fields: overview, symptoms (array), causes, treatment, prevention, whenToSeeDoctor`;
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: query }
@@ -515,7 +515,7 @@ Respond in JSON format with fields: overview, symptoms (array), causes, treatmen
 
 Respond in JSON format with fields: whatToExpect, beforeTreatment, duringTreatment, afterTreatment, sideEffects (array), questionsToAsk (array)`;
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: query }
@@ -599,7 +599,7 @@ Respond in JSON format with fields: whatToExpect, beforeTreatment, duringTreatme
         ? `بناءً على المعلومات التالية:\n${context}\n\nقم بإنشاء 8-10 أسئلة مهمة يمكن للمريض طرحها على طبيب آخر للحصول على رأي ثانٍ. يجب أن تكون الأسئلة:\n- محددة وواضحة\n- تغطي التشخيص والعلاج والتوقعات\n- تساعد المريض على اتخاذ قرار مستنير\n\nأجب بصيغة JSON مع حقل questions (array of strings)`
         : `Based on the following information:\n${context}\n\nGenerate 8-10 important questions the patient can ask another doctor for a second opinion. The questions should be:\n- Specific and clear\n- Cover diagnosis, treatment, and prognosis\n- Help the patient make an informed decision\n\nRespond in JSON format with a questions field (array of strings)`;
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: query }
@@ -651,7 +651,7 @@ Respond in JSON format with fields: whatToExpect, beforeTreatment, duringTreatme
         ? `بسّط هذا البحث الطبي للمريض العادي:\n\nالعنوان: ${input.title}\n\nالملخص: ${input.abstract}\n\nقدم:\n1. ملخص بسيط (2-3 جمل) لما يدور حوله البحث\n2. النتائج الرئيسية بلغة بسيطة\n3. ماذا يعني هذا للمريض العادي\n4. أي تحذيرات أو قيود`
         : `Simplify this medical research for a regular patient:\n\nTitle: ${input.title}\n\nAbstract: ${input.abstract}\n\nProvide:\n1. A simple summary (2-3 sentences) of what the research is about\n2. Key findings in simple language\n3. What this means for the average patient\n4. Any caveats or limitations`;
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: query }
@@ -689,7 +689,7 @@ Provide:
 
 Remember to emphasize that this is educational information and the patient should discuss results with their healthcare provider.`;
       
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: "You are a medical educator helping patients understand their lab results. Always emphasize the importance of discussing results with their healthcare provider." },
           { role: "user", content: query }

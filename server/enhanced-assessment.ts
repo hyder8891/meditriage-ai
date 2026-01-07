@@ -8,7 +8,7 @@
  * - Concise, understandable output without references
  */
 
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 // Import context vector
 let ConversationalContextVector: any;
 try {
@@ -383,7 +383,7 @@ export async function processEnhancedAssessment(
   const systemPrompt = buildGatheringPrompt(vector, message, effectiveLanguage, currentStep);
   
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message }

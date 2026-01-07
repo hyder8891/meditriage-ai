@@ -3,7 +3,7 @@
  * Provides retry logic, circuit breaker protection, and fallback mechanisms for LLM calls
  */
 
-import { invokeLLM, InvokeParams, InvokeResult } from './llm';
+import { invokeGemini, type GeminiParams as InvokeParams, type GeminiResult as InvokeResult } from './gemini';
 import { RetryManager } from './self-healing/retry-manager';
 import { CircuitBreakerRegistry } from './self-healing/circuit-breaker';
 import { GlobalErrorHandler } from './self-healing/global-error-handler';
@@ -57,7 +57,7 @@ export async function invokeResilientLLM(
         return await breaker.execute(async () => {
           // Timeout protection
           const response = await Promise.race([
-            invokeLLM(params),
+            invokeGemini(params),
             timeoutPromise<InvokeResult>(timeout),
           ]);
 

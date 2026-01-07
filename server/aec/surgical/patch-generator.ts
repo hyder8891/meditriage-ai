@@ -4,7 +4,7 @@
  * Generates code patches using Gemini Pro based on diagnostic results
  */
 
-import { invokeLLM } from "../../_core/llm";
+import { invokeGemini } from "../../_core/gemini";
 import fs from "fs/promises";
 import path from "path";
 import type { DiagnosticResult } from "../types";
@@ -109,7 +109,7 @@ export async function generatePatch(
     const prompt = buildPatchPrompt(diagnostic, fileContents);
 
     // Call Gemini Pro
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: "system", content: PATCH_SYSTEM_PROMPT },
         { role: "user", content: prompt },

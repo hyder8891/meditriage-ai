@@ -8,7 +8,7 @@
  * - Cross-referencing with medical databases
  */
 
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 
 /**
  * Confidence scoring for OCR extraction
@@ -54,7 +54,7 @@ export async function extractTextFromLabReportEnhanced(
 ): Promise<{ text: string; confidence: OCRConfidence }> {
   try {
     // Use Gemini's vision capabilities to extract text
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",
@@ -153,7 +153,7 @@ export async function parseLabResultsEnhanced(
   reportDate: Date
 ): Promise<EnhancedLabResult[]> {
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",
@@ -269,7 +269,7 @@ export async function interpretLabResultEnhanced(result: EnhancedLabResult): Pro
   requiresUrgentAction: boolean;
 }> {
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",
@@ -374,7 +374,7 @@ export async function generateOverallInterpretationEnhanced(
   clinicalGuidelineCompliance: string;
 }> {
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",

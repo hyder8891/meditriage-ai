@@ -54,7 +54,7 @@ import { clinicFinderRouter } from "./clinic-finder-router";
 import { doctorVerificationRouter } from "./doctor-verification-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 import { invokeDeepSeek, trainOnMedicalMaterial, deepMedicalReasoning } from "./_core/deepseek";
 import { analyzeXRayBackend } from "./_core/gemini";
 import { analyzeMedicalImage, detectImagingModality, type ImagingModality } from "./_core/medical-imaging";
@@ -520,7 +520,7 @@ export const appRouter = router({
           ? messages 
           : [systemMessage, ...messages];
 
-        const response = await invokeLLM({
+        const response = await invokeGemini({
           messages: fullMessages,
         });
 
@@ -551,7 +551,7 @@ export const appRouter = router({
 - Do NOT use ANY English words or medical terms
 - Use Arabic medical terminology throughout` : '';
 
-        const response = await invokeLLM({
+        const response = await invokeGemini({
           messages: [
             {
               role: 'system',

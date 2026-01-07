@@ -4,7 +4,7 @@
  */
 
 import { medicalKnowledge, MedicalConcept } from './knowledge/medical-knowledge';
-import { invokeLLM } from '../_core/llm';
+import { invokeGemini } from '../_core/gemini';
 import { invokeGeminiPro } from '../_core/gemini-dual';
 import mysql from 'mysql2/promise';
 import { searchAndCachePubMed, formatCitation, generatePubMedQuery } from './knowledge/pubmed-client';

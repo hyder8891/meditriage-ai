@@ -10,7 +10,7 @@
  * but internally uses Gemini for all operations.
  */
 
-import { invokeGeminiFlash, invokeGeminiPro } from './gemini-dual';
+import { invokeGemini, type GeminiResult } from './gemini';
 
 interface DeepSeekMessage {
   role: 'system' | 'user' | 'assistant';
@@ -55,37 +55,24 @@ export async function invokeDeepSeek(options: DeepSeekOptions): Promise<DeepSeek
     messages.some(m => 
       m.content.toLowerCase().includes('diagnos') ||
       m.content.toLowerCase().includes('differential') ||
-      m.content.toLowerCase().includes('analyze')
+      m.content.toLowerCase().includes('analyze') ||
+      m.content.toLowerCase().includes('clinical reasoning')
     );
 
-  // Extract system instruction from messages
-  const systemMessage = messages.find(m => m.role === 'system');
-  const userMessages = messages.filter(m => m.role !== 'system');
-
   try {
-    let content: string;
-    
-    if (requiresDeepReasoning) {
-      // Use Gemini Pro for complex medical reasoning
-      const result = await invokeGeminiFlash(userMessages, {
-        temperature,
-        thinkingLevel: 'medium',
-        systemInstruction: systemMessage?.content,
-        response_format,
-      });
-      // If response_format is specified, extract content from response
-      content = response_format ? result.choices[0]?.message?.content : result;
-    } else {
-      // Use Gemini Flash for fast triage and simple queries
-      const result = await invokeGeminiFlash(userMessages, {
-        temperature,
-        thinkingLevel: 'low',
-        systemInstruction: systemMessage?.content,
-        response_format,
-      });
-      // If response_format is specified, extract content from response
-      content = response_format ? result.choices[0]?.message?.content : result;
-    }
+    // Use Gemini with appropriate model based on task complexity
+    const response = await invokeGemini({
+      messages: messages.map(m => ({
+        role: m.role as 'system' | 'user' | 'assistant',
+        content: m.content,
+      })),
+      model: requiresDeepReasoning ? 'pro' : 'flash',
+      temperature,
+      response_format: response_format ? { type: 'json_object' } : undefined,
+    });
+
+    const content = response.choices[0]?.message?.content;
+    const text = typeof content === 'string' ? content : JSON.stringify(content);
 
     // Return DeepSeek-compatible response format
     return {
@@ -93,14 +80,14 @@ export async function invokeDeepSeek(options: DeepSeekOptions): Promise<DeepSeek
       choices: [{
         message: {
           role: 'assistant',
-          content,
+          content: text,
         },
         finish_reason: 'stop',
       }],
       usage: {
         prompt_tokens: messages.reduce((sum, m) => sum + m.content.length / 4, 0),
-        completion_tokens: content.length / 4,
-        total_tokens: (messages.reduce((sum, m) => sum + m.content.length, 0) + content.length) / 4,
+        completion_tokens: text.length / 4,
+        total_tokens: (messages.reduce((sum, m) => sum + m.content.length, 0) + text.length) / 4,
       },
     };
   } catch (error) {
@@ -144,19 +131,25 @@ Format as JSON:
   "clinicalRelevance": "..."
 }`;
 
-  const response = await invokeGeminiPro(
-    [{ role: 'user', content: prompt }],
-    {
-      temperature: 0.3,
-      thinkingLevel: 'high',
-      grounding: true,
-      systemInstruction: 'You are a medical knowledge extraction AI. Analyze medical literature and extract actionable clinical insights.',
-    }
-  );
+  const response = await invokeGemini({
+    messages: [
+      { 
+        role: 'system', 
+        content: 'You are a medical knowledge extraction AI. Analyze medical literature and extract actionable clinical insights.' 
+      },
+      { role: 'user', content: prompt }
+    ],
+    model: 'pro', // Use Pro for complex analysis
+    temperature: 0.3,
+    thinkingBudget: 2048,
+  });
+
+  const content = response.choices[0]?.message?.content;
+  const text = typeof content === 'string' ? content : JSON.stringify(content);
 
   try {
     // Clean markdown code blocks if present
-    const cleanJson = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const cleanJson = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const parsed = JSON.parse(cleanJson);
     
     return {
@@ -169,7 +162,7 @@ Format as JSON:
     
     // Fallback: extract from text
     return {
-      summary: response.substring(0, 200),
+      summary: text.substring(0, 200),
       keyFindings: [],
       clinicalRelevance: 'Analysis completed but structured extraction failed.',
     };
@@ -178,7 +171,7 @@ Format as JSON:
 
 /**
  * Deep medical reasoning for complex diagnostic cases
- * Uses Gemini Pro with high thinking level and grounding
+ * Uses Gemini Pro with high thinking level
  */
 export async function deepMedicalReasoning(params: {
   symptoms: string;
@@ -228,19 +221,25 @@ Format as JSON:
   "clinicalReasoning": "..."
 }`;
 
-  const response = await invokeGeminiPro(
-    [{ role: 'user', content: prompt }],
-    {
-      temperature: 0.7,
-      thinkingLevel: 'high',
-      grounding: true,
-      systemInstruction: 'You are an expert clinical diagnostician. Use evidence-based reasoning and consider Iraqi medical context.',
-    }
-  );
+  const response = await invokeGemini({
+    messages: [
+      { 
+        role: 'system', 
+        content: 'You are an expert clinical diagnostician. Use evidence-based reasoning and consider Iraqi medical context.' 
+      },
+      { role: 'user', content: prompt }
+    ],
+    task: 'clinical_reasoning', // Automatically uses Pro
+    temperature: 0.3,
+    thinkingBudget: 2048,
+  });
+
+  const content = response.choices[0]?.message?.content;
+  const text = typeof content === 'string' ? content : JSON.stringify(content);
 
   try {
     // Clean markdown code blocks if present
-    const cleanJson = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const cleanJson = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const parsed = JSON.parse(cleanJson);
     
     return {
@@ -257,14 +256,14 @@ Format as JSON:
       differentialDiagnosis: [],
       recommendedTests: [],
       urgencyLevel: 'routine',
-      clinicalReasoning: response.substring(0, 500),
+      clinicalReasoning: text.substring(0, 500),
     };
   }
 }
 
 /**
  * Legacy export for backward compatibility
- * @deprecated Use invokeGeminiFlash or invokeGeminiPro directly
+ * @deprecated Use invokeGemini directly from './gemini'
  */
 export const DeepSeekAPI = {
   invoke: invokeDeepSeek,

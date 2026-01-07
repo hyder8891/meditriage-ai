@@ -4,7 +4,7 @@
  * Layer 2 of the Accuracy Framework: Validates AI outputs against authoritative medical databases
  */
 
-import { invokeLLM } from '../llm';
+import { invokeGemini } from '../gemini';
 
 export interface CrossReferenceResult {
   isValidated: boolean;
@@ -93,7 +93,7 @@ Provide:
 Format as JSON with keys: icd10Code, snomedCode, typicalSymptoms (array), differentialDiagnoses (array), prevalence (string), conflicts (array), confidence (0-1)
 `;
 
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: 'system', content: 'You are a medical knowledge validation system. Respond only with valid JSON.' },
         { role: 'user', content: validationPrompt }
@@ -197,7 +197,7 @@ Provide:
 Format as JSON with keys: severity, mechanism (string), clinicalEffects (array), management (array), confidence (0-1)
 `;
 
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: 'system', content: 'You are a pharmacology validation system. Respond only with valid JSON.' },
         { role: 'user', content: interactionPrompt }
@@ -301,7 +301,7 @@ Provide:
 Format as JSON with keys: referenceRange (object with min, max, unit, ageGroup, gender), interpretation, clinicalSignificance (string), confidence (0-1)
 `;
 
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: 'system', content: 'You are a clinical laboratory validation system. Respond only with valid JSON.' },
         { role: 'user', content: validationPrompt }
@@ -409,7 +409,7 @@ Provide:
 Format as JSON with keys: isPlausible (boolean), typicalAppearance (string), differentials (array), concerns (array), confidence (0-1)
 `;
 
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: 'system', content: 'You are a radiology validation system. Respond only with valid JSON.' },
         { role: 'user', content: validationPrompt }
@@ -492,7 +492,7 @@ Provide up to ${maxResults} relevant publications with:
 Format as JSON array with keys: title (string), excerpt (string), relevance (number)
 `;
 
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: 'system', content: 'You are a medical literature search system. Respond only with valid JSON array.' },
         { role: 'user', content: searchPrompt }

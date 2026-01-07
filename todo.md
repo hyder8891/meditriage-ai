@@ -1353,3 +1353,27 @@
 ## Current Bug Fixes
 - [x] Fix imaging function not working
 - [x] Implement mobile-friendly dropdown for image upload instead of multiple cards
+
+
+## Gemini AI Migration (January 7, 2026)
+- [ ] Audit all current AI/LLM usage points in the application
+- [ ] Create unified Gemini integration module with model selection (Flash vs Pro)
+- [ ] Update medical imaging to use Gemini Pro for accurate analysis
+- [ ] Update triage/assessment functions to use appropriate Gemini models
+- [ ] Update other AI functions (drug interactions, clinical reasoning, etc.)
+- [ ] Remove/replace non-Gemini AI integrations
+- [ ] Test all Gemini integrations for accuracy
+- [ ] Validate medical imaging analysis quality
+
+
+## Gemini AI Migration (January 2026) - COMPLETED
+- [x] Create unified Gemini module with model selection (gemini.ts)
+- [x] Update medical imaging to use Gemini Pro for accurate analysis
+- [x] Update clinical reasoning to use Gemini Pro
+- [x] Update all AI functions to use Gemini exclusively
+- [x] Remove DeepSeek/other AI dependencies - now using Gemini only
+- [x] Implement intelligent model selection (Flash for fast tasks, Pro for complex tasks)
+- [x] Update resilient-llm wrapper to use Gemini
+- [x] Update all server routers to use invokeGemini
+- [x] Model selection: Pro for medical_imaging, clinical_reasoning, differential_diagnosis, drug_interaction, lab_analysis
+- [x] Model selection: Flash for triage, chat, simple_query, translation, summarization

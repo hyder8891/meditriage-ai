@@ -1,6 +1,6 @@
 import { router, publicProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 import { invokeGeminiFlash } from "./_core/gemini-dual";
 import { IRAQI_MEDICAL_CONTEXT_PROMPT } from "@shared/iraqiMedicalContext";
 

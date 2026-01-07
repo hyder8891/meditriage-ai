@@ -3,7 +3,7 @@
  * Uses Gemini 2.0 Pro to analyze errors and generate fixes
  */
 
-import { invokeLLM } from "../../_core/llm";
+import { invokeGemini } from "../../_core/gemini";
 import type { CodebaseContext } from "./context-builder";
 import type { DiagnosticResult } from "../types";
 
@@ -105,7 +105,7 @@ export async function diagnoseWithGemini(
 
   try {
     // Call Gemini Pro with Deep Think Mode
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: "system", content: DIAGNOSTIC_SYSTEM_PROMPT },
         { role: "user", content: userPrompt },

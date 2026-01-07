@@ -1,4 +1,4 @@
-import { invokeLLM } from "../_core/llm";
+import { invokeGemini } from "../_core/gemini";
 import { getDb } from "../db";
 import { doctorVerificationDocuments, users } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
@@ -140,7 +140,7 @@ If a field cannot be extracted, set it to null. Be precise and accurate.
 For Arabic text, preserve the exact Arabic characters.
 For English transliteration, use common conventions.`;
 
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: "system", content: systemPrompt },
         {

@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { invokeLLM } from '../_core/llm';
+import { invokeGemini } from '../_core/gemini';
 
 export const smartFormRouter = router({
   extractFieldsFromAudio: publicProcedure
@@ -78,7 +78,7 @@ Notes:
 
       try {
         // Use Gemini Flash for fast audio processing
-        const result = await invokeLLM({
+        const result = await invokeGemini({
           messages: [
             { role: 'system', content: systemPrompt },
             {

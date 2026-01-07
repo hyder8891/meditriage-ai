@@ -4,7 +4,7 @@
  * Extracts text from lab report images and PDFs
  */
 
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 
 /**
  * Extract text from lab report file using Gemini Vision
@@ -13,7 +13,7 @@ import { invokeLLM } from "./_core/llm";
 export async function extractTextFromLabReport(fileUrl: string, mimeType: string): Promise<string> {
   try {
     // Use Gemini's vision capabilities to extract text from the image/PDF
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",
@@ -73,7 +73,7 @@ export async function parseLabResults(ocrText: string, reportDate: Date): Promis
 }>> {
   try {
     // Use Gemini to parse the OCR text into structured lab results
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",
@@ -173,7 +173,7 @@ export async function interpretLabResult(result: {
   recommendedFollowUp: string;
 }> {
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",
@@ -261,7 +261,7 @@ export async function generateOverallInterpretation(results: Array<{
   recommendedActions: string[];
 }> {
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",

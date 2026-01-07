@@ -14,7 +14,7 @@ import {
   getRecruitingTrials,
   parseEligibilityCriteria
 } from "./clinicaltrials";
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 
 export const clinicalTrialsRouter = router({
   /**
@@ -147,7 +147,7 @@ Provide:
 4. Additional information needed
 5. Recommendations for next steps`;
 
-        const llmResponse = await invokeLLM({
+        const llmResponse = await invokeGemini({
           messages: [
             { role: "system", content: "You are a clinical research coordinator evaluating patient eligibility for clinical trials." },
             { role: "user", content: analysisPrompt }

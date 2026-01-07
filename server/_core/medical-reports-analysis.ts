@@ -4,7 +4,7 @@
  * Similar to medical-imaging.ts but for non-imaging reports
  */
 
-import { invokeLLM } from "./llm";
+import { invokeGemini } from "./gemini";
 
 export type ReportType =
   | "pathology"
@@ -385,7 +385,7 @@ Provide a comprehensive analysis in JSON format with the following structure:
 Provide ONLY the JSON object, no additional text.`;
 
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system" as const,

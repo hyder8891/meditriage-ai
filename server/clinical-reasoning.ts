@@ -1,4 +1,4 @@
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 import { invokeResilientLLM } from "./_core/resilient-llm";
 import { getSemanticCache } from "./_core/semantic-cache";
 

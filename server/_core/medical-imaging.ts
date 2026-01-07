@@ -1,9 +1,11 @@
 /**
  * Comprehensive Medical Image Analysis
- * Supports X-ray, MRI, CT, Ultrasound, Mammography, ECG, Pathology, and Retinal Imaging
+ * Uses Gemini Pro for accurate medical imaging interpretation
+ * 
+ * Supports: X-ray, MRI, CT, Ultrasound, Mammography, ECG, Pathology, Retinal, PET, DEXA, Fluoroscopy
  */
 
-import { invokeLLM } from './llm';
+import { invokeGemini } from './gemini';
 
 export type ImagingModality = 
   | 'xray' 
@@ -121,14 +123,17 @@ function getModalityPrompt(params: MedicalImageAnalysisParams): string {
 
 /**
  * Analyze medical image with specialized prompts for each modality
+ * Uses Gemini Pro for high accuracy medical imaging analysis
  */
 export async function analyzeMedicalImage(
   params: MedicalImageAnalysisParams
 ): Promise<MedicalImageAnalysisResult> {
   const prompt = getModalityPrompt(params);
 
-  // Use Manus built-in LLM with vision capabilities and structured JSON output
-  const response = await invokeLLM({
+  console.log(`[Medical Imaging] Analyzing ${params.modality} image with Gemini Pro`);
+
+  // Use Gemini Pro with structured JSON output for medical imaging
+  const response = await invokeGemini({
     messages: [
       {
         role: 'user',
@@ -144,6 +149,9 @@ export async function analyzeMedicalImage(
         ],
       },
     ],
+    task: 'medical_imaging', // Automatically uses Gemini Pro
+    temperature: 0.2, // Low temperature for accuracy
+    thinkingBudget: 2048, // Higher thinking budget for complex analysis
     response_format: {
       type: 'json_schema',
       json_schema: {
@@ -212,6 +220,9 @@ export async function analyzeMedicalImage(
     if (!parsed || typeof parsed !== 'object' || !('findings' in parsed)) {
       throw new Error('Invalid structure');
     }
+
+    console.log(`[Medical Imaging] Analysis complete - Urgency: ${parsed.urgency}, Abnormalities: ${parsed.abnormalities?.length || 0}`);
+
     return {
       modality: params.modality,
       findings: parsed.findings || text,
@@ -224,8 +235,8 @@ export async function analyzeMedicalImage(
       differentialDiagnosis: parsed.differentialDiagnosis,
     };
   } catch (error) {
-    console.error('Failed to parse medical imaging response:', error);
-    console.log('Raw response text (first 500 chars):', text.substring(0, 500));
+    console.error('[Medical Imaging] Failed to parse response:', error);
+    console.log('[Medical Imaging] Raw response text (first 500 chars):', text.substring(0, 500));
     
     // Fallback: return raw text in findings field so UI can attempt to parse
     return {

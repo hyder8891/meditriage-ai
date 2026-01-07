@@ -3,7 +3,7 @@
  * Manages AI model training jobs, progress tracking, and model versioning
  */
 
-import { invokeLLM } from "../_core/llm";
+import { invokeGemini } from "../_core/gemini";
 import { getDb } from "../db";
 import { trainingJobs, trainingProgress, modelVersions, trainingDatasets, medicalArticles, regionalMedicalData } from "../../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";

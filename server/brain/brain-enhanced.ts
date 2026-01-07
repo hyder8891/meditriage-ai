@@ -10,7 +10,7 @@
  */
 
 import { BRAIN, BRAINInput, BRAINOutput, DifferentialDiagnosis } from './index';
-import { invokeLLM } from '../_core/llm';
+import { invokeGemini } from '../_core/gemini';
 
 /**
  * Enhanced differential diagnosis with accuracy metrics
@@ -163,7 +163,7 @@ export class EnhancedBRAIN {
     validationStatus: "validated" | "uncertain" | "flagged";
   }> {
     try {
-      const response = await invokeLLM({
+      const response = await invokeGemini({
         messages: [
           {
             role: "system",
@@ -275,7 +275,7 @@ Medical History: ${input.patientInfo.medicalHistory?.join(', ') || 'None'}` as s
     }
 
     try {
-      const response = await invokeLLM({
+      const response = await invokeGemini({
         messages: [
           {
             role: "system",

@@ -12,7 +12,7 @@ import {
   getCompoundImageURL
 } from "./pubchem";
 import { getDrugSafetyInfo } from "./openfda";
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 
 export const drugInteractionRouter = router({
   /**
@@ -103,7 +103,7 @@ Provide:
 
 Format as JSON with keys: severity, mechanism, effects, recommendations, shouldAvoid`;
 
-              const llmResponse = await invokeLLM({
+              const llmResponse = await invokeGemini({
                 messages: [
                   { role: "system", content: "You are a clinical pharmacologist expert in drug interactions." },
                   { role: "user", content: analysisPrompt }
@@ -352,7 +352,7 @@ Provide a comprehensive analysis including:
 
 Be specific and evidence-based.`;
 
-      const llmResponse = await invokeLLM({
+      const llmResponse = await invokeGemini({
         messages: [
           { role: "system", content: "You are a clinical pharmacist conducting a comprehensive medication review." },
           { role: "user", content: analysisPrompt }

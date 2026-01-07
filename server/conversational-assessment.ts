@@ -1,4 +1,4 @@
-import { invokeLLM } from "./_core/llm";
+import { invokeGemini } from "./_core/gemini";
 import { ConversationalContextVector } from "./conversational-context-vector";
 
 // Emergency Questions (Used if AI fails)
@@ -86,7 +86,7 @@ export async function processConversationalAssessment(
   `;
 
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message }
@@ -215,7 +215,7 @@ async function generateFinalRecommendation(
   `;
   
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: "Please provide the final triage recommendation." }

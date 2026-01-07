@@ -16,7 +16,7 @@ import {
   MedicalImageAnalysisResult,
   ImagingModality 
 } from './medical-imaging';
-import { invokeLLM } from './llm';
+import { invokeGemini } from './gemini';
 
 /**
  * Enhanced abnormality with accuracy metrics
@@ -113,7 +113,7 @@ async function enhanceAbnormalities(
   }
 
   try {
-    const response = await invokeLLM({
+    const response = await invokeGemini({
       messages: [
         {
           role: "system",
