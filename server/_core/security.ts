@@ -83,7 +83,7 @@ export const securityHeaders = helmet({
         "wss://tabibi.clinic"           // 🟢 FIX: Explicitly allow Prod Socket
       ],
       frameSrc: ["'self'", "https://accounts.google.com"],
-      frameAncestors: ["'self'", "https://*.manus.computer", "https://manus.im"], // 🟢 FIX: Allow Manus preview iframe
+      frameAncestors: ["'self'", "https://*.manus.computer", "https://*.us2.manus.computer", "https://*.manus-asia.computer", "https://manus.im", "https://*.manus.im"], // 🟢 FIX: Allow Manus preview iframe
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },

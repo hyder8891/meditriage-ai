@@ -149,9 +149,8 @@ function PatientPharmaGuardContent() {
       
       // Upload and identify
       uploadImageMutation.mutate({
-        imageData: base64.split(",")[1],
-        fileName: file.name,
-        fileType: file.type,
+        imageBase64: base64.split(",")[1],
+        mimeType: file.type,
       });
     };
     reader.readAsDataURL(file);
@@ -165,7 +164,7 @@ function PatientPharmaGuardContent() {
     }
 
     checkPersonalizedMutation.mutate({
-      newDrugs: selectedMeds,
+      newMedication: selectedMeds.join(", "),
     });
   };
 

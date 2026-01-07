@@ -78,6 +78,7 @@ export default function ConsultationRoom() {
   );
   
   const utils = trpc.useUtils();
+  const isDoctor = user?.role === 'admin'; // Doctors have admin role in this system
   
   // Mutations
   const startMutation = trpc.consultation.start.useMutation({

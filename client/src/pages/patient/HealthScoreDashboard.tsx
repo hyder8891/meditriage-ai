@@ -50,7 +50,7 @@ function HealthScoreDashboardContent() {
     // Vitals contribution
     if (vitalsQuery.data && vitalsQuery.data.length > 0) {
       const latestVitals = vitalsQuery.data[0];
-      if (latestVitals.heartRate >= 60 && latestVitals.heartRate <= 100) {
+      if (latestVitals.heartRate && latestVitals.heartRate >= 60 && latestVitals.heartRate <= 100) {
         score += 5;
         factors.push({ name: language === 'ar' ? 'معدل ضربات القلب' : 'Heart Rate', impact: 5, status: 'good' });
       } else {
@@ -58,7 +58,7 @@ function HealthScoreDashboardContent() {
         factors.push({ name: language === 'ar' ? 'معدل ضربات القلب' : 'Heart Rate', impact: -5, status: 'warning' });
       }
       
-      if (latestVitals.bloodOxygen >= 95) {
+      if (latestVitals.oxygenSaturation && latestVitals.oxygenSaturation >= 95) {
         score += 5;
         factors.push({ name: language === 'ar' ? 'أكسجين الدم' : 'Blood Oxygen', impact: 5, status: 'good' });
       }

@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: "patient" | "admin";
+  requiredRole?: "patient" | "admin" | "doctor" | "clinician";
   redirectTo?: string;
 }
 
@@ -41,7 +41,7 @@ export function ProtectedRoute({
       // Redirect based on user role
       if (user?.role === "patient") {
         setLocation("/patient/portal");
-      } else if (user?.role === "admin") {
+      } else if (user?.role === "admin" || user?.role === "doctor" || user?.role === "clinician" || user?.role === "super_admin") {
         setLocation("/admin/dashboard");
       } else {
         setLocation("/");

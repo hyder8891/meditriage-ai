@@ -48,7 +48,7 @@ export default function AdminVerificationQueue() {
   
   // Mutation
   const reviewMutation = trpc.doctorVerification.reviewRequest.useMutation({
-    onSuccess: (result) => {
+    onSuccess: (result: { message: string }) => {
       toast.success(result.message);
       setShowReviewDialog(false);
       setSelectedRequest(null);
@@ -57,7 +57,7 @@ export default function AdminVerificationQueue() {
       setAdditionalInfoRequested("");
       refetch();
     },
-    onError: (error) => {
+    onError: (error: { message: string }) => {
       toast.error(error.message);
     },
   });
@@ -172,7 +172,7 @@ export default function AdminVerificationQueue() {
               </Card>
             ) : (
               <div className="grid gap-4">
-                {data?.requests.map((item) => (
+                {data?.requests.map((item: any) => (
                   <Card key={item.request.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="pt-6">
                       <div className="flex items-start justify-between">

@@ -64,6 +64,7 @@ export default function ConsultationHistory() {
   };
   
   const isAdmin = user?.role === 'admin';
+  const isDoctor = user?.role === 'admin'; // Doctors have admin role in this system
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">

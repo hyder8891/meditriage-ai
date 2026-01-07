@@ -56,7 +56,7 @@ export function useStaggeredAnimation(itemCount: number, baseDelay: number = 100
           // Stagger the visibility of each item
           for (let i = 0; i < itemCount; i++) {
             setTimeout(() => {
-              setVisibleItems((prev) => new Set([...prev, i]));
+              setVisibleItems((prev) => new Set(Array.from(prev).concat(i)));
             }, i * baseDelay);
           }
           observer.unobserve(container);

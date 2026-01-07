@@ -9,7 +9,7 @@ import { trpc } from "@/lib/trpc";
 import { useToast } from "@/hooks/use-toast";
 
 interface SMSLoginProps {
-  role?: "patient" | "admin";
+  role?: "patient" | "clinician";
   onSuccess?: (token: string, user: any) => void;
 }
 

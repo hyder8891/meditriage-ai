@@ -237,7 +237,7 @@ export async function processConversationalAssessment(
     let content = response.choices[0]?.message?.content || "";
     // Handle array content (extract text from first element)
     if (Array.isArray(content)) {
-      const textContent = content.find((c: any) => c.type === "text");
+      const textContent = content.find((c: any) => c.type === "text") as { type: string; text?: string } | undefined;
       content = textContent?.text || "";
     }
     
@@ -262,7 +262,7 @@ export async function processConversationalAssessment(
       // AI returned plain text - check if it contains JSON-like content
       if (cleanContent.includes('nextQuestion') || cleanContent.includes('extracted')) {
         // Try to extract nextQuestion using regex
-        const match = cleanContent.match(/nextQuestion["']?\s*:\s*["']([^"']+)["']/s);
+        const match = cleanContent.match(/nextQuestion["']?\s*:\s*["']([^"']+)["']/);
         if (match && match[1]) {
           data = { nextQuestion: match[1], extracted: {} };
         } else {

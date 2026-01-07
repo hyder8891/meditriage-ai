@@ -43,7 +43,7 @@ export const familyVaultRouter = router({
     .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       
-      const [member] = await db!
+      await db!
         .insert(familyMembers)
         .values({
           userId: ctx.user.id,
@@ -55,8 +55,11 @@ export const familyVaultRouter = router({
           conditions: input.conditions ? JSON.stringify(input.conditions) : null,
           createdAt: new Date(),
           updatedAt: new Date(),
-        })
-        .returning();
+        });
+      
+      // Get the inserted member for MySQL
+      const insertedMembers = await db!.select().from(familyMembers).where(eq(familyMembers.userId, ctx.user.id)).orderBy(desc(familyMembers.id)).limit(1);
+      const member = insertedMembers[0];
       
       return {
         ...member,
@@ -92,19 +95,25 @@ export const familyVaultRouter = router({
       if (input.allergies) updateData.allergies = JSON.stringify(input.allergies);
       if (input.conditions) updateData.conditions = JSON.stringify(input.conditions);
       
-      const [member] = await db!
+      await db!
         .update(familyMembers)
         .set(updateData)
         .where(and(
           eq(familyMembers.id, input.id),
           eq(familyMembers.userId, ctx.user.id)
-        ))
-        .returning();
+        ));
+      
+      // Get the updated member for MySQL
+      const updatedMembers = await db!.select().from(familyMembers).where(and(
+        eq(familyMembers.id, input.id),
+        eq(familyMembers.userId, ctx.user.id)
+      ));
+      const member = updatedMembers[0];
       
       return {
         ...member,
-        allergies: member.allergies ? JSON.parse(member.allergies) : [],
-        conditions: member.conditions ? JSON.parse(member.conditions) : [],
+        allergies: member?.allergies ? JSON.parse(member.allergies) : [],
+        conditions: member?.conditions ? JSON.parse(member.conditions) : [],
       };
     }),
 
