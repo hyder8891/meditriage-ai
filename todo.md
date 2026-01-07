@@ -1349,3 +1349,7 @@
 - [x] Add route for /patient/medical-imaging
 - [x] Support multiple imaging modalities (X-ray, MRI, CT, Ultrasound, etc.)
 - [x] Add navigation link in patient portal
+
+## Current Bug Fixes
+- [x] Fix imaging function not working
+- [x] Implement mobile-friendly dropdown for image upload instead of multiple cards

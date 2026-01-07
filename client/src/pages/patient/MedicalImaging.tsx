@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { 
   Upload, 
   Loader2, 
@@ -24,12 +23,12 @@ import {
   Bone,
   Brain,
   Zap,
-  Info,
   X,
   Download,
   Share2,
   History,
-  Clock
+  Clock,
+  Camera
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
@@ -81,10 +80,29 @@ async function fileToBase64(file: File): Promise<string> {
   });
 }
 
+/**
+ * Check if device is mobile
+ */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return isMobile;
+}
+
 export default function MedicalImaging() {
   const { language } = useLanguage();
   const [, setLocation] = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
   
   // State
   const [selectedModality, setSelectedModality] = useState<ImagingModality | null>(null);
@@ -94,6 +112,7 @@ export default function MedicalImaging() {
   const [patientAge, setPatientAge] = useState<string>("");
   const [patientGender, setPatientGender] = useState<string>("");
   const [bodyPart, setBodyPart] = useState("");
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<{
     findings: string;
     interpretation: string;
@@ -116,7 +135,19 @@ export default function MedicalImaging() {
   const [activeTab, setActiveTab] = useState("upload");
 
   // Use the comprehensive medical image analysis endpoint
-  const analyzeMutation = trpc.imaging.analyzeMedicalImage.useMutation();
+  const analyzeMutation = trpc.imaging.analyzeMedicalImage.useMutation({
+    onError: (error) => {
+      console.error('Medical image analysis error:', error);
+      setAnalysisError(error.message);
+      toast.error(language === 'ar' ? 'فشل تحليل الصورة: ' + error.message : 'Failed to analyze image: ' + error.message);
+    },
+    onSuccess: (result) => {
+      setAnalysis(result);
+      setActiveTab("results");
+      setAnalysisError(null);
+      toast.success(language === 'ar' ? 'تم تحليل الصورة بنجاح' : 'Image analyzed successfully');
+    }
+  });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -134,6 +165,7 @@ export default function MedicalImaging() {
 
     setSelectedFile(file);
     setAnalysis(null);
+    setAnalysisError(null);
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -148,10 +180,12 @@ export default function MedicalImaging() {
       return;
     }
 
+    setAnalysisError(null);
+
     try {
       const base64 = await fileToBase64(selectedFile);
       
-      const result = await analyzeMutation.mutateAsync({
+      await analyzeMutation.mutateAsync({
         imageBase64: base64,
         mimeType: selectedFile.type,
         modality: selectedModality,
@@ -161,13 +195,9 @@ export default function MedicalImaging() {
         bodyPart: bodyPart || undefined,
         language,
       });
-
-      setAnalysis(result);
-      setActiveTab("results");
-      toast.success(language === 'ar' ? 'تم تحليل الصورة بنجاح' : 'Image analyzed successfully');
     } catch (error) {
-      console.error('Medical image analysis error:', error);
-      toast.error(language === 'ar' ? 'فشل تحليل الصورة' : 'Failed to analyze image');
+      // Error is handled by onError callback
+      console.error('Analysis error:', error);
     }
   };
 
@@ -175,6 +205,7 @@ export default function MedicalImaging() {
     setSelectedFile(null);
     setPreviewUrl("");
     setAnalysis(null);
+    setAnalysisError(null);
     setClinicalContext("");
     setPatientAge("");
     setPatientGender("");
@@ -215,6 +246,10 @@ export default function MedicalImaging() {
     }
   };
 
+  const getSelectedModalityInfo = () => {
+    return modalities.find(m => m.id === selectedModality);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       {/* Header */}
@@ -226,7 +261,7 @@ export default function MedicalImaging() {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 {language === 'ar' ? 'العودة' : 'Back'}
               </Button>
-              <AppLogo href="/patient/portal" size="sm" showText={true} />
+              <AppLogo href="/patient/portal" size="sm" showText={!isMobile} />
             </div>
             <div className="flex items-center gap-3">
               <LanguageSwitcher />
@@ -241,10 +276,10 @@ export default function MedicalImaging() {
         <div className="max-w-5xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
               {language === 'ar' ? 'تحليل الصور الطبية' : 'Medical Image Analysis'}
             </h1>
-            <p className="text-slate-600">
+            <p className="text-slate-600 text-sm md:text-base">
               {language === 'ar' 
                 ? 'قم بتحميل صورك الطبية للحصول على تحليل بالذكاء الاصطناعي'
                 : 'Upload your medical images for AI-powered analysis'}
@@ -253,37 +288,89 @@ export default function MedicalImaging() {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="upload">
-                <Upload className="w-4 h-4 mr-2" />
-                {language === 'ar' ? 'رفع الصورة' : 'Upload'}
+              <TabsTrigger value="upload" className="text-xs md:text-sm">
+                <Upload className="w-4 h-4 mr-1 md:mr-2" />
+                {language === 'ar' ? 'رفع' : 'Upload'}
               </TabsTrigger>
-              <TabsTrigger value="results" disabled={!analysis}>
-                <CheckCircle className="w-4 h-4 mr-2" />
+              <TabsTrigger value="results" disabled={!analysis} className="text-xs md:text-sm">
+                <CheckCircle className="w-4 h-4 mr-1 md:mr-2" />
                 {language === 'ar' ? 'النتائج' : 'Results'}
               </TabsTrigger>
-              <TabsTrigger value="history">
-                <History className="w-4 h-4 mr-2" />
+              <TabsTrigger value="history" className="text-xs md:text-sm">
+                <History className="w-4 h-4 mr-1 md:mr-2" />
                 {language === 'ar' ? 'السجل' : 'History'}
               </TabsTrigger>
             </TabsList>
 
             {/* Upload Tab */}
             <TabsContent value="upload" className="space-y-6">
-              {/* Step 1: Select Modality */}
+              {/* Step 1: Select Modality - Mobile Dropdown / Desktop Cards */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">1</span>
+                  <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                    <span className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">1</span>
                     {language === 'ar' ? 'اختر نوع الفحص' : 'Select Imaging Type'}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     {language === 'ar' 
                       ? 'اختر نوع الصورة الطبية للحصول على تحليل متخصص'
                       : 'Choose the type of medical image for specialized analysis'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {/* Mobile: Dropdown Select */}
+                  <div className="md:hidden">
+                    <Select 
+                      value={selectedModality || ""} 
+                      onValueChange={(value) => setSelectedModality(value as ImagingModality)}
+                    >
+                      <SelectTrigger className="w-full h-14">
+                        <SelectValue placeholder={language === 'ar' ? 'اختر نوع الفحص...' : 'Select imaging type...'}>
+                          {selectedModality && (
+                            <div className="flex items-center gap-3">
+                              {(() => {
+                                const modality = getSelectedModalityInfo();
+                                if (!modality) return null;
+                                const Icon = modality.icon;
+                                return (
+                                  <>
+                                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${modality.color} flex items-center justify-center`}>
+                                      <Icon className="w-4 h-4 text-white" />
+                                    </div>
+                                    <div className="text-left">
+                                      <p className="font-medium">{language === 'ar' ? modality.nameAr : modality.nameEn}</p>
+                                      <p className="text-xs text-slate-500">{language === 'ar' ? modality.descAr : modality.descEn}</p>
+                                    </div>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {modalities.map((modality) => {
+                          const Icon = modality.icon;
+                          return (
+                            <SelectItem key={modality.id} value={modality.id} className="py-3">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${modality.color} flex items-center justify-center`}>
+                                  <Icon className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{language === 'ar' ? modality.nameAr : modality.nameEn}</p>
+                                  <p className="text-xs text-slate-500">{language === 'ar' ? modality.descAr : modality.descEn}</p>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Desktop: Card Grid */}
+                  <div className="hidden md:grid grid-cols-2 lg:grid-cols-5 gap-3">
                     {modalities.map((modality) => {
                       const Icon = modality.icon;
                       const isSelected = selectedModality === modality.id;
@@ -316,14 +403,14 @@ export default function MedicalImaging() {
               {/* Step 2: Upload Image */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">2</span>
+                  <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                    <span className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">2</span>
                     {language === 'ar' ? 'رفع الصورة' : 'Upload Image'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div 
-                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+                    className={`border-2 border-dashed rounded-xl p-6 md:p-8 text-center transition-colors ${
                       previewUrl ? 'border-green-300 bg-green-50' : 'border-slate-300 hover:border-rose-300 hover:bg-rose-50'
                     }`}
                   >
@@ -331,6 +418,7 @@ export default function MedicalImaging() {
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
+                      capture="environment"
                       onChange={handleFileSelect}
                       className="hidden"
                       id="medical-image-upload"
@@ -340,25 +428,32 @@ export default function MedicalImaging() {
                         <img
                           src={previewUrl}
                           alt="Medical image preview"
-                          className="max-h-64 mx-auto rounded-lg border shadow-sm"
+                          className="max-h-48 md:max-h-64 mx-auto rounded-lg border shadow-sm"
                         />
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-2 flex-wrap">
                           <CheckCircle className="w-5 h-5 text-green-600" />
-                          <span className="text-green-700 font-medium">{selectedFile?.name}</span>
+                          <span className="text-green-700 font-medium text-sm truncate max-w-[200px]">{selectedFile?.name}</span>
                           <Button variant="ghost" size="sm" onClick={resetForm}>
                             <X className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <label htmlFor="medical-image-upload" className="cursor-pointer">
-                        <Upload className="w-12 h-12 mx-auto mb-3 text-slate-400" />
-                        <p className="font-medium text-slate-700 mb-1">
-                          {language === 'ar' ? 'انقر لتحميل الصورة' : 'Click to upload image'}
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          {language === 'ar' ? 'PNG, JPG, JPEG, DICOM (حتى 10 ميجابايت)' : 'PNG, JPG, JPEG, DICOM (up to 10MB)'}
-                        </p>
+                      <label htmlFor="medical-image-upload" className="cursor-pointer block">
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                          <div className="flex items-center gap-3">
+                            <Upload className="w-10 h-10 md:w-12 md:h-12 text-slate-400" />
+                            <Camera className="w-8 h-8 md:w-10 md:h-10 text-slate-400 md:hidden" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-700 mb-1">
+                              {language === 'ar' ? 'انقر لتحميل أو التقاط صورة' : 'Click to upload or take a photo'}
+                            </p>
+                            <p className="text-sm text-slate-500">
+                              {language === 'ar' ? 'PNG, JPG, JPEG (حتى 10 ميجابايت)' : 'PNG, JPG, JPEG (up to 10MB)'}
+                            </p>
+                          </div>
+                        </div>
                       </label>
                     )}
                   </div>
@@ -368,8 +463,8 @@ export default function MedicalImaging() {
               {/* Step 3: Additional Context (Optional) */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold">3</span>
+                  <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                    <span className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold">3</span>
                     {language === 'ar' ? 'معلومات إضافية (اختياري)' : 'Additional Context (Optional)'}
                   </CardTitle>
                 </CardHeader>
@@ -420,13 +515,23 @@ export default function MedicalImaging() {
                 </CardContent>
               </Card>
 
+              {/* Error Display */}
+              {analysisError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {language === 'ar' ? 'خطأ: ' : 'Error: '}{analysisError}
+                  </AlertDescription>
+                </Alert>
+              )}
+
               {/* Analyze Button */}
               <div className="flex justify-center">
                 <Button
                   size="lg"
                   onClick={handleAnalyze}
                   disabled={!selectedFile || !selectedModality || analyzeMutation.isPending}
-                  className="px-12 py-6 text-lg bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600"
+                  className="w-full md:w-auto px-8 md:px-12 py-6 text-lg bg-gradient-to-r from-rose-500 to-purple-500 hover:from-rose-600 hover:to-purple-600"
                 >
                   {analyzeMutation.isPending ? (
                     <>
@@ -445,7 +550,7 @@ export default function MedicalImaging() {
               {/* Disclaimer */}
               <Alert variant="destructive" className="bg-amber-50 border-amber-200">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
-                <AlertDescription className="text-amber-800">
+                <AlertDescription className="text-amber-800 text-sm">
                   {language === 'ar'
                     ? 'هذا التحليل يتم بواسطة الذكاء الاصطناعي ولا يعتبر تشخيصاً طبياً. استشر طبيباً مؤهلاً دائماً للحصول على تشخيص دقيق.'
                     : 'This analysis is AI-generated and not a medical diagnosis. Always consult a qualified physician for accurate diagnosis.'}
@@ -464,7 +569,7 @@ export default function MedicalImaging() {
                     analysis.urgency === 'semi-urgent' ? 'bg-yellow-100 border-2 border-yellow-500' :
                     'bg-green-100 border-2 border-green-500'
                   }`}>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <Badge className={getUrgencyColor(analysis.urgency)}>
                           {language === 'ar' 
@@ -501,7 +606,7 @@ export default function MedicalImaging() {
                         <img
                           src={previewUrl}
                           alt="Analyzed medical image"
-                          className="max-h-48 mx-auto rounded-lg border"
+                          className="max-h-40 md:max-h-48 mx-auto rounded-lg border"
                         />
                       </CardContent>
                     </Card>
@@ -513,7 +618,7 @@ export default function MedicalImaging() {
                       <CardTitle>{language === 'ar' ? 'التقييم العام' : 'Overall Assessment'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line">{analysis.overallAssessment}</p>
+                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.overallAssessment}</p>
                     </CardContent>
                   </Card>
 
@@ -523,7 +628,7 @@ export default function MedicalImaging() {
                       <CardTitle>{language === 'ar' ? 'النتائج' : 'Findings'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line">{analysis.findings}</p>
+                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.findings}</p>
                     </CardContent>
                   </Card>
 
@@ -537,7 +642,7 @@ export default function MedicalImaging() {
                         <div className="space-y-3">
                           {analysis.abnormalities.map((abnormality, index) => (
                             <div key={index} className="p-4 bg-slate-50 rounded-lg border">
-                              <div className="flex items-start justify-between mb-2">
+                              <div className="flex flex-col md:flex-row items-start justify-between mb-2 gap-2">
                                 <div>
                                   <span className="font-medium text-slate-900">{abnormality.type}</span>
                                   <span className="text-slate-500 mx-2">•</span>
@@ -570,7 +675,7 @@ export default function MedicalImaging() {
                       <CardTitle>{language === 'ar' ? 'التفسير السريري' : 'Clinical Interpretation'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line">{analysis.interpretation}</p>
+                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.interpretation}</p>
                     </CardContent>
                   </Card>
 
@@ -583,7 +688,7 @@ export default function MedicalImaging() {
                       <CardContent>
                         <ul className="list-disc list-inside space-y-1">
                           {analysis.differentialDiagnosis.map((diagnosis, index) => (
-                            <li key={index} className="text-slate-700">{diagnosis}</li>
+                            <li key={index} className="text-slate-700 text-sm md:text-base">{diagnosis}</li>
                           ))}
                         </ul>
                       </CardContent>
@@ -596,21 +701,21 @@ export default function MedicalImaging() {
                       <CardTitle>{language === 'ar' ? 'التوصيات' : 'Recommendations'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line">{analysis.recommendations}</p>
+                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.recommendations}</p>
                     </CardContent>
                   </Card>
 
                   {/* Actions */}
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    <Button variant="outline" onClick={resetForm}>
+                  <div className="flex flex-col md:flex-row gap-3 justify-center">
+                    <Button variant="outline" onClick={resetForm} className="w-full md:w-auto">
                       <Upload className="w-4 h-4 mr-2" />
                       {language === 'ar' ? 'تحليل صورة جديدة' : 'Analyze New Image'}
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" className="w-full md:w-auto">
                       <Download className="w-4 h-4 mr-2" />
                       {language === 'ar' ? 'تحميل التقرير' : 'Download Report'}
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" className="w-full md:w-auto">
                       <Share2 className="w-4 h-4 mr-2" />
                       {language === 'ar' ? 'مشاركة مع الطبيب' : 'Share with Doctor'}
                     </Button>
@@ -619,7 +724,7 @@ export default function MedicalImaging() {
                   {/* Disclaimer */}
                   <Alert variant="destructive" className="bg-amber-50 border-amber-200">
                     <AlertCircle className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="text-amber-800">
+                    <AlertDescription className="text-amber-800 text-sm">
                       {language === 'ar'
                         ? 'هذا التحليل يتم بواسطة الذكاء الاصطناعي ولا يعتبر تشخيصاً طبياً. استشر طبيباً مؤهلاً دائماً للحصول على تشخيص دقيق.'
                         : 'This analysis is AI-generated and not a medical diagnosis. Always consult a qualified physician for accurate diagnosis.'}
