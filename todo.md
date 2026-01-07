@@ -225,6 +225,7 @@
 - [x] Display clinics/hospitals in Arabic when Arabic language is selected
 - [x] Ensure entire assessment flow maintains consistent Arabic language
 - [x] Fix AI assessment outcome to be fully Arabic when Arabic language is selected
+- [x] Deep debug Arabic language persistence issue - AI switches to English after ~3 questions (FIXED: Language now stored in context vector)
 
 - [x] Protect /medical-literature route to require clinician authentication
 - [x] Add sidebar navigation to Medical Literature page using ClinicianLayout

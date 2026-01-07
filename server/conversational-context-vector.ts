@@ -15,6 +15,9 @@ export class ConversationalContextVector {
   stepCount: number = 0;
   conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];
   
+  // Language preference - CRITICAL for maintaining Arabic throughout conversation
+  language: 'en' | 'ar' = 'en';
+  
   // Symptom details
   duration?: string;
   severity?: string;
@@ -74,6 +77,9 @@ export class ConversationalContextVector {
     
     // Numbers
     this.age = typeof data.age === 'number' ? data.age : undefined;
+    
+    // Language - CRITICAL: persist language across conversation turns
+    this.language = (data.language === 'ar' || data.language === 'en') ? data.language : 'en';
   }
 
   /**
@@ -114,7 +120,8 @@ export class ConversationalContextVector {
       medicalHistory: this.medicalHistory,
       medications: this.medications,
       pastHistory: this.pastHistory,
-      currentMeds: this.currentMeds
+      currentMeds: this.currentMeds,
+      language: this.language
     };
   }
 }

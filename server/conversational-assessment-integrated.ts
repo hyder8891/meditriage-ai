@@ -157,11 +157,14 @@ function getFallbackQuestion(index: number, language: string): string {
 export async function startConversation(language: string = 'en') {
   const greeting = language === 'ar' ? GREETING_AR : GREETING_EN;
   
+  // CRITICAL: Store language in context vector so it persists across conversation turns
+  const contextVector = new ConversationalContextVector({ language: language === 'ar' ? 'ar' : 'en' });
+  
   return {
     message: greeting,
     messageAr: GREETING_AR,
     conversationStage: "greeting" as const,
-    context: new ConversationalContextVector({}).toJSON(),
+    context: contextVector.toJSON(),
     quickReplies: []
   };
 }
@@ -177,8 +180,17 @@ export async function processConversationalAssessment(
   // 1. Rehydrate
   const vector = new ConversationalContextVector(contextData);
   
+  // CRITICAL: Use language from context vector if available, otherwise use passed language
+  // This ensures language persists across all conversation turns
+  const effectiveLanguage = vector.language || (language === 'ar' ? 'ar' : 'en');
+  
+  // Update vector language if it was passed but not stored
+  if (!vector.language && language) {
+    vector.language = language === 'ar' ? 'ar' : 'en';
+  }
+  
   // 🔬 DEBUG: Print Step to Console
-  console.log(`[AI DOCTOR] Processing Step ${vector.stepCount}. Input: "${message}"`);
+  console.log(`[AI DOCTOR] Processing Step ${vector.stepCount}. Input: "${message}". Language: ${effectiveLanguage}`);
   console.log(`[AI DOCTOR] Current Symptoms:`, vector.symptoms);
 
   // 2. Identify Current State
@@ -187,11 +199,11 @@ export async function processConversationalAssessment(
 
   // 3. If final step, generate comprehensive diagnosis using BRAIN + Avicenna-X
   if (isFinalStep) {
-    return await generateComprehensiveDiagnosis(vector, message, language, userId, userInfo);
+    return await generateComprehensiveDiagnosis(vector, message, effectiveLanguage, userId, userInfo);
   }
 
   // 4. Prompt Engineering for symptom gathering
-  const languageInstruction = language === 'ar'
+  const languageInstruction = effectiveLanguage === 'ar'
     ? `CRITICAL LANGUAGE REQUIREMENT:
 - You MUST respond ONLY in Arabic language (العربية)
 - ALL text in your response MUST be in Arabic
@@ -203,9 +215,11 @@ export async function processConversationalAssessment(
     : '';
   
   const systemPrompt = `
-    ROLE: ${language === 'ar' ? 'طبيب ذكاء اصطناعي (مساعد طبي ذكي)' : 'AI Doctor (Intelligent Medical Assistant)'}.
-    TASK: ${language === 'ar' ? 'جمع المعلومات الطبية خطوة بخطوة' : 'Step-by-step medical intake'}.
+    ROLE: ${effectiveLanguage === 'ar' ? 'طبيب ذكاء اصطناعي (مساعد طبي ذكي)' : 'AI Doctor (Intelligent Medical Assistant)'}.
+    TASK: ${effectiveLanguage === 'ar' ? 'جمع المعلومات الطبية خطوة بخطوة' : 'Step-by-step medical intake'}.
     ${languageInstruction}
+    
+    CONVERSATION LANGUAGE: ${effectiveLanguage === 'ar' ? 'Arabic (العربية) - MANDATORY' : 'English'}
     
     CURRENT STATUS:
     - Step: ${currentStep + 1}/8 (will finalize at step 8)
@@ -218,9 +232,10 @@ export async function processConversationalAssessment(
     1. Extract new information from the patient's message.
     2. Ask ONE focused follow-up question to gather critical details.
     3. Be conversational and empathetic.
-    ${language === 'ar' ? `4. MANDATORY: Your entire response including "nextQuestion" MUST be in Arabic (العربية) only.
+    ${effectiveLanguage === 'ar' ? `4. MANDATORY: Your entire response including "nextQuestion" MUST be in Arabic (العربية) only.
     5. Do NOT include any English text in your response.
-    6. Maintain Arabic throughout the entire conversation.` : ''}
+    6. Maintain Arabic throughout the entire conversation.
+    7. This is step ${currentStep + 1} of 8 - Arabic MUST be maintained for ALL steps.` : ''}
 
     OUTPUT FORMAT (JSON ONLY):
     {
@@ -230,7 +245,7 @@ export async function processConversationalAssessment(
         "severity": "string or null",
         "location": "string or null"
       },
-      "nextQuestion": "${language === 'ar' ? 'سؤالك هنا باللغة العربية فقط - يجب أن يكون السؤال بالعربية بالكامل' : 'Your question here'}"
+      "nextQuestion": "${effectiveLanguage === 'ar' ? 'سؤالك هنا باللغة العربية فقط - يجب أن يكون السؤال بالعربية بالكامل' : 'Your question here'}"
     }
   `;
 
@@ -256,16 +271,16 @@ export async function processConversationalAssessment(
     let data;
     try {
       // Try to parse as JSON
-      data = cleanContent ? JSON.parse(cleanContent) : { nextQuestion: getFallbackQuestion(currentStep + 1, language), extracted: {} };
+      data = cleanContent ? JSON.parse(cleanContent) : { nextQuestion: getFallbackQuestion(currentStep + 1, effectiveLanguage), extracted: {} };
       
       // Validate that nextQuestion exists and is a string
       if (!data.nextQuestion || typeof data.nextQuestion !== 'string') {
-        data.nextQuestion = getFallbackQuestion(currentStep + 1, language);
+        data.nextQuestion = getFallbackQuestion(currentStep + 1, effectiveLanguage);
       }
       
       // CRITICAL: If nextQuestion still looks like JSON, extract just the text
       if (data.nextQuestion.startsWith('{') || data.nextQuestion.includes('extracted')) {
-        data.nextQuestion = getFallbackQuestion(currentStep + 1, language);
+        data.nextQuestion = getFallbackQuestion(currentStep + 1, effectiveLanguage);
       }
     } catch (e) {
       // AI returned plain text - check if it contains JSON-like content
@@ -275,11 +290,11 @@ export async function processConversationalAssessment(
         if (match && match[1]) {
           data = { nextQuestion: match[1], extracted: {} };
         } else {
-          data = { nextQuestion: getFallbackQuestion(currentStep + 1, language), extracted: {} };
+          data = { nextQuestion: getFallbackQuestion(currentStep + 1, effectiveLanguage), extracted: {} };
         }
       } else {
         // It's truly plain text, use it as the question
-        data = { nextQuestion: cleanContent || getFallbackQuestion(currentStep + 1, language), extracted: {} };
+        data = { nextQuestion: cleanContent || getFallbackQuestion(currentStep + 1, effectiveLanguage), extracted: {} };
       }
     }
 
@@ -296,7 +311,7 @@ export async function processConversationalAssessment(
 
     return {
       message: data.nextQuestion,
-      messageAr: language === 'ar' ? data.nextQuestion : data.nextQuestion,
+      messageAr: effectiveLanguage === 'ar' ? data.nextQuestion : data.nextQuestion,
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
       quickReplies: []
@@ -307,11 +322,11 @@ export async function processConversationalAssessment(
     
     // Auto-Recovery
     vector.stepCount = currentStep + 1;
-    const nextQ = getFallbackQuestion(vector.stepCount, language);
+    const nextQ = getFallbackQuestion(vector.stepCount, effectiveLanguage);
     
     return {
       message: nextQ,
-      messageAr: language === 'ar' ? nextQ : FALLBACK_QUESTIONS_AR[Math.min(vector.stepCount, 9)],
+      messageAr: effectiveLanguage === 'ar' ? nextQ : FALLBACK_QUESTIONS_AR[Math.min(vector.stepCount, 9)],
       conversationStage: "gathering" as const,
       context: vector.toJSON(),
       quickReplies: []

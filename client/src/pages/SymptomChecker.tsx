@@ -134,9 +134,11 @@ export default function SymptomChecker() {
     setInput("");
 
     // Send to conversational router with context
+    // CRITICAL: Always pass language to ensure Arabic persists throughout conversation
     sendMessage.mutate({
       message: messageToSend,
-      context: context
+      context: context,
+      language: language === "ar" ? "ar" : "en"
     });
   };
 
