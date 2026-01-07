@@ -1377,3 +1377,4 @@
 - [x] Update all server routers to use invokeGemini
 - [x] Model selection: Pro for medical_imaging, clinical_reasoning, differential_diagnosis, drug_interaction, lab_analysis
 - [x] Model selection: Flash for triage, chat, simple_query, translation, summarization
+- [x] Fix medical assessment result display - show structured cards instead of plain markdown text in chat

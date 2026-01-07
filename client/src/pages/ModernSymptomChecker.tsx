@@ -152,12 +152,6 @@ export default function ModernSymptomChecker() {
     try {
       // Send to backend (use messages BEFORE adding current user message)
       // Don't use state 'messages' directly as it hasn't updated yet
-      console.log("[Frontend] Sending to backend:", {
-        message: messageText,
-        conversationHistory: messages,
-        context,
-        language
-      });
       const response = await sendMessageMutation.mutateAsync({
         message: messageText,
         conversationHistory: messages, // Use current messages (before adding user message)
@@ -165,13 +159,16 @@ export default function ModernSymptomChecker() {
         language
       });
 
-      // Add assistant response to chat (use Arabic if available)
-      const assistantMessage: ConversationMessage = {
-        role: "assistant",
-        content: isArabic && response.messageAr ? response.messageAr : response.message,
-        timestamp: Date.now()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
+      // Only add assistant response to chat if NOT complete
+      // When complete, we show the AssessmentResultCard instead of markdown message
+      if (response.conversationStage !== 'complete') {
+        const assistantMessage: ConversationMessage = {
+          role: "assistant",
+          content: isArabic && response.messageAr ? response.messageAr : response.message,
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      }
       setCurrentResponse(response);
 
       // Update context with the returned context from backend
