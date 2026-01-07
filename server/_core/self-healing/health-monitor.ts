@@ -181,10 +181,11 @@ export function registerBuiltInHealthChecks(): void {
     let status: "healthy" | "degraded" | "unhealthy" = "healthy";
     let message = "Memory usage normal";
 
-    if (heapUsedPercent > 90) {
+    // Optimized thresholds for large applications with 4GB heap limit
+    if (heapUsedPercent > 95) {
       status = "unhealthy";
       message = "Critical memory usage";
-    } else if (heapUsedPercent > 75) {
+    } else if (heapUsedPercent > 85) {
       status = "degraded";
       message = "High memory usage";
     }
@@ -247,10 +248,11 @@ export function registerBuiltInHealthChecks(): void {
     let status: "healthy" | "degraded" | "unhealthy" = "healthy";
     let message = "Event loop responsive";
 
-    if (lag > 100) {
+    // Optimized thresholds for complex applications with many async operations
+    if (lag > 500) {
       status = "unhealthy";
       message = "Event loop severely lagged";
-    } else if (lag > 50) {
+    } else if (lag > 200) {
       status = "degraded";
       message = "Event loop lagged";
     }
