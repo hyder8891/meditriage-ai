@@ -117,8 +117,11 @@ export interface ResourceMatch {
   };
   metadata: {
     name?: string;
+    nameAr?: string; // Arabic name
     specialty?: string;
+    specialtyAr?: string; // Arabic specialty
     location?: string;
+    locationAr?: string; // Arabic location
     estimatedWaitTime?: number;
     connectionQuality?: string;
   };
@@ -779,7 +782,9 @@ async function orchestrateResources(
         },
         metadata: {
           name: emergencyRoute.clinic.name,
+          nameAr: emergencyRoute.clinic.nameAr,
           location: emergencyRoute.clinic.location.address,
+          locationAr: emergencyRoute.clinic.location.addressAr,
           estimatedWaitTime: emergencyRoute.clinic.currentWaitTime,
         },
       },
@@ -818,7 +823,9 @@ async function orchestrateResources(
         },
         metadata: {
           name: emergencyRoute.clinic.name,
+          nameAr: emergencyRoute.clinic.nameAr,
           location: emergencyRoute.clinic.location.address,
+          locationAr: emergencyRoute.clinic.location.addressAr,
           estimatedWaitTime: emergencyRoute.clinic.currentWaitTime,
         },
       },

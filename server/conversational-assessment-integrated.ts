@@ -192,12 +192,19 @@ export async function processConversationalAssessment(
 
   // 4. Prompt Engineering for symptom gathering
   const languageInstruction = language === 'ar'
-    ? 'IMPORTANT: You must respond ONLY in Arabic language. All questions and responses must be in Arabic. Do not use any English words.'
+    ? `CRITICAL LANGUAGE REQUIREMENT:
+- You MUST respond ONLY in Arabic language (العربية)
+- ALL text in your response MUST be in Arabic
+- Do NOT use ANY English words, phrases, or sentences
+- The "nextQuestion" field MUST be 100% Arabic
+- If you cannot express something in Arabic, use Arabic medical transliteration
+- NEVER switch to English mid-conversation
+- The patient is communicating in Arabic, you MUST respond in Arabic`
     : '';
   
   const systemPrompt = `
-    ROLE: AI Doctor (Intelligent Medical Assistant).
-    TASK: Step-by-step medical intake.
+    ROLE: ${language === 'ar' ? 'طبيب ذكاء اصطناعي (مساعد طبي ذكي)' : 'AI Doctor (Intelligent Medical Assistant)'}.
+    TASK: ${language === 'ar' ? 'جمع المعلومات الطبية خطوة بخطوة' : 'Step-by-step medical intake'}.
     ${languageInstruction}
     
     CURRENT STATUS:
@@ -211,7 +218,9 @@ export async function processConversationalAssessment(
     1. Extract new information from the patient's message.
     2. Ask ONE focused follow-up question to gather critical details.
     3. Be conversational and empathetic.
-    ${language === 'ar' ? '4. Respond ONLY in Arabic language. No English words allowed.' : ''}
+    ${language === 'ar' ? `4. MANDATORY: Your entire response including "nextQuestion" MUST be in Arabic (العربية) only.
+    5. Do NOT include any English text in your response.
+    6. Maintain Arabic throughout the entire conversation.` : ''}
 
     OUTPUT FORMAT (JSON ONLY):
     {
@@ -221,7 +230,7 @@ export async function processConversationalAssessment(
         "severity": "string or null",
         "location": "string or null"
       },
-      "nextQuestion": "Your question here${language === 'ar' ? ' (must be in Arabic only)' : ''}"
+      "nextQuestion": "${language === 'ar' ? 'سؤالك هنا باللغة العربية فقط - يجب أن يكون السؤال بالعربية بالكامل' : 'Your question here'}"
     }
   `;
 
@@ -576,16 +585,20 @@ ${triageLevelText}
   // Add healthcare provider recommendation if available
   if (orchestrationResult && orchestrationResult.target) {
     const target = orchestrationResult.target;
-    message += `### 🏥 مقدم الرعاية الصحية الموصى به
-**${target.metadata.name || 'مقدم الرعاية الصحية'}**
+    // Use Arabic name/location if available, otherwise translate
+    const clinicName = target.metadata.nameAr || target.metadata.name || 'مقدم الرعاية الصحية';
+    const clinicLocation = target.metadata.locationAr || target.metadata.location;
+    
+    message += `### 🏥 المستشفى/العيادة الموصى بها
+**${clinicName}**
 `;
     if (target.metadata.specialty) {
-      const specialtyAr = translateToArabic(target.metadata.specialty);
+      const specialtyAr = target.metadata.specialtyAr || translateToArabic(target.metadata.specialty);
       message += `- التخصص: ${specialtyAr}
 `;
     }
-    if (target.metadata.location) {
-      message += `- الموقع: ${target.metadata.location}
+    if (clinicLocation) {
+      message += `- الموقع: ${clinicLocation}
 `;
     }
     if (target.metadata.estimatedWaitTime) {

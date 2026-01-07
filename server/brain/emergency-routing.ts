@@ -10,10 +10,12 @@ import { safeGet, safeSet, isRedisAvailable } from "./redis-client";
 export interface EmergencyClinic {
   id: number;
   name: string;
+  nameAr: string; // Arabic name
   location: {
     lat: number;
     lng: number;
     address: string;
+    addressAr: string; // Arabic address
   };
   emergencyCapabilities: string[];
   currentWaitTime: number; // minutes
@@ -103,15 +105,17 @@ async function findNearbyEmergencyClinics(
   requiredCapabilities?: string[]
 ): Promise<EmergencyClinic[]> {
   // TODO: Replace with actual database query
-  // For now, return mock data for Baghdad
+  // For now, return mock data for Baghdad with Arabic translations
   const mockClinics: EmergencyClinic[] = [
     {
       id: 1,
       name: "Baghdad Medical City Emergency",
+      nameAr: "مدينة بغداد الطبية - الطوارئ",
       location: {
         lat: 33.3152,
         lng: 44.3661,
         address: "Medical City Complex, Bab Al-Muadham, Baghdad",
+        addressAr: "مجمع مدينة الطب، باب المعظم، بغداد",
       },
       emergencyCapabilities: ["trauma", "cardiac", "stroke", "pediatric"],
       currentWaitTime: 45, // minutes
@@ -121,10 +125,12 @@ async function findNearbyEmergencyClinics(
     {
       id: 2,
       name: "Al-Yarmouk Teaching Hospital",
+      nameAr: "مستشفى اليرموك التعليمي",
       location: {
         lat: 33.2778,
         lng: 44.3611,
         address: "Al-Yarmouk, Baghdad",
+        addressAr: "اليرموك، بغداد",
       },
       emergencyCapabilities: ["trauma", "cardiac", "general"],
       currentWaitTime: 30,
@@ -134,15 +140,47 @@ async function findNearbyEmergencyClinics(
     {
       id: 3,
       name: "Ibn Al-Nafees Hospital",
+      nameAr: "مستشفى ابن النفيس",
       location: {
         lat: 33.3400,
         lng: 44.4100,
         address: "Al-Mansour, Baghdad",
+        addressAr: "المنصور، بغداد",
       },
       emergencyCapabilities: ["cardiac", "stroke", "general"],
       currentWaitTime: 20,
       distance: 6.5,
       travelTime: 18,
+    },
+    {
+      id: 4,
+      name: "Al-Kindi Teaching Hospital",
+      nameAr: "مستشفى الكندي التعليمي",
+      location: {
+        lat: 33.3500,
+        lng: 44.4200,
+        address: "Al-Kindi, Baghdad",
+        addressAr: "الكندي، بغداد",
+      },
+      emergencyCapabilities: ["trauma", "general", "orthopedic"],
+      currentWaitTime: 35,
+      distance: 4.5,
+      travelTime: 14,
+    },
+    {
+      id: 5,
+      name: "Al-Kadhimiya Teaching Hospital",
+      nameAr: "مستشفى الكاظمية التعليمي",
+      location: {
+        lat: 33.3800,
+        lng: 44.3400,
+        address: "Al-Kadhimiya, Baghdad",
+        addressAr: "الكاظمية، بغداد",
+      },
+      emergencyCapabilities: ["cardiac", "general", "pediatric"],
+      currentWaitTime: 25,
+      distance: 7.0,
+      travelTime: 20,
     },
   ];
 

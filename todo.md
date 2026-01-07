@@ -220,6 +220,11 @@
 
 ## Current Issues
 
+- [x] Fix AI chat language inconsistency - AI switches to English mid-conversation when user writes in Arabic
+- [x] Add clinic/hospital recommendations at end of assessment
+- [x] Display clinics/hospitals in Arabic when Arabic language is selected
+- [x] Ensure entire assessment flow maintains consistent Arabic language
+
 - [x] Protect /medical-literature route to require clinician authentication
 - [x] Add sidebar navigation to Medical Literature page using ClinicianLayout
 - [x] Bio scanner not working - Fixed camera configuration and added fallback

@@ -72,8 +72,11 @@ export interface AssessmentResult {
   resourceMatch?: {
     metadata: {
       name?: string;
+      nameAr?: string;
       specialty?: string;
+      specialtyAr?: string;
       location?: string;
+      locationAr?: string;
       estimatedWaitTime?: number;
     };
     score: number;
@@ -514,7 +517,7 @@ export function AssessmentResultCard({
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-indigo-600" />
                 <h3 className="font-semibold text-gray-900">
-                  {isArabic ? "مقدم الرعاية الصحية الموصى به" : "Recommended Healthcare Provider"}
+                  {isArabic ? "المستشفى/العيادة الموصى بها" : "Recommended Healthcare Provider"}
                 </h3>
               </div>
               
@@ -523,16 +526,25 @@ export function AssessmentResultCard({
                   <div className="flex items-start justify-between">
                     <div>
                       <h4 className="font-semibold text-indigo-900">
-                        {result.resourceMatch.metadata.name || (isArabic ? "مقدم الرعاية الصحية" : "Healthcare Provider")}
+                        {isArabic 
+                          ? (result.resourceMatch.metadata.nameAr || result.resourceMatch.metadata.name || "مقدم الرعاية الصحية")
+                          : (result.resourceMatch.metadata.name || "Healthcare Provider")
+                        }
                       </h4>
-                      {result.resourceMatch.metadata.specialty && (
+                      {(result.resourceMatch.metadata.specialty || result.resourceMatch.metadata.specialtyAr) && (
                         <p className="text-sm text-indigo-700 mt-1">
-                          {isArabic ? "التخصص:" : "Specialty:"} {result.resourceMatch.metadata.specialty}
+                          {isArabic ? "التخصص:" : "Specialty:"} {isArabic 
+                            ? (result.resourceMatch.metadata.specialtyAr || result.resourceMatch.metadata.specialty)
+                            : result.resourceMatch.metadata.specialty
+                          }
                         </p>
                       )}
-                      {result.resourceMatch.metadata.location && (
+                      {(result.resourceMatch.metadata.location || result.resourceMatch.metadata.locationAr) && (
                         <p className="text-sm text-indigo-600 mt-1">
-                          {isArabic ? "الموقع:" : "Location:"} {result.resourceMatch.metadata.location}
+                          {isArabic ? "الموقع:" : "Location:"} {isArabic 
+                            ? (result.resourceMatch.metadata.locationAr || result.resourceMatch.metadata.location)
+                            : result.resourceMatch.metadata.location
+                          }
                         </p>
                       )}
                       {result.resourceMatch.metadata.estimatedWaitTime && (
