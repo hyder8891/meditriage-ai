@@ -201,7 +201,7 @@ export function AssessmentResultCard({
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in-50 duration-500">
+    <div className="space-y-4 animate-in fade-in-50 duration-500" dir={isArabic ? 'rtl' : 'ltr'}>
       {/* Emergency Banner for Red Triage */}
       {result.triageLevel === "red" && (
         <Card className="bg-red-100 border-2 border-red-400 shadow-lg">

@@ -147,10 +147,12 @@ function MedicalReportAnalysisContent() {
     }
   };
 
+  const isArabic = language === 'ar';
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={isArabic ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className={`flex items-center justify-between ${isArabic ? 'flex-row-reverse' : ''}`}>
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
             {language === 'ar' ? 'تحليل التقارير الطبية' : 'Medical Report Analysis'}

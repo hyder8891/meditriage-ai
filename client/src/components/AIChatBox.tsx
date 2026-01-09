@@ -57,6 +57,11 @@ export type AIChatBoxProps = {
    * Click to send directly
    */
   suggestedPrompts?: string[];
+
+  /**
+   * Language for RTL support
+   */
+  language?: 'ar' | 'en';
 };
 
 /**
@@ -119,7 +124,9 @@ export const AIChatBox = memo(function AIChatBox({
   height = "600px",
   emptyStateMessage = "Start a conversation with AI",
   suggestedPrompts,
+  language = 'en',
 }: AIChatBoxProps) {
+  const isArabic = language === 'ar';
   const [input, setInput] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -195,6 +202,7 @@ export const AIChatBox = memo(function AIChatBox({
         className
       )}
       style={{ height }}
+      dir={isArabic ? 'rtl' : 'ltr'}
     >
       {/* Messages Area */}
       <div ref={scrollAreaRef} className="flex-1 overflow-hidden">
@@ -261,11 +269,11 @@ export const AIChatBox = memo(function AIChatBox({
                       )}
                     >
                       {message.role === "assistant" ? (
-                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <div className={`prose prose-sm dark:prose-invert max-w-none ${isArabic ? 'text-right' : 'text-left'}`}>
                           <Streamdown>{message.content}</Streamdown>
                         </div>
                       ) : (
-                        <p className="whitespace-pre-wrap text-sm">
+                        <p className={`whitespace-pre-wrap text-sm ${isArabic ? 'text-right' : 'text-left'}`}>
                           {message.content}
                         </p>
                       )}

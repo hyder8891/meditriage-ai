@@ -250,8 +250,10 @@ export default function MedicalImaging() {
     return modalities.find(m => m.id === selectedModality);
   };
 
+  const isArabic = language === 'ar';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white" dir={isArabic ? 'rtl' : 'ltr'}>
       {/* Header */}
       <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4">
@@ -559,7 +561,7 @@ export default function MedicalImaging() {
             </TabsContent>
 
             {/* Results Tab */}
-            <TabsContent value="results" className="space-y-6">
+            <TabsContent value="results" className="space-y-6" dir={isArabic ? 'rtl' : 'ltr'}>
               {analysis && (
                 <>
                   {/* Urgency Banner */}
@@ -615,20 +617,20 @@ export default function MedicalImaging() {
                   {/* Overall Assessment */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>{language === 'ar' ? 'التقييم العام' : 'Overall Assessment'}</CardTitle>
+                      <CardTitle className={isArabic ? 'text-right' : 'text-left'}>{language === 'ar' ? 'التقييم العام' : 'Overall Assessment'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.overallAssessment}</p>
+                      <p className={`text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base ${isArabic ? 'text-right' : 'text-left'}`}>{analysis.overallAssessment}</p>
                     </CardContent>
                   </Card>
 
                   {/* Findings */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>{language === 'ar' ? 'النتائج' : 'Findings'}</CardTitle>
+                      <CardTitle className={isArabic ? 'text-right' : 'text-left'}>{language === 'ar' ? 'النتائج' : 'Findings'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.findings}</p>
+                      <p className={`text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base ${isArabic ? 'text-right' : 'text-left'}`}>{analysis.findings}</p>
                     </CardContent>
                   </Card>
 
@@ -636,13 +638,13 @@ export default function MedicalImaging() {
                   {analysis.abnormalities && analysis.abnormalities.length > 0 && (
                     <Card>
                       <CardHeader>
-                        <CardTitle>{language === 'ar' ? 'الشذوذات المكتشفة' : 'Detected Abnormalities'}</CardTitle>
+                        <CardTitle className={isArabic ? 'text-right' : 'text-left'}>{language === 'ar' ? 'الشذوذات المكتشفة' : 'Detected Abnormalities'}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
                           {analysis.abnormalities.map((abnormality, index) => (
-                            <div key={index} className="p-4 bg-slate-50 rounded-lg border">
-                              <div className="flex flex-col md:flex-row items-start justify-between mb-2 gap-2">
+                            <div key={index} className={`p-4 bg-slate-50 rounded-lg border ${isArabic ? 'text-right' : 'text-left'}`}>
+                              <div className={`flex flex-col md:flex-row items-start justify-between mb-2 gap-2 ${isArabic ? 'md:flex-row-reverse' : ''}`}>
                                 <div>
                                   <span className="font-medium text-slate-900">{abnormality.type}</span>
                                   <span className="text-slate-500 mx-2">•</span>
@@ -672,10 +674,10 @@ export default function MedicalImaging() {
                   {/* Interpretation */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>{language === 'ar' ? 'التفسير السريري' : 'Clinical Interpretation'}</CardTitle>
+                      <CardTitle className={isArabic ? 'text-right' : 'text-left'}>{language === 'ar' ? 'التفسير السريري' : 'Clinical Interpretation'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.interpretation}</p>
+                      <p className={`text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base ${isArabic ? 'text-right' : 'text-left'}`}>{analysis.interpretation}</p>
                     </CardContent>
                   </Card>
 
@@ -683,10 +685,10 @@ export default function MedicalImaging() {
                   {analysis.differentialDiagnosis && analysis.differentialDiagnosis.length > 0 && (
                     <Card>
                       <CardHeader>
-                        <CardTitle>{language === 'ar' ? 'التشخيصات التفريقية' : 'Differential Diagnosis'}</CardTitle>
+                        <CardTitle className={isArabic ? 'text-right' : 'text-left'}>{language === 'ar' ? 'التشخيصات التفريقية' : 'Differential Diagnosis'}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <ul className="list-disc list-inside space-y-1">
+                        <ul className={`space-y-1 ${isArabic ? 'list-disc pr-5 text-right' : 'list-disc pl-5 text-left'}`}>
                           {analysis.differentialDiagnosis.map((diagnosis, index) => (
                             <li key={index} className="text-slate-700 text-sm md:text-base">{diagnosis}</li>
                           ))}
@@ -698,10 +700,10 @@ export default function MedicalImaging() {
                   {/* Recommendations */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>{language === 'ar' ? 'التوصيات' : 'Recommendations'}</CardTitle>
+                      <CardTitle className={isArabic ? 'text-right' : 'text-left'}>{language === 'ar' ? 'التوصيات' : 'Recommendations'}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">{analysis.recommendations}</p>
+                      <p className={`text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base ${isArabic ? 'text-right' : 'text-left'}`}>{analysis.recommendations}</p>
                     </CardContent>
                   </Card>
 
