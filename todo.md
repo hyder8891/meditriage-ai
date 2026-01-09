@@ -1448,3 +1448,8 @@
 - [x] Test mobile-specific features (touch gestures, orientation changes)
 - [x] Verify accessibility on mobile devices
 - [x] Test performance on mobile network conditions
+
+
+## New Bug Fixes Required
+- [x] Fix AI assessment severity logic - prevent "Critical/Call 122" for minor/low-mid cases
+- [x] Remove "Book an Appointment" feature and doctor list from assessment results

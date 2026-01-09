@@ -661,15 +661,7 @@ function FacilityCard({ facility, type, isArabic, onCall, onBook }: FacilityCard
               </Button>
             )}
             
-            {onBook && !isHospital && (
-              <Button 
-                size="sm"
-                onClick={() => onBook(facility.id)}
-                className="gap-1"
-              >
-                {isArabic ? 'احجز' : 'Book'}
-              </Button>
-            )}
+            {/* Booking feature temporarily disabled */}
           </div>
         </div>
       </CardContent>

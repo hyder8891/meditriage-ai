@@ -386,9 +386,16 @@ async function generateComprehensiveDiagnosis(
     const primaryDiagnosis = diagnosis.differentialDiagnosis[0];
     
     // Determine triage level from BRAIN severity
+    // Only set to 'red' (Critical/Call 122) for IMMEDIATE urgency red flags
     let triageLevel: 'green' | 'yellow' | 'red' = 'yellow';
-    if (diagnosis.redFlags && diagnosis.redFlags.length > 0) {
-      triageLevel = 'red';
+    
+    // Check if there are immediate urgency red flags
+    const hasImmediateRedFlags = brainResult.context?.redFlagCheck?.urgencyLevel === 'immediate';
+    
+    if (hasImmediateRedFlags && diagnosis.redFlags && diagnosis.redFlags.length > 0) {
+      triageLevel = 'red';  // Critical - Call 122
+    } else if (diagnosis.redFlags && diagnosis.redFlags.length > 0) {
+      triageLevel = 'yellow';  // Urgent but not critical
     } else if (primaryDiagnosis?.probability && primaryDiagnosis.probability > 0.7) {
       triageLevel = 'yellow';
     } else {

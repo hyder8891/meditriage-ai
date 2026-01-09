@@ -170,13 +170,27 @@ export async function checkRedFlags(symptomIds: number[]): Promise<{
   const allRedFlags = await db.select().from(redFlags);
   const relevantRedFlags: RedFlag[] = [];
   
+  // Only include red flags that match the patient's actual red flag symptoms
+  const redFlagSymptomNames = redFlagSymptoms.map(s => s.nameEn.toLowerCase());
+  
   for (const flag of allRedFlags) {
     // Check if this red flag is relevant to patient's symptoms
-    // This is a simplified check - in production, you'd want more sophisticated matching
-    relevantRedFlags.push(flag);
+    const flagDescription = flag.nameEn.toLowerCase();
+    const isRelevant = redFlagSymptomNames.some(symptom => 
+      flagDescription.includes(symptom) || symptom.includes(flagDescription.split(' ')[0])
+    );
+    
+    if (isRelevant) {
+      relevantRedFlags.push(flag);
+    }
   }
   
-  // Determine highest urgency level
+  // If no relevant red flags found after filtering, return routine
+  if (relevantRedFlags.length === 0) {
+    return { hasRedFlags: false, redFlags: [], urgencyLevel: 'routine' };
+  }
+  
+  // Determine highest urgency level from relevant red flags only
   let urgencyLevel: 'immediate' | 'urgent' | 'routine' = 'routine';
   for (const flag of relevantRedFlags) {
     if (flag.urgencyLevel === 'immediate') {
@@ -190,7 +204,7 @@ export async function checkRedFlags(symptomIds: number[]): Promise<{
   }
   
   return {
-    hasRedFlags: true,
+    hasRedFlags: relevantRedFlags.length > 0,
     redFlags: relevantRedFlags.slice(0, 5), // Return top 5 most relevant
     urgencyLevel,
   };
