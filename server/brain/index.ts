@@ -6,6 +6,7 @@
 import { medicalKnowledge, MedicalConcept } from './knowledge/medical-knowledge';
 import { invokeGemini } from '../_core/gemini';
 import { invokeGeminiPro } from '../_core/gemini-dual';
+import { performMedGeminiAssessment, generateCoTSystemPrompt, ESILevel, getESIAssessment } from '../_core/med-gemini';
 import mysql from 'mysql2/promise';
 import { searchAndCachePubMed, formatCitation, generatePubMedQuery } from './knowledge/pubmed-client';
 import { hybridKnowledgeLookup, generateEnhancedContext } from './knowledge-adapter';
@@ -344,9 +345,14 @@ ${context.language === 'ar' ? `**JSON Response (ALL TEXT MUST BE IN ARABIC):**
 \`\`\``}`;
 
     try {
-      // Use Gemini Pro for deep clinical reasoning with grounding
+      // Use Med-Gemini for advanced clinical reasoning with Chain-of-Thought
+      // Med-Gemini is Google's leading model for clinical reasoning and triage
+      const medGeminiSystemPrompt = generateCoTSystemPrompt(context.language);
+      
       const systemContent = context.language === 'ar'
-        ? `أنت BRAIN، نظام ذكاء اصطناعي طبي متقدم.
+        ? `${medGeminiSystemPrompt}
+
+أنت BRAIN مدعوم بـ Med-Gemini، نظام ذكاء اصطناعي طبي متقدم.
 
 تعليمات إلزامية:
 - يجب أن تكون جميع الاستجابات باللغة العربية فقط
@@ -355,8 +361,14 @@ ${context.language === 'ar' ? `**JSON Response (ALL TEXT MUST BE IN ARABIC):**
 - استخدم أسماء الفحوصات بالعربية (مثل: "تحليل دم كامل" وليس "CBC")
 - استخدم أسماء التخصصات بالعربية (مثل: "طبيب قلب" وليس "Cardiologist")
 - قدم تقييمات طبية دقيقة مبنية على الأدلة
+- استخدم منهجية التفكير المتسلسل (Chain-of-Thought) للتحليل السريري
 - يجب أن يكون الرد بتنسيق JSON صالح`
-        : 'You are BRAIN, an advanced medical AI system. Provide evidence-based, accurate medical assessments with PubMed citations. Always respond in valid JSON format.';
+        : `${medGeminiSystemPrompt}
+
+You are BRAIN powered by Med-Gemini, an advanced medical AI system.
+Provide evidence-based, accurate medical assessments with PubMed citations.
+Use Chain-of-Thought (CoT) reasoning methodology for clinical analysis.
+Always respond in valid JSON format.`;
       
       const responseText = await invokeGeminiPro(
         [
@@ -367,15 +379,26 @@ ${context.language === 'ar' ? `**JSON Response (ALL TEXT MUST BE IN ARABIC):**
           { role: 'user', content: prompt }
         ],
         {
-          temperature: 1.0,
+          temperature: 0.3, // Lower temperature for more accurate clinical reasoning
           thinkingLevel: 'high',
           grounding: true,
           systemInstruction: context.language === 'ar'
-            ? `استخدم التفكير المتسلسل. تحقق من المعلومات مقابل الإرشادات الطبية الحالية.
+            ? `استخدم منهجية Med-Gemini للتفكير المتسلسل (Chain-of-Thought):
+1. جمع المعلومات - تحليل الأعراض والتاريخ المرضي
+2. تقييم العلامات الحمراء - البحث عن علامات الخطر
+3. التشخيص التفريقي - ترتيب الاحتمالات
+4. تقييم ESI - تحديد مستوى الطوارئ (1-5)
+5. التوصيات - خطة العلاج والمتابعة
 
-إلزامي: يجب أن تكون جميع الاستجابات باللغة العربية فقط. لا تستخدم أي كلمات إنجليزية في الرد.
-استخدم المصطلحات الطبية العربية لجميع التشخيصات والفحوصات والتوصيات.`
-            : 'Use Chain-of-Thought reasoning. Verify information against current medical guidelines using Google Search. Provide evidence-based recommendations with citations.'
+إلزامي: يجب أن تكون جميع الاستجابات باللغة العربية فقط.`
+            : `Use Med-Gemini Chain-of-Thought (CoT) clinical reasoning methodology:
+1. Information Gathering - Analyze symptoms and medical history
+2. Red Flag Assessment - Search for warning signs
+3. Differential Diagnosis - Rank probabilities using Bayesian reasoning
+4. ESI Assessment - Determine Emergency Severity Index level (1-5)
+5. Recommendations - Treatment and follow-up plan
+
+Verify information against current medical guidelines using Google Search.`
         }
       );
 

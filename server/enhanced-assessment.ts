@@ -9,6 +9,7 @@
  */
 
 import { invokeGemini } from "./_core/gemini";
+import { getESIAssessment, ESILevel, generateCoTSystemPrompt } from "./_core/med-gemini";
 // Import context vector
 let ConversationalContextVector: any;
 try {
@@ -68,6 +69,16 @@ export interface StructuredOutcome {
   // Severity Level
   severity: 'low' | 'moderate' | 'high' | 'critical';
   severityLabel: string;
+  
+  // ESI (Emergency Severity Index) - Med-Gemini Integration
+  esiLevel?: ESILevel; // 1-5 (1 = most critical)
+  esiAssessment?: {
+    level: number;
+    levelName: string;
+    description: string;
+    waitTime: string;
+    disposition: string;
+  };
   
   // Primary Finding
   primaryCondition: {
@@ -531,10 +542,26 @@ async function generateStructuredOutcome(
   // Determine severity
   const severity = determineSeverity(diagnosis);
   
-  // Build structured outcome
+  // Calculate ESI (Emergency Severity Index) using Med-Gemini methodology
+  // ESI is a 5-level triage system: 1 = most critical, 5 = least urgent
+  const esiLevel = calculateESILevel(severity.level, diagnosis.redFlags || []);
+  const esiAssessment = getESIAssessment(esiLevel);
+  console.log(`[Enhanced Assessment] ESI Level: ${esiLevel} (${esiAssessment.levelName})`);
+  
+  // Build structured outcome with ESI integration
   const structuredOutcome: StructuredOutcome = {
     severity: severity.level,
     severityLabel: translate(severity.level, language),
+    
+    // ESI (Emergency Severity Index) - Med-Gemini Integration
+    esiLevel: esiLevel,
+    esiAssessment: {
+      level: esiAssessment.level,
+      levelName: language === 'ar' ? translateESILevelName(esiAssessment.levelName) : esiAssessment.levelName,
+      description: language === 'ar' ? translateESIDescription(esiAssessment.description) : esiAssessment.description,
+      waitTime: esiAssessment.waitTime,
+      disposition: language === 'ar' ? translateESIDisposition(esiAssessment.disposition) : esiAssessment.disposition
+    },
     
     primaryCondition: {
       name: translate(primaryDx?.condition || 'Unknown', language),
@@ -778,6 +805,90 @@ function buildSummaryMessage(outcome: StructuredOutcome, language: 'en' | 'ar'):
     return `تم إكمال التقييم. يرجى مراجعة النتائج أدناه.`;
   }
   return `Assessment complete. Please review the results below.`;
+}
+
+// ============================================================================
+// ESI (Emergency Severity Index) Helper Functions
+// Med-Gemini Integration for accurate triage
+// ============================================================================
+
+/**
+ * Calculate ESI level based on severity and red flags
+ * ESI is a 5-level triage system used in emergency departments
+ * Level 1: Requires immediate life-saving intervention
+ * Level 2: High-risk situation, severe pain/distress
+ * Level 3: Urgent, stable vitals, needs 2+ resources
+ * Level 4: Less urgent, needs 1 resource
+ * Level 5: Non-urgent, needs no resources
+ */
+function calculateESILevel(
+  severity: 'low' | 'moderate' | 'high' | 'critical',
+  redFlags: string[]
+): ESILevel {
+  // Critical severity with multiple red flags = ESI 1
+  if (severity === 'critical' && redFlags.length >= 2) {
+    return 1;
+  }
+  
+  // Critical severity or high severity with red flags = ESI 2
+  if (severity === 'critical' || (severity === 'high' && redFlags.length >= 1)) {
+    return 2;
+  }
+  
+  // High severity = ESI 3
+  if (severity === 'high') {
+    return 3;
+  }
+  
+  // Moderate severity = ESI 4
+  if (severity === 'moderate') {
+    return 4;
+  }
+  
+  // Low severity = ESI 5
+  return 5;
+}
+
+/**
+ * Translate ESI level name to Arabic
+ */
+function translateESILevelName(levelName: string): string {
+  const translations: Record<string, string> = {
+    'Resuscitation': 'إنعاش',
+    'Emergent': 'طارئ',
+    'Urgent': 'عاجل',
+    'Less Urgent': 'أقل إلحاحاً',
+    'Non-Urgent': 'غير عاجل'
+  };
+  return translations[levelName] || levelName;
+}
+
+/**
+ * Translate ESI description to Arabic
+ */
+function translateESIDescription(description: string): string {
+  const translations: Record<string, string> = {
+    'Requires immediate life-saving intervention': 'يتطلب تدخلاً فورياً لإنقاذ الحياة',
+    'High risk situation, confused/lethargic/disoriented, or severe pain/distress': 'حالة عالية الخطورة، ارتباك/خمول/فقدان التوجه، أو ألم/ضيق شديد',
+    'Stable vital signs but needs 2+ resources': 'علامات حيوية مستقرة ولكن يحتاج موردين أو أكثر',
+    'Stable, needs 1 resource': 'مستقر، يحتاج مورد واحد',
+    'Stable, needs no resources': 'مستقر، لا يحتاج موارد'
+  };
+  return translations[description] || description;
+}
+
+/**
+ * Translate ESI disposition to Arabic
+ */
+function translateESIDisposition(disposition: string): string {
+  const translations: Record<string, string> = {
+    'Resuscitation room': 'غرفة الإنعاش',
+    'Emergency department - high acuity': 'قسم الطوارئ - حالة حادة',
+    'Emergency department - moderate acuity': 'قسم الطوارئ - حالة متوسطة',
+    'Fast track or urgent care': 'المسار السريع أو الرعاية العاجلة',
+    'Primary care or self-care': 'الرعاية الأولية أو الرعاية الذاتية'
+  };
+  return translations[disposition] || disposition;
 }
 
 // ============================================================================

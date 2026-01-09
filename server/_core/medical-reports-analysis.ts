@@ -5,6 +5,7 @@
  */
 
 import { invokeGemini } from "./gemini";
+import { performMedGeminiReportAnalysis, generateCoTSystemPrompt } from "./med-gemini";
 
 export type ReportType =
   | "pathology"
@@ -328,7 +329,13 @@ function getReportTypePrompt(reportType: ReportType): string {
 }
 
 /**
- * Analyze a medical report using AI
+ * Analyze a medical report using Med-Gemini AI with Chain-of-Thought reasoning
+ * 
+ * Med-Gemini capabilities for report analysis:
+ * - Chain-of-Thought (CoT) systematic analysis methodology
+ * - Evidence-based interpretation with confidence scoring
+ * - Critical flag detection with urgency assessment
+ * - Uncertainty-guided external search when confidence is low
  */
 export async function analyzeMedicalReport(
   reportType: ReportType,
@@ -337,20 +344,34 @@ export async function analyzeMedicalReport(
     age?: number;
     gender?: string;
     medicalHistory?: string;
-  }
+  },
+  language: 'en' | 'ar' = 'en'
 ): Promise<ReportAnalysisResult> {
-  const systemPrompt = getReportTypePrompt(reportType);
+  // Generate Med-Gemini Chain-of-Thought system prompt
+  const medGeminiCoTPrompt = generateCoTSystemPrompt(language);
+  const reportTypePrompt = getReportTypePrompt(reportType);
 
   const contextInfo = patientContext
     ? `\n\n**Patient Context:**\n- Age: ${patientContext.age || "Unknown"}\n- Gender: ${patientContext.gender || "Unknown"}\n- Medical History: ${patientContext.medicalHistory || "Not provided"}`
     : "";
 
-  const userPrompt = `${systemPrompt}${contextInfo}
+  // Combine Med-Gemini CoT methodology with report-specific instructions
+  const userPrompt = `${medGeminiCoTPrompt}
+
+${reportTypePrompt}${contextInfo}
 
 **Report Text:**
 ${extractedText}
 
-**Instructions:**
+**Med-Gemini Chain-of-Thought Analysis Instructions:**
+Analyze this medical report using systematic Chain-of-Thought reasoning:
+1. Read and understand the complete report
+2. Identify all findings and classify by severity
+3. Correlate findings with clinical context
+4. Determine primary diagnosis with confidence level
+5. Identify critical flags requiring immediate attention
+6. Provide evidence-based recommendations
+
 Provide a comprehensive analysis in JSON format with the following structure:
 
 {
@@ -385,17 +406,33 @@ Provide a comprehensive analysis in JSON format with the following structure:
 Provide ONLY the JSON object, no additional text.`;
 
   try {
+    // Use Med-Gemini (Gemini Pro) with Chain-of-Thought reasoning for report analysis
+    console.log(`[Medical Reports] Analyzing ${reportType} report with Med-Gemini Chain-of-Thought reasoning`);
+    
     const response = await invokeGemini({
       messages: [
         {
           role: "system" as const,
-          content: "You are an expert medical AI assistant analyzing medical reports. Provide structured, accurate analysis in JSON format.",
+          content: `You are Med-Gemini, an advanced medical AI system for report analysis.
+
+Use Chain-of-Thought (CoT) reasoning methodology:
+1. Systematic reading and comprehension
+2. Finding identification and classification
+3. Clinical correlation and interpretation
+4. Diagnosis formulation with confidence scoring
+5. Critical flag detection
+6. Evidence-based recommendations
+
+Provide structured, accurate analysis in JSON format.`,
         },
         {
           role: "user" as const,
           content: userPrompt as string,
         },
       ],
+      task: 'clinical_reasoning', // Uses Gemini Pro for Med-Gemini clinical analysis
+      temperature: 0.2, // Low temperature for clinical accuracy
+      thinkingBudget: 3072, // Higher thinking budget for Med-Gemini Chain-of-Thought analysis
       response_format: {
         type: "json_schema",
         json_schema: {
