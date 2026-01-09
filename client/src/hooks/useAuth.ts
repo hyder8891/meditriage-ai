@@ -57,8 +57,6 @@ export function useAuth() {
   // Compute isAuthenticated based on token and user existence
   const isAuthenticated = Boolean(token && user);
 
-  console.log('[useAuth] Current state:', { token: token ? 'exists' : 'null', user, isAuthenticated });
-
   return {
     token,
     refreshToken,

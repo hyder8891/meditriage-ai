@@ -304,7 +304,7 @@ export default function PatientPortal() {
         {/* Quick Actions */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           {/* Start AI Assessment */}
-          <Card data-tour="ai-assessment" className="border-2 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto" onClick={(e) => { e.stopPropagation(); setLocation('/symptom-checker'); }}>
+          <Card data-tour="ai-assessment" className="border-2 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer group pointer-events-auto" onClick={(e) => { e.stopPropagation(); setLocation('/patient/symptom-checker'); }}>
             <CardContent className="p-4 sm:p-5 md:p-6">
               <div className="flex items-start justify-between mb-3 sm:mb-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">

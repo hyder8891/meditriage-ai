@@ -16,14 +16,12 @@ export async function refreshAccessToken(): Promise<string | null> {
   const { refreshToken, setToken, clearAuth } = useAuthStore.getState();
 
   if (!refreshToken) {
-    console.log('[TokenRefresh] No refresh token available');
     return null;
   }
 
   isRefreshing = true;
   refreshPromise = (async () => {
     try {
-      console.log('[TokenRefresh] Attempting to refresh access token...');
       
       const response = await fetch('/api/trpc/auth.refreshToken', {
         method: 'POST',
@@ -37,7 +35,6 @@ export async function refreshAccessToken(): Promise<string | null> {
       });
 
       if (!response.ok) {
-        console.log('[TokenRefresh] Refresh failed with status:', response.status);
         clearAuth();
         return null;
       }
@@ -46,16 +43,13 @@ export async function refreshAccessToken(): Promise<string | null> {
       
       if (data.result?.data?.json?.success && data.result?.data?.json?.token) {
         const newToken = data.result.data.json.token;
-        console.log('[TokenRefresh] Successfully refreshed token');
         setToken(newToken);
         return newToken;
       } else {
-        console.log('[TokenRefresh] Refresh response invalid:', data);
         clearAuth();
         return null;
       }
     } catch (error) {
-      console.error('[TokenRefresh] Error refreshing token:', error);
       clearAuth();
       return null;
     } finally {
@@ -98,7 +92,6 @@ export async function getValidToken(): Promise<string | null> {
   }
 
   if (isTokenExpired(token)) {
-    console.log('[TokenRefresh] Token expired, refreshing...');
     return refreshAccessToken();
   }
 

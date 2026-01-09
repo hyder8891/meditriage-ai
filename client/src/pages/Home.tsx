@@ -70,7 +70,7 @@ function useInView(options = {}) {
   return { ref, isInView };
 }
 
-// Animated counter component
+// Animated counter component - Fixed to properly detect viewport intersection
 function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: { 
   end: number; 
   duration?: number; 
@@ -78,9 +78,29 @@ function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: {
   prefix?: string;
 }) {
   const [count, setCount] = useState(0);
-  const { ref, isInView } = useInView();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
   const hasAnimated = useRef(false);
 
+  // Separate IntersectionObserver for the counter
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          setIsInView(true);
+        }
+      },
+      { threshold: 0.1, rootMargin: '50px 0px 50px 0px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  // Animation effect
   useEffect(() => {
     if (!isInView || hasAnimated.current) return;
     hasAnimated.current = true;
@@ -103,7 +123,11 @@ function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: {
     return () => clearInterval(timer);
   }, [isInView, end, duration]);
 
-  return <span ref={ref}>{prefix}{count.toLocaleString()}{suffix}</span>;
+  return (
+    <div ref={containerRef} className="inline-block">
+      <span>{prefix}{count.toLocaleString()}{suffix}</span>
+    </div>
+  );
 }
 
 // Floating Action Button Component
