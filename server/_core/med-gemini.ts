@@ -337,7 +337,7 @@ You MUST reason through each clinical case step-by-step:
 /**
  * Generate Chain-of-Thought prompt for image analysis
  */
-function generateImageCoTPrompt(modality: string, language: 'en' | 'ar' = 'en'): string {
+export function generateImageCoTPrompt(modality: string, language: 'en' | 'ar' = 'en'): string {
   if (language === 'ar') {
     return `أنت Med-Gemini، نظام ذكاء اصطناعي متخصص في تحليل الصور الطبية.
 
@@ -1041,6 +1041,5 @@ Provide evidence-based information from medical literature. Format as JSON:
 // ============================================================================
 
 export {
-  generateCoTSystemPrompt,
-  generateImageCoTPrompt
+  generateCoTSystemPrompt
 };
