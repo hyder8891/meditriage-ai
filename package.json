@@ -10,6 +10,11 @@
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:mobile": "playwright test",
+    "test:mobile:headed": "playwright test --headed",
+    "test:mobile:debug": "playwright test --debug",
+    "test:mobile:report": "playwright show-report",
+    "test:mobile:ui": "playwright test --ui",
     "db:push": "drizzle-kit generate && drizzle-kit migrate"
   },
   "dependencies": {
@@ -119,6 +124,7 @@
   },
   "devDependencies": {
     "@builder.io/vite-plugin-jsx-loc": "^0.1.1",
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.14",
     "@testing-library/jest-dom": "^6.9.1",
@@ -140,6 +146,7 @@
     "autoprefixer": "^10.4.21",
     "drizzle-kit": "^0.31.5",
     "esbuild": "^0.25.12",
+    "playwright": "^1.57.0",
     "pnpm": "^10.18.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
