@@ -52,6 +52,7 @@ import { matchingRouter } from "./matching-router";
 import { familyVaultRouter } from "./family-vault-router";
 import { clinicFinderRouter } from "./clinic-finder-router";
 import { doctorVerificationRouter } from "./doctor-verification-router";
+import { medicalImageRouter } from "./routers/medical-image-router";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { invokeGemini } from "./_core/gemini";
@@ -137,6 +138,7 @@ export const appRouter = router({
   familyVault: familyVaultRouter,
   clinicFinder: clinicFinderRouter,
   doctorVerification: doctorVerificationRouter,
+  medicalImage: medicalImageRouter,
   auth: router({
     ...authRouter._def.procedures,
     me: publicProcedure.query(opts => opts.ctx.user),

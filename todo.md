@@ -1502,3 +1502,31 @@
 - [x] Implement image upload interface for visual assessment
 - [x] Add longitudinal health timeline visualization
 
+
+
+## ESI Visualization & Reasoning Transparency (NEW)
+
+### ESI (Emergency Severity Index) Visualization
+- [x] Create ESI badge component with color-coded levels
+- [x] Level 1-2: Red badge (Immediate/Emergent)
+- [x] Level 3: Yellow/Orange badge (Urgent)
+- [x] Level 4-5: Green badge (Less Urgent/Non-Urgent)
+- [x] Display ESI level prominently in assessment results
+- [x] Add ESI explanation tooltip for patient education
+
+### Reasoning Transparency Panel
+- [x] Create Chain-of-Thought display component
+- [x] Show step-by-step reasoning process to users
+- [x] Display symptom analysis breakdown
+- [x] Show risk factor evaluation steps
+- [x] Display evidence-based reasoning for recommendations
+- [x] Add collapsible sections for detailed reasoning
+
+### Image Upload for Visual Assessment
+- [x] Create image upload component for wound/rash/symptom photos
+- [x] Implement S3 storage integration for medical images
+- [x] Add image preview and management functionality
+- [x] Integrate Med-Gemini multimodal analysis API
+- [x] Display visual assessment results with AI analysis
+- [ ] Add image annotation capabilities for highlighting areas of concern
+

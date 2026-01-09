@@ -30,6 +30,7 @@ import {
   BarChart3,
   UsersRound,
   Scan,
+  Camera,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -107,6 +108,13 @@ export default function PatientPortal() {
       desc: language === 'ar' ? 'تحليل الأشعة والصور الطبية' : 'Analyze X-rays, MRI, CT scans',
       color: 'from-purple-500 to-fuchsia-500',
       path: '/patient/medical-imaging',
+    },
+    {
+      icon: Camera,
+      title: language === 'ar' ? 'التقييم البصري' : 'Visual Assessment',
+      desc: language === 'ar' ? 'ارفع صورة للجروح أو الطفح الجلدي' : 'Upload wound or rash photos for AI analysis',
+      color: 'from-pink-500 to-rose-500',
+      path: '/patient/visual-assessment',
     },
   ];
 

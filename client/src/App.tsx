@@ -90,6 +90,7 @@ const AdminVerificationQueue = lazy(() => import("./pages/AdminVerificationQueue
 const PatientBooking = lazy(() => import("./pages/PatientBooking"));
 const PatientSymptomChecker = lazy(() => import("./pages/PatientSymptomChecker"));
 const EnhancedSymptomChecker = lazy(() => import("./pages/EnhancedSymptomChecker"));
+const VisualSymptomAssessment = lazy(() => import("./pages/VisualSymptomAssessment"));
 
 // Import all admin feature pages
 import * as AdminFeatures from "./pages/admin/index";
@@ -186,6 +187,9 @@ function Router() {
         </Route>
         <Route path="/patient/medical-imaging">
           {() => <ProtectedRoute requiredRole="patient"><MedicalImaging /></ProtectedRoute>}
+        </Route>
+        <Route path="/patient/visual-assessment">
+          {() => <ProtectedRoute requiredRole="patient"><VisualSymptomAssessment /></ProtectedRoute>}
         </Route>
         <Route path={"/patient/booking/:doctorId"}>
           {(params) => <ProtectedRoute><PatientBooking doctorId={parseInt(params.doctorId)} /></ProtectedRoute>}
