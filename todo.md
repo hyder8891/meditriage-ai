@@ -265,6 +265,7 @@
 - [ ] BUG: Manus preview panel not displaying website (works on actual 3000 port) - CONFIRMED: Platform issue, not app issue
 - [x] Comprehensive app audit - code, functionality, security
 - [x] Fix Visual Symptom Assessment image analysis - improved error handling and Gemini Pro integration
+- [x] Fix Visual Symptom Assessment - minor scratches incorrectly classified as ESI Level 2 Emergent (should be lower severity)
 
 ## Audit Findings Summary
 - Fixed 6+ TypeScript errors across multiple files

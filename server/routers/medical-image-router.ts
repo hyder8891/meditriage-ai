@@ -102,6 +102,14 @@ ${description ? `وصف المريض: ${description}` : ''}
 الخطوة 4 - الأدلة: اذكر الأدلة الداعمة لكل تشخيص محتمل
 الخطوة 5 - الخلاصة: قدم التقييم النهائي والتوصيات
 
+⚠️ تعليمات مهمة جداً لتحديد الشدة:
+- "mild" (خفيف): خدوش سطحية، كدمات صغيرة، طفح جلدي خفيف، لدغات حشرات عادية، جروح صغيرة ملتئمة
+- "moderate" (متوسط): جروح تحتاج تنظيف، طفح جلدي منتشر، علامات عدوى خفيفة، حروق درجة أولى صغيرة
+- "severe" (شديد): جروح عميقة نازفة، علامات عدوى واضحة (صديد، احمرار شديد، حمى)، حروق درجة ثانية
+- "critical" (حرج): نزيف غير متحكم فيه، علامات تسمم الدم، حروق شديدة، إصابات تهدد الحياة
+
+معظم الإصابات الجلدية البسيطة (خدوش، كدمات، طفح خفيف) يجب تصنيفها كـ "mild"!
+
 هام جداً: يجب أن تكون إجابتك بصيغة JSON صالحة فقط، بدون أي نص إضافي قبلها أو بعدها.
 
 قدم الإجابة بصيغة JSON التالية:
@@ -152,6 +160,15 @@ Step 2 - Analysis: Analyze visual characteristics and their relation to potentia
 Step 3 - Differential Diagnosis: Provide a list of possible conditions with probability for each
 Step 4 - Evidence: State supporting evidence for each potential diagnosis
 Step 5 - Conclusion: Provide final assessment and recommendations
+
+⚠️ CRITICAL SEVERITY GUIDELINES - BE CONSERVATIVE:
+- "mild": Superficial scratches, minor bruises, mild rashes, normal insect bites, small healing wounds, cat scratches, minor abrasions
+- "moderate": Wounds needing cleaning, widespread rash, mild infection signs, small first-degree burns
+- "severe": Deep bleeding wounds, clear infection signs (pus, severe redness, fever), second-degree burns
+- "critical": Uncontrolled bleeding, sepsis signs, severe burns, life-threatening injuries
+
+Most simple skin injuries (scratches, bruises, mild rashes) should be classified as "mild"!
+Do NOT over-triage minor injuries. A simple scratch or abrasion is NOT an emergency.
 
 IMPORTANT: Your response MUST be valid JSON only, with no additional text before or after.
 
@@ -220,23 +237,31 @@ function parseJsonResponse(responseText: string): any {
 
 /**
  * Create a fallback analysis result when parsing fails
+ * IMPORTANT: Default to conservative (mild) severity to avoid over-triaging
  */
 function createFallbackAnalysis(rawText: string, language: 'en' | 'ar'): VisualSymptomAnalysis {
   const isArabic = language === 'ar';
   
-  // Try to extract some useful information from the raw text
-  const hasUrgentKeywords = /urgent|emergency|immediate|critical|severe|خطير|طارئ|فوري|حرج/i.test(rawText);
-  const hasMildKeywords = /mild|minor|benign|normal|خفيف|بسيط|طبيعي/i.test(rawText);
+  // Try to extract severity from raw text - BE CONSERVATIVE
+  // Only escalate if there are STRONG indicators of serious conditions
+  const hasCriticalKeywords = /uncontrolled bleeding|sepsis|life-threatening|cardiac|stroke|نزيف غير متحكم|تسمم الدم|يهدد الحياة/i.test(rawText);
+  const hasSevereKeywords = /deep wound|severe infection|pus|high fever|second.?degree burn|جرح عميق|عدوى شديدة|صديد|حمى عالية|حرق درجة ثانية/i.test(rawText);
+  const hasModerateKeywords = /infection|spreading|first.?degree burn|عدوى|منتشر|حرق درجة أولى/i.test(rawText);
   
-  let severity: 'mild' | 'moderate' | 'severe' | 'critical' = 'moderate';
-  let seekCareTimeframe: 'immediate' | 'within_24h' | 'within_week' | 'routine' = 'within_week';
+  // Default to MILD - most visual symptoms are not emergencies
+  let severity: 'mild' | 'moderate' | 'severe' | 'critical' = 'mild';
+  let seekCareTimeframe: 'immediate' | 'within_24h' | 'within_week' | 'routine' = 'routine';
   
-  if (hasUrgentKeywords) {
+  // Only escalate if there are strong indicators
+  if (hasCriticalKeywords) {
+    severity = 'critical';
+    seekCareTimeframe = 'immediate';
+  } else if (hasSevereKeywords) {
     severity = 'severe';
     seekCareTimeframe = 'within_24h';
-  } else if (hasMildKeywords) {
-    severity = 'mild';
-    seekCareTimeframe = 'routine';
+  } else if (hasModerateKeywords) {
+    severity = 'moderate';
+    seekCareTimeframe = 'within_week';
   }
   
   return {
