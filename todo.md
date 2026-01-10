@@ -263,6 +263,7 @@
 
 - [x] Remove white background from logo to show only hexagon shape
 - [ ] BUG: Manus preview panel not displaying website (works on actual 3000 port) - CONFIRMED: Platform issue, not app issue
+- [ ] BUG: Health Library 404 error and "React is not defined" error in patient dashboard
 - [x] Comprehensive app audit - code, functionality, security
 - [x] Fix Visual Symptom Assessment image analysis - improved error handling and Gemini Pro integration
 - [x] Fix Visual Symptom Assessment - minor scratches incorrectly classified as ESI Level 2 Emergent (should be lower severity)
