@@ -1557,3 +1557,13 @@
 - [x] Fix subscription upgrade/downgrade not working when clicking on subscription options
 
 - [x] Develop enhanced top bar for patient dashboard with navigation, user profile, notifications, and quick actions
+
+
+## Replit Deployment
+- [x] Push code to GitHub repository (https://github.com/hyder8891/meditriage-ai)
+- [ ] Import GitHub repository to Replit
+- [ ] Configure Replit environment variables
+- [ ] Set up database connection on Replit
+- [ ] Configure build and run commands
+- [ ] Test deployment on Replit
+- [ ] Verify all features work on Replit deployment
