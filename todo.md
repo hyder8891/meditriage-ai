@@ -233,6 +233,8 @@
 
 ## Current Issues
 
+- [x] Fix health library tab in patient dashboard top bar not working
+
 - [x] Remove messages function from patient dashboard top bar (service no longer in use)
 - [x] Remove Messages page from the application completely
 

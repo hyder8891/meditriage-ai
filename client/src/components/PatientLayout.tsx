@@ -123,11 +123,11 @@ export function PatientLayout({ children, showBackButton = true, title }: Patien
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => setLocation('/patient/medical-literature')}
-                className={location === '/patient/medical-literature' ? 'text-rose-600 bg-rose-50' : ''}
+                onClick={() => setLocation('/patient/health-library')}
+                className={location === '/patient/health-library' ? 'text-rose-600 bg-rose-50' : ''}
               >
                 <BookOpen className="w-4 h-4 mr-2" />
-                {isArabic ? 'المكتبة الطبية' : 'Medical Library'}
+                {isArabic ? 'المكتبة الطبية' : 'Health Library'}
               </Button>
             </div>
 
@@ -244,12 +244,12 @@ export function PatientLayout({ children, showBackButton = true, title }: Patien
               variant="ghost" 
               className="w-full justify-start"
               onClick={() => {
-                setLocation('/patient/medical-literature');
+                setLocation('/patient/health-library');
                 setMobileMenuOpen(false);
               }}
             >
               <BookOpen className="w-4 h-4 mr-3" />
-              {isArabic ? 'المكتبة الطبية' : 'Medical Library'}
+              {isArabic ? 'المكتبة الطبية' : 'Health Library'}
             </Button>
             
             <Button 
