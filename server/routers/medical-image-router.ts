@@ -290,8 +290,11 @@ export const medicalImageRouter = router({
         // Parse JSON response
         let analysisResult: VisualSymptomAnalysis;
         try {
-          // Extract JSON from response
-          const jsonMatch = response.match(/\{[\s\S]*\}/);
+          // Extract JSON from response - get text content from GeminiResult
+          const responseText = typeof response.choices?.[0]?.message?.content === 'string' 
+            ? response.choices[0].message.content 
+            : JSON.stringify(response.choices?.[0]?.message?.content);
+          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
           if (!jsonMatch) {
             throw new Error("No JSON found in response");
           }
@@ -400,7 +403,11 @@ export const medicalImageRouter = router({
         // Parse JSON response
         let analysisResult: VisualSymptomAnalysis;
         try {
-          const jsonMatch = response.match(/\{[\s\S]*\}/);
+          // Extract JSON from response - get text content from GeminiResult
+          const responseText = typeof response.choices?.[0]?.message?.content === 'string' 
+            ? response.choices[0].message.content 
+            : JSON.stringify(response.choices?.[0]?.message?.content);
+          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
           if (!jsonMatch) {
             throw new Error("No JSON found in response");
           }
@@ -460,7 +467,7 @@ export const medicalImageRouter = router({
     )
     .query(async ({ input }) => {
       try {
-        const { url } = await storageGet(input.key, 3600); // 1 hour expiry
+        const { url } = await storageGet(input.key);
         return { url };
       } catch (error) {
         console.error("Get image URL error:", error);

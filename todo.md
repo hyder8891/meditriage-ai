@@ -1540,3 +1540,11 @@
 - [x] Update medical imaging analysis results to use RTL for Arabic
 - [x] Update medical reports to use RTL for Arabic headings and content
 - [x] Ensure all Arabic text renders correctly with proper alignment
+
+## Performance Issues
+- [ ] Investigate slow performance in final recommendation generation
+- [ ] Investigate slow performance in medical imaging analysis
+- [ ] Optimize API calls and processing logic to reduce wait times
+
+
+- [x] Fix visual-assessment feature not working properly (fixed TypeScript errors in medical-image-router.ts - GeminiResult parsing and storageGet signature)

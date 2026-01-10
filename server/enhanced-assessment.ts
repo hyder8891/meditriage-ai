@@ -891,13 +891,4 @@ function translateESIDisposition(disposition: string): string {
   return translations[disposition] || disposition;
 }
 
-// ============================================================================
-// Export
-// ============================================================================
-
-export {
-  StructuredOutcome,
-  ClinicRecommendation,
-  PharmacyRecommendation,
-  HospitalRecommendation
-};
+// Types are already exported inline above
