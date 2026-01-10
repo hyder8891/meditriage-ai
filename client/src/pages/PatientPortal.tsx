@@ -8,7 +8,6 @@ import {
   FileText,
   Search,
   Users,
-  MessageSquare,
   Crown,
   TrendingUp,
   Calendar,
@@ -176,7 +175,7 @@ export default function PatientPortal() {
     { icon: Activity, label: language === 'ar' ? 'لوحة التحكم' : 'Dashboard', path: '/patient/portal' },
 
     { icon: BookOpen, label: language === 'ar' ? 'المكتبة الصحية' : 'Health Library', path: '/patient/health-library' },
-    { icon: MessageSquare, label: language === 'ar' ? 'الرسائل' : 'Messages', path: '/patient/messages' },
+
     { icon: Crown, label: language === 'ar' ? 'الاشتراك' : 'Subscription', path: '/patient/subscription' },
   ];
 
@@ -233,10 +232,7 @@ export default function PatientPortal() {
                   <BookOpen className="w-4 h-4 mr-2" />
                   {language === 'ar' ? 'المكتبة الصحية' : 'Health Library'}
                 </Button>
-                <Button variant="ghost" onClick={() => setLocation('/patient/messages')}>
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  {language === 'ar' ? 'الرسائل' : 'Messages'}
-                </Button>
+
                 <Button variant="ghost" onClick={() => setLocation('/patient/subscription')}>
                   <Crown className="w-4 h-4 mr-2" />
                   {language === 'ar' ? 'الاشتراك' : 'Subscription'}

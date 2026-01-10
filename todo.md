@@ -234,6 +234,7 @@
 ## Current Issues
 
 - [x] Remove messages function from patient dashboard top bar (service no longer in use)
+- [x] Remove Messages page from the application completely
 
 - [x] Fix medical imaging to enforce Arabic language in outcome when Arabic is selected
 

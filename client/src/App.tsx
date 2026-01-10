@@ -49,7 +49,7 @@ const PatientMedications = lazy(() => import("./pages/PatientMedications"));
 const PatientPortal = lazy(() => import("./pages/PatientPortal"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const TestNotifications = lazy(() => import("./pages/TestNotifications"));
-const Messages = lazy(() => import("./pages/Messages"));
+
 const PatientSubscription = lazy(() => import("./pages/PatientSubscription"));
 const PatientProfile = lazy(() => import("./pages/PatientProfile"));
 const DebugUser = lazy(() => import("./pages/DebugUser"));
@@ -120,8 +120,7 @@ function Router() {
         <Route path={"/patient/care-locator"}>
           {() => <ProtectedRoute requiredRole="patient"><CareLocator /></ProtectedRoute>}
         </Route>
-        <Route path={"/messages"} component={Messages} />
-        <Route path={"/patient/messages"} component={Messages} />
+
         <Route path={"/patient/subscription"} component={PatientSubscription} />
         <Route path={"/patient/medications"} component={PatientMedications} />
         <Route path="/patient/portal">
