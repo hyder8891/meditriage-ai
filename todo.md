@@ -1567,3 +1567,5 @@
 - [ ] Configure build and run commands
 - [ ] Test deployment on Replit
 - [ ] Verify all features work on Replit deployment
+
+- [x] Fix OAuth login visibility - user cannot see OAuth login interface despite credentials being configured
