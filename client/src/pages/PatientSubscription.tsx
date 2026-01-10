@@ -9,7 +9,7 @@ import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 
 const PATIENT_PLANS = [
   {
-    id: "free",
+    id: "patient-free",
     name: "Free",
     nameAr: "مجاني",
     price: 0,
@@ -29,7 +29,7 @@ const PATIENT_PLANS = [
     ]
   },
   {
-    id: "lite",
+    id: "patient-lite",
     name: "Lite",
     nameAr: "لايت",
     price: 2.99,
@@ -51,7 +51,7 @@ const PATIENT_PLANS = [
     ]
   },
   {
-    id: "pro",
+    id: "patient-pro",
     name: "Pro",
     nameAr: "برو",
     price: 5.99,
@@ -85,9 +85,15 @@ export default function PatientSubscription() {
   const { data: usage, isLoading: usageLoading } = trpc.b2b2c.subscription.getUsageStats.useQuery();
   
   const upgradeMutation = trpc.b2b2c.subscription.createOrUpgrade.useMutation({
-    onSuccess: () => {
-      alert(language === "ar" ? "تم الترقية بنجاح!" : "Upgraded successfully!");
-      window.location.reload();
+    onSuccess: (data) => {
+      // If there's a checkout URL, redirect to Stripe Checkout
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        // Free plan was activated directly
+        alert(language === "ar" ? "تم الترقية بنجاح!" : "Upgraded successfully!");
+        window.location.reload();
+      }
     },
     onError: (error) => {
       alert(language === "ar" ? `خطأ: ${error.message}` : `Error: ${error.message}`);
@@ -112,7 +118,8 @@ export default function PatientSubscription() {
 
     upgradeMutation.mutate({
       planId: planId,
-      billingCycle: "monthly"
+      billingCycle: "monthly",
+      origin: window.location.origin
     });
   };
 
@@ -122,7 +129,7 @@ export default function PatientSubscription() {
     }
   };
 
-  const currentPlan = subscription?.planType || "free";
+  const currentPlan = subscription?.planType || "patient-free";
   const consultationsUsed = usage?.consultationsUsed || 0;
   const currentPlanData = PATIENT_PLANS.find(p => p.id === currentPlan);
   const consultationsLimit = currentPlanData?.consultations || 3;

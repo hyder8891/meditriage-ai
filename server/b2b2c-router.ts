@@ -1,6 +1,8 @@
 import { router, publicProcedure, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { createCheckoutSession } from "./stripe/checkout";
+import { PATIENT_PLANS, DOCTOR_PLANS } from "./stripe/products";
 import { getDb } from "./db";
 import { 
   doctorPatientRelationships, 
@@ -759,7 +761,7 @@ export const b2b2cRouter = router({
 
         if (!subscription) {
           return {
-            plan: "free",
+            plan: "patient-free",
             consultationsUsed: 0,
             consultationsLimit: 3,
             patientsConnected: 0,
@@ -803,12 +805,13 @@ export const b2b2cRouter = router({
       }),
 
     /**
-     * Create or upgrade subscription
+     * Create or upgrade subscription - redirects to Stripe Checkout for paid plans
      */
     createOrUpgrade: protectedProcedure
       .input(z.object({
         planId: z.string(),
         billingCycle: z.enum(["monthly", "yearly"]),
+        origin: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         if (!ctx.user) {
@@ -839,7 +842,42 @@ export const b2b2cRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid plan ID" });
         }
 
-        // Calculate dates
+        // For paid plans, redirect to Stripe Checkout
+        if (plan.price > 0) {
+          // Determine user role for Stripe
+          const userRole = ctx.user.role === "patient" ? "patient" : 
+                          (ctx.user.role === "doctor" || ctx.user.role === "clinician") ? "doctor" : "patient";
+          
+          // Extract the simple plan ID (e.g., "patient-lite" -> "lite")
+          const simplePlanId = input.planId.replace("patient-", "").replace("doctor-", "");
+          
+          const origin = input.origin || process.env.VITE_FRONTEND_FORGE_API_URL || "https://tabibi.clinic";
+          
+          try {
+            const checkoutUrl = await createCheckoutSession({
+              planId: simplePlanId,
+              userRole: userRole as "patient" | "doctor" | "clinician",
+              userId: ctx.user.id.toString(),
+              userEmail: ctx.user.email || "",
+              userName: ctx.user.name || "",
+              origin,
+            });
+            
+            return { 
+              success: true, 
+              checkoutUrl,
+              message: "Redirecting to payment..." 
+            };
+          } catch (error) {
+            console.error("[Subscription] Stripe checkout error:", error);
+            throw new TRPCError({ 
+              code: "INTERNAL_SERVER_ERROR", 
+              message: "Failed to create checkout session. Please try again." 
+            });
+          }
+        }
+
+        // For free plan, just update the subscription directly
         const now = new Date();
         const nextBillingDate = new Date(now);
         if (input.billingCycle === "monthly") {
