@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { PatientLayout } from "@/components/PatientLayout";
-
+import { Streamdown } from "streamdown";
 
 function PatientMedicalLiteratureContent() {
   const { language } = useLanguage();
@@ -104,8 +104,25 @@ function PatientMedicalLiteratureContent() {
     setSearchTerm(term);
   };
   
-  // Update loading state
-  useEffect(() => {
+  // Update results when search data changes
+  React.useEffect(() => {
+    if (searchData) {
+      setSearchResults(searchData.articles || []);
+      setIsSearching(false);
+      if (searchData.articles?.length === 0) {
+        toast.info(language === 'ar' ? 'لم يتم العثور على نتائج' : 'No results found');
+      }
+    }
+  }, [searchData, language]);
+  
+  React.useEffect(() => {
+    if (searchError) {
+      toast.error(language === 'ar' ? 'فشل البحث' : 'Search failed');
+      setIsSearching(false);
+    }
+  }, [searchError, language]);
+  
+  React.useEffect(() => {
     setIsSearching(searchLoading);
   }, [searchLoading]);
 
@@ -296,7 +313,7 @@ function PatientMedicalLiteratureContent() {
                   </div>
                 ) : (
                   <div className="prose prose-slate max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: simplifiedSummary.replace(/\n/g, '<br/>') }} />
+                    <Streamdown>{simplifiedSummary}</Streamdown>
                   </div>
                 )}
               </CardContent>

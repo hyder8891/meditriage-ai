@@ -50,10 +50,9 @@ export function NotificationBadge() {
               {notifications.map((notification) => (
                 <div
                   key={notification.messageId}
-                  className="cursor-pointer p-4 transition-colors hover:bg-accent"
+                  className="p-4 transition-colors hover:bg-accent"
                   onClick={() => {
                     markAsRead(notification.messageId);
-                    window.location.href = '/patient/messages';
                   }}
                 >
                   <div className="flex items-start justify-between gap-2">

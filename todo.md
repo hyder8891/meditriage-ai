@@ -233,6 +233,8 @@
 
 ## Current Issues
 
+- [x] Remove messages function from patient dashboard top bar (service no longer in use)
+
 - [x] Fix medical imaging to enforce Arabic language in outcome when Arabic is selected
 
 - [x] BUG: AI assessment showing clinic names and references in chat message instead of structured output panel (Fixed - removed clinic data from markdown message, now only in structured resourceMatch field)
@@ -263,10 +265,7 @@
 
 - [x] Remove white background from logo to show only hexagon shape
 - [ ] BUG: Manus preview panel not displaying website (works on actual 3000 port) - CONFIRMED: Platform issue, not app issue
-- [ ] BUG: Health Library 404 error and "React is not defined" error in patient dashboard
 - [x] Comprehensive app audit - code, functionality, security
-- [x] Fix Visual Symptom Assessment image analysis - improved error handling and Gemini Pro integration
-- [x] Fix Visual Symptom Assessment - minor scratches incorrectly classified as ESI Level 2 Emergent (should be lower severity)
 
 ## Audit Findings Summary
 - Fixed 6+ TypeScript errors across multiple files

@@ -4,10 +4,9 @@
  * 
  * Features:
  * - S3 storage integration
- * - Med-Gemini multimodal analysis with Gemini Pro
+ * - Med-Gemini multimodal analysis
  * - Chain-of-Thought reasoning for transparency
  * - Bilingual support (Arabic/English)
- * - Improved error handling and fallback responses
  */
 
 import { z } from "zod";
@@ -102,16 +101,6 @@ ${description ? `وصف المريض: ${description}` : ''}
 الخطوة 4 - الأدلة: اذكر الأدلة الداعمة لكل تشخيص محتمل
 الخطوة 5 - الخلاصة: قدم التقييم النهائي والتوصيات
 
-⚠️ تعليمات مهمة جداً لتحديد الشدة:
-- "mild" (خفيف): خدوش سطحية، كدمات صغيرة، طفح جلدي خفيف، لدغات حشرات عادية، جروح صغيرة ملتئمة
-- "moderate" (متوسط): جروح تحتاج تنظيف، طفح جلدي منتشر، علامات عدوى خفيفة، حروق درجة أولى صغيرة
-- "severe" (شديد): جروح عميقة نازفة، علامات عدوى واضحة (صديد، احمرار شديد، حمى)، حروق درجة ثانية
-- "critical" (حرج): نزيف غير متحكم فيه، علامات تسمم الدم، حروق شديدة، إصابات تهدد الحياة
-
-معظم الإصابات الجلدية البسيطة (خدوش، كدمات، طفح خفيف) يجب تصنيفها كـ "mild"!
-
-هام جداً: يجب أن تكون إجابتك بصيغة JSON صالحة فقط، بدون أي نص إضافي قبلها أو بعدها.
-
 قدم الإجابة بصيغة JSON التالية:
 {
   "description": "وصف تفصيلي بالإنجليزية",
@@ -161,17 +150,6 @@ Step 3 - Differential Diagnosis: Provide a list of possible conditions with prob
 Step 4 - Evidence: State supporting evidence for each potential diagnosis
 Step 5 - Conclusion: Provide final assessment and recommendations
 
-⚠️ CRITICAL SEVERITY GUIDELINES - BE CONSERVATIVE:
-- "mild": Superficial scratches, minor bruises, mild rashes, normal insect bites, small healing wounds, cat scratches, minor abrasions
-- "moderate": Wounds needing cleaning, widespread rash, mild infection signs, small first-degree burns
-- "severe": Deep bleeding wounds, clear infection signs (pus, severe redness, fever), second-degree burns
-- "critical": Uncontrolled bleeding, sepsis signs, severe burns, life-threatening injuries
-
-Most simple skin injuries (scratches, bruises, mild rashes) should be classified as "mild"!
-Do NOT over-triage minor injuries. A simple scratch or abrasion is NOT an emergency.
-
-IMPORTANT: Your response MUST be valid JSON only, with no additional text before or after.
-
 Provide response in the following JSON format:
 {
   "description": "Detailed description in English",
@@ -210,110 +188,6 @@ Provide response in the following JSON format:
 }`;
 
   return prompt;
-}
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-/**
- * Parse JSON from AI response, handling various formats
- */
-function parseJsonResponse(responseText: string): any {
-  // Remove markdown code blocks if present
-  let cleanText = responseText
-    .replace(/```json\s*/gi, '')
-    .replace(/```\s*/g, '')
-    .trim();
-  
-  // Try to find JSON object in the text
-  const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    cleanText = jsonMatch[0];
-  }
-  
-  return JSON.parse(cleanText);
-}
-
-/**
- * Create a fallback analysis result when parsing fails
- * IMPORTANT: Default to conservative (mild) severity to avoid over-triaging
- */
-function createFallbackAnalysis(rawText: string, language: 'en' | 'ar'): VisualSymptomAnalysis {
-  const isArabic = language === 'ar';
-  
-  // Try to extract severity from raw text - BE CONSERVATIVE
-  // Only escalate if there are STRONG indicators of serious conditions
-  const hasCriticalKeywords = /uncontrolled bleeding|sepsis|life-threatening|cardiac|stroke|نزيف غير متحكم|تسمم الدم|يهدد الحياة/i.test(rawText);
-  const hasSevereKeywords = /deep wound|severe infection|pus|high fever|second.?degree burn|جرح عميق|عدوى شديدة|صديد|حمى عالية|حرق درجة ثانية/i.test(rawText);
-  const hasModerateKeywords = /infection|spreading|first.?degree burn|عدوى|منتشر|حرق درجة أولى/i.test(rawText);
-  
-  // Default to MILD - most visual symptoms are not emergencies
-  let severity: 'mild' | 'moderate' | 'severe' | 'critical' = 'mild';
-  let seekCareTimeframe: 'immediate' | 'within_24h' | 'within_week' | 'routine' = 'routine';
-  
-  // Only escalate if there are strong indicators
-  if (hasCriticalKeywords) {
-    severity = 'critical';
-    seekCareTimeframe = 'immediate';
-  } else if (hasSevereKeywords) {
-    severity = 'severe';
-    seekCareTimeframe = 'within_24h';
-  } else if (hasModerateKeywords) {
-    severity = 'moderate';
-    seekCareTimeframe = 'within_week';
-  }
-  
-  return {
-    description: isArabic 
-      ? "تم تحليل الصورة. يرجى مراجعة النتائج أدناه."
-      : "Image analyzed. Please review the findings below.",
-    descriptionAr: "تم تحليل الصورة. يرجى مراجعة النتائج أدناه.",
-    findings: isArabic 
-      ? ["تم اكتشاف أعراض مرئية في الصورة"]
-      : ["Visual symptoms detected in the image"],
-    findingsAr: ["تم اكتشاف أعراض مرئية في الصورة"],
-    severity,
-    possibleConditions: [{
-      name: "Requires professional evaluation",
-      nameAr: "يتطلب تقييم متخصص",
-      probability: 50,
-      reasoning: "Visual analysis suggests consultation with a healthcare provider for accurate diagnosis",
-      reasoningAr: "يشير التحليل البصري إلى ضرورة استشارة مقدم الرعاية الصحية للتشخيص الدقيق"
-    }],
-    recommendations: isArabic
-      ? ["استشر طبيب أمراض جلدية أو مقدم رعاية صحية للتقييم المناسب"]
-      : ["Consult a dermatologist or healthcare provider for proper evaluation"],
-    recommendationsAr: ["استشر طبيب أمراض جلدية أو مقدم رعاية صحية للتقييم المناسب"],
-    warningSignsToWatch: isArabic
-      ? ["تغير في الحجم أو اللون", "ألم متزايد", "علامات العدوى"]
-      : ["Changes in size or color", "Increasing pain", "Signs of infection"],
-    warningSignsToWatchAr: ["تغير في الحجم أو اللون", "ألم متزايد", "علامات العدوى"],
-    seekCareTimeframe,
-    confidence: 60,
-    chainOfThought: [
-      {
-        id: 'step-1',
-        type: 'observation',
-        title: 'Visual Observation',
-        titleAr: 'الملاحظة المرئية',
-        description: 'Image received and processed for visual analysis',
-        descriptionAr: 'تم استلام الصورة ومعالجتها للتحليل البصري',
-        confidence: 70,
-        findings: ['Image processed successfully'],
-        findingsAr: ['تمت معالجة الصورة بنجاح']
-      },
-      {
-        id: 'step-2',
-        type: 'conclusion',
-        title: 'Recommendation',
-        titleAr: 'التوصية',
-        description: 'Professional medical evaluation recommended for accurate diagnosis',
-        descriptionAr: 'يوصى بالتقييم الطبي المتخصص للتشخيص الدقيق',
-        confidence: 60,
-      }
-    ],
-  };
 }
 
 // ============================================================================
@@ -368,7 +242,7 @@ export const medicalImageRouter = router({
     }),
 
   /**
-   * Analyze a medical image for visual symptom assessment using Med-Gemini Pro
+   * Analyze a medical image for visual symptom assessment using Med-Gemini
    */
   analyzeImage: protectedProcedure
     .input(
@@ -388,9 +262,9 @@ export const medicalImageRouter = router({
           input.language
         );
 
-        console.log(`[Medical Image Analysis] Analyzing image with Gemini Pro, body part: ${input.bodyPart || 'unspecified'}, language: ${input.language}`);
+        console.log(`[Medical Image Analysis] Analyzing image with Med-Gemini, body part: ${input.bodyPart || 'unspecified'}`);
 
-        // Use Gemini Pro for multimodal medical analysis
+        // Use Gemini Pro for multimodal analysis
         const response = await invokeGemini({
           messages: [
             {
@@ -404,61 +278,58 @@ export const medicalImageRouter = router({
                   type: 'image_url',
                   image_url: {
                     url: `data:${input.mimeType};base64,${input.imageBase64}`,
-                    detail: 'high',
                   },
                 },
               ],
             },
           ],
-          task: 'medical_imaging', // Uses Gemini Pro automatically
           temperature: 0.3,
           maxTokens: 4000,
-          thinkingBudget: 2048, // Higher thinking budget for complex analysis
         });
-
-        // Extract response text
-        const content = response.choices?.[0]?.message?.content;
-        const responseText = typeof content === 'string' 
-          ? content 
-          : Array.isArray(content) 
-            ? content.map(c => 'text' in c ? c.text : '').join('')
-            : JSON.stringify(content);
-
-        console.log(`[Medical Image Analysis] Raw response length: ${responseText.length} chars`);
 
         // Parse JSON response
         let analysisResult: VisualSymptomAnalysis;
         try {
-          analysisResult = parseJsonResponse(responseText);
-          
-          // Validate required fields
-          if (!analysisResult.description || !analysisResult.findings) {
-            throw new Error("Missing required fields in response");
+          // Extract JSON from response - get text content from GeminiResult
+          const responseText = typeof response.choices?.[0]?.message?.content === 'string' 
+            ? response.choices[0].message.content 
+            : JSON.stringify(response.choices?.[0]?.message?.content);
+          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) {
+            throw new Error("No JSON found in response");
           }
-          
-          // Ensure all arrays exist
-          analysisResult.findings = analysisResult.findings || [];
-          analysisResult.findingsAr = analysisResult.findingsAr || [];
-          analysisResult.recommendations = analysisResult.recommendations || [];
-          analysisResult.recommendationsAr = analysisResult.recommendationsAr || [];
-          analysisResult.warningSignsToWatch = analysisResult.warningSignsToWatch || [];
-          analysisResult.warningSignsToWatchAr = analysisResult.warningSignsToWatchAr || [];
-          analysisResult.possibleConditions = analysisResult.possibleConditions || [];
-          analysisResult.chainOfThought = analysisResult.chainOfThought || [];
-          
-          console.log(`[Medical Image Analysis] Successfully parsed response with ${analysisResult.possibleConditions.length} conditions, confidence: ${analysisResult.confidence}%`);
-          
+          analysisResult = JSON.parse(jsonMatch[0]);
         } catch (parseError) {
-          console.error("[Medical Image Analysis] Failed to parse Gemini response:", parseError);
-          console.error("[Medical Image Analysis] Raw response:", responseText.substring(0, 500));
-          
-          // Create a more informative fallback based on the raw response
-          analysisResult = createFallbackAnalysis(responseText, input.language);
+          console.error("Failed to parse Gemini response:", parseError);
+          // Return a default structured response
+          analysisResult = {
+            description: "Unable to analyze image. Please try again or consult a healthcare provider.",
+            descriptionAr: "تعذر تحليل الصورة. يرجى المحاولة مرة أخرى أو استشارة مقدم الرعاية الصحية.",
+            findings: ["Image analysis inconclusive"],
+            findingsAr: ["تحليل الصورة غير حاسم"],
+            severity: 'moderate',
+            possibleConditions: [],
+            recommendations: ["Consult a healthcare provider for proper evaluation"],
+            recommendationsAr: ["استشر مقدم الرعاية الصحية للتقييم المناسب"],
+            warningSignsToWatch: [],
+            warningSignsToWatchAr: [],
+            seekCareTimeframe: 'within_week',
+            confidence: 30,
+            chainOfThought: [{
+              id: 'error',
+              type: 'conclusion',
+              title: 'Analysis Error',
+              titleAr: 'خطأ في التحليل',
+              description: 'Unable to complete analysis',
+              descriptionAr: 'تعذر إكمال التحليل',
+              confidence: 30,
+            }],
+          };
         }
 
         return analysisResult;
       } catch (error) {
-        console.error("[Medical Image Analysis] Error:", error);
+        console.error("Medical image analysis error:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to analyze image",
@@ -496,7 +367,6 @@ export const medicalImageRouter = router({
         }
         
         // Upload to S3
-        console.log(`[Medical Image] Uploading image for user ${userId}`);
         const { url, key } = await storagePut(fileKey, imageBuffer, input.mimeType);
 
         // Analyze image
@@ -506,7 +376,7 @@ export const medicalImageRouter = router({
           input.language
         );
 
-        console.log(`[Medical Image] Upload and analyze, body part: ${input.bodyPart || 'unspecified'}, language: ${input.language}`);
+        console.log(`[Medical Image] Upload and analyze, body part: ${input.bodyPart || 'unspecified'}`);
 
         const response = await invokeGemini({
           messages: [
@@ -521,56 +391,52 @@ export const medicalImageRouter = router({
                   type: 'image_url',
                   image_url: {
                     url: `data:${input.mimeType};base64,${input.imageBase64}`,
-                    detail: 'high',
                   },
                 },
               ],
             },
           ],
-          task: 'medical_imaging', // Uses Gemini Pro automatically
           temperature: 0.3,
           maxTokens: 4000,
-          thinkingBudget: 2048,
         });
-
-        // Extract response text
-        const content = response.choices?.[0]?.message?.content;
-        const responseText = typeof content === 'string' 
-          ? content 
-          : Array.isArray(content) 
-            ? content.map(c => 'text' in c ? c.text : '').join('')
-            : JSON.stringify(content);
-
-        console.log(`[Medical Image] Raw response length: ${responseText.length} chars`);
 
         // Parse JSON response
         let analysisResult: VisualSymptomAnalysis;
         try {
-          analysisResult = parseJsonResponse(responseText);
-          
-          // Validate required fields
-          if (!analysisResult.description || !analysisResult.findings) {
-            throw new Error("Missing required fields in response");
+          // Extract JSON from response - get text content from GeminiResult
+          const responseText = typeof response.choices?.[0]?.message?.content === 'string' 
+            ? response.choices[0].message.content 
+            : JSON.stringify(response.choices?.[0]?.message?.content);
+          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) {
+            throw new Error("No JSON found in response");
           }
-          
-          // Ensure all arrays exist
-          analysisResult.findings = analysisResult.findings || [];
-          analysisResult.findingsAr = analysisResult.findingsAr || [];
-          analysisResult.recommendations = analysisResult.recommendations || [];
-          analysisResult.recommendationsAr = analysisResult.recommendationsAr || [];
-          analysisResult.warningSignsToWatch = analysisResult.warningSignsToWatch || [];
-          analysisResult.warningSignsToWatchAr = analysisResult.warningSignsToWatchAr || [];
-          analysisResult.possibleConditions = analysisResult.possibleConditions || [];
-          analysisResult.chainOfThought = analysisResult.chainOfThought || [];
-          
-          console.log(`[Medical Image] Successfully parsed response with ${analysisResult.possibleConditions.length} conditions, confidence: ${analysisResult.confidence}%`);
-          
+          analysisResult = JSON.parse(jsonMatch[0]);
         } catch (parseError) {
-          console.error("[Medical Image] Failed to parse Gemini response:", parseError);
-          console.error("[Medical Image] Raw response:", responseText.substring(0, 500));
-          
-          // Create a more informative fallback
-          analysisResult = createFallbackAnalysis(responseText, input.language);
+          console.error("Failed to parse Gemini response:", parseError);
+          analysisResult = {
+            description: "Unable to analyze image. Please try again or consult a healthcare provider.",
+            descriptionAr: "تعذر تحليل الصورة. يرجى المحاولة مرة أخرى أو استشارة مقدم الرعاية الصحية.",
+            findings: ["Image analysis inconclusive"],
+            findingsAr: ["تحليل الصورة غير حاسم"],
+            severity: 'moderate',
+            possibleConditions: [],
+            recommendations: ["Consult a healthcare provider for proper evaluation"],
+            recommendationsAr: ["استشر مقدم الرعاية الصحية للتقييم المناسب"],
+            warningSignsToWatch: [],
+            warningSignsToWatchAr: [],
+            seekCareTimeframe: 'within_week',
+            confidence: 30,
+            chainOfThought: [{
+              id: 'error',
+              type: 'conclusion',
+              title: 'Analysis Error',
+              titleAr: 'خطأ في التحليل',
+              description: 'Unable to complete analysis',
+              descriptionAr: 'تعذر إكمال التحليل',
+              confidence: 30,
+            }],
+          };
         }
 
         return {
@@ -582,7 +448,7 @@ export const medicalImageRouter = router({
           analysis: analysisResult,
         };
       } catch (error) {
-        console.error("[Medical Image] Upload and analysis error:", error);
+        console.error("Medical image upload and analysis error:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to process image",

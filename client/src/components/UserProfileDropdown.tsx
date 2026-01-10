@@ -16,7 +16,6 @@ import {
   User, 
   Settings, 
   LogOut, 
-  MessageSquare, 
   Calendar,
   FileText,
   CreditCard,
@@ -108,10 +107,6 @@ export function UserProfileDropdown() {
             <DropdownMenuItem onClick={() => setLocation("/patient/profile")}>
               <User className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
               <span>{language === 'ar' ? 'ملفي الشخصي' : 'My Profile'}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocation("/patient/messages")}>
-              <MessageSquare className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-              <span>{language === 'ar' ? 'الرسائل' : 'Messages'}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/patient/subscription")}>
               <CreditCard className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />

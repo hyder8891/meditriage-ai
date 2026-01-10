@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { 
   Activity,
   Users,
-  MessageSquare,
   Crown,
   FileText,
   Calendar,
@@ -70,14 +69,6 @@ export function PatientLayout({ children, showBackButton = true, title }: Patien
                 {isArabic ? 'لوحة التحكم' : 'Dashboard'}
               </Button>
 
-
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation('/patient/messages')}
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                {isArabic ? 'الرسائل' : 'Messages'}
-              </Button>
             </div>
 
             <div className="flex items-center gap-3">
