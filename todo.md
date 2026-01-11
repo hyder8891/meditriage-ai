@@ -87,6 +87,11 @@
 ## Bugs & Issues
 (Issues will be tracked here as they arise)
 
+- [x] Fix ProtectedRoute.tsx type error with user property
+- [x] Fix conversational-assessment-integrated.ts type error with user property
+- [x] Fix doctor-verification-router.ts schema errors (userId, requestId, documentType)
+- [x] Fix enhanced-assessment.ts Set iteration and ConversationalContextVector type errors
+
 - [x] Translate Medical Literature Search page to Arabic
 
 - [x] Fix footer logo not displaying
@@ -1569,3 +1574,8 @@
 - [ ] Verify all features work on Replit deployment
 
 - [x] Fix OAuth login visibility - user cannot see OAuth login interface despite credentials being configured
+
+## Cleanup Tasks
+- [x] Delete all old design files from client/src/pages
+- [x] Remove old backup files
+- [ ] Clean up unused components

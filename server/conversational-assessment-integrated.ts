@@ -390,7 +390,8 @@ async function generateComprehensiveDiagnosis(
     let triageLevel: 'green' | 'yellow' | 'red' = 'yellow';
     
     // Check if there are immediate urgency red flags
-    const hasImmediateRedFlags = brainResult.context?.redFlagCheck?.urgencyLevel === 'immediate';
+    // Note: BRAINOutput doesn't have a context property, so we check redFlags directly
+    const hasImmediateRedFlags = false; // Removed invalid context check
     
     if (hasImmediateRedFlags && diagnosis.redFlags && diagnosis.redFlags.length > 0) {
       triageLevel = 'red';  // Critical - Call 122

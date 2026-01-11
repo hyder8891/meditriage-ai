@@ -16,7 +16,7 @@ export const doctorVerificationRouter = router({
    */
   getPendingRequests: protectedProcedure
     .input(z.object({
-      status: z.enum(["pending", "approved", "rejected", "info_requested"]).optional(),
+      status: z.enum(["pending", "approved", "rejected", "under_review", "requires_more_info"]).optional(),
       limit: z.number().min(1).max(100).default(50),
       offset: z.number().min(0).default(0),
     }))
@@ -58,7 +58,7 @@ export const doctorVerificationRouter = router({
           const documents = await db!
             .select()
             .from(doctorVerificationDocuments)
-            .where(eq(doctorVerificationDocuments.requestId, request.id));
+            .where(eq(doctorVerificationDocuments.userId, request.userId));
 
           return {
             request,
@@ -110,7 +110,7 @@ export const doctorVerificationRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Request not found" });
       }
 
-      let newStatus: "approved" | "rejected" | "info_requested";
+      let newStatus: "approved" | "rejected" | "requires_more_info";
       let message: string;
 
       switch (input.action) {
@@ -134,7 +134,7 @@ export const doctorVerificationRouter = router({
           break;
 
         case "request_more_info":
-          newStatus = "info_requested";
+          newStatus = "requires_more_info";
           message = "Additional information requested";
           break;
       }
@@ -196,12 +196,10 @@ export const doctorVerificationRouter = router({
           fullName: input.fullName,
           specialty: input.specialty || null,
           medicalLicenseNumber: input.medicalLicenseNumber,
+          licenseIssuingAuthority: input.hospitalAffiliation || "Unknown",
+          licenseIssueDate: new Date(),
           yearsOfExperience: input.yearsOfExperience || null,
-          hospitalAffiliation: input.hospitalAffiliation || null,
-          bio: input.bio || null,
           status: "pending",
-          createdAt: new Date(),
-          updatedAt: new Date(),
         });
 
       return { success: true, message: "Verification request submitted successfully" };
@@ -228,7 +226,7 @@ export const doctorVerificationRouter = router({
     const documents = await db!
       .select()
       .from(doctorVerificationDocuments)
-      .where(eq(doctorVerificationDocuments.requestId, request.id));
+      .where(eq(doctorVerificationDocuments.userId, ctx.user.id));
 
     return { request, documents };
   }),
@@ -239,7 +237,7 @@ export const doctorVerificationRouter = router({
   uploadDocument: protectedProcedure
     .input(z.object({
       requestId: z.number(),
-      documentType: z.enum(["license", "diploma", "id", "other"]),
+      documentType: z.enum(["national_id", "medical_certificate"]),
       documentUrl: z.string().url(),
       documentName: z.string(),
     }))
@@ -264,11 +262,13 @@ export const doctorVerificationRouter = router({
       await db!
         .insert(doctorVerificationDocuments)
         .values({
-          requestId: input.requestId,
+          userId: ctx.user.id,
           documentType: input.documentType,
-          documentUrl: input.documentUrl,
-          documentName: input.documentName,
-          createdAt: new Date(),
+          fileKey: input.documentUrl, // Using URL as key for now
+          fileUrl: input.documentUrl,
+          fileName: input.documentName,
+          fileSize: 0, // Unknown size
+          mimeType: "application/octet-stream", // Unknown type
         });
 
       return { success: true, message: "Document uploaded successfully" };

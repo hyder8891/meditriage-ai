@@ -41,7 +41,7 @@ export function ProtectedRoute({
       // Redirect based on user role
       if (user?.role === "patient") {
         setLocation("/patient/portal");
-      } else if (user?.role === "admin" || user?.role === "doctor" || user?.role === "clinician" || user?.role === "super_admin") {
+      } else if (user?.role === "doctor" || user?.role === "clinician" || user?.role === "super_admin" || user?.role === "nurse" || user?.role === "clinic_admin") {
         setLocation("/admin/dashboard");
       } else {
         setLocation("/");

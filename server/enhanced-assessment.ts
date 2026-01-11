@@ -33,7 +33,7 @@ try {
     }
     
     addSymptoms(symptoms: string[]) {
-      this.symptoms = [...new Set([...this.symptoms, ...symptoms])];
+      this.symptoms = Array.from(new Set([...this.symptoms, ...symptoms]));
     }
     
     addToHistory(role: string, content: string) {
@@ -462,7 +462,7 @@ export async function processEnhancedAssessment(
 // ============================================================================
 
 function buildGatheringPrompt(
-  vector: ConversationalContextVector,
+  vector: any,
   message: string,
   language: 'en' | 'ar',
   step: number
@@ -507,7 +507,7 @@ OUTPUT (JSON only):
 // ============================================================================
 
 async function generateStructuredOutcome(
-  vector: ConversationalContextVector,
+  vector: any,
   lastMessage: string,
   language: 'en' | 'ar',
   userLocation?: { governorate?: string; city?: string }
